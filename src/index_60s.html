@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Visualization Motion Video | 1-Minute Programmatic Animation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --panel-bg: rgba(18, 22, 34, 0.75);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-indigo: #6366f1;
+      --accent-rose: #f43f5e;
+      --accent-amber: #f59e0b;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 20%, #0d121f 0%, #06080d 100%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      padding: 20px 16px 40px;
+    }
+
+    header {
+      width: 100%;
+      max-width: 1360px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      margin-bottom: 16px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .badge-live::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .author-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .author-note a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+
+    /* Video Frame Container */
+    .viewport-card {
+      width: 100%;
+      max-width: 1360px;
+      position: relative;
+      background: #000000;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85), 0 0 40px rgba(99, 102, 241, 0.12);
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas#motionCanvas {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      cursor: pointer;
+    }
+
+    /* Overlay Overlay Elements */
+    .hud-watermark {
+      position: absolute;
+      top: 20px;
+      left: 24px;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      z-index: 10;
+    }
+
+    .hud-watermark .hud-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.85);
+      text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+    }
+
+    .hud-watermark .hud-sub {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-cyan);
+      text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+    }
+
+    .hud-status-badge {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      pointer-events: none;
+      background: rgba(10, 15, 25, 0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    /* Controller Panel */
+    .controls-panel {
+      width: 100%;
+      max-width: 1360px;
+      margin-top: 16px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .timeline-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .timeline-bar-wrapper {
+      position: relative;
+      width: 100%;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .timeline-track {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .timeline-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6366f1, #06b6d4, #10b981);
+      border-radius: 4px;
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
+    }
+
+    .timeline-thumb {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.8), 0 0 2px rgba(0,0,0,0.8);
+      transform: translateX(-50%);
+      left: 0%;
+      pointer-events: none;
+      transition: transform 0.1s;
+    }
+
+    .timeline-markers {
+      position: absolute;
+      width: 100%;
+      height: 8px;
+      pointer-events: none;
+      top: 8px;
+    }
+
+    .marker-dot {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .marker-dot::after {
+      content: attr(data-label);
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+      font-family: 'JetBrains Mono', monospace;
+      color: rgba(255, 255, 255, 0.4);
+      white-space: nowrap;
+    }
+
+    .buttons-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .left-controls, .right-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      border: none;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #6366f1, #22d3ee);
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.45);
+    }
+
+    .btn-record {
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      color: #fb7185;
+    }
+
+    .btn-record:hover {
+      background: rgba(244, 63, 94, 0.25);
+      border-color: rgba(244, 63, 94, 0.5);
+    }
+
+    .btn-record.recording {
+      background: #f43f5e;
+      color: #ffffff;
+      animation: pulse 1s infinite;
+    }
+
+    .timecode {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+      padding: 0 8px;
+    }
+
+    .timecode b {
+      color: #ffffff;
+    }
+
+    .scene-navigator {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .scene-pill {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .scene-pill:hover, .scene-pill.active {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: rgba(6, 182, 212, 0.4);
+      color: #22d3ee;
+    }
+
+    /* Director Brief Drawer */
+    .director-brief {
+      width: 100%;
+      max-width: 1360px;
+      margin-top: 16px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .brief-col h3 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-cyan);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brief-col p, .brief-col li {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #cbd5e1;
+    }
+
+    .brief-col ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .brief-col li {
+      position: relative;
+      padding-left: 14px;
+      margin-bottom: 4px;
+    }
+
+    .brief-col li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent-indigo);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-group">
+      <span class="badge-live">Director Engine 60FPS</span>
+      <h1>動態圖表視覺化 · 1 分鐘程式動畫</h1>
+    </div>
+    <div class="author-note">
+      Inspired by <a href="https://x.com/guanmo_ai/status/2105146205915283737" target="_blank">@guanmo_ai 觀默 導演層動效系統</a>
+    </div>
+  </header>
+
+  <!-- Video Screen -->
+  <div class="viewport-card" id="viewportCard">
+    <canvas id="motionCanvas" width="1920" height="1080"></canvas>
+    
+    <div class="hud-watermark">
+      <div class="hud-title">Data Visualization Symphony</div>
+      <div class="hud-sub" id="currentShotSub">Shot 0: 起勢 · 混沌到秩序</div>
+    </div>
+
+    <div class="hud-status-badge" id="hudBadge">
+      <span id="fpsReadout">60.0 FPS</span>
+      <span>•</span>
+      <span id="frameCounter">Frame 0 / 3600</span>
+    </div>
+  </div>
+
+  <!-- Player Controls -->
+  <div class="controls-panel">
+    <div class="timeline-row">
+      <div class="timeline-bar-wrapper" id="timelineWrapper">
+        <div class="timeline-track">
+          <div class="timeline-fill" id="timelineFill"></div>
+        </div>
+        <div class="timeline-thumb" id="timelineThumb"></div>
+        <div class="timeline-markers" id="timelineMarkers"></div>
+      </div>
+    </div>
+
+    <div class="buttons-row">
+      <div class="left-controls">
+        <button class="btn btn-primary" id="btnPlayPause">
+          <span id="playIcon">▶</span> 播放 (Play)
+        </button>
+        <button class="btn" id="btnRestart">↺ 重播</button>
+        <button class="btn" id="btnPrevFrame">⏮ -1 幀</button>
+        <button class="btn" id="btnNextFrame">+1 幀 ⏭</button>
+        <div class="timecode">
+          <b id="timeCurrent">00:00.00</b> / <span id="timeTotal">01:00.00</span>
+        </div>
+      </div>
+
+      <div class="right-controls">
+        <button class="btn" id="btnAudioToggle">🔊 音效: 開</button>
+        <select class="btn" id="speedSelect" style="padding: 7px 10px;">
+          <option value="0.25">0.25x 逐幀</option>
+          <option value="0.5">0.5x 慢速</option>
+          <option value="1" selected>1.0x 正常</option>
+          <option value="1.5">1.5x 快速</option>
+        </select>
+        <button class="btn btn-record" id="btnExport">
+          ⏺ 匯出高畫質影片 (.webm)
+        </button>
+      </div>
+    </div>
+
+    <!-- Scene Jump Pill Navigation -->
+    <div class="scene-navigator" id="sceneNav">
+      <!-- Injected dynamically -->
+    </div>
+  </div>
+
+  <!-- Director Brief Inspector -->
+  <div class="director-brief">
+    <div class="brief-col">
+      <h3>🎬 導演層分鏡規劃 (Story Beats)</h3>
+      <p>整片嚴格卡點 120 BPM 節拍網格（每拍 30 幀），涵蓋 6 大數據可視化圖表形態，透過「一形貫穿（Continuous Momentum）」完成不中斷的幾何形變轉場。</p>
+    </div>
+    <div class="brief-col">
+      <h3>⚡ 運動力學系統 (Motion Physics)</h3>
+      <ul>
+        <li><b>預備與衝量：</b>元素蓄力壓縮（Squash & Stretch）再彈跳。</li>
+        <li><b>阻尼彈簧過衝：</b>動態數值使用 Damped Spring 物理公式。</li>
+        <li><b>層級錯相（Staggering）：</b>坐標軸先動、圖形延遲、標籤後隨。</li>
+      </ul>
+    </div>
+    <div class="brief-col">
+      <h3>🎵 程序化音頻合成 (Web Audio)</h3>
+      <p>內建即時音頻合成器，無依賴任何外部 MP3：包含 120BPM 科技感底鼓、電子合成弦樂 Pad、柱體彈射 Whoosh 聲效、散點爆破晶亮音與流向水聲。</p>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * 1-MINUTE PROGRAMMATIC DATA VISUALIZATION MOTION VIDEO
+     * Duration: 60.00 seconds (3600 frames @ 60 FPS)
+     * Tempo: 120 BPM (1 beat = 0.5s = 30 frames, 1 measure = 2.0s = 120 frames)
+     */
+
+    const FPS = 60;
+    const TOTAL_FRAMES = 60 * FPS; // 3600 frames
+    const CANVAS_WIDTH = 1920;
+    const CANVAS_HEIGHT = 1080;
+
+    // Shot Definition
+    const SHOTS = [
+      { id: 0, name: "起勢 · 混沌到秩序", sub: "Raw Data to Dimension Matrix", start: 0, end: 360, color: "#6366f1" },
+      { id: 1, name: "離散對比 · 柱狀賽跑圖", sub: "Bar Chart & Race Dynamics", start: 360, end: 840, color: "#06b6d4" },
+      { id: 2, name: "時間流變 · 時序面積圖", sub: "Line & Gradient Area Flow", start: 840, end: 1320, color: "#10b981" },
+      { id: 3, name: "多維關聯 · 散點氣泡陣列", sub: "Scatter Plot & Correlation Matrix", start: 1320, end: 1800, color: "#f59e0b" },
+      { id: 4, name: "比例構成 · 環形旭日圖", sub: "Donut & Hierarchical Sunburst", start: 1800, end: 2280, color: "#ec4899" },
+      { id: 5, name: "綜合評估 · 六維雷達圖", sub: "Radar & Spider Profile", start: 2280, end: 2760, color: "#8b5cf6" },
+      { id: 6, name: "能量流轉 · 桑基數據流", sub: "Sankey Flow & Resource Allocation", start: 2760, end: 3240, color: "#14b8a6" },
+      { id: 7, name: "終章 · 數據之魂全景收束", sub: "Data Synthesis & Insight Horizon", start: 3240, end: 3600, color: "#f43f5e" }
+    ];
+
+    // Canvas Setup
+    const canvas = document.getElementById("motionCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // State
+    let currentFrame = 0;
+    let isPlaying = false;
+    let playbackSpeed = 1.0;
+    let lastTimestamp = 0;
+    let isAudioMuted = false;
+    let isRecording = false;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+
+    // --- Web Audio Procedural Sound Synthesizer ---
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playKick(time) {
+      if (!audioCtx || isAudioMuted) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        const now = time || audioCtx.currentTime;
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(32, now + 0.12);
+        
+        gain.gain.setValueAtTime(0.7, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        
+        osc.start(now);
+        osc.stop(now + 0.26);
+      } catch(e){}
+    }
+
+    function playHihat(time) {
+      if (!audioCtx || isAudioMuted) return;
+      try {
+        const bufferSize = audioCtx.sampleRate * 0.05;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 7000;
+        
+        const gain = audioCtx.createGain();
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        const now = time || audioCtx.currentTime;
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+        
+        noise.start(now);
+      } catch(e){}
+    }
+
+    function playSynthTone(freq, duration = 0.2, type = 'sine') {
+      if (!audioCtx || isAudioMuted) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e){}
+    }
+
+    function playWhoosh() {
+      if (!audioCtx || isAudioMuted) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(650, audioCtx.currentTime + 0.25);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.32);
+      } catch(e){}
+    }
+
+    // --- Math & Physics Helpers ---
+    function clamp(val, min, max) {
+      return Math.max(min, Math.min(max, val));
+    }
+
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function easeOutBack(t, s = 1.70158) {
+      return 1 + (s + 1) * Math.pow(t - 1, 3) + s * Math.pow(t - 1, 2);
+    }
+
+    function spring(t, stiffness = 120, damping = 12) {
+      if (t <= 0) return 0;
+      if (t >= 1) return 1;
+      const omega = Math.sqrt(stiffness);
+      const zeta = damping / (2 * omega);
+      const omegaD = omega * Math.sqrt(Math.max(0.001, 1 - zeta * zeta));
+      return 1 - Math.exp(-zeta * omega * t * 3.5) * (Math.cos(omegaD * t * 3.5) + (zeta * omega / omegaD) * Math.sin(omegaD * t * 3.5));
+    }
+
+    // --- Procedural Scene Elements / Mock Data ---
+    const barData = [
+      { label: "Cloud Infra", val: 88, color: "#06b6d4", rankT0: 0, rankT1: 1 },
+      { label: "GenAI Models", val: 96, color: "#6366f1", rankT0: 1, rankT1: 0 },
+      { label: "Data Pipeline", val: 64, color: "#10b981", rankT0: 2, rankT1: 3 },
+      { label: "Autonomous Agents", val: 76, color: "#f59e0b", rankT0: 3, rankT1: 2 },
+      { label: "Edge Computing", val: 45, color: "#ec4899", rankT0: 4, rankT1: 4 }
+    ];
+
+    const radarCategories = ["吞吐量", "精確度", "穩定性", "資源利用", "擴展潛力", "回應延遲"];
+    const radarDataA = [0.88, 0.94, 0.76, 0.85, 0.90, 0.72];
+    const radarDataB = [0.65, 0.80, 0.92, 0.70, 0.60, 0.88];
+
+    // Precompute 80 deterministic scatter points
+    const scatterPoints = [];
+    for (let i = 0; i < 75; i++) {
+      const u = (i * 137.5) % 1;
+      const x = 0.15 + 0.7 * ((i * 37) % 100) / 100;
+      const noise = (Math.sin(i * 9.2) * 0.15);
+      const y = clamp(0.1 + x * 0.75 + noise, 0.1, 0.85);
+      const r = 8 + (Math.cos(i * 4.3) * 0.5 + 0.5) * 22;
+      const cat = i % 4;
+      const colors = ["#06b6d4", "#6366f1", "#10b981", "#f59e0b"];
+      scatterPoints.push({ x, y, r, color: colors[cat], id: i });
+    }
+
+    // -------------------------------------------------------------
+    // RENDER PIPELINE: Frame Drawing Function
+    // -------------------------------------------------------------
+    function renderFrame(frame) {
+      ctx.save();
+      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // 1. Unified Atmospheric Background & Key Light (Guanmo's rule: unified key light)
+      const bgGrad = ctx.createRadialGradient(
+        CANVAS_WIDTH * 0.35, CANVAS_HEIGHT * 0.25, 100,
+        CANVAS_WIDTH * 0.5, CANVAS_HEIGHT * 0.5, 1200
+      );
+      bgGrad.addColorStop(0, "#0e1526");
+      bgGrad.addColorStop(0.6, "#070a12");
+      bgGrad.addColorStop(1, "#030408");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // Subtle Background Grid with depth perspective
+      ctx.save();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.035)";
+      ctx.lineWidth = 1;
+      const gridSize = 80;
+      const gridShift = (frame * 0.4) % gridSize;
+      for (let x = -gridSize; x <= CANVAS_WIDTH + gridSize; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x + gridShift, 0);
+        ctx.lineTo(x + gridShift, CANVAS_HEIGHT);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= CANVAS_HEIGHT; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(CANVAS_WIDTH, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Find current active shot
+      let activeShot = SHOTS[0];
+      for (const s of SHOTS) {
+        if (frame >= s.start && frame < s.end) {
+          activeShot = s;
+          break;
+        }
+      }
+      if (frame >= SHOTS[SHOTS.length - 1].end) {
+        activeShot = SHOTS[SHOTS.length - 1];
+      }
+
+      // Render individual Shot modules
+      if (frame < 360) {
+        renderShot0_Genesis(frame);
+      } else if (frame < 840) {
+        renderShot1_BarChart(frame - 360);
+      } else if (frame < 1320) {
+        renderShot2_LineChart(frame - 840);
+      } else if (frame < 1800) {
+        renderShot3_ScatterPlot(frame - 1320);
+      } else if (frame < 2280) {
+        renderShot4_DonutSunburst(frame - 1800);
+      } else if (frame < 2760) {
+        renderShot5_RadarSpider(frame - 2280);
+      } else if (frame < 3240) {
+        renderShot6_Sankey(frame - 2760);
+      } else {
+        renderShot7_Finale(frame - 3240);
+      }
+
+      // Render Global Cinematic Vignette & Grain
+      drawCinematicOverlay();
+
+      ctx.restore();
+
+      // Sound events trigger on key beat boundaries
+      handleAudioBeats(frame);
+    }
+
+    // -------------------------------------------------------------
+    // SHOT 0: 起勢 · 混沌到秩序 (0 - 360 frames / 0.0s - 6.0s)
+    // -------------------------------------------------------------
+    function renderShot0_Genesis(f) {
+      const progress = f / 360;
+      const cx = CANVAS_WIDTH / 2;
+      const cy = CANVAS_HEIGHT / 2;
+
+      // Floating data particles coalescing
+      const pCount = 90;
+      for (let i = 0; i < pCount; i++) {
+        const seed = i * 23.4;
+        const initAngle = seed;
+        const initDist = 800 + Math.sin(seed) * 400;
+        
+        // As time advances, particles converge toward center
+        const convT = easeInOutCubic(clamp((f - 40) / 220, 0, 1));
+        const currentDist = initDist * (1 - convT * 0.75);
+        const currentAngle = initAngle + (1 - convT) * (i % 2 === 0 ? 1 : -1) * 1.5;
+        
+        const px = cx + Math.cos(currentAngle) * currentDist;
+        const py = cy + Math.sin(currentAngle) * currentDist;
+        const alpha = clamp(0.2 + 0.8 * Math.sin(f * 0.05 + i), 0.1, 0.9);
+
+        ctx.fillStyle = i % 3 === 0 ? `rgba(6, 182, 212, ${alpha})` : (i % 3 === 1 ? `rgba(99, 102, 241, ${alpha})` : `rgba(16, 185, 129, ${alpha})`);
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5 + (i % 4), 0, Math.PI * 2);
+        ctx.fill();
+
+        // Connecting lines when getting closer
+        if (convT > 0.4 && i % 3 === 0) {
+          ctx.strokeStyle = `rgba(6, 182, 212, ${(convT - 0.4) * 0.25})`;
+          ctx.beginPath();
+          ctx.moveTo(px, py);
+          ctx.lineTo(cx, cy);
+          ctx.stroke();
+        }
+      }
+
+      // Central Expanding Rings (Anticipation)
+      const ringScale = spring(clamp((f - 120) / 100, 0, 1), 100, 14);
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(ringScale, ringScale);
+      ctx.strokeStyle = "rgba(99, 102, 241, 0.35)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, 180, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(6, 182, 212, 0.25)";
+      ctx.beginPath();
+      ctx.arc(0, 0, 260, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+
+      // Kinetic Typography - Staggered Reveal
+      const titleAlpha = clamp((f - 60) / 60, 0, 1);
+      const titleY = cy - 20 + (1 - easeOutCubic(titleAlpha)) * 40;
+
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.fillStyle = `rgba(255, 255, 255, ${titleAlpha})`;
+      ctx.font = "800 64px 'Plus Jakarta Sans'";
+      ctx.letterSpacing = "0.08em";
+      ctx.shadowColor = "rgba(6, 182, 212, 0.6)";
+      ctx.shadowBlur = 30;
+      ctx.fillText("DATA VISUALIZATION", cx, titleY);
+
+      // Subtitle
+      const subAlpha = clamp((f - 140) / 60, 0, 1);
+      ctx.font = "500 24px 'JetBrains Mono'";
+      ctx.fillStyle = `rgba(148, 163, 184, ${subAlpha})`;
+      ctx.shadowBlur = 0;
+      ctx.fillText("PROGRAMMATIC MOTION ARCHITECTURE", cx, titleY + 60);
+
+      // Shot Outro transition momentum: rapid acceleration collapse
+      if (f > 300) {
+        const transT = (f - 300) / 60;
+        const flashAlpha = easeInOutCubic(transT) * 0.4;
+        ctx.fillStyle = `rgba(6, 182, 212, ${flashAlpha})`;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      }
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------
+    // SHOT 1: 離散對比 · 柱狀賽跑圖 (360 - 840 frames / 6.0s - 14.0s)
+    // -------------------------------------------------------------
+    function renderShot1_BarChart(f) {
+      const cx = CANVAS_WIDTH / 2;
+      const cy = CANVAS_HEIGHT / 2;
+      const originX = 380;
+      const originY = 820;
+      const chartWidth = 1160;
+      const chartHeight = 520;
+
+      drawSceneHeader("01 / CATEGORICAL COMPARISON", "柱狀圖與動態賽跑 · 離散體量與即時排序");
+
+      // Draw Grid Axes with Spring whip
+      const axisT = spring(clamp(f / 60, 0, 1), 120, 14);
+      ctx.save();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(originX, originY);
+      ctx.lineTo(originX + chartWidth * axisT, originY);
+      ctx.stroke();
+
+      // Horizontal dashed guide lines
+      for (let i = 1; i <= 4; i++) {
+        const gy = originY - (chartHeight / 4) * i;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
+        ctx.setLineDash([8, 8]);
+        ctx.beginPath();
+        ctx.moveTo(originX, gy);
+        ctx.lineTo(originX + chartWidth * axisT, gy);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        ctx.fillStyle = "rgba(148, 163, 184, 0.4)";
+        ctx.font = "12px 'JetBrains Mono'";
+        ctx.textAlign = "right";
+        ctx.fillText(`${i * 25}%`, originX - 16, gy + 4);
+      }
+      ctx.restore();
+
+      // Bars Motion: Staggered anticipation squash -> stretch -> spring overshoot
+      const barCount = barData.length;
+      const barSlotWidth = chartWidth / barCount;
+      const barW = 100;
+
+      // Ranking race happens at f = 240 (around 10s mark)
+      const raceT = easeInOutCubic(clamp((f - 240) / 90, 0, 1));
+
+      for (let i = 0; i < barCount; i++) {
+        const item = barData[i];
+        const staggerDelay = i * 12;
+        const itemF = f - staggerDelay;
+        if (itemF <= 0) continue;
+
+        // Position calculation during race (smooth swap)
+        const currentSlot = item.rankT0 * (1 - raceT) + item.rankT1 * raceT;
+        const bx = originX + currentSlot * barSlotWidth + (barSlotWidth - barW) / 2;
+
+        // Spring height growth
+        const growT = spring(clamp(itemF / 70, 0, 1), 90, 11);
+        const targetH = (item.val / 100) * chartHeight;
+        const currentH = targetH * growT;
+
+        // Squash & Stretch physics during fast rise
+        let squashX = 1;
+        if (itemF < 25) {
+          squashX = 1.18 - (itemF / 25) * 0.18; // base squash anticipation
+        } else if (itemF < 60) {
+          squashX = 0.92; // vertical stretch
+        } else {
+          squashX = 1 + (growT - 1) * 0.4; // overshoot wobble
+        }
+
+        ctx.save();
+        ctx.translate(bx + barW / 2, originY);
+        ctx.scale(squashX, 1);
+
+        // Bar Body with high-end linear gradient
+        const barGrad = ctx.createLinearGradient(0, 0, 0, -currentH);
+        barGrad.addColorStop(0, "rgba(255, 255, 255, 0.05)");
+        barGrad.addColorStop(0.7, item.color);
+        barGrad.addColorStop(1, "#ffffff");
+
+        ctx.fillStyle = barGrad;
+        ctx.shadowColor = item.color;
+        ctx.shadowBlur = 18;
+
+        // Rounded top bar
+        const r = 8;
+        ctx.beginPath();
+        ctx.moveTo(-barW / 2, 0);
+        ctx.lineTo(-barW / 2, -currentH + r);
+        ctx.quadraticCurveTo(-barW / 2, -currentH, -barW / 2 + r, -currentH);
+        ctx.lineTo(barW / 2 - r, -currentH);
+        ctx.quadraticCurveTo(barW / 2, -currentH, barW / 2, -currentH + r);
+        ctx.lineTo(barW / 2, 0);
+        ctx.closePath();
+        ctx.fill();
+
+        // Contact Shadow at the base
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.beginPath();
+        ctx.ellipse(0, 4, barW * 0.55, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Top Glowing Edge Highlight
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-barW / 2 + r, -currentH);
+        ctx.lineTo(barW / 2 - r, -currentH);
+        ctx.stroke();
+
+        ctx.restore();
+
+        // Animated Value Counter & Label
+        ctx.save();
+        ctx.textAlign = "center";
+        const valAlpha = clamp((itemF - 30) / 30, 0, 1);
+        ctx.fillStyle = `rgba(255, 255, 255, ${valAlpha})`;
+        ctx.font = "700 20px 'JetBrains Mono'";
+        const displayVal = Math.round(item.val * clamp(itemF / 50, 0, 1));
+        ctx.fillText(`${displayVal}`, bx + barW / 2, originY - currentH - 18);
+
+        // Category Tag
+        ctx.font = "600 14px 'Plus Jakarta Sans'";
+        ctx.fillStyle = `rgba(203, 213, 225, ${valAlpha})`;
+        ctx.fillText(item.label, bx + barW / 2, originY + 32);
+        ctx.restore();
+      }
+
+      // Outro transition: Bar heads connect as anchor points for Shot 2
+      if (f > 420) {
+        const transT = (f - 420) / 60;
+        ctx.strokeStyle = `rgba(16, 185, 129, ${transT * 0.8})`;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let i = 0; i < barCount; i++) {
+          const item = barData[i];
+          const bx = originX + item.rankT1 * barSlotWidth + barSlotWidth / 2;
+          const by = originY - (item.val / 100) * chartHeight;
+          if (i === 0) ctx.moveTo(bx, by);
+          else ctx.lineTo(bx, by);
+        }
+        ctx.stroke();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // SHOT 2: 時間流變 · 時序折線圖 (840 - 1320 frames / 14.0s - 22.0s)
+    // -------------------------------------------------------------
+    function renderShot2_LineChart(f) {
+      drawSceneHeader("02 / TEMPORAL CONTINUITY", "折線圖與漸變面積 · 時間序列與連續趨勢");
+
+      const originX = 320;
+      const originY = 820;
+      const width = 1280;
+      const height = 500;
+
+      // Deterministic wavy trend data points (12 months)
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const linePoints = [];
+      for (let i = 0; i < months.length; i++) {
+        const px = originX + (i / (months.length - 1)) * width;
+        const normY = 0.35 + 0.35 * Math.sin(i * 0.7 + 0.4) + (i / months.length) * 0.25;
+        const py = originY - normY * height;
+        linePoints.push({ x: px, y: py, normY });
+      }
+
+      // Drawing progress of line (elastic trace)
+      const drawProgress = clamp(f / 160, 0, 1);
+      const activeIdx = (months.length - 1) * drawProgress;
+
+      ctx.save();
+      // Draw Bottom Grid
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+      ctx.lineWidth = 1;
+      for (let i = 0; i < months.length; i++) {
+        const pt = linePoints[i];
+        ctx.beginPath();
+        ctx.moveTo(pt.x, originY);
+        ctx.lineTo(pt.x, originY - height);
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(148, 163, 184, 0.5)";
+        ctx.font = "12px 'JetBrains Mono'";
+        ctx.textAlign = "center";
+        ctx.fillText(months[i], pt.x, originY + 28);
+      }
+
+      // Area Fill with continuous animated gradient
+      const endPtIdx = Math.min(months.length - 1, Math.floor(activeIdx) + 1);
+      ctx.beginPath();
+      ctx.moveTo(linePoints[0].x, originY);
+      for (let i = 0; i <= endPtIdx; i++) {
+        const pt = linePoints[i];
+        if (i === 0) ctx.lineTo(pt.x, pt.y);
+        else {
+          const prev = linePoints[i - 1];
+          const mx = (prev.x + pt.x) / 2;
+          ctx.bezierCurveTo(mx, prev.y, mx, pt.y, pt.x, pt.y);
+        }
+      }
+      const lastX = originX + drawProgress * width;
+      const curY = originY - (0.35 + 0.35 * Math.sin(activeIdx * 0.7 + 0.4) + (activeIdx / months.length) * 0.25) * height;
+      ctx.lineTo(lastX, curY);
+      ctx.lineTo(lastX, originY);
+      ctx.closePath();
+
+      const areaGrad = ctx.createLinearGradient(0, originY - height, 0, originY);
+      areaGrad.addColorStop(0, "rgba(16, 185, 129, 0.35)");
+      areaGrad.addColorStop(0.7, "rgba(6, 182, 212, 0.08)");
+      areaGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = areaGrad;
+      ctx.fill();
+
+      // Main Stroke Line
+      ctx.beginPath();
+      for (let i = 0; i <= endPtIdx; i++) {
+        const pt = linePoints[i];
+        if (i === 0) ctx.moveTo(pt.x, pt.y);
+        else {
+          const prev = linePoints[i - 1];
+          const mx = (prev.x + pt.x) / 2;
+          ctx.bezierCurveTo(mx, prev.y, mx, pt.y, pt.x, pt.y);
+        }
+      }
+      ctx.strokeStyle = "#10b981";
+      ctx.lineWidth = 4;
+      ctx.shadowColor = "#10b981";
+      ctx.shadowBlur = 18;
+      ctx.stroke();
+
+      // Tracking Head Cursor (Whoosh & Spotlight)
+      ctx.shadowBlur = 24;
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(lastX, curY, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pulse ring around cursor
+      const pulseR = 12 + (Math.sin(f * 0.2) * 0.5 + 0.5) * 14;
+      ctx.strokeStyle = "rgba(16, 185, 129, 0.6)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(lastX, curY, pulseR, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Floating dynamic HUD Badge attached to current cursor
+      if (drawProgress > 0.15) {
+        ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+        ctx.strokeStyle = "rgba(16, 185, 129, 0.4)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(lastX - 70, curY - 74, 140, 50, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "700 16px 'JetBrains Mono'";
+        ctx.textAlign = "center";
+        const valText = `$${Math.round((1 - (curY - (originY - height)) / height) * 480 + 120)}K`;
+        ctx.fillText(valText, lastX, curY - 45);
+        ctx.font = "500 11px 'Plus Jakarta Sans'";
+        ctx.fillStyle = "#34d399";
+        ctx.fillText("▲ +34.8% YoY", lastX, curY - 30);
+      }
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------
+    // SHOT 3: 多維關聯 · 散點氣泡陣列 (1320 - 1800 frames / 22.0s - 30.0s)
+    // -------------------------------------------------------------
+    function renderShot3_ScatterPlot(f) {
+      drawSceneHeader("03 / MULTIDIMENSIONAL CORRELATION", "散點圖與氣泡陣列 · 相關性分佈與離群聚類");
+
+      const originX = 360;
+      const originY = 820;
+      const width = 1200;
+      const height = 520;
+
+      // Coordinate axes
+      ctx.save();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(originX, originY - height);
+      ctx.lineTo(originX, originY);
+      ctx.lineTo(originX + width, originY);
+      ctx.stroke();
+
+      // Axis labels
+      ctx.fillStyle = "rgba(148, 163, 184, 0.7)";
+      ctx.font = "12px 'JetBrains Mono'";
+      ctx.fillText("X: 研發投入率 (R&D Ratio %)", originX + width - 180, originY + 36);
+      ctx.save();
+      ctx.translate(originX - 36, originY - height + 160);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText("Y: 營收複合成長率 (CAGR %)", 0, 0);
+      ctx.restore();
+
+      // Scatter Points Explosion & Spring Settle
+      const settleT = spring(clamp(f / 90, 0, 1), 90, 12);
+
+      // Trend / Regression Line
+      const regAlpha = clamp((f - 100) / 80, 0, 1);
+      if (regAlpha > 0) {
+        ctx.save();
+        ctx.strokeStyle = `rgba(245, 158, 11, ${regAlpha * 0.8})`;
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([10, 6]);
+        ctx.beginPath();
+        ctx.moveTo(originX + 80, originY - 120);
+        ctx.lineTo(originX + width - 100, originY - height + 80);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // R² indicator
+        ctx.fillStyle = `rgba(245, 158, 11, ${regAlpha})`;
+        ctx.font = "700 13px 'JetBrains Mono'";
+        ctx.fillText("線性迴歸 R² = 0.942 (強正相關)", originX + width - 260, originY - height + 60);
+        ctx.restore();
+      }
+
+      // Render Bubbles with floating breathing physics
+      for (const p of scatterPoints) {
+        // Points explode from previous line position then settle
+        const targetPx = originX + p.x * width;
+        const targetPy = originY - p.y * height;
+        const startPx = originX + p.x * width;
+        const startPy = originY - height * 0.5;
+
+        const curPx = startPx * (1 - settleT) + targetPx * settleT;
+        const curPy = startPy * (1 - settleT) + targetPy * settleT;
+
+        // Subtle floating sine wave
+        const floatY = Math.sin(f * 0.05 + p.id) * 3;
+        const currentR = p.r * settleT;
+
+        ctx.save();
+        ctx.translate(curPx, curPy + floatY);
+
+        // Bubble fill with radial highlight
+        const grad = ctx.createRadialGradient(-currentR * 0.3, -currentR * 0.3, currentR * 0.1, 0, 0, currentR);
+        grad.addColorStop(0, "#ffffff");
+        grad.addColorStop(0.3, p.color);
+        grad.addColorStop(1, "rgba(10, 15, 26, 0.4)");
+
+        ctx.fillStyle = grad;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.arc(0, 0, currentR, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Highlighting significant outliers
+        if (p.id === 18 || p.id === 42) {
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(0, 0, currentR + 6 + Math.sin(f * 0.1) * 3, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "600 11px 'JetBrains Mono'";
+          ctx.fillText("Outlier α", currentR + 10, -5);
+        }
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------
+    // SHOT 4: 比例構成 · 環形旭日圖 (1800 - 2280 frames / 30.0s - 38.0s)
+    // -------------------------------------------------------------
+    function renderShot4_DonutSunburst(f) {
+      drawSceneHeader("04 / PROPORTIONAL HIERARCHY", "環形圖與層級旭日圖 · 整體佔比與深層解構");
+
+      const cx = CANVAS_WIDTH / 2;
+      const cy = CANVAS_HEIGHT / 2 + 30;
+
+      const slices = [
+        { label: "北美市場", pct: 0.38, color: "#6366f1", sub: ["SaaS 22%", "Hard 16%"] },
+        { label: "歐洲市場", pct: 0.26, color: "#06b6d4", sub: ["Enterprise 18%", "Retail 8%"] },
+        { label: "亞太市場", pct: 0.22, color: "#10b981", sub: ["Cloud 14%", "AI 8%"] },
+        { label: "新興市場", pct: 0.14, color: "#f59e0b", sub: ["FinTech 10%", "Other 4%"] }
+      ];
+
+      // Donut opening sweep animation
+      const openT = spring(clamp(f / 90, 0, 1), 100, 13);
+      const innerR = 140;
+      const outerR = 260;
+      const sunburstOuterR = 340;
+
+      // Sunburst bloom delay
+      const sunburstBloomT = easeOutCubic(clamp((f - 120) / 90, 0, 1));
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      // Contact Shadow on floor
+      ctx.save();
+      ctx.scale(1, 0.35);
+      ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+      ctx.beginPath();
+      ctx.arc(0, 750, sunburstOuterR * 1.1, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      let currentAngle = -Math.PI / 2;
+
+      for (let i = 0; i < slices.length; i++) {
+        const sl = slices[i];
+        const sliceAngle = sl.pct * (Math.PI * 2) * openT;
+        const midAngle = currentAngle + sliceAngle / 2;
+
+        // Radial explosion displacement on hover
+        const popDist = Math.sin(f * 0.05 + i) * 6;
+        const popX = Math.cos(midAngle) * popDist;
+        const popY = Math.sin(midAngle) * popDist;
+
+        // Draw Main Donut Segment
+        ctx.save();
+        ctx.translate(popX, popY);
+        ctx.beginPath();
+        ctx.arc(0, 0, outerR, currentAngle, currentAngle + sliceAngle);
+        ctx.arc(0, 0, innerR, currentAngle + sliceAngle, currentAngle, true);
+        ctx.closePath();
+
+        ctx.fillStyle = sl.color;
+        ctx.shadowColor = sl.color;
+        ctx.shadowBlur = 20;
+        ctx.fill();
+
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw Outer Sunburst (Nested decomposition)
+        if (sunburstBloomT > 0) {
+          const sOuter = outerR + (sunburstOuterR - outerR) * sunburstBloomT;
+          ctx.beginPath();
+          ctx.arc(0, 0, sOuter, currentAngle + 0.02, currentAngle + sliceAngle - 0.02);
+          ctx.arc(0, 0, outerR + 10, currentAngle + sliceAngle - 0.02, currentAngle + 0.02, true);
+          ctx.closePath();
+
+          ctx.fillStyle = sl.color + "55"; // translucent
+          ctx.shadowBlur = 0;
+          ctx.fill();
+          ctx.strokeStyle = sl.color;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // Slice Percentage and Label Tag
+        if (openT > 0.8) {
+          const labelDist = sunburstOuterR + 40;
+          const lx = Math.cos(midAngle) * labelDist;
+          const ly = Math.sin(midAngle) * labelDist;
+
+          ctx.save();
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "700 16px 'Plus Jakarta Sans'";
+          ctx.textAlign = lx > 0 ? "left" : "right";
+          ctx.fillText(`${sl.label} ${(sl.pct * 100).toFixed(0)}%`, lx, ly);
+          ctx.font = "12px 'JetBrains Mono'";
+          ctx.fillStyle = "rgba(148, 163, 184, 0.8)";
+          ctx.fillText(sl.sub.join(" • "), lx, ly + 20);
+          ctx.restore();
+        }
+
+        currentAngle += sliceAngle;
+      }
+
+      // Center Core Readout
+      ctx.fillStyle = "#ffffff";
+      ctx.textAlign = "center";
+      ctx.font = "800 38px 'JetBrains Mono'";
+      ctx.fillText("100%", 0, 5);
+      ctx.font = "600 13px 'Plus Jakarta Sans'";
+      ctx.fillStyle = "rgba(148, 163, 184, 0.8)";
+      ctx.fillText("全球市場總份額", 0, 32);
+
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------
+    // SHOT 5: 綜合評估 · 六維雷達圖 (2280 - 2760 frames / 38.0s - 46.0s)
+    // -------------------------------------------------------------
+    function renderShot5_RadarSpider(f) {
+      drawSceneHeader("05 / MULTI-ATTRIBUTE EVALUATION", "雷達圖與蜘蛛網絡 · 多維度綜合能力評估");
+
+      const cx = CANVAS_WIDTH / 2;
+      const cy = CANVAS_HEIGHT / 2 + 30;
+      const maxR = 260;
+      const sides = radarCategories.length;
+
+      // Spider Web Expanding Ripple
+      const rippleT = spring(clamp(f / 80, 0, 1), 110, 14);
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      // Concentric Polygon Rings
+      const rings = 5;
+      for (let r = 1; r <= rings; r++) {
+        const curRadius = (maxR / rings) * r * rippleT;
+        ctx.beginPath();
+        for (let s = 0; s < sides; s++) {
+          const angle = (s / sides) * Math.PI * 2 - Math.PI / 2;
+          const rx = Math.cos(angle) * curRadius;
+          const ry = Math.sin(angle) * curRadius;
+          if (s === 0) ctx.moveTo(rx, ry);
+          else ctx.lineTo(rx, ry);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // Radiating Spokes
+      for (let s = 0; s < sides; s++) {
+        const angle = (s / sides) * Math.PI * 2 - Math.PI / 2;
+        const rx = Math.cos(angle) * maxR * rippleT;
+        const ry = Math.sin(angle) * maxR * rippleT;
+
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(rx, ry);
+        ctx.stroke();
+
+        // Label on vertices
+        if (rippleT > 0.8) {
+          const lx = Math.cos(angle) * (maxR + 45);
+          const ly = Math.sin(angle) * (maxR + 45);
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "600 15px 'Plus Jakarta Sans'";
+          ctx.textAlign = "center";
+          ctx.fillText(radarCategories[s], lx, ly + 5);
+        }
+      }
+
+      // Draw Benchmark Polygon A (e.g. Next-Gen AI System)
+      drawRadarPolygon(radarDataA, "#06b6d4", "rgba(6, 182, 212, 0.35)", rippleT, f, 0);
+
+      // Draw Benchmark Polygon B (e.g. Legacy Model)
+      drawRadarPolygon(radarDataB, "#f43f5e", "rgba(244, 63, 94, 0.2)", rippleT, f, 1.2);
+
+      // Legend in top-right
+      ctx.restore();
+
+      ctx.save();
+      const lx = CANVAS_WIDTH - 420;
+      const ly = 240;
+      ctx.fillStyle = "rgba(15, 23, 42, 0.7)";
+      ctx.roundRect(lx, ly, 220, 90, 10);
+      ctx.fill();
+
+      ctx.fillStyle = "#06b6d4";
+      ctx.fillRect(lx + 20, ly + 25, 16, 16);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "600 13px 'Plus Jakarta Sans'";
+      ctx.fillText("Model Opus (Score: 92.4)", lx + 45, ly + 38);
+
+      ctx.fillStyle = "#f43f5e";
+      ctx.fillRect(lx + 20, ly + 55, 16, 16);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText("Baseline Alpha (Score: 78.1)", lx + 45, ly + 68);
+      ctx.restore();
+    }
+
+    function drawRadarPolygon(data, strokeColor, fillColor, progress, f, phase) {
+      const sides = data.length;
+      const maxR = 260;
+      ctx.beginPath();
+      for (let s = 0; s < sides; s++) {
+        const angle = (s / sides) * Math.PI * 2 - Math.PI / 2;
+        // subtle pulsating vertex
+        const vertexBreathe = Math.sin(f * 0.08 + s + phase) * 0.03;
+        const val = clamp(data[s] + vertexBreathe, 0.1, 1.0) * maxR * progress;
+        const px = Math.cos(angle) * val;
+        const py = Math.sin(angle) * val;
+        if (s === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fillStyle = fillColor;
+      ctx.fill();
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = 3;
+      ctx.shadowColor = strokeColor;
+      ctx.shadowBlur = 18;
+      ctx.stroke();
+
+      // Vertex beads
+      for (let s = 0; s < sides; s++) {
+        const angle = (s / sides) * Math.PI * 2 - Math.PI / 2;
+        const val = data[s] * maxR * progress;
+        const px = Math.cos(angle) * val;
+        const py = Math.sin(angle) * val;
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(px, py, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // SHOT 6: 能量流轉 · 桑基數據流 (2760 - 3240 frames / 46.0s - 54.0s)
+    // -------------------------------------------------------------
+    function renderShot6_Sankey(f) {
+      drawSceneHeader("06 / FLOW & RESOURCE ALLOCATION", "桑基流向圖 · 能量轉移與全鏈路歸因");
+
+      const x0 = 360;
+      const x1 = 960;
+      const x2 = 1560;
+
+      const flowProgress = clamp(f / 120, 0, 1);
+
+      // Source Nodes (Left)
+      const sources = [
+        { name: "Direct Traffic", y: 340, h: 120, color: "#6366f1" },
+        { name: "Organic Search", y: 500, h: 160, color: "#06b6d4" },
+        { name: "Referral Campaign", y: 700, h: 100, color: "#10b981" }
+      ];
+
+      // Intermediate Layer (Mid)
+      const midNodes = [
+        { name: "Active Engaged Users", y: 380, h: 220, color: "#3b82f6" },
+        { name: "Bounced / Dropoff", y: 660, h: 140, color: "#64748b" }
+      ];
+
+      // Conversion Target (Right)
+      const targets = [
+        { name: "Paid Subscription", y: 360, h: 140, color: "#10b981" },
+        { name: "Free Trial Tier", y: 540, h: 110, color: "#f59e0b" },
+        { name: "Churn Pool", y: 690, h: 90, color: "#ef4444" }
+      ];
+
+      // Draw Ribbon Streams (Bézier Flows)
+      function drawFlowRibbon(sY, sH, tY, tH, sX, tX, color, flowP) {
+        const curTX = sX + (tX - sX) * flowP;
+        const cp1x = sX + (tX - sX) * 0.5;
+        const cp2x = sX + (tX - sX) * 0.5;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(sX, sY);
+        ctx.bezierCurveTo(cp1x, sY, cp2x, tY, curTX, tY);
+        ctx.lineTo(curTX, tY + tH);
+        ctx.bezierCurveTo(cp2x, tY + tH, cp1x, sY + sH, sX, sY + sH);
+        ctx.closePath();
+
+        const grad = ctx.createLinearGradient(sX, 0, tX, 0);
+        grad.addColorStop(0, color + "66");
+        grad.addColorStop(1, color + "22");
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Draw Streams: Source -> Mid
+      drawFlowRibbon(sources[0].y, sources[0].h, midNodes[0].y, 100, x0, x1, "#6366f1", flowProgress);
+      drawFlowRibbon(sources[1].y, sources[1].h * 0.75, midNodes[0].y + 100, 120, x0, x1, "#06b6d4", flowProgress);
+      drawFlowRibbon(sources[1].y + sources[1].h * 0.75, sources[1].h * 0.25, midNodes[1].y, 60, x0, x1, "#64748b", flowProgress);
+      drawFlowRibbon(sources[2].y, sources[2].h, midNodes[1].y + 60, 80, x0, x1, "#10b981", flowProgress);
+
+      // Mid -> Target
+      if (flowProgress > 0.4) {
+        const p2 = (flowProgress - 0.4) / 0.6;
+        drawFlowRibbon(midNodes[0].y, 140, targets[0].y, targets[0].h, x1, x2, "#10b981", p2);
+        drawFlowRibbon(midNodes[0].y + 140, 80, targets[1].y, targets[1].h, x1, x2, "#f59e0b", p2);
+        drawFlowRibbon(midNodes[1].y, midNodes[1].h, targets[2].y, targets[2].h, x1, x2, "#ef4444", p2);
+      }
+
+      // Flowing Energy Photons along Ribbons
+      const photonCount = 45;
+      for (let i = 0; i < photonCount; i++) {
+        const seed = i * 7.1;
+        const t = ((f * 0.012 + seed) % 1);
+        const px = x0 + t * (x2 - x0);
+        const py = 420 + Math.sin(t * Math.PI) * 120 + Math.cos(seed) * 80;
+
+        ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = "#38bdf8";
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Draw Vertical Pillar Nodes
+      function drawNodes(list, x) {
+        for (const n of list) {
+          ctx.save();
+          ctx.fillStyle = n.color;
+          ctx.shadowColor = n.color;
+          ctx.shadowBlur = 16;
+          ctx.beginPath();
+          ctx.roundRect(x - 8, n.y, 16, n.h, 6);
+          ctx.fill();
+
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "600 14px 'Plus Jakarta Sans'";
+          ctx.textAlign = x === x0 ? "right" : (x === x2 ? "left" : "center");
+          const tx = x === x0 ? x - 20 : (x === x2 ? x + 24 : x);
+          const ty = n.y + n.h / 2 + 5;
+          ctx.fillText(n.name, tx, ty);
+          ctx.restore();
+        }
+      }
+
+      drawNodes(sources, x0);
+      drawNodes(midNodes, x1);
+      drawNodes(targets, x2);
+    }
+
+    // -------------------------------------------------------------
+    // SHOT 7: 終章 · 數據之魂全景收束 (3240 - 3600 frames / 54.0s - 60.0s)
+    // -------------------------------------------------------------
+    function renderShot7_Finale(f) {
+      const cx = CANVAS_WIDTH / 2;
+      const cy = CANVAS_HEIGHT / 2;
+      const progress = f / 360;
+
+      // Convergence of all chart representations into an isometric rotating hologram
+      const rot = f * 0.015;
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      // 3D Isometric holographic rings
+      for (let i = 0; i < 4; i++) {
+        const r = 240 + i * 80;
+        ctx.save();
+        ctx.rotate(rot * (i % 2 === 0 ? 1 : -1));
+        ctx.scale(1, 0.45);
+        ctx.strokeStyle = i % 2 === 0 ? "rgba(6, 182, 212, 0.35)" : "rgba(99, 102, 241, 0.35)";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([16, 12]);
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Central Luminary Core
+      const coreScale = spring(clamp(f / 90, 0, 1), 100, 14);
+      ctx.scale(coreScale, coreScale);
+
+      const coreGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, 140);
+      coreGrad.addColorStop(0, "#ffffff");
+      coreGrad.addColorStop(0.3, "#06b6d4");
+      coreGrad.addColorStop(0.7, "#6366f1");
+      coreGrad.addColorStop(1, "rgba(0,0,0,0)");
+
+      ctx.fillStyle = coreGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, 140, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Final Brand Statement & Message
+      ctx.restore();
+
+      ctx.save();
+      ctx.textAlign = "center";
+      const settleAlpha = clamp(f / 70, 0, 1);
+
+      ctx.fillStyle = `rgba(255, 255, 255, ${settleAlpha})`;
+      ctx.font = "800 56px 'Plus Jakarta Sans'";
+      ctx.letterSpacing = "0.05em";
+      ctx.shadowColor = "rgba(6, 182, 212, 0.8)";
+      ctx.shadowBlur = 35;
+      ctx.fillText("SEE THE UNSEEN", cx, cy - 20);
+
+      ctx.font = "600 24px 'Plus Jakarta Sans'";
+      ctx.fillStyle = `rgba(52, 211, 153, ${settleAlpha})`;
+      ctx.shadowBlur = 0;
+      ctx.fillText("用頂尖動態圖表 · 喚醒數據的深層靈魂", cx, cy + 40);
+
+      ctx.font = "500 15px 'JetBrains Mono'";
+      ctx.fillStyle = `rgba(148, 163, 184, ${settleAlpha * 0.8})`;
+      ctx.fillText("BAR • LINE • SCATTER • DONUT • RADAR • SANKEY", cx, cy + 85);
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------
+    // Global Cinematic Header and Aesthetic Overlays
+    // -------------------------------------------------------------
+    function drawSceneHeader(category, title) {
+      ctx.save();
+      ctx.fillStyle = "rgba(6, 182, 212, 0.9)";
+      ctx.font = "700 13px 'JetBrains Mono'";
+      ctx.letterSpacing = "0.1em";
+      ctx.fillText(category, 180, 130);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "700 32px 'Plus Jakarta Sans'";
+      ctx.letterSpacing = "-0.01em";
+      ctx.fillText(title, 180, 175);
+      ctx.restore();
+    }
+
+    function drawCinematicOverlay() {
+      // Vignette
+      const vig = ctx.createRadialGradient(
+        CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_HEIGHT * 0.45,
+        CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, CANVAS_WIDTH * 0.75
+      );
+      vig.addColorStop(0, "rgba(0,0,0,0)");
+      vig.addColorStop(1, "rgba(0,0,0,0.65)");
+      ctx.fillStyle = vig;
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // Clean Outer Border Frame
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(40, 40, CANVAS_WIDTH - 80, CANVAS_HEIGHT - 80);
+
+      // Subtle Corner Crosshairs
+      drawCrosshair(40, 40);
+      drawCrosshair(CANVAS_WIDTH - 40, 40);
+      drawCrosshair(40, CANVAS_HEIGHT - 40);
+      drawCrosshair(CANVAS_WIDTH - 40, CANVAS_HEIGHT - 40);
+    }
+
+    function drawCrosshair(x, y) {
+      ctx.strokeStyle = "rgba(6, 182, 212, 0.4)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x - 8, y);
+      ctx.lineTo(x + 8, y);
+      ctx.moveTo(x, y - 8);
+      ctx.lineTo(x, y + 8);
+      ctx.stroke();
+    }
+
+    // -------------------------------------------------------------
+    // Sound Beat Grid Scheduler (120 BPM = 30 frames per beat)
+    // -------------------------------------------------------------
+    let lastPlayedBeat = -1;
+    function handleAudioBeats(f) {
+      if (!isPlaying || isAudioMuted) return;
+      const beat = Math.floor(f / 30);
+      if (beat !== lastPlayedBeat) {
+        lastPlayedBeat = beat;
+
+        // 4-on-the-floor Kick Drum
+        if (beat % 2 === 0) {
+          playKick();
+        } else {
+          playHihat();
+        }
+
+        // Shot transitions trigger whoosh & tonal chime
+        for (const s of SHOTS) {
+          if (f >= s.start && f < s.start + 2) {
+            playWhoosh();
+            playSynthTone(523.25, 0.4, 'triangle'); // C5
+            break;
+          }
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // UI CONTROLS & TIMELINE INTERACTION
+    // -------------------------------------------------------------
+    const btnPlayPause = document.getElementById("btnPlayPause");
+    const playIcon = document.getElementById("playIcon");
+    const btnRestart = document.getElementById("btnRestart");
+    const btnPrevFrame = document.getElementById("btnPrevFrame");
+    const btnNextFrame = document.getElementById("btnNextFrame");
+    const timeCurrent = document.getElementById("timeCurrent");
+    const frameCounter = document.getElementById("frameCounter");
+    const timelineWrapper = document.getElementById("timelineWrapper");
+    const timelineFill = document.getElementById("timelineFill");
+    const timelineThumb = document.getElementById("timelineThumb");
+    const timelineMarkers = document.getElementById("timelineMarkers");
+    const currentShotSub = document.getElementById("currentShotSub");
+    const btnAudioToggle = document.getElementById("btnAudioToggle");
+    const speedSelect = document.getElementById("speedSelect");
+    const sceneNav = document.getElementById("sceneNav");
+    const btnExport = document.getElementById("btnExport");
+
+    // Initialize Scene Jump Pills
+    SHOTS.forEach((shot, idx) => {
+      const pill = document.createElement("button");
+      pill.className = "scene-pill" + (idx === 0 ? " active" : "");
+      pill.textContent = `[${idx}] ${shot.name.split('·')[0].trim()}`;
+      pill.addEventListener("click", () => {
+        initAudio();
+        seekToFrame(shot.start);
+      });
+      sceneNav.appendChild(pill);
+
+      // Marker on timeline
+      const mark = document.createElement("div");
+      mark.className = "marker-dot";
+      mark.style.left = `${(shot.start / TOTAL_FRAMES) * 100}%`;
+      mark.setAttribute("data-label", `S${idx}`);
+      timelineMarkers.appendChild(mark);
+    });
+
+    function updateUI() {
+      const pct = (currentFrame / TOTAL_FRAMES) * 100;
+      timelineFill.style.width = `${pct}%`;
+      timelineThumb.style.left = `${pct}%`;
+
+      const sec = currentFrame / FPS;
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = Math.floor(sec % 60).toString().padStart(2, '0');
+      const ms = Math.floor((sec % 1) * 100).toString().padStart(2, '0');
+      timeCurrent.innerHTML = `<b>${m}:${s}.${ms}</b>`;
+      frameCounter.textContent = `Frame ${currentFrame} / ${TOTAL_FRAMES}`;
+
+      // Update Active Shot
+      let activeIdx = 0;
+      SHOTS.forEach((shot, idx) => {
+        if (currentFrame >= shot.start && currentFrame < shot.end) {
+          activeIdx = idx;
+        }
+      });
+      const current = SHOTS[activeIdx];
+      currentShotSub.textContent = `Shot ${current.id}: ${current.name} · ${current.sub}`;
+
+      // Update Pill Highlight
+      const pills = sceneNav.querySelectorAll(".scene-pill");
+      pills.forEach((p, i) => {
+        if (i === activeIdx) p.classList.add("active");
+        else p.classList.remove("active");
+      });
+    }
+
+    function seekToFrame(f) {
+      currentFrame = clamp(f, 0, TOTAL_FRAMES - 1);
+      renderFrame(currentFrame);
+      updateUI();
+    }
+
+    function togglePlay() {
+      initAudio();
+      isPlaying = !isPlaying;
+      if (isPlaying) {
+        if (currentFrame >= TOTAL_FRAMES - 1) currentFrame = 0;
+        playIcon.textContent = "⏸";
+        btnPlayPause.childNodes[2].textContent = " 暫停 (Pause)";
+        lastTimestamp = performance.now();
+        requestAnimationFrame(animationLoop);
+      } else {
+        playIcon.textContent = "▶";
+        btnPlayPause.childNodes[2].textContent = " 播放 (Play)";
+      }
+    }
+
+    function animationLoop(timestamp) {
+      if (!isPlaying) return;
+
+      const delta = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+
+      // Advance frames based on actual elapsed time and playback speed
+      const framesToAdvance = delta * FPS * playbackSpeed;
+      currentFrame += framesToAdvance;
+
+      if (currentFrame >= TOTAL_FRAMES) {
+        currentFrame = TOTAL_FRAMES - 1;
+        isPlaying = false;
+        playIcon.textContent = "▶";
+        btnPlayPause.childNodes[2].textContent = " 重新播放";
+        renderFrame(currentFrame);
+        updateUI();
+        if (isRecording) stopRecording();
+        return;
+      }
+
+      renderFrame(Math.floor(currentFrame));
+      updateUI();
+
+      requestAnimationFrame(animationLoop);
+    }
+
+    // Scrubbing timeline
+    let isDragging = false;
+    timelineWrapper.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      handleScrub(e);
+    });
+    window.addEventListener("mousemove", (e) => {
+      if (isDragging) handleScrub(e);
+    });
+    window.addEventListener("mouseup", () => {
+      isDragging = false;
+    });
+
+    function handleScrub(e) {
+      const rect = timelineWrapper.getBoundingClientRect();
+      const x = clamp(e.clientX - rect.left, 0, rect.width);
+      const pct = x / rect.width;
+      seekToFrame(Math.floor(pct * TOTAL_FRAMES));
+    }
+
+    btnPlayPause.addEventListener("click", togglePlay);
+    btnRestart.addEventListener("click", () => seekToFrame(0));
+    btnPrevFrame.addEventListener("click", () => {
+      if (isPlaying) togglePlay();
+      seekToFrame(currentFrame - 1);
+    });
+    btnNextFrame.addEventListener("click", () => {
+      if (isPlaying) togglePlay();
+      seekToFrame(currentFrame + 1);
+    });
+
+    speedSelect.addEventListener("change", (e) => {
+      playbackSpeed = parseFloat(e.target.value);
+    });
+
+    btnAudioToggle.addEventListener("click", () => {
+      initAudio();
+      isAudioMuted = !isAudioMuted;
+      btnAudioToggle.textContent = isAudioMuted ? "🔇 音效: 關" : "🔊 音效: 開";
+    });
+
+    // Canvas click to play/pause
+    canvas.addEventListener("click", togglePlay);
+
+    // --- High-Quality MediaRecorder Video Export ---
+    btnExport.addEventListener("click", () => {
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    });
+
+    function startRecording() {
+      initAudio();
+      isRecording = true;
+      recordedChunks = [];
+      btnExport.classList.add("recording");
+      btnExport.textContent = "⏺ 正在錄製並導出 (Recording...)";
+
+      seekToFrame(0);
+
+      // Create stream from Canvas @ 60fps
+      const stream = canvas.captureStream(60);
+      
+      const options = { mimeType: 'video/webm;codecs=vp9', videoBitsPerSecond: 16000000 };
+      try {
+        mediaRecorder = new MediaRecorder(stream, options);
+      } catch (e) {
+        mediaRecorder = new MediaRecorder(stream);
+      }
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) {
+          recordedChunks.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `DataViz_Motion_1Min_${Date.now()}.webm`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        btnExport.classList.remove("recording");
+        btnExport.textContent = "⏺ 匯出高畫質影片 (.webm)";
+        isRecording = false;
+      };
+
+      mediaRecorder.start();
+      if (!isPlaying) togglePlay();
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+    }
+
+    // Initial First Frame Render
+    renderFrame(0);
+    updateUI();
+  </script>
+</body>
+</html>
