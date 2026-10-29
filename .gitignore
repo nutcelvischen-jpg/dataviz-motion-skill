@@ -1,0 +1,7 @@
+api_key.txt
+gemini_api_key.txt
+*.key
+.DS_Store
+node_modules/
+__pycache__/
+.venv/

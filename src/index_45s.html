@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Atoms | 數據分析可視化 45 秒動態影片</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #f4f4f2;
+      --text-black: #111111;
+      --text-gray: #666666;
+      --accent-orange: #ff5722;
+      --switch-gray: #d4d4d0;
+      --border-light: rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #e8e8e4;
+      color: var(--text-black);
+      font-family: 'Plus Jakarta Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 40px;
+    }
+
+    header {
+      width: 100%;
+      max-width: 1360px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      margin-bottom: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111111;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(255, 87, 34, 0.12);
+      color: var(--accent-orange);
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Video Viewport */
+    .viewport-card {
+      width: 100%;
+      max-width: 1360px;
+      position: relative;
+      background: var(--bg-cream);
+      border-radius: 16px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas#motionCanvas {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      cursor: pointer;
+    }
+
+    /* Controls Panel */
+    .controls-panel {
+      width: 100%;
+      max-width: 1360px;
+      margin-top: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+
+    .timeline-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .timeline-bar-wrapper {
+      position: relative;
+      width: 100%;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .timeline-track {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: #e2e2dc;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .timeline-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-orange);
+      border-radius: 4px;
+    }
+
+    .timeline-thumb {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid var(--accent-orange);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transform: translateX(-50%);
+      left: 0%;
+      pointer-events: none;
+    }
+
+    .buttons-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .left-controls, .right-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      background: #f4f4f2;
+      border: 1px solid #d4d4d0;
+      color: #111111;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .btn:hover {
+      background: #eaeae6;
+      border-color: #bbbbb6;
+    }
+
+    .btn-primary {
+      background: var(--accent-orange);
+      border: none;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: #e64a19;
+    }
+
+    .timecode {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #666666;
+      padding: 0 8px;
+    }
+
+    .timecode b {
+      color: #111111;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-title">
+      <span>數據分析原子 · 45 秒動態視覺化</span>
+      <span class="badge-tag">45s / 120 BPM / 繁體中文版</span>
+    </div>
+    <div style="font-size: 12px; color: #666; font-family: 'JetBrains Mono', monospace;">
+      Inspired by @guanmo_ai Motion Atoms
+    </div>
+  </header>
+
+  <div class="viewport-card">
+    <canvas id="motionCanvas" width="1920" height="1080"></canvas>
+  </div>
+
+  <div class="controls-panel">
+    <div class="timeline-row">
+      <div class="timeline-bar-wrapper" id="timelineWrapper">
+        <div class="timeline-track">
+          <div class="timeline-fill" id="timelineFill"></div>
+        </div>
+        <div class="timeline-thumb" id="timelineThumb"></div>
+      </div>
+    </div>
+
+    <div class="buttons-row">
+      <div class="left-controls">
+        <button class="btn btn-primary" id="btnPlayPause">▶ 播放 (Play)</button>
+        <button class="btn" id="btnRestart">↺ 重播</button>
+        <button class="btn" id="btnPrevFrame">⏮ -1 幀</button>
+        <button class="btn" id="btnNextFrame">+1 幀 ⏭</button>
+        <div class="timecode">
+          <b id="timeCurrent">00:00.00</b> / <span id="timeTotal">00:45.00</span>
+        </div>
+      </div>
+
+      <div class="right-controls">
+        <button class="btn" id="btnAudioToggle">🔊 音效: 開</button>
+        <button class="btn" id="btnExport" style="background: rgba(255, 87, 34, 0.12); color: #ff5722; border-color: rgba(255, 87, 34, 0.3);">
+          ⏺ 匯出高畫質影片 (.webm)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * 45-SECOND DATA ANALYTICS ATOMS (TRADITIONAL CHINESE)
+     * Duration: 45.00 seconds (1350 frames @ 30 FPS / 2700 frames @ 60 FPS)
+     * Tempo: 120 BPM (1 beat = 0.5s = 15 frames at 30fps)
+     */
+
+    const FPS = 30;
+    const TOTAL_FRAMES = 45 * FPS; // 1350 frames
+    const CANVAS_WIDTH = 1920;
+    const CANVAS_HEIGHT = 1080;
+
+    // Atoms Definition (45s schedule)
+    const ATOMS = [
+      {
+        id: 0,
+        num: "00.",
+        title: "原始數據",
+        enTitle: "RAW DATA",
+        summary: "— 尚未結構化的混沌雜訊",
+        formula: "status: unstructured · entropy: high",
+        explanation: "未經清洗與維度切分的原始數據缺乏決策脈絡，容易產生資訊過載與解讀偏差。",
+        start: 0,
+        end: 120, // 0 - 4.0s
+        switchActive: false
+      },
+      {
+        id: 1,
+        num: "01.",
+        title: "離散體量",
+        enTitle: "DISCRETE COMPARISON",
+        summary: "— 橫向對比分類體量與極值差異",
+        formula: "+ rank · variance · Δ = 420K",
+        explanation: "比較不同產品線或部門的絕對產出，快速鎖定高價值貢獻者與極值落差。",
+        start: 120,
+        end: 300, // 4.0 - 10.0s
+        switchActive: true
+      },
+      {
+        id: 2,
+        num: "02.",
+        title: "時序趨勢",
+        enTitle: "TEMPORAL TREND",
+        summary: "— 連續時間序列下的波動與移動平均",
+        formula: "+ trendline · MA7 · seasonality",
+        explanation: "消除短期隨機雜訊，觀察週期性波動、拐點與長期成長動能。",
+        start: 300,
+        end: 480, // 10.0 - 16.0s
+        switchActive: true
+      },
+      {
+        id: 3,
+        num: "03.",
+        title: "相關分佈",
+        enTitle: "CORRELATION MATRIX",
+        summary: "— 挖掘雙變量正負相關性與離群雜訊",
+        formula: "+ pearson R = 0.942 · 3.4σ outlier",
+        explanation: "驗證變量間因果假說，識別異常離群值（Outliers）以防策略誤判。",
+        start: 480,
+        end: 660, // 16.0 - 22.0s
+        switchActive: true
+      },
+      {
+        id: 4,
+        num: "04.",
+        title: "結構佔比",
+        enTitle: "COMPOSITION HIERARCHY",
+        summary: "— 整體與局部的比例拆解及二八法則",
+        formula: "+ pareto 80/20 · normalization",
+        explanation: "檢視二八法則（Pareto Principle），評估各業務單元在總體營收中的份額權重。",
+        start: 660,
+        end: 840, // 22.0 - 28.0s
+        switchActive: true
+      },
+      {
+        id: 5,
+        num: "05.",
+        title: "多維畫像",
+        enTitle: "MULTIVARIATE PROFILE",
+        summary: "— 綜合多指標能力的全面體檢與基準對比",
+        formula: "+ 6-axis std · benchmark 90+",
+        explanation: "跳脫單一維度盲區，綜合評估系統體質，發掘潛在短板與平衡點。",
+        start: 840,
+        end: 1020, // 28.0 - 34.0s
+        switchActive: true
+      },
+      {
+        id: 6,
+        num: "06.",
+        title: "轉化路徑",
+        enTitle: "CONVERSION FUNNEL",
+        summary: "— 追蹤全鏈路轉化流失與流量分流歸因",
+        formula: "+ conservation · CR 14.8% · drop-off",
+        explanation: "追蹤全鏈路轉化效率，精準定位漏斗流失瓶頸與關鍵歸因來源。",
+        start: 1020,
+        end: 1200, // 34.0 - 40.0s
+        switchActive: true
+      },
+      {
+        id: 7,
+        num: "07.",
+        title: "數據洞察",
+        enTitle: "DECISION SYNTHESIS",
+        summary: "— 數據分析原子 · 全鏈路決策閉環",
+        formula: "discrete • trend • correlation • composition • radar • sankey",
+        explanation: "好的數據分析，是讓趨勢一目了然，將數據轉化為確信的商業行動。",
+        start: 1200,
+        end: 1350, // 40.0 - 45.0s
+        switchActive: true
+      }
+    ];
+
+    const SWITCH_LABELS = [
+      "01 柱狀體量",
+      "02 時序趨勢",
+      "03 相關分佈",
+      "04 結構佔比",
+      "05 多維畫像",
+      "06 轉化路徑"
+    ];
+
+    const canvas = document.getElementById("motionCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let currentFrame = 0;
+    let isPlaying = false;
+    let lastTimestamp = 0;
+
+    // --- Math & Spring Helpers ---
+    function clamp(val, min, max) {
+      return Math.max(min, Math.min(max, val));
+    }
+
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function spring(t, stiffness = 120, damping = 12) {
+      if (t <= 0) return 0;
+      if (t >= 1) return 1;
+      const omega = Math.sqrt(stiffness);
+      const zeta = damping / (2 * omega);
+      const omegaD = omega * Math.sqrt(Math.max(0.001, 1 - zeta * zeta));
+      return 1 - Math.exp(-zeta * omega * t * 3.5) * (Math.cos(omegaD * t * 3.5) + (zeta * omega / omegaD) * Math.sin(omegaD * t * 3.5));
+    }
+
+    // --- Deterministic Mock Data ---
+    const barItems = [
+      { name: "旗艦產品 A", val: 940, color: "#ff5722", rank0: 0, rank1: 1 },
+      { name: "SaaS 雲服務", val: 860, color: "#1e293b", rank0: 1, rank1: 0 },
+      { name: "企業顧問案", val: 620, color: "#475569", rank0: 2, rank1: 2 },
+      { name: "數據 API 模組", val: 480, color: "#64748b", rank0: 3, rank1: 4 },
+      { name: "邊緣硬體設備", val: 510, color: "#94a3b8", rank0: 4, rank1: 3 }
+    ];
+
+    const scatterPoints = [];
+    for (let i = 0; i < 55; i++) {
+      const u = (i * 137.5) % 1;
+      const x = 0.12 + 0.76 * ((i * 41) % 100) / 100;
+      const noise = Math.sin(i * 8.3) * 0.12;
+      const y = clamp(0.15 + x * 0.72 + noise, 0.1, 0.9);
+      const r = 6 + (Math.cos(i * 3.7) * 0.5 + 0.5) * 16;
+      const isOutlier = (i === 14 || i === 38);
+      scatterPoints.push({ x, y, r, isOutlier, id: i });
+    }
+
+    // -------------------------------------------------------------
+    // RENDER MAIN FRAME
+    // -------------------------------------------------------------
+    function renderFrame(f) {
+      ctx.save();
+      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // 1. Warm Off-White Minimalist Canvas
+      ctx.fillStyle = "#f5f5f3";
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // Find Active Atom
+      let atom = ATOMS[0];
+      let atomIndex = 0;
+      for (let i = 0; i < ATOMS.length; i++) {
+        if (f >= ATOMS[i].start && f < ATOMS[i].end) {
+          atom = ATOMS[i];
+          atomIndex = i;
+          break;
+        }
+      }
+      if (f >= ATOMS[ATOMS.length - 1].end) {
+        atom = ATOMS[ATOMS.length - 1];
+        atomIndex = ATOMS.length - 1;
+      }
+
+      const atomLocalF = f - atom.start;
+
+      // 2. Top Header Bar
+      drawTopHeader(atomIndex);
+
+      // 3. Left Information & Explanation Column
+      drawLeftInfoColumn(atom, atomLocalF);
+
+      // 4. Center-Right Stage Chart Area
+      drawStageChart(atomIndex, atomLocalF, f);
+
+      // 5. Bottom Switchboard Dock
+      drawBottomSwitchboard(atomIndex, atomLocalF);
+
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------
+    // TOP HEADER BAR
+    // -------------------------------------------------------------
+    function drawTopHeader(atomIdx) {
+      ctx.save();
+      // Thin separator line
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.08)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(80, 75);
+      ctx.lineTo(CANVAS_WIDTH - 80, 75);
+      ctx.stroke();
+
+      // Left Brand Tag
+      ctx.fillStyle = "#111111";
+      ctx.font = "800 13px 'Plus Jakarta Sans'";
+      ctx.letterSpacing = "0.08em";
+      ctx.fillText("DATA ATOMS", 80, 52);
+
+      ctx.fillStyle = "#888888";
+      ctx.font = "500 13px 'Noto Sans TC'";
+      ctx.fillText("數據分析原子 · ONE MORE DIMENSION", 195, 52);
+
+      // Right Status Readout
+      ctx.textAlign = "right";
+      const displayIdx = Math.min(6, atomIdx);
+      ctx.fillStyle = "#555555";
+      ctx.font = "500 13px 'Noto Sans TC'";
+      ctx.fillText(`原子 ${displayIdx} / 6`, CANVAS_WIDTH - 150, 52);
+
+      ctx.font = "600 13px 'JetBrains Mono'";
+      ctx.fillStyle = "#888888";
+      ctx.fillText("·  120 BPM", CANVAS_WIDTH - 80, 52);
+
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------
+    // LEFT INFORMATION & EXPLANATION COLUMN
+    // -------------------------------------------------------------
+    function drawLeftInfoColumn(atom, localF) {
+      ctx.save();
+      const leftX = 120;
+      const topY = 280;
+
+      const enterT = easeOutCubic(clamp(localF / 25, 0, 1));
+      const transY = (1 - enterT) * 20;
+
+      ctx.translate(0, transY);
+
+      // Giant Number with Orange Dot (Reference Video Style)
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 100px 'Plus Jakarta Sans'";
+      ctx.letterSpacing = "-0.04em";
+      ctx.fillText(atom.num.replace('.', ''), leftX, topY);
+
+      const numWidth = ctx.measureText(atom.num.replace('.', '')).width;
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.arc(leftX + numWidth + 16, topY - 14, 11, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bold Title in Traditional Chinese
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 48px 'Noto Sans TC'";
+      ctx.fillText(atom.title, leftX, topY + 70);
+
+      // English Subtitle
+      ctx.fillStyle = "#888888";
+      ctx.font = "700 15px 'JetBrains Mono'";
+      ctx.letterSpacing = "0.15em";
+      ctx.fillText(atom.enTitle, leftX, topY + 105);
+
+      // Core Summary Line with Orange Dash
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "700 20px 'Noto Sans TC'";
+      ctx.fillText("—", leftX, topY + 160);
+
+      ctx.fillStyle = "#222222";
+      ctx.fillText(atom.summary.replace('— ', ''), leftX + 32, topY + 160);
+
+      // Technical Parameter / Formula
+      ctx.fillStyle = "#777777";
+      ctx.font = "500 15px 'JetBrains Mono'";
+      ctx.fillText(atom.formula, leftX, topY + 200);
+
+      // Analytical Explanation Box (Side Explanation Box)
+      const boxY = topY + 245;
+      const boxW = 500;
+      const boxH = 150;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.08)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(leftX, boxY, boxW, boxH, 12);
+      ctx.fill();
+      ctx.stroke();
+
+      // Orange Left Accent Stripe
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.roundRect(leftX, boxY, 5, boxH, [12, 0, 0, 12]);
+      ctx.fill();
+
+      // Explanation Header
+      ctx.fillStyle = "#111111";
+      ctx.font = "700 15px 'Noto Sans TC'";
+      ctx.fillText("💡 分析解讀指引 (Analytical Insight)", leftX + 24, boxY + 36);
+
+      // Wrapped Explanation Text
+      ctx.fillStyle = "#444444";
+      ctx.font = "400 15px/1.7 'Noto Sans TC'";
+      wrapText(ctx, atom.explanation, leftX + 24, boxY + 70, boxW - 48, 26);
+
+      ctx.restore();
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      let line = '';
+      for (let i = 0; i < text.length; i++) {
+        const testLine = line + text[i];
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && i > 0) {
+          ctx.fillText(line, x, y);
+          line = text[i];
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, y);
+    }
+
+    // -------------------------------------------------------------
+    // STAGE CHART AREA
+    // -------------------------------------------------------------
+    function drawStageChart(atomIdx, localF, globalF) {
+      ctx.save();
+      const stageX = 700;
+      const stageY = 160;
+      const stageW = 1100;
+      const stageH = 700;
+
+      // Ground Base Line (Reference video style: clean timeline 0 --- 1)
+      const baseLineY = 740;
+      ctx.strokeStyle = "#111111";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(stageX + 40, baseLineY);
+      ctx.lineTo(stageX + stageW - 40, baseLineY);
+      ctx.stroke();
+
+      // Tick markers at 0 and 1
+      drawTick(stageX + 40, baseLineY, "0");
+      drawTick(stageX + stageW - 40, baseLineY, "1");
+
+      if (atomIdx === 0) {
+        renderStage0_Raw(stageX, stageY, stageW, stageH, localF);
+      } else if (atomIdx === 1) {
+        renderStage1_Bars(stageX, stageY, stageW, stageH, localF);
+      } else if (atomIdx === 2) {
+        renderStage2_Line(stageX, stageY, stageW, stageH, localF);
+      } else if (atomIdx === 3) {
+        renderStage3_Scatter(stageX, stageY, stageW, stageH, localF);
+      } else if (atomIdx === 4) {
+        renderStage4_Donut(stageX, stageY, stageW, stageH, localF);
+      } else if (atomIdx === 5) {
+        renderStage5_Radar(stageX, stageY, stageW, stageH, localF);
+      } else if (atomIdx === 6) {
+        renderStage6_Sankey(stageX, stageY, stageW, stageH, localF);
+      } else {
+        renderStage7_Synthesis(stageX, stageY, stageW, stageH, localF);
+      }
+
+      ctx.restore();
+    }
+
+    function drawTick(x, y, label) {
+      ctx.strokeStyle = "#111111";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x, y - 6);
+      ctx.lineTo(x, y + 6);
+      ctx.stroke();
+
+      ctx.fillStyle = "#666666";
+      ctx.font = "500 13px 'JetBrains Mono'";
+      ctx.textAlign = "center";
+      ctx.fillText(label, x, y + 26);
+    }
+
+    // --- Chart 0: Raw Data Floating ---
+    function renderStage0_Raw(x, y, w, h, f) {
+      const baseY = 740;
+      const count = 35;
+      for (let i = 0; i < count; i++) {
+        const seed = i * 17.3;
+        const normX = ((i * 31) % 100) / 100;
+        const px = x + 80 + normX * (w - 160);
+        const floatY = Math.sin(f * 0.08 + seed) * 40;
+        const py = baseY - 120 + floatY;
+
+        ctx.fillStyle = i % 2 === 0 ? "#1e293b" : "#ff5722";
+        ctx.beginPath();
+        ctx.arc(px, py, 6 + (i % 5), 0, Math.PI * 2);
+        ctx.fill();
+
+        // Raw hex values
+        ctx.fillStyle = "#888888";
+        ctx.font = "11px 'JetBrains Mono'";
+        ctx.fillText(`0x${(i * 47).toString(16)}`, px - 14, py - 14);
+      }
+    }
+
+    // --- Chart 1: Bar Comparison ---
+    function renderStage1_Bars(x, y, w, h, f) {
+      const baseY = 740;
+      const chartH = 460;
+      const originX = x + 100;
+      const availW = w - 200;
+      const slotW = availW / barItems.length;
+      const barW = 86;
+
+      // Race swap happens at local frame 90
+      const raceT = easeInOutCubic(clamp((f - 90) / 45, 0, 1));
+
+      // Benchmark Average Line
+      const avgY = baseY - (680 / 1000) * chartH;
+      ctx.save();
+      ctx.strokeStyle = "#ff5722";
+      ctx.setLineDash([8, 6]);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(originX - 30, avgY);
+      ctx.lineTo(originX + availW + 30, avgY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "700 13px 'Noto Sans TC'";
+      ctx.textAlign = "right";
+      ctx.fillText("行業基準線 $680K", originX - 40, avgY + 4);
+      ctx.restore();
+
+      for (let i = 0; i < barItems.length; i++) {
+        const item = barItems[i];
+        const itemSlot = item.rank0 * (1 - raceT) + item.rank1 * raceT;
+        const bx = originX + itemSlot * slotW + (slotW - barW) / 2;
+
+        const growT = spring(clamp((f - i * 6) / 40, 0, 1), 90, 11);
+        const curH = (item.val / 1000) * chartH * growT;
+
+        ctx.save();
+        ctx.translate(bx + barW / 2, baseY);
+
+        // Bar Fill
+        ctx.fillStyle = item.color;
+        ctx.beginPath();
+        ctx.roundRect(-barW / 2, -curH, barW, curH, [8, 8, 0, 0]);
+        ctx.fill();
+
+        // Contact Shadow
+        ctx.fillStyle = "rgba(0,0,0,0.12)";
+        ctx.beginPath();
+        ctx.ellipse(0, 3, barW * 0.45, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Value text
+        ctx.save();
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#111111";
+        ctx.font = "800 18px 'JetBrains Mono'";
+        const displayVal = Math.round(item.val * clamp((f - i * 6) / 35, 0, 1));
+        ctx.fillText(`$${displayVal}K`, bx + barW / 2, baseY - curH - 14);
+
+        ctx.font = "600 13px 'Noto Sans TC'";
+        ctx.fillStyle = "#555555";
+        ctx.fillText(item.name, bx + barW / 2, baseY + 30);
+        ctx.restore();
+      }
+
+      // Floating Callout Badge on Peak
+      const peakX = originX + (barItems[0].rank0 * (1 - raceT) + barItems[0].rank1 * raceT) * slotW + slotW / 2;
+      const peakY = baseY - (barItems[0].val / 1000) * chartH;
+      drawCalloutBadge(peakX, peakY - 45, "核心貢獻 +38% 營收佔比");
+    }
+
+    // --- Chart 2: Line & Moving Average ---
+    function renderStage2_Line(x, y, w, h, f) {
+      const baseY = 740;
+      const chartH = 460;
+      const originX = x + 100;
+      const availW = w - 200;
+
+      const pts = 12;
+      const lineData = [];
+      for (let i = 0; i < pts; i++) {
+        const px = originX + (i / (pts - 1)) * availW;
+        const normY = 0.3 + 0.35 * Math.sin(i * 0.8 + 0.2) + (i / pts) * 0.3;
+        const py = baseY - normY * chartH;
+        lineData.push({ x: px, y: py });
+      }
+
+      const progress = clamp(f / 70, 0, 1);
+      const activeIdx = (pts - 1) * progress;
+      const endI = Math.min(pts - 1, Math.floor(activeIdx) + 1);
+
+      // Area fill
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(lineData[0].x, baseY);
+      for (let i = 0; i <= endI; i++) {
+        const pt = lineData[i];
+        if (i === 0) ctx.lineTo(pt.x, pt.y);
+        else {
+          const prev = lineData[i - 1];
+          const mx = (prev.x + pt.x) / 2;
+          ctx.bezierCurveTo(mx, prev.y, mx, pt.y, pt.x, pt.y);
+        }
+      }
+      const curX = originX + progress * availW;
+      const curY = baseY - (0.3 + 0.35 * Math.sin(activeIdx * 0.8 + 0.2) + (activeIdx / pts) * 0.3) * chartH;
+      ctx.lineTo(curX, curY);
+      ctx.lineTo(curX, baseY);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(255, 87, 34, 0.12)";
+      ctx.fill();
+
+      // Line Stroke
+      ctx.beginPath();
+      for (let i = 0; i <= endI; i++) {
+        const pt = lineData[i];
+        if (i === 0) ctx.moveTo(pt.x, pt.y);
+        else {
+          const prev = lineData[i - 1];
+          const mx = (prev.x + pt.x) / 2;
+          ctx.bezierCurveTo(mx, prev.y, mx, pt.y, pt.x, pt.y);
+        }
+      }
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Tracking Head Cursor with Pulse
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(curX, curY, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Tooltip Card
+      if (progress > 0.2) {
+        drawCalloutBadge(curX, curY - 35, "拐點向上：Q3 突破 7日均線");
+      }
+      ctx.restore();
+    }
+
+    // --- Chart 3: Scatter Plot ---
+    function renderStage3_Scatter(x, y, w, h, f) {
+      const baseY = 740;
+      const chartH = 460;
+      const originX = x + 100;
+      const availW = w - 200;
+
+      const settleT = spring(clamp(f / 45, 0, 1), 90, 12);
+
+      // Linear Regression Line
+      ctx.save();
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([8, 6]);
+      ctx.beginPath();
+      ctx.moveTo(originX + 40, baseY - 80);
+      ctx.lineTo(originX + availW - 40, baseY - chartH + 60);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      // Points
+      for (const p of scatterPoints) {
+        const px = originX + p.x * availW;
+        const py = baseY - p.y * chartH * settleT;
+        const r = p.r * settleT;
+
+        ctx.save();
+        ctx.fillStyle = p.isOutlier ? "#ff5722" : "#1e293b";
+        ctx.beginPath();
+        ctx.arc(px, py, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (p.isOutlier) {
+          ctx.strokeStyle = "#ff5722";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(px, py, r + 6 + Math.sin(f * 0.2) * 3, 0, Math.PI * 2);
+          ctx.stroke();
+
+          drawCalloutBadge(px, py - 28, "異常離群值 (+3.4σ 突波)");
+        }
+        ctx.restore();
+      }
+    }
+
+    // --- Chart 4: Donut Composition ---
+    function renderStage4_Donut(x, y, w, h, f) {
+      const cx = x + w / 2;
+      const cy = 480;
+      const openT = spring(clamp(f / 45, 0, 1), 90, 13);
+
+      const slices = [
+        { label: "旗艦自營業務", pct: 0.42, color: "#ff5722" },
+        { label: "企業 SaaS 訂閱", pct: 0.28, color: "#1e293b" },
+        { label: "生態合作夥伴", pct: 0.18, color: "#475569" },
+        { label: "海外長尾流量", pct: 0.12, color: "#94a3b8" }
+      ];
+
+      const outerR = 210;
+      const innerR = 120;
+      let angle = -Math.PI / 2;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      for (let i = 0; i < slices.length; i++) {
+        const sl = slices[i];
+        const span = sl.pct * Math.PI * 2 * openT;
+
+        ctx.save();
+        ctx.fillStyle = sl.color;
+        ctx.beginPath();
+        ctx.arc(0, 0, outerR, angle, angle + span);
+        ctx.arc(0, 0, innerR, angle + span, angle, true);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        // Label Callout on the largest slice
+        if (i === 0 && openT > 0.8) {
+          const midA = angle + span / 2;
+          const lx = Math.cos(midA) * (outerR + 50);
+          const ly = Math.sin(midA) * (outerR + 50);
+          ctx.save();
+          ctx.fillStyle = "#111111";
+          ctx.font = "800 16px 'Noto Sans TC'";
+          ctx.fillText("二八法則：佔比 42%", lx, ly);
+          ctx.restore();
+        }
+
+        angle += span;
+      }
+
+      // Center Core
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 36px 'JetBrains Mono'";
+      ctx.textAlign = "center";
+      ctx.fillText("100%", 0, 8);
+      ctx.font = "600 13px 'Noto Sans TC'";
+      ctx.fillStyle = "#666666";
+      ctx.fillText("總體營收結構", 0, 32);
+
+      ctx.restore();
+    }
+
+    // --- Chart 5: Radar Spider Profile ---
+    function renderStage5_Radar(x, y, w, h, f) {
+      const cx = x + w / 2;
+      const cy = 480;
+      const maxR = 220;
+      const cats = ["系統效能", "營運成本", "穩定彈性", "成長動能", "使用者體驗", "資安合規"];
+      const actual = [0.92, 0.65, 0.88, 0.94, 0.78, 0.86];
+      const benchmark = [0.80, 0.80, 0.80, 0.80, 0.80, 0.80];
+
+      const rippleT = spring(clamp(f / 45, 0, 1), 90, 13);
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      // Web rings
+      for (let r = 1; r <= 4; r++) {
+        const rad = (maxR / 4) * r * rippleT;
+        ctx.beginPath();
+        for (let s = 0; s < 6; s++) {
+          const a = (s / 6) * Math.PI * 2 - Math.PI / 2;
+          const rx = Math.cos(a) * rad;
+          const ry = Math.sin(a) * rad;
+          if (s === 0) ctx.moveTo(rx, ry);
+          else ctx.lineTo(rx, ry);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = "rgba(0,0,0,0.08)";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // Spokes and labels
+      for (let s = 0; s < 6; s++) {
+        const a = (s / 6) * Math.PI * 2 - Math.PI / 2;
+        ctx.strokeStyle = "rgba(0,0,0,0.12)";
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(Math.cos(a) * maxR, Math.sin(a) * maxR);
+        ctx.stroke();
+
+        ctx.fillStyle = "#222222";
+        ctx.font = "700 14px 'Noto Sans TC'";
+        ctx.textAlign = "center";
+        ctx.fillText(cats[s], Math.cos(a) * (maxR + 32), Math.sin(a) * (maxR + 32) + 5);
+      }
+
+      // Actual Polygon
+      ctx.beginPath();
+      for (let s = 0; s < 6; s++) {
+        const a = (s / 6) * Math.PI * 2 - Math.PI / 2;
+        const val = actual[s] * maxR * rippleT;
+        if (s === 0) ctx.moveTo(Math.cos(a) * val, Math.sin(a) * val);
+        else ctx.lineTo(Math.cos(a) * val, Math.sin(a) * val);
+      }
+      ctx.closePath();
+      ctx.fillStyle = "rgba(255, 87, 34, 0.25)";
+      ctx.fill();
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.restore();
+
+      drawCalloutBadge(cx + 80, cy - 140, "優勢：效能與成長超標；短板：成本偏高");
+    }
+
+    // --- Chart 6: Sankey Funnel Flow ---
+    function renderStage6_Sankey(x, y, w, h, f) {
+      const x0 = x + 120;
+      const x1 = x + w / 2;
+      const x2 = x + w - 120;
+      const flowP = clamp(f / 60, 0, 1);
+
+      // Left Nodes
+      const nL = [
+        { name: "自然流量 45%", y: 320, h: 140, c: "#1e293b" },
+        { name: "付費投放 35%", y: 490, h: 100, c: "#ff5722" },
+        { name: "轉介紹 20%", y: 620, h: 60, c: "#64748b" }
+      ];
+
+      // Mid Node
+      const midY = 360;
+      const midH = 240;
+
+      // Right Nodes
+      const nR = [
+        { name: "成功註冊 55%", y: 330, h: 130, c: "#ff5722" },
+        { name: "流失離開 45%", y: 510, h: 110, c: "#94a3b8" }
+      ];
+
+      // Flow ribbon
+      function drawRibbon(sy, sh, ty, th, sx, tx, color, p) {
+        const curTX = sx + (tx - sx) * p;
+        const cp1x = sx + (tx - sx) * 0.5;
+        const cp2x = sx + (tx - sx) * 0.5;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.bezierCurveTo(cp1x, sy, cp2x, ty, curTX, ty);
+        ctx.lineTo(curTX, ty + th);
+        ctx.bezierCurveTo(cp2x, ty + th, cp1x, sy + sh, sx, sy + sh);
+        ctx.closePath();
+        ctx.fillStyle = color + "44";
+        ctx.fill();
+        ctx.restore();
+      }
+
+      drawRibbon(nL[0].y, nL[0].h, midY, 130, x0, x1, "#1e293b", flowP);
+      drawRibbon(nL[1].y, nL[1].h, midY + 130, 80, x0, x1, "#ff5722", flowP);
+      drawRibbon(nL[2].y, nL[2].h, midY + 210, 30, x0, x1, "#64748b", flowP);
+
+      if (flowP > 0.4) {
+        const p2 = (flowP - 0.4) / 0.6;
+        drawRibbon(midY, 140, nR[0].y, nR[0].h, x1, x2, "#ff5722", p2);
+        drawRibbon(midY + 140, 100, nR[1].y, nR[1].h, x1, x2, "#94a3b8", p2);
+      }
+
+      // Vertical Node Pillars
+      function drawNodeBars(list, nx) {
+        for (const n of list) {
+          ctx.save();
+          ctx.fillStyle = n.c;
+          ctx.beginPath();
+          ctx.roundRect(nx - 8, n.y, 16, n.h, 4);
+          ctx.fill();
+
+          ctx.fillStyle = "#111111";
+          ctx.font = "700 14px 'Noto Sans TC'";
+          ctx.textAlign = nx === x0 ? "right" : (nx === x2 ? "left" : "center");
+          const txPos = nx === x0 ? nx - 18 : (nx === x2 ? nx + 22 : nx);
+          ctx.fillText(n.name, txPos, n.y + n.h / 2 + 5);
+          ctx.restore();
+        }
+      }
+
+      drawNodeBars(nL, x0);
+      drawNodeBars(nR, x2);
+
+      drawCalloutBadge(x1, 310, "流向歸因：付費流量轉化率高出 22%");
+    }
+
+    // --- Chart 7: Grand Synthesis ---
+    function renderStage7_Synthesis(x, y, w, h, f) {
+      const cx = x + w / 2;
+      const cy = 480;
+
+      // Rotating 3D holographic matrix
+      const rot = f * 0.02;
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      for (let i = 0; i < 3; i++) {
+        const rad = 180 + i * 50;
+        ctx.save();
+        ctx.rotate(rot * (i % 2 === 0 ? 1 : -1));
+        ctx.scale(1, 0.4);
+        ctx.strokeStyle = i === 1 ? "#ff5722" : "rgba(0,0,0,0.15)";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([12, 10]);
+        ctx.beginPath();
+        ctx.arc(0, 0, rad, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Center Orange Sphere (The Motion Atom)
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.arc(0, 0, 56, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+
+      // Brand Conclusion Text
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 36px 'Noto Sans TC'";
+      ctx.fillText("好分析，是用圖表洞見真實趨勢", cx, cy + 180);
+
+      ctx.font = "600 16px 'JetBrains Mono'";
+      ctx.fillStyle = "#ff5722";
+      ctx.fillText("6 ATOMS • CONTINUOUS DECISION LOOP", cx, cy + 220);
+      ctx.restore();
+    }
+
+    function drawCalloutBadge(x, y, text) {
+      ctx.save();
+      ctx.font = "700 13px 'Noto Sans TC'";
+      const textW = ctx.measureText(text).width;
+      const boxW = textW + 28;
+      const boxH = 34;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(x - boxW / 2, y - boxH / 2, boxW, boxH, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#ff5722";
+      ctx.textAlign = "center";
+      ctx.fillText(text, x, y + 5);
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------
+    // BOTTOM SWITCHBOARD DOCK
+    // -------------------------------------------------------------
+    function drawBottomSwitchboard(activeIdx, localF) {
+      ctx.save();
+      const dockY = 960;
+      const totalSwitches = SWITCH_LABELS.length;
+      const startX = 280;
+      const spacing = (CANVAS_WIDTH - startX - 160) / (totalSwitches - 1);
+
+      for (let i = 0; i < totalSwitches; i++) {
+        const sx = startX + i * spacing;
+        const isSwitchedOn = (activeIdx > i + 1) || (activeIdx === i + 1 && localF > 8) || (activeIdx === 7);
+
+        // Switch Container Pill (Width: 62, Height: 32)
+        const pillW = 62;
+        const pillH = 32;
+
+        ctx.save();
+        ctx.fillStyle = isSwitchedOn ? "#ff5722" : "#d8d8d4";
+        ctx.beginPath();
+        ctx.roundRect(sx - pillW / 2, dockY - pillH / 2, pillW, pillH, pillH / 2);
+        ctx.fill();
+
+        // Inner White Knob (Diameter: 24)
+        const knobD = 24;
+        const knobLeftX = sx - pillW / 2 + 5 + knobD / 2;
+        const knobRightX = sx + pillW / 2 - 5 - knobD / 2;
+
+        // Slide Animation
+        let knobX = knobLeftX;
+        if (isSwitchedOn) {
+          if (activeIdx === i + 1) {
+            const slideT = spring(clamp((localF - 8) / 25, 0, 1), 120, 12);
+            knobX = knobLeftX + (knobRightX - knobLeftX) * slideT;
+          } else {
+            knobX = knobRightX;
+          }
+        }
+
+        ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = "rgba(0,0,0,0.15)";
+        ctx.shadowBlur = 4;
+        ctx.beginPath();
+        ctx.arc(knobX, dockY, knobD / 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Switch Label Below
+        ctx.save();
+        ctx.textAlign = "center";
+        ctx.fillStyle = isSwitchedOn ? "#111111" : "#888888";
+        ctx.font = isSwitchedOn ? "700 15px 'Noto Sans TC'" : "500 15px 'Noto Sans TC'";
+        ctx.fillText(SWITCH_LABELS[i], sx, dockY + 38);
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------
+    // CONTROLS & EVENT LISTENERS
+    // -------------------------------------------------------------
+    const btnPlayPause = document.getElementById("btnPlayPause");
+    const btnRestart = document.getElementById("btnRestart");
+    const btnPrevFrame = document.getElementById("btnPrevFrame");
+    const btnNextFrame = document.getElementById("btnNextFrame");
+    const timeCurrent = document.getElementById("timeCurrent");
+    const timelineWrapper = document.getElementById("timelineWrapper");
+    const timelineFill = document.getElementById("timelineFill");
+    const timelineThumb = document.getElementById("timelineThumb");
+
+    function updateUI() {
+      const pct = (currentFrame / TOTAL_FRAMES) * 100;
+      timelineFill.style.width = `${pct}%`;
+      timelineThumb.style.left = `${pct}%`;
+
+      const sec = currentFrame / FPS;
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = Math.floor(sec % 60).toString().padStart(2, '0');
+      const ms = Math.floor((sec % 1) * 100).toString().padStart(2, '0');
+      timeCurrent.innerHTML = `<b>${m}:${s}.${ms}</b>`;
+    }
+
+    function seekToFrame(f) {
+      currentFrame = clamp(f, 0, TOTAL_FRAMES - 1);
+      renderFrame(currentFrame);
+      updateUI();
+    }
+
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      if (isPlaying) {
+        if (currentFrame >= TOTAL_FRAMES - 1) currentFrame = 0;
+        btnPlayPause.textContent = "⏸ 暫停 (Pause)";
+        lastTimestamp = performance.now();
+        requestAnimationFrame(loop);
+      } else {
+        btnPlayPause.textContent = "▶ 播放 (Play)";
+      }
+    }
+
+    function loop(now) {
+      if (!isPlaying) return;
+      const delta = (now - lastTimestamp) / 1000;
+      lastTimestamp = now;
+
+      currentFrame += delta * FPS;
+      if (currentFrame >= TOTAL_FRAMES) {
+        currentFrame = TOTAL_FRAMES - 1;
+        isPlaying = false;
+        btnPlayPause.textContent = "▶ 重新播放";
+        renderFrame(currentFrame);
+        updateUI();
+        return;
+      }
+
+      renderFrame(Math.floor(currentFrame));
+      updateUI();
+      requestAnimationFrame(loop);
+    }
+
+    btnPlayPause.addEventListener("click", togglePlay);
+    btnRestart.addEventListener("click", () => seekToFrame(0));
+    btnPrevFrame.addEventListener("click", () => {
+      if (isPlaying) togglePlay();
+      seekToFrame(currentFrame - 1);
+    });
+    btnNextFrame.addEventListener("click", () => {
+      if (isPlaying) togglePlay();
+      seekToFrame(currentFrame + 1);
+    });
+
+    timelineWrapper.addEventListener("click", (e) => {
+      const rect = timelineWrapper.getBoundingClientRect();
+      const pct = clamp((e.clientX - rect.left) / rect.width, 0, 1);
+      seekToFrame(Math.floor(pct * TOTAL_FRAMES));
+    });
+
+    // Initial render
+    renderFrame(0);
+    updateUI();
+  </script>
+</body>
+</html>
