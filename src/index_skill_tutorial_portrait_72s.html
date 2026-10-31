@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>手把手教你自製 Antigravity Skill (9:16 直式 72s · 大字清晰版)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800;900&family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #f4f4f2;
+      --text-black: #111111;
+      --text-gray: #666666;
+      --accent-orange: #ff5722;
+      --switch-gray: #d4d4d0;
+      --border-light: rgba(0, 0, 0, 0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1e1e1e;
+      color: var(--text-black);
+      font-family: 'Plus Jakarta Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 40px;
+    }
+    header {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      margin-bottom: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #111111;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-tag {
+      background: var(--accent-orange);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .viewport-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--bg-cream);
+      border-radius: 20px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+      aspect-ratio: 9 / 16;
+      display: flex;
+      position: relative;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .controls-panel {
+      width: 100%;
+      max-width: 520px;
+      margin-top: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 14px 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .timeline-row { margin-bottom: 12px; }
+    .timeline-bar-wrapper {
+      position: relative;
+      width: 100%;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .timeline-track {
+      width: 100%;
+      height: 6px;
+      background: #e2e2de;
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+    }
+    .timeline-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-orange);
+    }
+    .timeline-thumb {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: var(--accent-orange);
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      top: 4px;
+      left: 0%;
+      pointer-events: none;
+    }
+    .buttons-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .btn {
+      background: #f4f4f2;
+      border: 1px solid #d4d4d0;
+      color: #111111;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary {
+      background: var(--accent-orange);
+      border: none;
+      color: #ffffff;
+    }
+    .timecode {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #666666;
+    }
+    .timecode b { color: #111111; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-title">
+      <span>⚡ Antigravity Skill 實戰教學</span>
+      <span class="badge-tag">9:16 大字清晰版</span>
+    </div>
+    <div style="font-size: 12px; color: #666666;">
+      1080×1920 / 72s
+    </div>
+  </header>
+
+  <main class="viewport-card">
+    <canvas id="motionCanvas" width="1080" height="1920"></canvas>
+  </main>
+
+  <section class="controls-panel">
+    <div class="timeline-row">
+      <div class="timeline-bar-wrapper" id="timelineWrapper">
+        <div class="timeline-track">
+          <div class="timeline-fill" id="timelineFill"></div>
+        </div>
+        <div class="timeline-thumb" id="timelineThumb"></div>
+      </div>
+    </div>
+    <div class="buttons-row">
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button class="btn btn-primary" id="playBtn">▶ 播放</button>
+        <button class="btn" id="restartBtn">↺ 重播</button>
+        <span class="timecode" id="timeDisplay">00:00 / 01:12</span>
+      </div>
+      <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+        <button class="btn" onclick="jumpToScene(0)">01. 痛點</button>
+        <button class="btn" onclick="jumpToScene(1)">02. 結構</button>
+        <button class="btn" onclick="jumpToScene(2)">03. 創建</button>
+        <button class="btn" onclick="jumpToScene(3)">04. 觸發</button>
+        <button class="btn" onclick="jumpToScene(4)">05. 升級</button>
+      </div>
+    </div>
+  </section>
+
+  <audio id="bgmAudio" src="../master_soundtrack_skill_tutorial_72s.wav" preload="auto"></audio>
+
+  <script>
+    const CANVAS_WIDTH = 1080;
+    const CANVAS_HEIGHT = 1920;
+    const FPS = 30;
+    const DURATION_SEC = 72;
+    const TOTAL_FRAMES = FPS * DURATION_SEC; // 2160 frames
+
+    // 5 Scenes with exact durations: [13s, 13s, 17s, 16s, 13s]
+    const SCENES = [
+      {
+        id: "01",
+        startSec: 0,
+        durSec: 13,
+        tag: "💡 痛點破局",
+        title: "別再重複打字教 AI！",
+        enTitle: "FROM PROMPT TO SKILL",
+        summary: "— 把工作 SOP 封裝成「一鍵專屬外掛」",
+        formula: "manual_prompts ➔ reusable_skill_assets",
+        explanation: "每次都要貼上一大串提示詞、交代規則很累？Skill 就像一張專屬外掛卡帶，把你的工作流程與審核標準永久固化，AI 插上就會做！"
+      },
+      {
+        id: "02",
+        startSec: 13,
+        durSec: 13,
+        tag: "📁 檔案秘密",
+        title: "一個資料夾就是 Skill",
+        enTitle: "DIRECTORY ANATOMY",
+        summary: "— SKILL.md + 漸進式載入神機制",
+        formula: "SKILL.md (YAML frontmatter) + scripts/ + progressive_disclosure",
+        explanation: "Skill 結構超簡單：只需一個資料夾與 SKILL.md。最神的是漸進式載入：平時只記住一句話介紹、不佔 Token，提到相關任務才一秒讀懂！"
+      },
+      {
+        id: "03",
+        startSec: 26,
+        durSec: 17,
+        tag: "💻 實戰創建",
+        title: "一句話，AI 自己寫 Skill！",
+        enTitle: "AGENTIC CREATION",
+        summary: "— 免動手開目錄 · AI 全自動封裝",
+        formula: "prompt(\"封裝 excel-auditor skill\") ➔ auto_scaffold()",
+        explanation: "不用手動建資料夾！直接對 Antigravity 說：『把剛剛驗算 Excel 的流程做成 Skill』，AI 自動建目錄、寫規範，連 Python 腳本都幫你放好！"
+      },
+      {
+        id: "04",
+        startSec: 43,
+        durSec: 16,
+        tag: "⚡ 一秒喚醒",
+        title: "隨口一句話，外掛自動跑",
+        enTitle: "INSTANT ACTIVATION",
+        summary: "— 雜亂報表拖入 · 自動喚醒對帳",
+        formula: "user(\"幫我對帳\") ➔ [Skill: excel-auditor ACTIVATED]",
+        explanation: "做完怎麼用？丟入雜亂業務報表，只要隨口一句：『幫我對帳』，AI 瞬間自動辨識喚醒 Skill，格式修正、算術交叉驗算一氣呵成！"
+      },
+      {
+        id: "05",
+        startSec: 59,
+        durSec: 13,
+        tag: "🚀 團隊升級",
+        title: "成為 AI 工作流架構師",
+        enTitle: "WORKFLOW ARCHITECT",
+        summary: "— Git 同步共享 · 全員戰力十倍翻",
+        formula: "git push .agents/skills/ ➔ team_productivity_loop",
+        explanation: "把寫好的 Skill 放進專案 Git，團隊成員 Pull 下來立刻擁有相同的專家技能！你不再是打工族，而是打造專屬 AI 團隊的架構師！"
+      }
+    ];
+
+    const SWITCH_LABELS = [
+      "01. 痛點破局",
+      "02. 檔案秘密",
+      "03. 實戰創建",
+      "04. 一秒喚醒",
+      "05. 團隊升級"
+    ];
+
+    const canvas = document.getElementById('motionCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let currentFrame = 0;
+    let isPlaying = false;
+    let audioObj = null;
+
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+    function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+    function spring(t, stiffness = 130, damping = 12) {
+      if (t <= 0) return 0;
+      if (t >= 1) return 1;
+      const omega = Math.sqrt(stiffness);
+      const decay = Math.exp(-damping * t * 0.5);
+      return 1 - decay * Math.cos(omega * t);
+    }
+
+    function wrapText(context, text, x, y, maxWidth, lineHeight) {
+      let line = '';
+      for (let n = 0; n < text.length; n++) {
+        const testLine = line + text[n];
+        const metrics = context.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          context.fillText(line, x, y);
+          line = text[n];
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      context.fillText(line, x, y);
+    }
+
+    function getSceneAtFrame(f) {
+      const curSec = f / FPS;
+      for (let i = SCENES.length - 1; i >= 0; i--) {
+        if (curSec >= SCENES[i].startSec) {
+          const localSec = curSec - SCENES[i].startSec;
+          const localF = Math.floor(localSec * FPS);
+          return { sceneIdx: i, scene: SCENES[i], localF, localSec };
+        }
+      }
+      return { sceneIdx: 0, scene: SCENES[0], localF: f, localSec: f / FPS };
+    }
+
+    // -------------------------------------------------------------
+    // MAIN DRAW FUNCTION FOR FRAME `f` (0 <= f < 2160)
+    // -------------------------------------------------------------
+    function drawFrame(f) {
+      f = clamp(f, 0, TOTAL_FRAMES - 1);
+      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // Clean Minimalist Off-white Canvas Background
+      ctx.fillStyle = "#f4f4f2";
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      const { sceneIdx, scene, localF, localSec } = getSceneAtFrame(f);
+
+      // 1. Top Navigation Bar
+      drawTopNav(sceneIdx + 1, f);
+
+      // 2. Upper Explanation Section (Extra Large Fonts for Mobile)
+      drawUpperInfoSection(scene, localF);
+
+      // 3. Middle Live Demonstration Graphics (960 x 800)
+      const graphX = 60;
+      const graphY = 820;
+      const graphW = 960;
+      const graphH = 800;
+
+      switch(sceneIdx) {
+        case 0: drawScene0_PainPointVsSkill(graphX, graphY, graphW, graphH, localF); break;
+        case 1: drawScene1_FolderStructure(graphX, graphY, graphW, graphH, localF); break;
+        case 2: drawScene2_LiveScreenCreation(graphX, graphY, graphW, graphH, localF); break;
+        case 3: drawScene3_LiveExecution(graphX, graphY, graphW, graphH, localF); break;
+        case 4: drawScene4_ArchitectElevation(graphX, graphY, graphW, graphH, localF); break;
+      }
+
+      // 4. Bottom Switch Dock (5 Large Buttons)
+      drawBottomSwitchDock5(sceneIdx, localSec / scene.durSec);
+    }
+
+    function drawTopNav(sceneNum, f) {
+      ctx.save();
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0,0,0,0.06)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(60, 60, 960, 84, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      // Orange square logo
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.roundRect(84, 88, 28, 28, 8);
+      ctx.fill();
+
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 24px 'Plus Jakarta Sans'";
+      ctx.textAlign = "left";
+      ctx.fillText("ANTIGRAVITY", 126, 110);
+
+      ctx.fillStyle = "#666666";
+      ctx.font = "800 20px 'Noto Sans TC'";
+      ctx.fillText("手把手自製 Skill 外掛實戰", 310, 110);
+
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 22px 'Noto Sans TC'";
+      ctx.fillText(`步驟 0${sceneNum} / 05`, 895, 110);
+
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "800 20px 'JetBrains Mono'";
+      ctx.fillText("· 126BPM", 996, 110);
+      ctx.restore();
+    }
+
+    function drawUpperInfoSection(scene, localF) {
+      ctx.save();
+      const leftX = 60;
+      const topY = 270;
+
+      const enterT = easeOutCubic(clamp(localF / 16, 0, 1));
+      ctx.translate(0, (1 - enterT) * 16);
+
+      // Giant Number with Orange Dot (124px!)
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 124px 'Plus Jakarta Sans'";
+      ctx.letterSpacing = "-0.04em";
+      ctx.fillText(scene.id, leftX, topY);
+
+      const numWidth = ctx.measureText(scene.id).width;
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.arc(leftX + numWidth + 20, topY - 18, 15, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Tag Badge (e.g. 💡 痛點破局)
+      const badgeX = leftX + numWidth + 52;
+      const badgeY = topY - 76;
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.roundRect(badgeX, badgeY, 210, 52, 12);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 24px 'Noto Sans TC'";
+      ctx.textAlign = "center";
+      ctx.fillText(scene.tag, badgeX + 105, badgeY + 36);
+      ctx.textAlign = "left";
+
+      // Bold Title (48px)
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 48px 'Noto Sans TC'";
+      ctx.fillText(scene.title, badgeX + 230, topY - 36);
+
+      ctx.fillStyle = "#666666";
+      ctx.font = "700 20px 'JetBrains Mono'";
+      ctx.fillText(scene.enTitle, leftX + numWidth + 56, topY + 12);
+
+      // Summary with Orange Dash (28px bold!)
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "900 28px 'Noto Sans TC'";
+      ctx.fillText("—", leftX, topY + 70);
+
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 28px 'Noto Sans TC'";
+      ctx.fillText(scene.summary.replace('— ', ''), leftX + 38, topY + 70);
+
+      // Formula capsule (20px)
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "700 20px 'JetBrains Mono'";
+      ctx.fillText("⚡ " + scene.formula, leftX, topY + 112);
+
+      // White Key Takeaway Card with orange border
+      const cardY = topY + 135;
+      const cardW = 960;
+      const cardH = 205;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(leftX, cardY, cardW, cardH, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      // Left orange accent stripe
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.roundRect(leftX, cardY, 8, cardH, [18, 0, 0, 18]);
+      ctx.fill();
+
+      // Card Header
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 24px 'Noto Sans TC'";
+      ctx.fillText(`✨ 核心秘訣 (Key Takeaway)`, leftX + 32, cardY + 44);
+
+      // Card Body (24px with 38px line height!)
+      ctx.fillStyle = "#2b2b2b";
+      ctx.font = "600 24px/1.6 'Noto Sans TC'";
+      wrapText(ctx, scene.explanation, leftX + 32, cardY + 90, cardW - 64, 38);
+
+      ctx.restore();
+    }
+
+    // --- Scene 0: 痛點破局 (Pain Point vs Skill Cartridge) ---
+    function drawScene0_PainPointVsSkill(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 20, 0, 1), 130, 12);
+      const cx = x + w / 2;
+
+      // Left Box: Painful Manual Prompting
+      const boxW = 460;
+      const leftBoxX = x;
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#ff5252";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.roundRect(leftBoxX, y + 20, boxW, 540, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      // Red Top Tag
+      ctx.fillStyle = "#ff5252";
+      ctx.beginPath();
+      ctx.roundRect(leftBoxX, y + 20, boxW, 52, [18, 18, 0, 0]);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 20px 'Noto Sans TC'";
+      ctx.textAlign = "center";
+      ctx.fillText("❌ 傳統痛點：每次手打長 Prompt", leftBoxX + boxW / 2, y + 54);
+
+      // Chat bubble simulation
+      ctx.fillStyle = "#fef2f2";
+      ctx.beginPath();
+      ctx.roundRect(leftBoxX + 24, y + 96, boxW - 48, 220, 14);
+      ctx.fill();
+
+      ctx.fillStyle = "#b71c1c";
+      ctx.font = "600 18px 'Noto Sans TC'";
+      ctx.textAlign = "left";
+      ctx.fillText("「請你當資深財務會計，規則如下：", leftBoxX + 44, y + 134);
+      ctx.fillText("1. 日期格式要轉為 YYYY-MM-DD", leftBoxX + 44, y + 170);
+      ctx.fillText("2. 缺失值補 0，不能有 NaN", leftBoxX + 44, y + 206);
+      ctx.fillText("3. 細項加總必須等於母體總額...", leftBoxX + 44, y + 242);
+      ctx.fillText("（每次都要重新複製貼上 500 字！）", leftBoxX + 44, y + 284);
+
+      // Frustrated Warning
+      ctx.fillStyle = "#d32f2f";
+      ctx.font = "800 22px 'Noto Sans TC'";
+      ctx.fillText("😫 每次重新教 · 浪費時間又卡頓", leftBoxX + 36, y + 360);
+
+      // Right Box: Skill Cartridge (The Solution!)
+      const rightBoxX = x + 500;
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(rightBoxX, y + 20, boxW * p, 540, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      // Orange Top Tag
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.roundRect(rightBoxX, y + 20, boxW, 52, [18, 18, 0, 0]);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 20px 'Noto Sans TC'";
+      ctx.textAlign = "center";
+      ctx.fillText("⚡ Antigravity Skill：一鍵專屬外掛", rightBoxX + boxW / 2, y + 54);
+
+      // Glowing Skill Card Icon
+      ctx.fillStyle = "#fff7ed";
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(rightBoxX + 24, y + 96, boxW - 48, 220, 14);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "900 32px 'JetBrains Mono'";
+      ctx.fillText("📁 excel-auditor", rightBoxX + 50, y + 154);
+
+      ctx.fillStyle = "#111111";
+      ctx.font = "800 20px 'Noto Sans TC'";
+      ctx.fillText("✓ 規則標準化固化在本地", rightBoxX + 50, y + 204);
+      ctx.fillText("✓ 一句話自動調用，零重複打字", rightBoxX + 50, y + 244);
+      ctx.fillText("✓ 漸進式載入，完全不耗 Token", rightBoxX + 50, y + 284);
+
+      ctx.fillStyle = "#2e7d32";
+      ctx.font = "900 22px 'Noto Sans TC'";
+      ctx.fillText("🎉 效率提升 10 倍 · 告別打工人！", rightBoxX + 36, y + 360);
+
+      drawCalloutBadgePortrait(cx, y + 640, "💡 Skill：把你的日常 SOP 做成外掛卡帶，插上 AI 就會做！");
+      ctx.restore();
+    }
+
+    // --- Scene 1: 檔案秘密 (Folder Structure & Progressive Disclosure) ---
+    function drawScene1_FolderStructure(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 20, 0, 1), 130, 12);
+      const cx = x + w / 2;
+
+      // File Tree Mockup Container
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(x, y + 10, w, 560, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      // Header Bar
+      ctx.fillStyle = "#1e1e1e";
+      ctx.beginPath();
+      ctx.roundRect(x, y + 10, w, 56, [18, 18, 0, 0]);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "800 18px 'JetBrains Mono'";
+      ctx.fillText("📁 WORKSPACE SKILL ARCHITECTURE (.agents/skills/)", x + 30, y + 46);
+
+      // Folder Tree
+      const treeLines = [
+        { text: ".agents/skills/excel-auditor/", type: "dir", desc: "👈 你的專屬技能資料夾" },
+        { text: "├── SKILL.md", type: "file-spec", desc: "⭐ 核心靈魂！定義 YAML 標頭與 SOP 步驟" },
+        { text: "├── scripts/audit.py", type: "file-code", desc: "🐍 Python 自動化驗算小工具" },
+        { text: "├── examples/sample.xlsx", type: "file-asset", desc: "📊 示範輸入與期望輸出 (Few-shot)" },
+        { text: "└── references/spec.pdf", type: "file-ref", desc: "📚 完整技術文件 (需要時 AI 才翻閱)" }
+      ];
+
+      treeLines.forEach((item, idx) => {
+        const ty = y + 90 + idx * 72;
+        ctx.fillStyle = "#fafaf8";
+        ctx.strokeStyle = item.type === "file-spec" ? "#ff5722" : "rgba(0,0,0,0.06)";
+        ctx.lineWidth = item.type === "file-spec" ? 2 : 1;
+        ctx.beginPath();
+        ctx.roundRect(x + 28, ty, w - 56, 62, 12);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = item.type === "file-spec" ? "#ff5722" : "#111111";
+        ctx.font = "900 22px 'JetBrains Mono'";
+        ctx.fillText(item.text, x + 48, ty + 40);
+
+        ctx.fillStyle = item.type === "file-spec" ? "#ff5722" : "#666666";
+        ctx.font = "700 18px 'Noto Sans TC'";
+        ctx.textAlign = "right";
+        ctx.fillText(item.desc, x + w - 48, ty + 40);
+        ctx.textAlign = "left";
+      });
+
+      // Progressive Disclosure Banner
+      const bannerY = y + 460;
+      ctx.fillStyle = "#fff7ed";
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(x + 28, bannerY, w - 56, 80, 14);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "900 22px 'Noto Sans TC'";
+      ctx.fillText("⚡ 漸進式載入 (Progressive Disclosure) 的黑科技：", x + 50, bannerY + 34);
+      ctx.fillStyle = "#111111";
+      ctx.font = "700 19px 'Noto Sans TC'";
+      ctx.fillText("平常只記住名稱與簡介 (0 額外負擔)，唯有觸發任務才一秒讀入全套 SOP！", x + 50, bannerY + 64);
+
+      drawCalloutBadgePortrait(cx, y + 640, "📁 Skill 結構超簡單：一個資料夾 ＋ 一份 SKILL.md 即刻生效！");
+      ctx.restore();
+    }
+
+    // --- Scene 2: 實戰創建 (Live Antigravity Screen Recording Mockup) ---
+    function drawScene2_LiveScreenCreation(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 20, 0, 1), 130, 12);
+      const cx = x + w / 2;
+
+      // Dark Terminal Window (Simulating Real IDE Screen Recording)
+      ctx.fillStyle = "#1e1e1e";
+      ctx.strokeStyle = "rgba(0,0,0,0.2)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(x, y + 10, w, 560, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      // Top title bar with Mac dots
+      ctx.fillStyle = "#2d2d2d";
+      ctx.beginPath();
+      ctx.roundRect(x, y + 10, w, 52, [18, 18, 0, 0]);
+      ctx.fill();
+
+      ["#ff5f56", "#ffbd2e", "#27c93f"].forEach((c, i) => {
+        ctx.fillStyle = c;
+        ctx.beginPath();
+        ctx.arc(x + 28 + i * 20, y + 36, 6, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "800 16px 'JetBrains Mono'";
+      ctx.fillText("Antigravity 2.0 · Live Prompt-to-Skill Workflow", x + 100, y + 42);
+
+      // Terminal Conversation Stream
+      const lines = [
+        { role: "user", text: "> 幫我把剛剛驗算 Excel 的流程做成 Skill 叫做 excel-auditor！", color: "#4fc3f7" },
+        { role: "agy", text: "🤖 收到！正在為您自動建立結構化 Skill 資產...", color: "#ff9800" },
+        { role: "step", text: "  [1/3] 建立目錄: .agents/skills/excel-auditor/", color: "#81c784" },
+        { role: "step", text: "  [2/3] 寫入 SKILL.md (YAML 標頭 + SOP 步驟定義)", color: "#81c784" },
+        { role: "step", text: "  [3/3] 生成輔助腳本: scripts/audit_helper.py", color: "#81c784" },
+        { role: "done", text: "✨ SUCCESS: Skill [excel-auditor] 已自動掛載生效！隨時可用！", color: "#ff5722" }
+      ];
+
+      lines.forEach((l, i) => {
+        const itemP = clamp((f - i * 18) / 20, 0, 1);
+        if (itemP > 0) {
+          const ly = y + 96 + i * 56;
+          ctx.fillStyle = l.color;
+          ctx.font = i === 0 ? "900 22px 'JetBrains Mono'" : "700 20px 'JetBrains Mono'";
+          ctx.fillText(l.text, x + 36, ly);
+        }
+      });
+
+      // Realtime Typing Cursor at current line
+      const blink = Math.floor(f / 10) % 2 === 0 ? "█" : "";
+      ctx.fillStyle = "#4caf50";
+      ctx.font = "900 22px 'JetBrains Mono'";
+      ctx.fillText(`$ agy ready ${blink}`, x + 36, y + 460);
+
+      drawCalloutBadgePortrait(cx, y + 640, "💬 一句話自動生成：說出需求，Antigravity 自動幫你寫完整個 Skill！");
+      ctx.restore();
+    }
+
+    // --- Scene 3: 一秒喚醒 (Live Triggering & Execution) ---
+    function drawScene3_LiveExecution(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 20, 0, 1), 130, 12);
+      const cx = x + w / 2;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(x, y + 10, w, 560, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      // Top Active Badge: GREEN GLOW
+      ctx.fillStyle = "#1e1e1e";
+      ctx.beginPath();
+      ctx.roundRect(x, y + 10, w, 56, [18, 18, 0, 0]);
+      ctx.fill();
+
+      // Pulsing Green LED
+      ctx.fillStyle = "#4caf50";
+      ctx.beginPath();
+      ctx.arc(x + 40, y + 38, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 18px 'JetBrains Mono'";
+      ctx.fillText("SKILL AUTO-TRIGGERED: [excel-auditor] ACTIVE", x + 62, y + 44);
+
+      // User Input Box
+      ctx.fillStyle = "#f0f0ed";
+      ctx.beginPath();
+      ctx.roundRect(x + 28, y + 84, w - 56, 86, 12);
+      ctx.fill();
+
+      ctx.fillStyle = "#111111";
+      ctx.font = "800 20px 'Noto Sans TC'";
+      ctx.fillText("拖入檔案：2026_Q1_雜亂業務報表.xlsx", x + 50, y + 120);
+      ctx.font = "900 24px 'Noto Sans TC'";
+      ctx.fillStyle = "#ff5722";
+      ctx.fillText("💬 使用者隨口說：「幫我對帳」", x + 50, y + 154);
+
+      // Automated SOP Execution Steps (Real-time check)
+      const auditSteps = [
+        { label: "SOP Step 1: 缺失值自動填補 0、日期標準化", status: "✓ PASS", color: "#4caf50" },
+        { label: "SOP Step 2: 執行 scripts/audit_helper.py 交叉勾稽", status: "✓ PASS", color: "#4caf50" },
+        { label: "SOP Step 3: 驗算細項加總 == 母體成交額 ($4,829,320)", status: "✓ PASS (差額=0)", color: "#4caf50" },
+        { label: "SOP Step 4: 輸出乾淨 CSV 與 60s 視覺化動態短片", status: "✓ COMPLETED", color: "#ff5722" }
+      ];
+
+      auditSteps.forEach((st, idx) => {
+        const sy = y + 190 + idx * 76;
+        const stepP = clamp((f - idx * 15) / 20, 0, 1);
+
+        ctx.fillStyle = "#fbfbf9";
+        ctx.strokeStyle = "rgba(0,0,0,0.06)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(x + 28, sy, (w - 56) * stepP, 66, 12);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#111111";
+        ctx.font = "800 20px 'Noto Sans TC'";
+        ctx.fillText(st.label, x + 48, sy + 42);
+
+        ctx.fillStyle = st.color;
+        ctx.font = "900 20px 'JetBrains Mono'";
+        ctx.textAlign = "right";
+        ctx.fillText(st.status, x + w - 48, sy + 42);
+        ctx.textAlign = "left";
+      });
+
+      drawCalloutBadgePortrait(cx, y + 640, "⚡ 說一句「幫我對帳」，AI 自動喚醒專屬 Skill，零失誤驗算！");
+      ctx.restore();
+    }
+
+    // --- Scene 4: 團隊升級 (Architect Elevation & Git Collaboration) ---
+    function drawScene4_ArchitectElevation(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 20, 0, 1), 130, 12);
+      const cx = x + w / 2;
+
+      // Grand Champion Card
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(x, y + 10, w, 560, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      // Central Shield Badge
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.arc(cx, y + 140, 75 * p, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 28px 'Noto Sans TC'";
+      ctx.textAlign = "center";
+      ctx.fillText("AI 架構師", cx, y + 134);
+      ctx.font = "800 16px 'JetBrains Mono'";
+      ctx.fillText("ARCHITECT", cx, y + 162);
+
+      // Git Push & Team Collaboration Cards
+      const teamBenefits = [
+        { title: "📦 Git 版本控制共享", desc: "把 .agents/skills/ 推上 Git，團隊成員 Pull 下來一秒同步！" },
+        { title: "⚙️ 告別手動打工", desc: "個人智慧固化為團隊數位資產，經驗不再隨員工離職丟失！" },
+        { title: "🚀 打造專屬 AI 團隊", desc: "結合 /boost、/browser 與 MCP，讓 AI 成為百萬級超級副手！" }
+      ];
+
+      teamBenefits.forEach((tb, i) => {
+        const by = y + 250 + i * 94;
+        ctx.fillStyle = "#fafaf8";
+        ctx.strokeStyle = "rgba(0,0,0,0.06)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(x + 28, by, w - 56, 80, 14);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#ff5722";
+        ctx.font = "900 22px 'Noto Sans TC'";
+        ctx.textAlign = "left";
+        ctx.fillText(tb.title, x + 50, by + 36);
+
+        ctx.fillStyle = "#444444";
+        ctx.font = "600 18px 'Noto Sans TC'";
+        ctx.fillText(tb.desc, x + 50, by + 64);
+      });
+
+      drawCalloutBadgePortrait(cx, y + 640, "✨ 不做重複打字打工人，升級成打造專屬 AI 團隊的架構師！");
+      ctx.restore();
+    }
+
+    function drawCalloutBadgePortrait(x, y, text) {
+      ctx.save();
+      ctx.font = "900 22px 'Noto Sans TC'";
+      const textW = ctx.measureText(text).width;
+      const boxW = Math.min(960, textW + 52);
+      const boxH = 58;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.roundRect(x - boxW / 2, y - boxH / 2, boxW, boxH, 14);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#ff5722";
+      ctx.textAlign = "center";
+      ctx.fillText(text, x, y + 8);
+      ctx.restore();
+    }
+
+    // --- Bottom Switch Dock (5 Large Buttons) ---
+    function drawBottomSwitchDock5(activeIdx, localProgress) {
+      ctx.save();
+      const dockW = 960;
+      const dockH = 80;
+      const dockX = (CANVAS_WIDTH - dockW) / 2;
+      const dockY = CANVAS_HEIGHT - 170;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(dockX, dockY, dockW, dockH, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      const btnCount = 5;
+      const pad = 8;
+      const btnW = (dockW - pad * (btnCount + 1)) / btnCount;
+      const btnH = dockH - pad * 2;
+
+      for (let i = 0; i < btnCount; i++) {
+        const bx = dockX + pad + i * (btnW + pad);
+        const by = dockY + pad;
+        const isActive = (i === activeIdx);
+
+        if (isActive) {
+          ctx.fillStyle = "#ff5722";
+          ctx.beginPath();
+          ctx.roundRect(bx, by, btnW, btnH, 12);
+          ctx.fill();
+
+          // Progress line
+          const progressW = btnW * clamp(localProgress, 0, 1);
+          ctx.fillStyle = "rgba(255, 255, 255, 0.45)";
+          ctx.fillRect(bx + 8, by + 4, progressW - 16, 4);
+
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "900 20px 'Noto Sans TC'";
+        } else {
+          ctx.fillStyle = "#f4f4f2";
+          ctx.beginPath();
+          ctx.roundRect(bx, by, btnW, btnH, 12);
+          ctx.fill();
+
+          ctx.fillStyle = "#444444";
+          ctx.font = "700 18px 'Noto Sans TC'";
+        }
+
+        ctx.textAlign = "center";
+        ctx.fillText(SWITCH_LABELS[i], bx + btnW / 2, by + btnH / 2 + 7);
+      }
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------
+    // INTERACTIVE PLAYER CONTROLS
+    // -------------------------------------------------------------
+    const playBtn = document.getElementById('playBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const timelineWrapper = document.getElementById('timelineWrapper');
+    const timelineFill = document.getElementById('timelineFill');
+    const timelineThumb = document.getElementById('timelineThumb');
+    audioObj = document.getElementById('bgmAudio');
+
+    function updateUI() {
+      const pct = (currentFrame / (TOTAL_FRAMES - 1)) * 100;
+      timelineFill.style.width = pct + '%';
+      timelineThumb.style.left = pct + '%';
+
+      const sec = Math.floor(currentFrame / FPS);
+      const m = String(Math.floor(sec / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      timeDisplay.innerHTML = `${m}:${s} / 01:12 (格: ${currentFrame})`;
+    }
+
+    function renderLoop() {
+      if (isPlaying) {
+        if (audioObj && !audioObj.paused) {
+          currentFrame = Math.floor(audioObj.currentTime * FPS);
+        } else {
+          currentFrame++;
+        }
+
+        if (currentFrame >= TOTAL_FRAMES) {
+          currentFrame = TOTAL_FRAMES - 1;
+          pause();
+        }
+        drawFrame(currentFrame);
+        updateUI();
+        requestAnimationFrame(renderLoop);
+      }
+    }
+
+    function play() {
+      if (isPlaying) return;
+      isPlaying = true;
+      playBtn.textContent = "⏸ 暫停";
+      playBtn.classList.remove('btn-primary');
+      if (audioObj) {
+        audioObj.currentTime = currentFrame / FPS;
+        audioObj.play().catch(e => console.log('Audio autoplay prevented:', e));
+      }
+      requestAnimationFrame(renderLoop);
+    }
+
+    function pause() {
+      isPlaying = false;
+      playBtn.textContent = "▶ 播放";
+      playBtn.classList.add('btn-primary');
+      if (audioObj) audioObj.pause();
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (isPlaying) pause();
+      else play();
+    });
+
+    restartBtn.addEventListener('click', () => {
+      pause();
+      currentFrame = 0;
+      if (audioObj) audioObj.currentTime = 0;
+      drawFrame(0);
+      updateUI();
+      play();
+    });
+
+    timelineWrapper.addEventListener('click', (e) => {
+      const rect = timelineWrapper.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const ratio = clamp(clickX / rect.width, 0, 1);
+      currentFrame = Math.floor(ratio * TOTAL_FRAMES);
+      if (audioObj) audioObj.currentTime = currentFrame / FPS;
+      drawFrame(currentFrame);
+      updateUI();
+    });
+
+    window.jumpToScene = function(idx) {
+      currentFrame = SCENES[idx].startSec * FPS;
+      if (audioObj) audioObj.currentTime = currentFrame / FPS;
+      drawFrame(currentFrame);
+      updateUI();
+    };
+
+    window.renderFrame = function(f) {
+      drawFrame(f);
+    };
+
+    document.fonts.ready.then(() => {
+      drawFrame(0);
+      updateUI();
+    });
+  </script>
+</body>
+</html>
