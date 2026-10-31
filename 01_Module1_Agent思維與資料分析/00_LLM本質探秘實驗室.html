@@ -566,6 +566,9 @@
       <button class="exp-tab" onclick="selectExperiment(4)">
         <span>5. 🔢 算術盲區與代碼 (Math & Code)</span>
       </button>
+      <button class="exp-tab" onclick="selectExperiment(5)">
+        <span style="color: #f43f5e;">6. 🚨 API 金鑰外洩與前後端</span>
+      </button>
     </div>
 
     <!-- Workspace Grid -->
@@ -806,6 +809,112 @@
         ],
         analysis: "<strong>為什麼語言模型不擅長算術？</strong><br>神經網絡在處理語言時是連續向量空間，而精確數學運算（如多位數乘法、除法、小數點）需要<strong>離散、無容錯率的嚴格邏輯與進位寄存器</strong>。在純語言模式下，模型只是在模仿『數學解答的長相』，而不是真正在執行算盤。<br>讓 LLM 口算百萬級財務報表，就像叫一個詩人去當會計師一樣危險！",
         takeaway: "🎓 課程啟示：這就是 Module 1 的最高靈魂！我們教大家透過 Prompt 強迫 AI 呼叫 Python (Pandas/Numpy) 執行運算，再以細項加總等式進行收尾勾稽，打造 100% 零誤差的數據工作流！"
+      },
+      {
+        id: "security",
+        title: "🚨 實驗 06：API 金鑰外洩慘案與前後端架構 (API Security & Full-Stack)",
+        badge: "千萬天價帳單與前後端概念",
+        badgeClass: "badge-rose",
+        hasSystem: false,
+        presets: [
+          {
+            label: "1. 🖱️ 模擬新手錯誤：把 API Key 寫在前端 HTML/JS",
+            tag: "反面教材",
+            prompt: "模擬情境：新手工程師把 const API_KEY = 'sk-ant-api03-TOP-SECRET' 寫在前端 index.html 裡發布上線。",
+            simulated: `【🚨 災難重現：新手把 API Key 寫在前端網頁】
+任何訪客只需在網頁上「按右鍵 ➔ 檢視網頁原始碼 (View Source)」或按「F12 開發者工具」，立刻看見：
+
+==================================================
+<!DOCTYPE html>
+<html>
+<head><title>我的 AI 聊天室</title></head>
+<body>
+  <scr` + `ipt>
+    // ❌ 致命新手錯誤：把最高權限 API 金鑰裸露在客戶端！
+    const ANTHROPIC_API_KEY = "sk-ant-api03-h8F92...CRITICAL_LEAK";
+    const GEMINI_API_KEY = "AIzaSyD8942...EXPOSED_KEY";
+    
+    fetch('https://api.anthropic.com/v1/messages', {
+      headers: { 'x-api-key': ANTHROPIC_API_KEY } // 所有人都能直接複製！
+    });
+  </scr` + `ipt>
+</body>
+</html>
+==================================================
+
+🤖【黑客爬蟲機器人 (Scraper Bot) 於 3 秒內自動捕獲】：
+1. 爬蟲在 GitHub 公開倉庫或公開網站掃描到 "sk-ant-" 標記。
+2. 30 秒內自動接管，開起 500 個並發線程瘋狂跑 Claude 3.5 Sonnet / GPT-4o！
+3. 24 小時後產生真實帳單：$15,800 美元（約合新台幣 50 萬元）！`
+          },
+          {
+            label: "2. 📰 真實天價帳單慘案：韓國開發者 5.3 億台幣帳單",
+            tag: "新聞慘案",
+            prompt: "請分析 BlockTempo 報導：韓國開發者收到 Anthropic 166 萬至 1,662 萬美元（逾 5.3 億台幣）天價帳單事件的根本原因與警示。",
+            simulated: `【📰 新聞還原：韓國開發者收到 5.3 億元天價帳單】
+（報導來源：BlockTempo 動區動趨）
+
+一名韓國開發者（remy_notes）使用 Mac mini 運行多套 AI 自動化代理，短短兩天內接連收到 Stripe 扣款失敗通知：
+• 第一筆通知：166 萬美元（約 5,366 萬台幣）
+• 第二筆通知：1,662 萬美元（約 5.34 億台幣！）
+兩筆加總超過 5.8 億台幣！
+
+【深度技術復盤：為什麼會發生這種天災？】
+1. 循環死鬥（Infinite Agent Loop）：AI Agent 被賦予了自動寫 code 並自動呼叫 API 測試的權限，因邏輯死結陷入每秒數百次的高並發無限遞迴！
+2. 缺乏熔斷機制（Hard Spending Limit）：帳號後台未設定「每月硬性預算上限（Spending Cap）」。
+3. 金鑰權限未做最小化（Over-privileged Key）：一把 Key 可以無限開大模型，一旦洩漏或失控等同無限透支信用卡！`
+          },
+          {
+            label: "3. ❌ 致命架構：前端直接呼叫 LLM (金鑰裸奔)",
+            tag: "致命架構",
+            prompt: "請圖解並說明：為什麼前端直接呼叫大模型 API 是絕對被禁止的？",
+            simulated: `【❌ 致命架構圖解：前端直接呼叫 (Client-Side Direct Call)】
+
+  [ 使用者瀏覽器 (Chrome/Safari) ]
+  ├── 包含 HTML / CSS / JavaScript
+  ├── ❌ 寫入 const API_KEY = "sk-..." 
+  └── 任何人按右鍵「檢視原始碼」一覽無遺！
+         │
+         │ (金鑰裸奔在網路上，任何人可攔截)
+         ▼
+  [ 雲端 AI 伺服器 (OpenAI / Anthropic / Google) ]
+
+💥 致命後果：
+• 任何人都能 F12 偷走你的 Key 帶回家免費爽用。
+• 帳單無上限掛在你的信用卡上，一夜破產！
+• 無法限制誰可以用、無法限制每人每小時提問次數。`
+          },
+          {
+            label: "4. ✅ 安全標準架構：前後端分離代理 (BFF / Reverse Proxy)",
+            tag: "安全架構",
+            prompt: "請圖解並說明：現代工程師是如何使用「後端代理伺服器 (Backend Proxy)」安全保護 API Key 的？",
+            simulated: `【✅ 安全標準架構：前後端分離代理 (Server-Side Proxy)】
+
+  [ 💻 前端：使用者瀏覽器 ]
+  └── 只有純 UI (HTML/CSS/JS)
+  └── 零金鑰！只有使用者登入 Token (JWT/Cookie)
+         │
+         │ 1. 訪客發送提問：「幫我分析這張報表」
+         ▼
+  [ 🛡️ 你的後端伺服器 (Node.js / Python FastAPI / Cloudflare Worker) ]
+  ├── 🔒 環境變數 (.env)：API_KEY 藏在伺服器記憶體中，外人 100% 看不到！
+  ├── 🚦 流量警衛 (Rate Limiting)：每人每分鐘限問 5 次，防刷爆。
+  ├── 💰 預算熔斷機制：單日帳單超過 $10 美元自動切斷。
+  └── 🛡️ 資料脫敏過濾：檢查是否有機密個資。
+         │
+         │ 2. 後端確認合規，代為掏出金鑰發送請求
+         ▼
+  [ ☁️ 雲端 AI 伺服器 (Anthropic / Google / OpenAI) ]
+         │
+         │ 3. 回傳文字答案
+         ▼
+  [ 🛡️ 你的後端伺服器 ] ──(4. 回傳乾淨答案)──► [ 💻 前端使用者 ]
+
+🎯 核心結論：前端永遠不可信！金鑰永遠只准留在後端！`
+          }
+        ],
+        analysis: "<strong>前後端（Frontend vs. Backend）的核心概念：</strong><br>• <strong>前端（Frontend / Client-Side）</strong>：運行在<strong>使用者的電腦與手機瀏覽器裡</strong>（Chrome、Safari）。包含 HTML、CSS 與 JavaScript。<strong>任何送到前端的代碼，對全世界都是 100% 透明公開的！按右鍵『檢視原始碼』或 F12 一秒無所遁形。</strong><br>• <strong>後端（Backend / Server-Side）</strong>：運行在<strong>你自己掌控的雲端伺服器裡</strong>（如 Node.js、Python、Cloudflare Worker）。這裡才是存放 <code>.env</code> 金鑰與執行業務邏輯的保險箱。<br>• <strong>天價帳單的防禦心法</strong>：永遠不要將 API Key 暴露給前端，並務必在雲端平台設定『每月預算硬上限（Spending Limit）』！",
+        takeaway: "🎓 課程啟示：在 Module 3 使用 Antigravity 建站時，我們正是教大家透過現代 Agentic 架構，將本地金鑰與伺服器環境嚴格隔離，打造兼具互動性與銀行級安全的工作流程！"
       }
     ];
 
