@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="zh-TW" data-composition-variables='[
+  {"id":"kicker","type":"string","label":"眉題","default":"DATA ATOMS STUDIO"},
+  {"id":"title","type":"string","label":"主標題","default":"Excel 數據視覺化工作台"},
+  {"id":"accent","type":"color","label":"強調色","default":"#ff5722"},
+  {"id":"paper","type":"color","label":"底色","default":"#f4f4f2"},
+  {"id":"ink","type":"color","label":"文字深色","default":"#1e293b"},
+  {"id":"endHold","type":"number","label":"結尾停留（秒）","default":2.5,"min":0,"max":10,"step":0.1,"group":"節奏"}
+]'>
+<head>
+<meta charset="utf-8">
+<title>Data Atoms Studio · Launch Demo (cursor-demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/om.js"></script>
+<style>
+  :root {
+    --paper: #f4f4f2;
+    --card-bg: #ffffff;
+    --ink: #111111;
+    --slate: #1e293b;
+    --slate-muted: #64748b;
+    --accent: #ff5722;
+    --border: rgba(0, 0, 0, 0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #0d1117;
+    font-family: 'Plus Jakarta Sans', 'Noto Sans TC', sans-serif;
+  }
+
+  #film {
+    position: relative; width: 1920px; height: 1080px; overflow: hidden;
+    background: var(--paper); color: var(--ink);
+    transform-origin: 0 0;
+  }
+
+  /* Virtual World Camera Container */
+  #world {
+    position: absolute; top: 0; left: 0; width: 1920px; height: 1080px;
+    transform-origin: 960px 540px;
+  }
+
+  /* Header Bar */
+  .app-header {
+    position: absolute; top: 24px; left: 60px; right: 60px; height: 72px;
+    background: #ffffff; border: 1px solid var(--border); border-radius: 14px;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  }
+  .brand-wrap { display: flex; align-items: center; gap: 14px; }
+  .brand-icon {
+    width: 40px; height: 40px; background: var(--slate); color: #fff;
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 20px;
+  }
+  .brand-icon span { color: var(--accent); }
+  .brand-title { font-size: 18px; font-weight: 800; color: var(--ink); display: flex; align-items: center; gap: 10px; }
+  .badge-tag {
+    font-size: 11px; padding: 3px 8px; border-radius: 6px;
+    background: rgba(255, 87, 34, 0.12); color: var(--accent);
+    font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  }
+  .btn-export {
+    display: flex; align-items: center; gap: 8px; padding: 10px 18px;
+    background: var(--accent); color: #fff; font-size: 13px; font-weight: 700;
+    border-radius: 8px; border: none; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 87, 34, 0.25);
+  }
+
+  /* Workspace Layout */
+  .layout-grid {
+    position: absolute; top: 116px; left: 60px; right: 60px; bottom: 24px;
+    display: grid; grid-template-columns: 420px 1fr; gap: 24px;
+  }
+
+  /* Sidebar Controls */
+  .sidebar { display: flex; flex-direction: column; gap: 16px; }
+  .panel-card {
+    background: #ffffff; border: 1px solid var(--border); border-radius: 14px;
+    padding: 18px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  }
+  .panel-title {
+    font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  /* Upload Dropzone */
+  .dropzone {
+    border: 2px dashed #cbd5e1; background: #fafaf8; border-radius: 12px;
+    padding: 22px 16px; text-align: center; position: relative;
+  }
+  .dropzone.active-drag {
+    border-color: var(--accent); background: rgba(255, 87, 34, 0.08);
+    transform: scale(1.02);
+  }
+  .drop-icon {
+    width: 44px; height: 44px; margin: 0 auto 10px; background: #e2e8f0;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: var(--slate);
+  }
+
+  /* Chart Type Selection */
+  .chart-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .chart-btn {
+    padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+    background: #fff; display: flex; flex-direction: column; gap: 3px; cursor: pointer;
+  }
+  .chart-btn.active {
+    border-color: var(--accent); background: rgba(255, 87, 34, 0.06);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .chart-btn .c-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent); }
+  .chart-btn .c-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+
+  /* Right Arena */
+  .main-arena { display: flex; flex-direction: column; gap: 16px; }
+
+  /* Top 4 KPI Tiles */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .kpi-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 18px; position: relative; overflow: hidden;
+  }
+  .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
+  .kpi-lbl { font-size: 11px; font-weight: 700; color: var(--slate-muted); font-family: 'JetBrains Mono', monospace; }
+  .kpi-val { font-size: 28px; font-weight: 800; color: var(--ink); font-family: 'JetBrains Mono', monospace; line-height: 1.2; }
+
+  /* Canvas Stage Card */
+  .stage-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 16px;
+    padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 14px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  }
+  .stage-inner {
+    position: relative; width: 100%; height: 580px;
+    background: #f4f4f2; border-radius: 12px; border: 1px solid rgba(0,0,0,0.06);
+    overflow: hidden; display: flex;
+  }
+
+  /* Left Guide Column */
+  .stage-left-guide {
+    width: 340px; padding: 28px 24px; display: flex; flex-direction: column; gap: 12px;
+    border-right: 1px solid rgba(0,0,0,0.06); background: #fbfbf9;
+  }
+  .guide-badge { font-size: 48px; font-weight: 800; color: var(--accent); font-family: 'JetBrains Mono', monospace; line-height: 1; }
+  .guide-title { font-size: 36px; font-weight: 800; color: var(--slate); line-height: 1.2; }
+  .guide-en { font-size: 14px; font-weight: 700; color: var(--slate-muted); font-family: 'JetBrains Mono', monospace; }
+  .guide-formula {
+    padding: 8px 12px; background: rgba(255, 87, 34, 0.1); border-radius: 6px;
+    font-size: 12px; font-weight: 700; color: var(--accent); font-family: 'JetBrains Mono', monospace;
+  }
+  .guide-box {
+    margin-top: 10px; background: #fff; border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; font-size: 14px; line-height: 1.6; color: #475569;
+  }
+
+  /* Right Chart Visual Stage */
+  .stage-visual { position: relative; flex: 1; height: 100%; padding: 24px; }
+  .chart-canvas-view {
+    position: absolute; inset: 20px; background: #fff; border-radius: 12px;
+    border: 1px solid var(--border); overflow: hidden;
+  }
+
+  /* Virtual Elements for Animation */
+  /* Bar Chart Visual */
+  .bar-container {
+    position: absolute; top: 60px; bottom: 30px; left: 30px; right: 30px;
+    display: flex; align-items: flex-end; justify-content: space-around;
+    opacity: 0; transform: translateY(20px);
+  }
+  .bar-col {
+    width: 60px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+    position: relative;
+  }
+  .bar-track { position: absolute; inset: 0; background: #f1f1ed; border-radius: 6px; z-index: 1; }
+  .bar-body {
+    position: relative; z-index: 2; width: 100%; border-radius: 6px; background: var(--slate);
+    transform-origin: bottom center; transform: scaleY(0);
+  }
+  .bar-body.peak { background: var(--accent); }
+  .bar-cap { width: 100%; height: 6px; background: var(--accent); border-radius: 3px 3px 0 0; }
+  .bar-lbl { margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--slate); text-align: center; }
+  .bar-val { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .peak-badge {
+    position: absolute; top: -38px; background: var(--accent); color: #fff;
+    padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 800;
+    font-family: 'JetBrains Mono', monospace; white-space: nowrap; box-shadow: 0 4px 10px rgba(255, 87, 34, 0.3);
+  }
+
+  /* Scatter Visual */
+  .scatter-container { position: absolute; inset: 40px; opacity: 0; }
+  .reg-line {
+    position: absolute; width: 100%; height: 3px; background: var(--accent);
+    transform-origin: 0 0; transform: rotate(-25deg); top: 380px; left: 30px;
+  }
+  .conf-corridor {
+    position: absolute; width: 100%; height: 70px; background: rgba(255, 87, 34, 0.08);
+    transform-origin: 0 0; transform: rotate(-25deg); top: 345px; left: 30px;
+  }
+  .scatter-dot {
+    position: absolute; border-radius: 50%; background: var(--accent);
+    border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .pearson-chip {
+    position: absolute; top: 10px; right: 20px; background: var(--slate); color: #fff;
+    padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Funnel Visual */
+  .funnel-container { position: absolute; inset: 30px; opacity: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; }
+  .funnel-layer {
+    height: 48px; background: var(--slate); border-radius: 6px;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
+    color: #fff; font-weight: 700; font-size: 14px;
+  }
+
+  /* Cursor & Dragged File */
+  #cursor {
+    position: absolute; width: 32px; height: 32px; z-index: 9999; pointer-events: none;
+    transform: translate(1400px, 80px);
+  }
+  #cursor svg { filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3)); }
+  
+  #draggedFile {
+    position: absolute; width: 160px; height: 50px; background: #fff;
+    border: 1px solid rgba(0,0,0,0.15); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+    display: flex; align-items: center; gap: 10px; padding: 0 12px; font-size: 12px; font-weight: 700;
+    z-index: 9998; pointer-events: none; opacity: 0; transform: translate(1420px, 100px);
+  }
+
+  /* Toast Notification */
+  .toast-banner {
+    position: absolute; top: 104px; right: 70px; background: var(--slate); color: #fff;
+    padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 700;
+    border-left: 4px solid var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    opacity: 0; transform: translateY(-20px); z-index: 9995;
+  }
+
+  /* Outro Screen */
+  #outroOverlay {
+    position: absolute; inset: 0; background: rgba(244, 244, 242, 0.95);
+    backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; z-index: 8000;
+  }
+  .outro-title { font-size: 56px; font-weight: 900; color: var(--ink); margin-bottom: 12px; letter-spacing: -0.02em; }
+  .outro-sub { font-size: 22px; font-weight: 600; color: var(--slate-muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* Signature */
+  .signature-badge {
+    position: absolute; bottom: 24px; right: 32px; font-size: 13px; font-family: 'JetBrains Mono', monospace;
+    color: var(--slate-muted); opacity: 0.7; z-index: 9000;
+  }
+  .signature-badge b { color: var(--accent); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div id="film" data-composition-id="film" data-width="1920" data-height="1080">
+  
+  <div id="world">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="brand-wrap">
+        <div class="brand-icon">D<span>A</span></div>
+        <div class="brand-title">
+          Data Atoms · Excel 數據視覺化工作台
+          <span class="badge-tag">7 大商業圖表引擎</span>
+        </div>
+      </div>
+      <div>
+        <button class="btn-export" id="btnExportTop">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          匯出 1080p 圖片 (.png)
+        </button>
+      </div>
+    </header>
+
+    <!-- Workspace Grid -->
+    <div class="layout-grid">
+      
+      <!-- Left Sidebar -->
+      <aside class="sidebar">
+        <!-- Dropzone -->
+        <div class="panel-card">
+          <div class="panel-title">
+            <span>數據來源上傳</span>
+            <span style="font-size: 11px; padding: 2px 7px; background: #f1f1ee; border-radius: 10px; font-family: 'JetBrains Mono';" id="uploadCountPill">未載入檔案</span>
+          </div>
+          <div class="dropzone" id="uiDropzone">
+            <div class="drop-icon">📥</div>
+            <div style="font-size: 14px; font-weight: 700; color: var(--ink);">點擊或將 Excel / CSV 拖曳至此</div>
+            <div style="font-size: 11px; color: var(--slate-muted); margin-top: 4px;">支援 .xlsx, .xls, .csv 檔案格式</div>
+          </div>
+        </div>
+
+        <!-- 7 Chart Types -->
+        <div class="panel-card">
+          <div class="panel-title">
+            <span>選擇可視化圖型</span>
+            <span style="font-size: 11px; color: var(--slate-muted); font-family: 'JetBrains Mono';">7 大圖型</span>
+          </div>
+          <div class="chart-grid">
+            <div class="chart-btn active" id="btnChartBar">
+              <span class="c-num">01.</span>
+              <span class="c-name">離散體量</span>
+            </div>
+            <div class="chart-btn" id="btnChartLine">
+              <span class="c-num">02.</span>
+              <span class="c-name">時序趨勢</span>
+            </div>
+            <div class="chart-btn" id="btnChartScatter">
+              <span class="c-num">03.</span>
+              <span class="c-name">相關分佈</span>
+            </div>
+            <div class="chart-btn" id="btnChartDonut">
+              <span class="c-num">04.</span>
+              <span class="c-name">結構佔比</span>
+            </div>
+            <div class="chart-btn" id="btnChartRadar">
+              <span class="c-num">05.</span>
+              <span class="c-name">多維畫像</span>
+            </div>
+            <div class="chart-btn" id="btnChartFunnel">
+              <span class="c-num">06.</span>
+              <span class="c-name">轉化路徑</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dimension Controls -->
+        <div class="panel-card" style="font-size: 13px;">
+          <div class="panel-title"><span>維度與指標映射</span></div>
+          <div style="padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-family: 'JetBrains Mono'; color: var(--slate); margin-bottom: 8px;">
+            維度 [X]: <span style="font-weight: 700;" id="activeDimX">產品線</span>
+          </div>
+          <div style="padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-family: 'JetBrains Mono'; color: var(--slate);">
+            指標 [Y]: <span style="font-weight: 700;" id="activeDimY">本季營收(萬元)</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Visual Arena -->
+      <main class="main-arena">
+        
+        <!-- 4 Top KPI Cards -->
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-lbl">數據樣本量 (ROWS)</div>
+            <div class="kpi-val" id="kpiRows">0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-lbl">指標總和 (SUM)</div>
+            <div class="kpi-val" id="kpiSum">0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-lbl">樣本均值 (MEAN)</div>
+            <div class="kpi-val" id="kpiMean">0</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-lbl" id="kpiLabel4">極值跨度 (MAX-MIN)</div>
+            <div class="kpi-val" id="kpiVal4">0</div>
+          </div>
+        </div>
+
+        <!-- Stage Card -->
+        <div class="stage-card">
+          <div class="stage-inner">
+            
+            <!-- Left Guide Column -->
+            <div class="stage-left-guide">
+              <div class="guide-badge" id="guideBadge">01.</div>
+              <div class="guide-title" id="guideTitle">離散體量</div>
+              <div class="guide-en" id="guideEn">DISCRETE COMPARISON</div>
+              <div class="guide-formula" id="guideFormula">+ rank · variance · max peak delta</div>
+              <div class="guide-box" id="guideInsight">
+                快速對比各業務單元的本季營收絕對體量，透過排序與目標基準線，可直接鎖定貢獻主力與潛在落後環節。
+              </div>
+            </div>
+
+            <!-- Right Visual Stage -->
+            <div class="stage-visual">
+              <div class="chart-canvas-view">
+                
+                <!-- 01 Bar Chart Visual -->
+                <div class="bar-container" id="visualBar">
+                  <div class="bar-col">
+                    <div class="peak-badge">MAX: 940</div>
+                    <div class="bar-val" style="color: var(--accent);">940</div>
+                    <div class="bar-body peak" style="height: 380px;">
+                      <div class="bar-cap"></div>
+                    </div>
+                    <div class="bar-lbl">企業雲平台</div>
+                  </div>
+                  <div class="bar-col">
+                    <div class="bar-val">720</div>
+                    <div class="bar-body" style="height: 290px;">
+                      <div class="bar-cap"></div>
+                    </div>
+                    <div class="bar-lbl">數據中台</div>
+                  </div>
+                  <div class="bar-col">
+                    <div class="bar-val">580</div>
+                    <div class="bar-body" style="height: 235px;">
+                      <div class="bar-cap"></div>
+                    </div>
+                    <div class="bar-lbl">AI視覺助理</div>
+                  </div>
+                  <div class="bar-col">
+                    <div class="bar-val">430</div>
+                    <div class="bar-body" style="height: 175px;">
+                      <div class="bar-cap"></div>
+                    </div>
+                    <div class="bar-lbl">物聯網邊緣</div>
+                  </div>
+                  <div class="bar-col">
+                    <div class="bar-val">360</div>
+                    <div class="bar-body" style="height: 145px;">
+                      <div class="bar-cap"></div>
+                    </div>
+                    <div class="bar-lbl">資安套件</div>
+                  </div>
+                  <div class="bar-col">
+                    <div class="bar-val">290</div>
+                    <div class="bar-body" style="height: 118px;">
+                      <div class="bar-cap"></div>
+                    </div>
+                    <div class="bar-lbl">行動端SDK</div>
+                  </div>
+                </div>
+
+                <!-- 03 Scatter Visual -->
+                <div class="scatter-container" id="visualScatter">
+                  <div class="pearson-chip">PEARSON R = +0.714 · 高度強相關</div>
+                  <div class="conf-corridor"></div>
+                  <div class="reg-line"></div>
+                  <!-- Dots -->
+                  <div class="scatter-dot" style="left: 100px; top: 400px; width: 18px; height: 18px;"></div>
+                  <div class="scatter-dot" style="left: 180px; top: 350px; width: 22px; height: 22px;"></div>
+                  <div class="scatter-dot" style="left: 280px; top: 290px; width: 26px; height: 26px;"></div>
+                  <div class="scatter-dot" style="left: 420px; top: 220px; width: 32px; height: 32px;"></div>
+                  <div class="scatter-dot" style="left: 580px; top: 120px; width: 44px; height: 44px; box-shadow: 0 0 0 6px rgba(255,87,34,0.25);"></div>
+                  <div class="scatter-dot" style="left: 520px; top: 420px; width: 20px; height: 20px; background: #64748b;"></div>
+                </div>
+
+                <!-- 06 Funnel Visual -->
+                <div class="funnel-container" id="visualFunnel">
+                  <div class="funnel-layer" style="width: 85%;"><span>01_首頁登錄 (100,000人)</span><span>CR: 100%</span></div>
+                  <div class="funnel-layer" style="width: 70%; background: #334155;"><span>02_商品瀏覽 (68,500人)</span><span>CR: 68.5%</span></div>
+                  <div class="funnel-layer" style="width: 52%; background: #475569;"><span>03_詳情進入 (38,200人)</span><span>CR: 38.2%</span></div>
+                  <div class="funnel-layer" style="width: 36%; background: #64748b;"><span>04_加入購物車 (19,600人)</span><span>CR: 19.6%</span></div>
+                  <div class="funnel-layer" style="width: 26%; background: var(--accent);"><span>05_完成支付 (10,200人)</span><span>CR: 10.2%</span></div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </main>
+
+    </div>
+
+    <!-- Dragged File Item -->
+    <div id="draggedFile">
+      <span style="font-size: 20px;">📄</span>
+      <div>
+        <div>產品線營收體量.xlsx</div>
+        <div style="font-size: 10px; color: var(--slate-muted); font-family: 'JetBrains Mono';">8 行 · 6 欄</div>
+      </div>
+    </div>
+
+    <!-- The Animated Cursor -->
+    <div id="cursor">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <path d="M3 3l7 18 3-7 7-3L3 3z" fill="#111111" stroke="#ffffff" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-banner" id="toast">
+      ✅ 成功載入檔案：產品線營收體量.xlsx
+    </div>
+
+  </div>
+
+  <!-- Outro Overlay -->
+  <div id="outroOverlay" data-layout-allow-occlusion data-layout-allow-overlap>
+    <div class="outro-title">Data Atoms · Excel 數據視覺化工作台</div>
+    <div class="outro-sub">零依賴 · 100% 離線運作 · 觀默導演層動態美學</div>
+  </div>
+
+  <div class="signature-badge">Made with <b>huashu-motion</b></div>
+
+  <!-- Master Soundtrack (Voiceover + SFX + BGM) -->
+  <audio id="om-sound" src="assets/sound.wav" preload="auto"></audio>
+</div>
+
+<script>
+  /**
+   * Data Atoms Studio · 38s 商業發表影片 (cursor-demo)
+   * 118 BPM Hybrid 運鏡路線
+   */
+  const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
+
+  // 1. Scene: Hook & Drag Drop (0.0s - 9.0s)
+  tl.addLabel('scene:hook', 0)
+    // 鏡頭初始全景
+    .fromTo('#world', { scale: 1.0, x: 0, y: 0 }, { scale: 1.02, duration: 2.0, ease: 'sine.inOut' }, 0)
+    // 檔案拖曳進場
+    .fromTo('#draggedFile', { opacity: 0, x: 1450, y: 40 }, { opacity: 1, x: 620, y: 220, duration: 2.3, ease: 'power2.inOut' }, 0.5)
+    .fromTo('#cursor', { x: 1430, y: 25 }, { x: 600, y: 205, duration: 2.3, ease: 'power2.inOut' }, 0.5)
+    // 鏡頭推向上傳區
+    .to('#world', { scale: 1.35, x: 420, y: 240, duration: 1.5, ease: 'power2.inOut' }, 2.0)
+    // 檔案拖入 Dropzone
+    .to('#draggedFile', { x: 260, y: 240, duration: 1.2, ease: 'power2.out' }, 2.6)
+    .to('#cursor', { x: 240, y: 225, duration: 1.2, ease: 'power2.out' }, 2.6)
+    .to('#uiDropzone', { borderColor: '#ff5722', backgroundColor: 'rgba(255,87,34,0.12)', scale: 1.04, duration: 0.3 }, 3.0)
+    // 鬆手釋放 (Drop!)
+    .to('#draggedFile', { scale: 0.85, opacity: 0, duration: 0.35, ease: 'back.in(2)' }, 3.3)
+    .to('#uiDropzone', { scale: 1.0, backgroundColor: '#fafaf8', duration: 0.4 }, 3.5)
+    // Toast 彈出
+    .to('#toast', { opacity: 1, y: 0, duration: 0.4, ease: 'back.out(1.5)' }, 3.6)
+    .set('#uploadCountPill', { textContent: '8 列數據' }, 3.6)
+    // 鏡頭拉回中景，展示圖表升起
+    .to('#world', { scale: 1.12, x: -120, y: 40, duration: 1.8, ease: 'power3.inOut' }, 4.5);
+
+  // KPI 數字計數器
+  const counterObj = { rows: 0, sum: 0, mean: 0, maxmin: 0 };
+  tl.addLabel('scene:bar_render', 5.0)
+    .to(counterObj, {
+      rows: 8, sum: 3700, mean: 461.3, maxmin: 780,
+      duration: 1.4, ease: 'expo.out',
+      onUpdate: () => {
+        document.getElementById('kpiRows').textContent = Math.round(counterObj.rows);
+        document.getElementById('kpiSum').textContent = counterObj.sum > 1000 ? (counterObj.sum / 1000).toFixed(1) + 'K' : Math.round(counterObj.sum);
+        document.getElementById('kpiMean').textContent = counterObj.mean.toFixed(1);
+        document.getElementById('kpiVal4').textContent = Math.round(counterObj.maxmin);
+      }
+    }, 5.0)
+    // 柱狀圖升起
+    .to('#visualBar', { opacity: 1, y: 0, duration: 0.6 }, 5.2)
+    .fromTo('.bar-body', { scaleY: 0 }, { scaleY: 1, stagger: 0.08, duration: 0.9, ease: 'elastic.out(1, 0.75)' }, 5.3)
+    .fromTo('.peak-badge', { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(2)' }, 6.2)
+    .to('#toast', { opacity: 0, y: 30, duration: 0.4 }, 7.5);
+
+  // 2. Scene: Switch to Scatter (9.0s - 19.0s)
+  tl.addLabel('scene:scatter', 9.0)
+    // 游標滑向左側選單
+    .to('#cursor', { x: 310, y: 465, duration: 1.1, ease: 'power2.inOut' }, 9.0)
+    .to('#world', { scale: 1.3, x: 140, y: -40, duration: 1.2, ease: 'power3.inOut' }, 9.0)
+    // 點擊「03. 相關分佈」按鈕
+    .to('#cursor', { scale: 0.8, duration: 0.15 }, 10.1)
+    .to('#cursor', { scale: 1.0, duration: 0.15 }, 10.25)
+    .set('#btnChartBar', { className: 'chart-btn' }, 10.2)
+    .set('#btnChartScatter', { className: 'chart-btn active' }, 10.2)
+    // 導讀資訊切換
+    .call(() => { document.getElementById('guideBadge').textContent = '03.'; }, null, 10.2)
+    .set('#guideTitle', { textContent: '相關分佈' }, 10.2)
+    .set('#guideEn', { textContent: 'CORRELATION MATRIX' }, 10.2)
+    .set('#guideFormula', { textContent: '+ pearson R · 95% corridor · outlier' }, 10.2)
+    .set('#guideInsight', { textContent: '驗證雙變量間因果假說，識別異常離群值（Outliers）與線性回歸趨勢以防策略誤判。' }, 10.2)
+    .set('#activeDimX', { textContent: '廣告預算(千元)' }, 10.2)
+    .set('#activeDimY', { textContent: '新增轉化用戶' }, 10.2)
+    .set('#kpiLabel4', { textContent: '皮爾森相關 (PEARSON R)' }, 10.2)
+    .set('#kpiVal4', { textContent: '+0.714' }, 10.2)
+    // 圖表形變為散點圖
+    .to('#visualBar', { opacity: 0, duration: 0.3 }, 10.1)
+    .to('#visualScatter', { opacity: 1, duration: 0.5 }, 10.3)
+    .fromTo('.reg-line', { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: 'expo.out' }, 10.5)
+    .fromTo('.conf-corridor', { opacity: 0, scaleY: 0 }, { opacity: 1, scaleY: 1, duration: 0.7 }, 10.7)
+    .fromTo('.scatter-dot', { scale: 0 }, { scale: 1, stagger: 0.08, duration: 0.6, ease: 'back.out(2)' }, 10.6)
+    .fromTo('.pearson-chip', { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }, 11.2)
+    // 游標滑向離群值
+    .to('#world', { scale: 1.35, x: -300, y: -20, duration: 1.6, ease: 'power3.inOut' }, 13.5)
+    .to('#cursor', { x: 1360, y: 390, duration: 1.8, ease: 'power2.out' }, 13.8);
+
+  // 3. Scene: Multi-Chart Burst (19.0s - 29.5s)
+  tl.addLabel('scene:burst', 19.0)
+    // 游標移回左側快速點選
+    .to('#world', { scale: 1.15, x: 0, y: -20, duration: 1.0, ease: 'power2.inOut' }, 19.0)
+    .to('#cursor', { x: 310, y: 530, duration: 0.9, ease: 'power2.out' }, 19.1)
+    // 點擊「06. 轉化路徑」
+    .to('#cursor', { scale: 0.8, duration: 0.1 }, 20.0)
+    .to('#cursor', { scale: 1.0, duration: 0.1 }, 20.1)
+    .set('#btnChartScatter', { className: 'chart-btn' }, 20.05)
+    .set('#btnChartFunnel', { className: 'chart-btn active' }, 20.05)
+    .call(() => { document.getElementById('guideBadge').textContent = '06.'; }, null, 20.05)
+    .set('#guideTitle', { textContent: '轉化路徑' }, 20.05)
+    .set('#guideEn', { textContent: 'CONVERSION FUNNEL' }, 20.05)
+    .set('#guideFormula', { textContent: '+ step drop-off · retention CR%' }, 20.05)
+    .to('#visualScatter', { opacity: 0, duration: 0.2 }, 20.0)
+    .to('#visualFunnel', { opacity: 1, duration: 0.4 }, 20.1)
+    .fromTo('.funnel-layer', { x: 50, opacity: 0 }, { x: 0, opacity: 1, stagger: 0.08, duration: 0.5, ease: 'power3.out' }, 20.2)
+    // 游標停頓欣賞
+    .to('#cursor', { x: 330, y: 540, duration: 2.0 }, 21.0)
+    // 鏡頭緩動
+    .to('#world', { scale: 1.15, x: 0, y: -40, duration: 2.5, ease: 'sine.inOut' }, 24.0);
+
+  // 4. Scene: Export & Outro (29.5s - 38.0s)
+  tl.addLabel('scene:export', 29.5)
+    // 鏡頭推向右上角「匯出 1080p 圖片」按鈕
+    .to('#world', { scale: 1.45, x: -580, y: 380, duration: 1.4, ease: 'power3.inOut' }, 29.5)
+    .to('#cursor', { x: 1720, y: 60, duration: 1.3, ease: 'power2.inOut' }, 29.6)
+    // 點擊匯出按鈕
+    .to('#btnExportTop', { scale: 0.92, duration: 0.12 }, 31.0)
+    .to('#btnExportTop', { scale: 1.0, duration: 0.15 }, 31.15)
+    .set('#toast', { textContent: '📥 圖表已匯出為高畫質 1080p PNG 圖片！' }, 31.2)
+    .to('#toast', { opacity: 1, y: 0, duration: 0.4, ease: 'back.out(1.5)' }, 31.2)
+    // 全景拉回
+    .to('#world', { scale: 1.0, x: 0, y: 0, duration: 2.0, ease: 'power3.inOut' }, 32.2)
+    .to('#cursor', { x: 1550, y: 400, opacity: 0.5, duration: 1.5 }, 32.5)
+    // 結尾品牌層
+    .to('#outroOverlay', { opacity: 1, duration: 1.2, ease: 'power2.out' }, 34.5)
+    .to({}, { duration: 2.5 }); // Closing hold to 38.0s
+
+  window.__timelines['film'] = tl;
+</script>
+</body>
+</html>

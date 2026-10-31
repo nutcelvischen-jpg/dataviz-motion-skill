@@ -1,7 +1,10 @@
 api_key.txt
 gemini_api_key.txt
 *.key
+*.textClipping
 .DS_Store
+bin/
+node_modules
 node_modules/
 __pycache__/
 .venv/
