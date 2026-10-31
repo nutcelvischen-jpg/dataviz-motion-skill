@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Atoms · Excel 數據視覺化工作台</title>
+  
+  <!-- Typography: Plus Jakarta Sans, Noto Sans TC, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="app-body">
+
+  <div class="app-shell">
+    
+    <!-- 1. Top Header Application Bar (52px fixed, Zero-Scroll) -->
+    <header class="app-topbar">
+      <!-- Left: Brand & File Info -->
+      <div class="topbar-left">
+        <div class="brand-badge">
+          <div class="brand-logo">DA</div>
+          <div class="brand-text">
+            <span class="brand-title">Data Atoms</span>
+            <span class="brand-sub">Studio</span>
+          </div>
+        </div>
+
+        <div class="topbar-divider"></div>
+
+        <!-- Active File Info Pill (Click to open file picker) -->
+        <div class="active-file-pill" id="activeFileInfo" title="點擊更換資料檔案">
+          <svg class="pill-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span class="file-name" id="activeFileName">01_產品線營收體量_測試.xlsx</span>
+          <span class="file-meta" id="activeFileMeta">8 列 · 6 欄</span>
+        </div>
+
+        <!-- Multi-Sheet Selector (when workbook has >1 sheets) -->
+        <div class="sheet-select-pill" id="sheetSelectRow" style="display: none;">
+          <span class="sheet-label">工作表:</span>
+          <select class="app-select-sm" id="sheetSelector"></select>
+        </div>
+      </div>
+
+      <!-- Center: View Mode Segmented Switcher -->
+      <div class="topbar-center">
+        <div class="view-segmented-control" id="viewModeToggle">
+          <button type="button" class="view-btn active" data-view="canvas" id="btnViewCanvas" title="圖表畫布全螢幕視圖">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+            <span>圖表畫布</span>
+          </button>
+          <button type="button" class="view-btn" data-view="split" id="btnViewSplit" title="畫布與表格並排檢視">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+            </svg>
+            <span>分割視圖</span>
+          </button>
+          <button type="button" class="view-btn" data-view="table" id="btnViewTable" title="完整數據明細表格">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v18"></path>
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <path d="M3 9h18"></path>
+              <path d="M3 15h18"></path>
+            </svg>
+            <span>數據明細</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: Presets, Export, Reset -->
+      <div class="topbar-right">
+        <!-- Built-in Samples Quick Loader -->
+        <select id="sampleDataSelector" class="app-select-sm sample-select">
+          <option value="" disabled selected>⚡ 載入精選商業範例...</option>
+          <option value="bar">01. 產品線營收體量 (柱狀圖)</option>
+          <option value="line">02. 12個月營收時序趨勢 (折線圖)</option>
+          <option value="scatter">03. 行銷廣告與獲客相關 (散點圖)</option>
+          <option value="donut">04. 核心業務份額佔比 (環形圖)</option>
+          <option value="radar">05. 團隊綜合多維畫像 (雷達圖)</option>
+          <option value="funnel">06. 電商全鏈路轉化漏斗 (漏斗圖)</option>
+        </select>
+
+        <button type="button" class="btn btn-primary" id="btnExportImage" title="匯出 1920x1080 印刷級 PNG 圖檔">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>匯出 1080p 圖表</span>
+        </button>
+
+        <button type="button" class="btn btn-ghost" id="btnResetData" title="清除當前數據重新載入">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+          <span>重設</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. Workspace Body (Flex 1, Zero Window Scroll) -->
+    <div class="workspace-body">
+      
+      <!-- Left Dock: Controls & Settings (320px fixed, Independent Internal Scroll) -->
+      <aside class="sidebar-dock">
+        <div class="sidebar-scroll-container">
+          
+          <!-- Section 1: Data Source & Upload Dropzone -->
+          <div class="dock-card">
+            <div class="dock-card-header">
+              <span class="dock-title">數據來源</span>
+              <span class="status-chip" id="fileStatusBadge">已就緒</span>
+            </div>
+
+            <div class="upload-dropzone-compact" id="dropzone">
+              <input type="file" id="fileInput" accept=".xlsx, .xls, .csv">
+              <div class="dropzone-inner">
+                <svg class="dropzone-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <div class="dropzone-text">
+                  <div class="dropzone-prompt">拖曳 Excel / CSV 或點擊上傳</div>
+                  <div class="dropzone-hint">支援 .xlsx, .xls, .csv · 本機 100% 離線運算</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dock-card-subaction">
+              <span>快速測試：</span>
+              <button type="button" class="btn-link" id="btnQuickSample">載入預設產品數據</button>
+            </div>
+          </div>
+
+          <!-- Section 2: Chart Type Selection Grid (7 Data Atoms with Bespoke SVGs) -->
+          <div class="dock-card">
+            <div class="dock-card-header">
+              <span class="dock-title">圖表引擎</span>
+              <span class="count-badge">7 大原子</span>
+            </div>
+
+            <div class="chart-type-dock-grid" id="chartTypeGrid">
+              <!-- 01. 柱狀體量 -->
+              <button type="button" class="chart-type-card active" data-chart="bar">
+                <div class="card-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 20V10M12 20V4M6 20v-6"></path>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row">
+                    <span class="card-num">01.</span>
+                    <span class="card-name">離散體量</span>
+                  </div>
+                  <div class="card-en">Bar Comparison</div>
+                </div>
+              </button>
+
+              <!-- 02. 時序趨勢 -->
+              <button type="button" class="chart-type-card" data-chart="line">
+                <div class="card-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 16 6-6 4 4 8-8"></path>
+                    <path d="M17 6h4v4"></path>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row">
+                    <span class="card-num">02.</span>
+                    <span class="card-name">時序趨勢</span>
+                  </div>
+                  <div class="card-en">Temporal Trend</div>
+                </div>
+              </button>
+
+              <!-- 03. 相關分佈 -->
+              <button type="button" class="chart-type-card" data-chart="scatter">
+                <div class="card-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="7.5" cy="15.5" r="1.5" fill="currentColor"></circle>
+                    <circle cx="12" cy="11" r="1.5" fill="currentColor"></circle>
+                    <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"></circle>
+                    <circle cx="9" cy="8" r="1.5" fill="currentColor"></circle>
+                    <circle cx="15" cy="16" r="1.5" fill="currentColor"></circle>
+                    <line x1="4" y1="18" x2="20" y2="4" stroke-dasharray="2 2"></line>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row">
+                    <span class="card-num">03.</span>
+                    <span class="card-name">相關分佈</span>
+                  </div>
+                  <div class="card-en">Correlation Matrix</div>
+                </div>
+              </button>
+
+              <!-- 04. 結構佔比 -->
+              <button type="button" class="chart-type-card" data-chart="donut">
+                <div class="card-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                    <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row">
+                    <span class="card-num">04.</span>
+                    <span class="card-name">結構佔比</span>
+                  </div>
+                  <div class="card-en">Composition Donut</div>
+                </div>
+              </button>
+
+              <!-- 05. 多維畫像 -->
+              <button type="button" class="chart-type-card" data-chart="radar">
+                <div class="card-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"></polygon>
+                    <polygon points="12 6 18 10 18 14 12 18 6 14 6 10"></polygon>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row">
+                    <span class="card-num">05.</span>
+                    <span class="card-name">多維畫像</span>
+                  </div>
+                  <div class="card-en">Radar Profile</div>
+                </div>
+              </button>
+
+              <!-- 06. 轉化路徑 -->
+              <button type="button" class="chart-type-card" data-chart="funnel">
+                <div class="card-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row">
+                    <span class="card-num">06.</span>
+                    <span class="card-name">轉化路徑</span>
+                  </div>
+                  <div class="card-en">Funnel Conversion</div>
+                </div>
+              </button>
+
+              <!-- 07. 矩陣總覽 -->
+              <button type="button" class="chart-type-card full-width" data-chart="overview">
+                <div class="card-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row">
+                    <span class="card-num">07.</span>
+                    <span class="card-name">指標矩陣總覽</span>
+                  </div>
+                  <div class="card-en">Metric Matrix Overview</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 3: Field Mapping Controls -->
+          <div class="dock-card">
+            <div class="dock-card-header">
+              <span class="dock-title">維度與指標映射</span>
+              <span class="count-badge">自動對齊</span>
+            </div>
+
+            <!-- X Axis / Dimension -->
+            <div class="control-field">
+              <label class="control-label" for="selectXAxis">
+                <span>X 軸 / 類別維度 (Category)</span>
+                <span class="req">*</span>
+              </label>
+              <select class="app-select" id="selectXAxis"></select>
+            </div>
+
+            <!-- Y Axis / Metric -->
+            <div class="control-field">
+              <label class="control-label" for="selectYAxis">
+                <span>Y 軸 / 主要數值指標 (Metric)</span>
+                <span class="req">*</span>
+              </label>
+              <select class="app-select" id="selectYAxis"></select>
+            </div>
+
+            <!-- Secondary Metric (Optional) -->
+            <div class="control-field" id="groupSecondary">
+              <label class="control-label" for="selectSecondary">
+                <span id="labelSecondary">次要指標 / 目標線 (Secondary)</span>
+                <span class="opt-label">(選填)</span>
+              </label>
+              <select class="app-select" id="selectSecondary"></select>
+            </div>
+
+            <div class="divider-subtle"></div>
+
+            <!-- Options & Toggles -->
+            <div class="toggles-list">
+              <label class="toggle-row">
+                <input type="checkbox" id="chkShowLabels" checked>
+                <span class="toggle-text">顯示精確數值標籤</span>
+              </label>
+              <label class="toggle-row" id="rowSortDescending">
+                <input type="checkbox" id="chkSortDescending" checked>
+                <span class="toggle-text">依指標由大至小排序 (Ranking)</span>
+              </label>
+              <label class="toggle-row" id="rowShowAverage">
+                <input type="checkbox" id="chkShowAverage" checked>
+                <span class="toggle-text">顯示平均值 / 基準參考線</span>
+              </label>
+              <label class="toggle-row" id="rowShowTrendline">
+                <input type="checkbox" id="chkShowTrendline" checked>
+                <span class="toggle-text" id="txtTrendlineLabel">顯示移動平均線 / 回歸線</span>
+              </label>
+              <label class="toggle-row" id="rowHighlightOutliers">
+                <input type="checkbox" id="chkHighlightOutliers" checked>
+                <span class="toggle-text">標記最高極值 / 離群值 (Outlier)</span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- Main Center Arena (Flex 1, Zero Window Scroll) -->
+      <main class="main-stage">
+        
+        <!-- Live KPI Ribbon (Horizontal Compact Strip, 46px height) -->
+        <section class="kpi-ribbon">
+          <div class="kpi-chip chip-1">
+            <span class="kpi-micro-label" id="kpiRowCountSub">ROWS</span>
+            <span class="kpi-micro-val" id="kpiRowCount">0</span>
+          </div>
+
+          <div class="kpi-chip-divider"></div>
+
+          <div class="kpi-chip chip-2">
+            <span class="kpi-micro-label" id="kpiTotalSumSub">SUM</span>
+            <span class="kpi-micro-val" id="kpiTotalSum">0</span>
+          </div>
+
+          <div class="kpi-chip-divider"></div>
+
+          <div class="kpi-chip chip-3">
+            <span class="kpi-micro-label" id="kpiMeanValSub">MEAN</span>
+            <span class="kpi-micro-val" id="kpiMeanVal">0</span>
+          </div>
+
+          <div class="kpi-chip-divider"></div>
+
+          <div class="kpi-chip chip-4">
+            <span class="kpi-micro-label" id="kpiMetric4Title">MAX-MIN</span>
+            <span class="kpi-micro-val" id="kpiMetric4Val">0</span>
+            <span class="kpi-micro-sub" id="kpiMetric4Sub" style="display: none;"></span>
+          </div>
+        </section>
+
+        <!-- Stage Body (Canvas Viewport + Collapsible Drawer) -->
+        <div class="stage-body" data-view-mode="canvas">
+          
+          <!-- 1. Canvas Viewport (100% fits within viewport, zero page scroll) -->
+          <div class="canvas-viewport" id="canvasViewport">
+            <div class="canvas-wrapper">
+              
+              <!-- Floating Metadata Chip (Top Left) -->
+              <div class="canvas-floating-meta">
+                <div class="meta-tag">
+                  <span class="meta-num" id="canvasBadgeNum">01.</span>
+                  <span class="meta-title" id="canvasChartTitle">離散體量 · DISCRETE COMPARISON</span>
+                </div>
+                <div class="meta-formula" id="canvasFormulaText">+ rank · variance · delta</div>
+              </div>
+
+              <!-- Native 1080p Canvas -->
+              <canvas id="mainChartCanvas" width="1920" height="1080"></canvas>
+              
+              <!-- Hover Floating Tooltip -->
+              <div class="canvas-tooltip" id="canvasTooltip">
+                <div class="tt-title">類別名稱</div>
+                <div class="tt-val">數值: 0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Integrated Data Table Drawer (Collapsible & Expandable) -->
+          <section class="data-drawer" id="dataDrawer">
+            <!-- Drawer Header / Handle Bar -->
+            <div class="drawer-header-bar" id="drawerToggleBar">
+              <div class="drawer-left-action" id="btnToggleDrawer" title="展開 / 收合明細表格">
+                <span class="drawer-toggle-icon" id="drawerIcon">▲</span>
+                <span class="drawer-heading">數據明細預覽</span>
+                <span class="drawer-count-chip" id="drawerRowCount">8 列資料</span>
+              </div>
+
+              <div class="drawer-right-tools">
+                <div class="drawer-search-box">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input type="text" id="tableSearchInput" class="drawer-search-input" placeholder="搜尋表格內容...">
+                </div>
+
+                <button type="button" class="btn btn-sm btn-outline" id="btnExportCSV">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>匯出 CSV</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Drawer Body: Data Table & Pagination -->
+            <div class="drawer-body" id="drawerBody">
+              <div class="table-scroll-wrap">
+                <table class="preview-table" id="previewTable">
+                  <thead id="previewTableHead"></thead>
+                  <tbody id="previewTableBody"></tbody>
+                </table>
+              </div>
+
+              <div class="drawer-footer-pagination">
+                <span class="pagination-info" id="paginationInfo">第 1 頁 / 共 1 頁</span>
+                <span class="pagination-rows-info" id="tableRowsInfo">顯示前 10 筆資料</span>
+                <div class="pagination-actions">
+                  <button type="button" class="btn btn-xs" id="btnPrevPage">上一頁</button>
+                  <button type="button" class="btn btn-xs" id="btnNextPage">下一頁</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Toast Notification element -->
+  <div class="toast-notice" id="toastNotice">
+    <span>通知內容</span>
+  </div>
+
+  <!-- Local SheetJS (works 100% offline) -->
+  <script src="js/xlsx.full.min.js"></script>
+  <!-- Application Script -->
+  <script src="js/app.js"></script>
+</body>
+</html>

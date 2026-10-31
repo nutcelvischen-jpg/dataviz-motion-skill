@@ -1,0 +1,14 @@
+{
+  "servers": {
+    "local-data": {
+      "command": "node",
+      "args": ["./scripts/test_all_charts.js"],
+      "enabled": true
+    },
+    "gemini-docs": {
+      "command": "npx",
+      "args": ["-y", "@google/gemini-api-mcp"],
+      "enabled": true
+    }
+  }
+}

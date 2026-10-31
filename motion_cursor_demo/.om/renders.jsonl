@@ -1,0 +1,2 @@
+{"at":"2026-10-29T15:00:38.759Z","out":"./motion_cursor_demo/out/motion_cursor_demo-v1.mp4","token":"14811bc8a421f2c5043940dd724d034f8d10b8a53acda2fba1a3a20c0d8556d2","fps":30,"format":"mp4","engine":"om","video":"extract","workers":8,"seconds":33.205}
+{"at":"2026-10-29T15:40:05.491Z","out":"./motion_cursor_demo/out/motion_cursor_demo-v2.mp4","token":"ffd94d102c9ef384f7b7997fb83b693c35a87e1c52a1c10b80174665cc86eb68","fps":30,"format":"mp4","engine":"om","video":"extract","workers":8,"seconds":32.63}
