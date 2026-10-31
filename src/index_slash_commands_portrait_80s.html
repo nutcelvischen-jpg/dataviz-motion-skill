@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Antigravity 十大斜線神指令全攻略 (9:16 直式 80s)</title>
+  <title>Antigravity 十大斜線神指令全攻略 (9:16 直式 80s · 大字高清晰版)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800;900&family=Noto+Sans+TC:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-cream: #f4f4f2;
@@ -155,7 +155,7 @@
   <header>
     <div class="brand-title">
       <span>⚡ Antigravity 斜線全家桶</span>
-      <span class="badge-tag">9:16 直式 80s</span>
+      <span class="badge-tag">9:16 大字清晰版</span>
     </div>
     <div style="font-size: 12px; color: #666666;">
       1080×1920 / 10 大神指令
@@ -253,7 +253,7 @@
         title: "定時排程小鬧鐘",
         enTitle: "CRON & AUTOMATION",
         summary: "— 定時循環巡檢 · 晨間自動報表",
-        formula: "cron('0 9 * * *') → fetch_data() → send_report()",
+        formula: "cron('0 9 * * 1-5') → fetch_data() → send_report()",
         explanation: "想每天早上自動收到彙總郵件？輸入 /schedule，AI 變身貼心定時秘書！支援精準 Cron 排程與定時巡檢，時間一到自動執行！"
       },
       {
@@ -289,7 +289,7 @@
         title: "大腦記憶壓縮術",
         enTitle: "CONTEXT COMPACTION",
         summary: "— 一鍵智慧瘦身 · 對話輕盈如飛",
-        formula: "compress(raw_history) → dense_summary (tokens -80%)",
+        formula: "compress(raw_history) → dense_summary (tokens -85%)",
         explanation: "聊了一整天對話快卡住了？輸入 /compact！AI 自動把幾萬字的歷史過程提煉成精華記憶，清出龐大空間，讓思維再次輕快如初！"
       },
       {
@@ -354,17 +354,17 @@
       const localF = f % FRAMES_PER_ATOM;
       const atom = ATOMS[atomIdx];
 
-      // 1. Top Navigation Bar (SafeArea adapted)
+      // 1. Top Navigation Bar (SafeArea adapted, larger typography)
       drawTopNav(atomIdx + 1, f);
 
-      // 2. Upper Explanation Section
+      // 2. Upper Explanation Section (Significantly boosted font sizes)
       drawUpperInfoSection(atom, localF);
 
-      // 3. Middle Visual Graphics Area (960 x 820)
+      // 3. Middle Visual Graphics Area (960 x 780, centered)
       const graphX = 60;
       const graphY = 820;
       const graphW = 960;
-      const graphH = 800;
+      const graphH = 780;
 
       switch(atomIdx) {
         case 0: drawChart0_Plan(graphX, graphY, graphW, graphH, localF); break;
@@ -379,137 +379,137 @@
         case 9: drawChart9_Learn(graphX, graphY, graphW, graphH, localF); break;
       }
 
-      // 4. Bottom Switch Dock (10 Command Pills: 2 rows x 5 cols)
+      // 4. Bottom Switch Dock (10 Command Pills: 2 rows x 5 cols, large clear font)
       drawBottomSwitchDockPortrait10(atomIdx, localF);
     }
 
     function drawTopNav(atomNum, f) {
       ctx.save();
-      // Top header bar
+      // Enlarged top bar: height 84px
       ctx.fillStyle = "#ffffff";
       ctx.strokeStyle = "rgba(0,0,0,0.06)";
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.roundRect(60, 80, 960, 72, 16);
+      ctx.roundRect(60, 60, 960, 84, 18);
       ctx.fill();
       ctx.stroke();
 
-      // Orange tiny square logo
+      // Orange square logo
       ctx.fillStyle = "#ff5722";
       ctx.beginPath();
-      ctx.roundRect(84, 104, 24, 24, 6);
+      ctx.roundRect(84, 88, 28, 28, 8);
       ctx.fill();
 
       ctx.fillStyle = "#111111";
-      ctx.font = "800 20px 'Plus Jakarta Sans'";
+      ctx.font = "900 24px 'Plus Jakarta Sans'";
       ctx.textAlign = "left";
-      ctx.fillText("ANTIGRAVITY", 120, 122);
+      ctx.fillText("ANTIGRAVITY", 126, 110);
 
       ctx.fillStyle = "#666666";
-      ctx.font = "600 17px 'Noto Sans TC'";
-      ctx.fillText("十大斜線指令全家桶", 270, 122);
+      ctx.font = "800 20px 'Noto Sans TC'";
+      ctx.fillText("十大斜線指令全家桶", 310, 110);
 
       ctx.textAlign = "right";
       ctx.fillStyle = "#111111";
-      ctx.font = "800 18px 'Noto Sans TC'";
-      ctx.fillText(`招式 ${String(atomNum).padStart(2, '0')} / 10`, 910, 122);
+      ctx.font = "900 22px 'Noto Sans TC'";
+      ctx.fillText(`招式 ${String(atomNum).padStart(2, '0')} / 10`, 895, 110);
 
       ctx.fillStyle = "#ff5722";
-      ctx.font = "700 16px 'JetBrains Mono'";
-      ctx.fillText("· 126BPM", 996, 122);
+      ctx.font = "800 20px 'JetBrains Mono'";
+      ctx.fillText("· 126BPM", 996, 110);
       ctx.restore();
     }
 
     function drawUpperInfoSection(atom, localF) {
       ctx.save();
       const leftX = 60;
-      const topY = 275;
+      const topY = 270;
 
       const enterT = easeOutCubic(clamp(localF / 16, 0, 1));
       ctx.translate(0, (1 - enterT) * 16);
 
-      // Giant Number with Orange Dot
+      // Giant Number with Orange Dot (Boosted to 124px!)
       ctx.fillStyle = "#111111";
-      ctx.font = "900 102px 'Plus Jakarta Sans'";
+      ctx.font = "900 124px 'Plus Jakarta Sans'";
       ctx.letterSpacing = "-0.04em";
       ctx.fillText(atom.num.replace('.', ''), leftX, topY);
 
       const numWidth = ctx.measureText(atom.num.replace('.', '')).width;
       ctx.fillStyle = "#ff5722";
       ctx.beginPath();
-      ctx.arc(leftX + numWidth + 18, topY - 16, 13, 0, Math.PI * 2);
+      ctx.arc(leftX + numWidth + 20, topY - 18, 15, 0, Math.PI * 2);
       ctx.fill();
 
-      // Command Badge (e.g. /plan)
-      const badgeX = leftX + numWidth + 48;
-      const badgeY = topY - 65;
+      // Large Command Badge (Boosted to 230x52 with 28px font!)
+      const badgeX = leftX + numWidth + 52;
+      const badgeY = topY - 76;
       ctx.fillStyle = "#ff5722";
       ctx.beginPath();
-      ctx.roundRect(badgeX, badgeY, 180, 42, 10);
+      ctx.roundRect(badgeX, badgeY, 230, 52, 12);
       ctx.fill();
 
       ctx.fillStyle = "#ffffff";
-      ctx.font = "900 24px 'JetBrains Mono'";
+      ctx.font = "900 28px 'JetBrains Mono'";
       ctx.textAlign = "center";
-      ctx.fillText(atom.cmd, badgeX + 90, badgeY + 30);
+      ctx.fillText(atom.cmd, badgeX + 115, badgeY + 37);
       ctx.textAlign = "left";
 
-      // Bold Title & English Tag
+      // Bold Title (Boosted to 48px!) & English Tag (20px)
       ctx.fillStyle = "#111111";
-      ctx.font = "900 44px 'Noto Sans TC'";
-      ctx.fillText(atom.title, badgeX + 195, topY - 30);
+      ctx.font = "900 48px 'Noto Sans TC'";
+      ctx.fillText(atom.title, badgeX + 248, topY - 36);
 
-      ctx.fillStyle = "#777777";
-      ctx.font = "700 18px 'JetBrains Mono'";
-      ctx.fillText(atom.enTitle, leftX + numWidth + 50, topY + 12);
+      ctx.fillStyle = "#666666";
+      ctx.font = "700 20px 'JetBrains Mono'";
+      ctx.fillText(atom.enTitle, leftX + numWidth + 56, topY + 12);
 
-      // Summary with Orange Dash
+      // Summary with Orange Dash (Boosted to 28px bold!)
       ctx.fillStyle = "#ff5722";
-      ctx.font = "700 24px 'Noto Sans TC'";
-      ctx.fillText("—", leftX, topY + 65);
+      ctx.font = "900 28px 'Noto Sans TC'";
+      ctx.fillText("—", leftX, topY + 70);
 
       ctx.fillStyle = "#111111";
-      ctx.font = "800 24px 'Noto Sans TC'";
-      ctx.fillText(atom.summary.replace('— ', ''), leftX + 34, topY + 65);
+      ctx.font = "900 28px 'Noto Sans TC'";
+      ctx.fillText(atom.summary.replace('— ', ''), leftX + 38, topY + 70);
 
-      // Formula capsule
+      // Formula capsule (Boosted to 20px!)
       ctx.fillStyle = "#ff5722";
-      ctx.font = "700 16px 'JetBrains Mono'";
-      ctx.fillText("⚡ " + atom.formula, leftX, topY + 104);
+      ctx.font = "700 20px 'JetBrains Mono'";
+      ctx.fillText("⚡ " + atom.formula, leftX, topY + 112);
 
-      // White Key Takeaway Card with orange border
-      const cardY = topY + 125;
+      // White Key Takeaway Card with orange border (Boosted to 205px height, 24px body font!)
+      const cardY = topY + 135;
       const cardW = 960;
-      const cardH = 170;
+      const cardH = 205;
 
       ctx.fillStyle = "#ffffff";
       ctx.strokeStyle = "rgba(0,0,0,0.08)";
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.roundRect(leftX, cardY, cardW, cardH, 16);
+      ctx.roundRect(leftX, cardY, cardW, cardH, 18);
       ctx.fill();
       ctx.stroke();
 
       // Left orange accent stripe
       ctx.fillStyle = "#ff5722";
       ctx.beginPath();
-      ctx.roundRect(leftX, cardY, 8, cardH, [16, 0, 0, 16]);
+      ctx.roundRect(leftX, cardY, 8, cardH, [18, 0, 0, 18]);
       ctx.fill();
 
-      // Card Header
+      // Card Header (Boosted to 24px bold!)
       ctx.fillStyle = "#111111";
-      ctx.font = "800 19px 'Noto Sans TC'";
-      ctx.fillText(`✨ ${atom.cmd} 小白白話速解`, leftX + 28, cardY + 38);
+      ctx.font = "900 24px 'Noto Sans TC'";
+      ctx.fillText(`✨ ${atom.cmd} 小白白話速解 (Key Takeaway)`, leftX + 32, cardY + 44);
 
-      // Card Body
-      ctx.fillStyle = "#333333";
-      ctx.font = "500 19px/1.65 'Noto Sans TC'";
-      wrapText(ctx, atom.explanation, leftX + 28, cardY + 76, cardW - 56, 30);
+      // Card Body (Boosted to 24px with 38px line height!)
+      ctx.fillStyle = "#2b2b2b";
+      ctx.font = "600 24px/1.6 'Noto Sans TC'";
+      wrapText(ctx, atom.explanation, leftX + 32, cardY + 90, cardW - 64, 38);
 
       ctx.restore();
     }
 
-    // --- Chart 0: /plan (Strategic Blueprint Architect) ---
+    // --- Chart 0: /plan (Strategic Blueprint Architect · Large Text) ---
     function drawChart0_Plan(x, y, w, h, f) {
       ctx.save();
       const p = spring(clamp(f / 20, 0, 1), 140, 12);
@@ -520,95 +520,92 @@
       ctx.strokeStyle = "rgba(0,0,0,0.08)";
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.roundRect(x, y + 20, w, 580, 16);
+      ctx.roundRect(x, y + 10, w, 560, 18);
       ctx.fill();
       ctx.stroke();
 
       // Header Bar
       ctx.fillStyle = "#f8f8f6";
       ctx.beginPath();
-      ctx.roundRect(x, y + 20, w, 52, [16, 16, 0, 0]);
+      ctx.roundRect(x, y + 10, w, 56, [18, 18, 0, 0]);
       ctx.fill();
       ctx.fillStyle = "#ff5722";
-      ctx.font = "800 16px 'JetBrains Mono'";
-      ctx.fillText("📋 PLAN SPECIFICATION & ARCHITECTURE BREAKDOWN", x + 28, y + 52);
+      ctx.font = "800 18px 'JetBrains Mono'";
+      ctx.fillText("📋 PLAN SPECIFICATION & ARCHITECTURE BREAKDOWN", x + 30, y + 46);
 
-      // 4 Milestone Cards
+      // 4 Milestone Cards (Larger text!)
       const milestones = [
         { id: "M1", title: "需求與資料來源定義", detail: "鎖定 10 家財經公開資料庫 API", pct: "100%", color: "#4caf50" },
         { id: "M2", title: "自動清洗與算術勾稽", detail: "建立 Pandas & DuckDB 交叉校驗管線", pct: "100%", color: "#4caf50" },
         { id: "M3", title: "前端儀表板與短片生成", detail: "封裝 Canvas 60FPS 渲染管線", pct: "85%", color: "#ff9800" },
-        { id: "M4", title: "端到端交付與測試驗收", detail: "執行 1800 幀全量回歸測試", pct: "進行中", color: "#ff5722" }
+        { id: "M4", title: "端到端交付與測試驗收", detail: "執行 2400 幀全量回歸測試", pct: "進行中", color: "#ff5722" }
       ];
 
       milestones.forEach((m, idx) => {
-        const my = y + 100 + idx * 115;
+        const my = y + 84 + idx * 114;
         const mp = spring(clamp((f - idx * 6) / 18, 0, 1), 140, 12);
 
         ctx.fillStyle = "#fafaf8";
         ctx.strokeStyle = "rgba(0,0,0,0.06)";
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.roundRect(x + 30, my, (w - 60) * mp, 95, 12);
+        ctx.roundRect(x + 28, my, (w - 56) * mp, 98, 14);
         ctx.fill();
         ctx.stroke();
 
         // Left Tag
         ctx.fillStyle = m.color;
         ctx.beginPath();
-        ctx.roundRect(x + 48, my + 24, 48, 48, 8);
+        ctx.roundRect(x + 46, my + 22, 54, 54, 10);
         ctx.fill();
         ctx.fillStyle = "#ffffff";
-        ctx.font = "900 16px 'JetBrains Mono'";
+        ctx.font = "900 20px 'JetBrains Mono'";
         ctx.textAlign = "center";
-        ctx.fillText(m.id, x + 72, my + 54);
+        ctx.fillText(m.id, x + 73, my + 56);
         ctx.textAlign = "left";
 
         ctx.fillStyle = "#111111";
-        ctx.font = "800 20px 'Noto Sans TC'";
-        ctx.fillText(m.title, x + 115, my + 44);
+        ctx.font = "900 24px 'Noto Sans TC'";
+        ctx.fillText(m.title, x + 120, my + 44);
 
-        ctx.fillStyle = "#777777";
-        ctx.font = "600 15px 'Noto Sans TC'";
-        ctx.fillText(m.detail, x + 115, my + 72);
+        ctx.fillStyle = "#666666";
+        ctx.font = "600 18px 'Noto Sans TC'";
+        ctx.fillText(m.detail, x + 120, my + 76);
 
         // Status badge
         ctx.fillStyle = m.color;
-        ctx.font = "800 16px 'JetBrains Mono'";
+        ctx.font = "900 20px 'JetBrains Mono'";
         ctx.textAlign = "right";
-        ctx.fillText(m.pct, x + w - 60, my + 54);
+        ctx.fillText(m.pct, x + w - 50, my + 56);
         ctx.textAlign = "left";
       });
 
-      drawCalloutBadgePortrait(cx, y + 680, "🎯 /plan：先謀而後動！先產出嚴密藍圖，絕不瞎寫走彎路！");
+      drawCalloutBadgePortrait(cx, y + 640, "🎯 /plan：先謀而後動！先產出嚴密藍圖，絕不瞎寫走彎路！");
       ctx.restore();
     }
 
-    // --- Chart 1: /grill-me (Devil Interviewer) ---
+    // --- Chart 1: /grill-me (Devil Interviewer · Large Text) ---
     function drawChart1_GrillMe(x, y, w, h, f) {
       ctx.save();
       const p = spring(clamp(f / 20, 0, 1), 130, 12);
       const cx = x + w / 2;
 
-      // Interview Dialogue Container
       ctx.fillStyle = "#ffffff";
       ctx.strokeStyle = "rgba(0,0,0,0.08)";
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.roundRect(x, y + 20, w, 580, 16);
+      ctx.roundRect(x, y + 10, w, 560, 18);
       ctx.fill();
       ctx.stroke();
 
-      // Top Title Bar
       ctx.fillStyle = "#111111";
       ctx.beginPath();
-      ctx.roundRect(x, y + 20, w, 52, [16, 16, 0, 0]);
+      ctx.roundRect(x, y + 10, w, 56, [18, 18, 0, 0]);
       ctx.fill();
       ctx.fillStyle = "#ffffff";
-      ctx.font = "800 16px 'JetBrains Mono'";
-      ctx.fillText("🔥 /grill-me INTERACTIVE REQUIREMENT INTERVIEW", x + 28, y + 52);
+      ctx.font = "800 18px 'JetBrains Mono'";
+      ctx.fillText("🔥 /grill-me INTERACTIVE REQUIREMENT INTERVIEW", x + 30, y + 46);
 
-      // 3 Intense Questions from AI
       const qList = [
         { q: "「你預期使用者在斷網時該看到什麼？離線緩存策略為何？」", tag: "邊界異常處理" },
         { q: "「資料量如果突然從 1 萬筆爆發到 100 萬筆，效能極限在哪？」", tag: "容量壓力測試" },
@@ -616,85 +613,84 @@
       ];
 
       qList.forEach((item, idx) => {
-        const qy = y + 100 + idx * 135;
+        const qy = y + 86 + idx * 135;
         const qp = spring(clamp((f - idx * 6) / 18, 0, 1), 140, 12);
 
-        // Speech Bubble
         ctx.fillStyle = "#fff5f0";
         ctx.strokeStyle = "#ff5722";
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.roundRect(x + 30, qy, (w - 60) * qp, 115, 14);
+        ctx.roundRect(x + 28, qy, (w - 56) * qp, 118, 14);
         ctx.fill();
         ctx.stroke();
 
         ctx.fillStyle = "#ff5722";
-        ctx.font = "800 14px 'Noto Sans TC'";
-        ctx.fillText(`🚨 靈魂拷問 0${idx + 1} · ${item.tag}`, x + 55, qy + 36);
+        ctx.font = "900 17px 'Noto Sans TC'";
+        ctx.fillText(`🚨 靈魂拷問 0${idx + 1} · ${item.tag}`, x + 50, qy + 36);
 
         ctx.fillStyle = "#111111";
-        ctx.font = "800 18px 'Noto Sans TC'";
-        ctx.fillText(item.q, x + 55, qy + 74);
+        ctx.font = "900 22px 'Noto Sans TC'";
+        ctx.fillText(item.q, x + 50, qy + 76);
       });
 
       // Bottom Consensus Badge
       ctx.fillStyle = "#4caf50";
       ctx.beginPath();
-      ctx.roundRect(x + 30, y + 510, w - 60, 60, 12);
+      ctx.roundRect(x + 28, y + 500, w - 56, 56, 12);
       ctx.fill();
       ctx.fillStyle = "#ffffff";
-      ctx.font = "800 18px 'Noto Sans TC'";
+      ctx.font = "900 22px 'Noto Sans TC'";
       ctx.textAlign = "center";
-      ctx.fillText("✓ 需求盲點全部對齊 · 達成 100% 開發共識！", cx, y + 546);
+      ctx.fillText("✓ 需求盲點全部對齊 · 達成 100% 開發共識！", cx, y + 536);
 
-      drawCalloutBadgePortrait(cx, y + 680, "🔥 /grill-me：AI 當面試官靈魂拷問，逼出最完美的專案架構！");
+      drawCalloutBadgePortrait(cx, y + 640, "🔥 /grill-me：AI 當面試官靈魂拷問，逼出最完美的專案架構！");
       ctx.restore();
     }
 
-    // --- Chart 2: /browser (Headless Chrome) ---
+    // --- Chart 2: /browser (Headless Chrome · Large Text) ---
     function drawChart2_Browser(x, y, w, h, f) {
       ctx.save();
       const p = spring(clamp(f / 20, 0, 1), 130, 12);
       const cx = x + w / 2;
 
       const winX = x;
-      const winY = y + 20;
+      const winY = y + 10;
       const winW = w;
-      const winH = 580;
+      const winH = 560;
 
       ctx.fillStyle = "#ffffff";
       ctx.strokeStyle = "rgba(0,0,0,0.1)";
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.roundRect(winX, winY, winW, winH, 16);
+      ctx.roundRect(winX, winY, winW, winH, 18);
       ctx.fill();
       ctx.stroke();
 
       ctx.fillStyle = "#f0f0ed";
       ctx.beginPath();
-      ctx.roundRect(winX, winY, winW, 52, [16, 16, 0, 0]);
+      ctx.roundRect(winX, winY, winW, 56, [18, 18, 0, 0]);
       ctx.fill();
 
       // Window dots
       ["#ff5f56", "#ffbd2e", "#27c93f"].forEach((c, i) => {
         ctx.fillStyle = c;
         ctx.beginPath();
-        ctx.arc(winX + 28 + i * 20, winY + 26, 6, 0, Math.PI * 2);
+        ctx.arc(winX + 30 + i * 22, winY + 28, 7, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // Address Bar
+      // Address Bar (Larger font: 16px)
       ctx.fillStyle = "#ffffff";
       ctx.beginPath();
-      ctx.roundRect(winX + 104, winY + 10, winW - 130, 32, 8);
+      ctx.roundRect(winX + 110, winY + 10, winW - 140, 36, 8);
       ctx.fill();
 
-      ctx.fillStyle = "#555555";
-      ctx.font = "600 14px 'JetBrains Mono'";
+      ctx.fillStyle = "#444444";
+      ctx.font = "700 16px 'JetBrains Mono'";
       ctx.textAlign = "left";
-      ctx.fillText("🔒 https://data.gov.tw/realtime-export.csv", winX + 120, winY + 31);
+      ctx.fillText("🔒 https://data.gov.tw/realtime-export.csv", winX + 130, winY + 34);
 
-      // Data Rows
+      // Data Rows (Boosted to 24px and 26px!)
       const rows = [
         { name: "商業大盤成交額即時採集", val: "$4,829,320", status: "✓ 下載完畢" },
         { name: "各分部行政審核表單自動填寫", val: "100 筆入庫", status: "✓ 表單提交" },
@@ -702,37 +698,37 @@
       ];
 
       rows.forEach((r, idx) => {
-        const ry = winY + 90 + idx * 120;
+        const ry = winY + 86 + idx * 128;
         ctx.fillStyle = "#fbfbf9";
         ctx.strokeStyle = "rgba(0,0,0,0.06)";
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.roundRect(winX + 24, ry, winW - 48, 95, 12);
+        ctx.roundRect(winX + 24, ry, winW - 48, 108, 14);
         ctx.fill();
         ctx.stroke();
 
         ctx.fillStyle = "#111111";
-        ctx.font = "800 20px 'Noto Sans TC'";
-        ctx.fillText(r.name, winX + 48, ry + 42);
+        ctx.font = "900 24px 'Noto Sans TC'";
+        ctx.fillText(r.name, winX + 48, ry + 46);
 
-        ctx.font = "800 22px 'JetBrains Mono'";
+        ctx.font = "900 26px 'JetBrains Mono'";
         ctx.fillStyle = "#ff5722";
-        ctx.fillText(r.val, winX + 48, ry + 74);
+        ctx.fillText(r.val, winX + 48, ry + 82);
 
         ctx.fillStyle = "rgba(255, 87, 34, 0.15)";
         ctx.beginPath();
-        ctx.roundRect(winX + winW - 200, ry + 30, 160, 38, 8);
+        ctx.roundRect(winX + winW - 210, ry + 32, 175, 44, 10);
         ctx.fill();
         ctx.fillStyle = "#ff5722";
-        ctx.font = "800 16px 'Noto Sans TC'";
+        ctx.font = "900 19px 'Noto Sans TC'";
         ctx.textAlign = "center";
-        ctx.fillText(r.status, winX + winW - 120, ry + 55);
+        ctx.fillText(r.status, winX + winW - 122, ry + 60);
         ctx.textAlign = "left";
       });
 
       // Animated Mouse Cursor Clicking
       const cursorX = winX + winW - 140 + Math.sin(f * 0.1) * 12;
-      const cursorY = winY + 470 + Math.cos(f * 0.1) * 12;
+      const cursorY = winY + 460 + Math.cos(f * 0.1) * 12;
       const wave = (f * 3) % 40;
 
       ctx.strokeStyle = `rgba(255, 87, 34, ${1 - wave / 40})`;
@@ -744,26 +740,25 @@
       ctx.fillStyle = "#111111";
       ctx.beginPath();
       ctx.moveTo(cursorX, cursorY);
-      ctx.lineTo(cursorX + 20, cursorY + 16);
-      ctx.lineTo(cursorX + 10, cursorY + 18);
-      ctx.lineTo(cursorX + 16, cursorY + 28);
-      ctx.lineTo(cursorX + 8, cursorY + 30);
-      ctx.lineTo(cursorX + 3, cursorY + 20);
-      ctx.lineTo(cursorX - 4, cursorY + 25);
+      ctx.lineTo(cursorX + 22, cursorY + 18);
+      ctx.lineTo(cursorX + 11, cursorY + 20);
+      ctx.lineTo(cursorX + 18, cursorY + 30);
+      ctx.lineTo(cursorX + 9, cursorY + 33);
+      ctx.lineTo(cursorX + 3, cursorY + 22);
+      ctx.lineTo(cursorX - 4, cursorY + 28);
       ctx.closePath();
       ctx.fill();
 
-      drawCalloutBadgePortrait(cx, y + 680, "🌐 /browser：自己開瀏覽器、自動跨頁採集與填表！");
+      drawCalloutBadgePortrait(cx, y + 640, "🌐 /browser：自己開瀏覽器、自動跨頁採集與填表！");
       ctx.restore();
     }
 
-    // --- Chart 3: /boost (Deep Reasoning) ---
+    // --- Chart 3: /boost (Deep Reasoning · Large Text) ---
     function drawChart3_Boost(x, y, w, h, f) {
       ctx.save();
       const p = spring(clamp(f / 20, 0, 1), 130, 12);
       const cx = x + w / 2;
 
-      // Reasoning Graph Nodes arranged in a circle
       const nodeR = 190 * p;
       const nodes = [
         { label: "問題拆解", ang: -Math.PI / 2 },
@@ -776,11 +771,11 @@
       const nodePts = nodes.map(nd => ({
         label: nd.label,
         x: cx + Math.cos(nd.ang) * nodeR,
-        y: y + 210 + Math.sin(nd.ang) * nodeR
+        y: y + 200 + Math.sin(nd.ang) * nodeR
       }));
 
       ctx.strokeStyle = "#ff5722";
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 3.5;
       ctx.beginPath();
       for (let i = 0; i < nodePts.length; i++) {
         const next = nodePts[(i + 1) % nodePts.length];
@@ -797,37 +792,37 @@
       const py = nodePts[idx].y + (nodePts[nextIdx].y - nodePts[idx].y) * pulseT;
       ctx.fillStyle = "#ff5722";
       ctx.beginPath();
-      ctx.arc(px, py, 9, 0, Math.PI * 2);
+      ctx.arc(px, py, 10, 0, Math.PI * 2);
       ctx.fill();
 
       nodePts.forEach((nd, i) => {
         const delayP = spring(clamp((f - i * 5) / 18, 0, 1), 140, 12);
         ctx.fillStyle = "#ffffff";
         ctx.strokeStyle = "#111111";
-        ctx.lineWidth = 2.5;
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.arc(nd.x, nd.y, 40 * delayP, 0, Math.PI * 2);
+        ctx.arc(nd.x, nd.y, 46 * delayP, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
         ctx.fillStyle = "#ff5722";
         ctx.beginPath();
-        ctx.arc(nd.x, nd.y, 6, 0, Math.PI * 2);
+        ctx.arc(nd.x, nd.y, 7, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.fillStyle = "#111111";
-        ctx.font = "800 15px 'Noto Sans TC'";
+        ctx.font = "900 18px 'Noto Sans TC'";
         ctx.textAlign = "center";
-        ctx.fillText(nd.label, nd.x, nd.y + 56);
+        ctx.fillText(nd.label, nd.x, nd.y + 64);
       });
 
-      // Verification Card below
-      const cardY = y + 430;
+      // Verification Card below (Larger font: 22px!)
+      const cardY = y + 420;
       ctx.fillStyle = "#ffffff";
       ctx.strokeStyle = "rgba(0,0,0,0.08)";
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.roundRect(x, cardY, w, 175, 16);
+      ctx.roundRect(x, cardY, w, 185, 18);
       ctx.fill();
       ctx.stroke();
 
@@ -839,23 +834,22 @@
 
       checks.forEach((chk, i) => {
         ctx.fillStyle = "#111111";
-        ctx.font = "700 18px 'Noto Sans TC'";
+        ctx.font = "800 22px 'Noto Sans TC'";
         ctx.textAlign = "left";
-        ctx.fillText(chk, x + 30, cardY + 46 + i * 46);
+        ctx.fillText(chk, x + 32, cardY + 50 + i * 50);
       });
 
-      drawCalloutBadgePortrait(cx, y + 680, "🧠 /boost：啟動學霸深度推理，複雜問題反覆驗算零誤差！");
+      drawCalloutBadgePortrait(cx, y + 640, "🧠 /boost：啟動學霸深度推理，複雜問題反覆驗算零誤差！");
       ctx.restore();
     }
 
-    // --- Chart 4: /schedule (Cron & Automation Alarm) ---
+    // --- Chart 4: /schedule (Cron & Automation Alarm · Large Text) ---
     function drawChart4_Schedule(x, y, w, h, f) {
       ctx.save();
       const p = spring(clamp(f / 20, 0, 1), 130, 12);
       const cx = x + w / 2;
 
-      // Clock Simulation
-      const clockY = y + 150;
+      const clockY = y + 140;
       const clockR = 85;
 
       ctx.fillStyle = "#ffffff";
@@ -866,33 +860,29 @@
       ctx.fill();
       ctx.stroke();
 
-      // Rotating Hands
       const secAng = (f * 0.15);
       const minAng = (f * 0.02);
 
-      // Minute hand
       ctx.strokeStyle = "#111111";
-      ctx.lineWidth = 4;
+      ctx.lineWidth = 4.5;
       ctx.beginPath();
       ctx.moveTo(cx, clockY);
       ctx.lineTo(cx + Math.cos(minAng) * 50, clockY + Math.sin(minAng) * 50);
       ctx.stroke();
 
-      // Second hand
       ctx.strokeStyle = "#ff5722";
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.moveTo(cx, clockY);
       ctx.lineTo(cx + Math.cos(secAng) * 65, clockY + Math.sin(secAng) * 65);
       ctx.stroke();
 
-      // Center Pin
       ctx.fillStyle = "#ff5722";
       ctx.beginPath();
-      ctx.arc(cx, clockY, 6, 0, Math.PI * 2);
+      ctx.arc(cx, clockY, 7, 0, Math.PI * 2);
       ctx.fill();
 
-      // 3 Scheduled Cron Tasks below
+      // 3 Scheduled Tasks (Boosted to 24px and 22px!)
       const tasks = [
         { time: "09:00 AM", cron: "0 9 * * 1-5", task: "每日開盤數據採集與趨勢簡報", active: true },
         { time: "01:00 PM", cron: "0 13 * * *", task: "校園與行政公文待辦進度巡檢", active: true },
@@ -900,59 +890,57 @@
       ];
 
       tasks.forEach((t, i) => {
-        const ty = y + 270 + i * 110;
+        const ty = y + 260 + i * 116;
         ctx.fillStyle = "#ffffff";
         ctx.strokeStyle = "rgba(0,0,0,0.08)";
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.roundRect(x, ty, w, 92, 14);
+        ctx.roundRect(x, ty, w, 98, 16);
         ctx.fill();
         ctx.stroke();
 
         ctx.fillStyle = "#ff5722";
-        ctx.font = "800 20px 'JetBrains Mono'";
-        ctx.fillText(t.time, x + 30, ty + 40);
+        ctx.font = "900 24px 'JetBrains Mono'";
+        ctx.fillText(t.time, x + 32, ty + 42);
 
-        ctx.fillStyle = "#888888";
-        ctx.font = "600 13px 'JetBrains Mono'";
-        ctx.fillText(`cron: "${t.cron}"`, x + 30, ty + 68);
+        ctx.fillStyle = "#777777";
+        ctx.font = "700 16px 'JetBrains Mono'";
+        ctx.fillText(`cron: "${t.cron}"`, x + 32, ty + 72);
 
         ctx.fillStyle = "#111111";
-        ctx.font = "800 18px 'Noto Sans TC'";
-        ctx.fillText(t.task, x + 190, ty + 50);
+        ctx.font = "900 22px 'Noto Sans TC'";
+        ctx.fillText(t.task, x + 210, ty + 54);
 
         // Status badge
         ctx.fillStyle = "#4caf50";
         ctx.beginPath();
-        ctx.roundRect(x + w - 160, ty + 26, 130, 36, 8);
+        ctx.roundRect(x + w - 170, ty + 28, 140, 42, 10);
         ctx.fill();
         ctx.fillStyle = "#ffffff";
-        ctx.font = "800 15px 'Noto Sans TC'";
+        ctx.font = "900 18px 'Noto Sans TC'";
         ctx.textAlign = "center";
-        ctx.fillText("● 運行中", x + w - 95, ty + 50);
+        ctx.fillText("● 運行中", x + w - 100, ty + 55);
         ctx.textAlign = "left";
       });
 
-      drawCalloutBadgePortrait(cx, y + 680, "⏰ /schedule：設定自動循環排程，時間一到自動幹活！");
+      drawCalloutBadgePortrait(cx, y + 640, "⏰ /schedule：設定自動循環排程，時間一到自動幹活！");
       ctx.restore();
     }
 
-    // --- Chart 5: /goal (Night Autonomous Runner) ---
+    // --- Chart 5: /goal (Night Autonomous Runner · Large Text) ---
     function drawChart5_Goal(x, y, w, h, f) {
       ctx.save();
       const p = clamp(f / 200, 0, 1);
       const cx = x + w / 2;
-      const cy = y + 170;
+      const cy = y + 160;
       const radius = 110;
 
-      // Circular Track
-      ctx.lineWidth = 18;
+      ctx.lineWidth = 20;
       ctx.strokeStyle = "#e8e8e4";
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Progress Arc
       const startAngle = -Math.PI / 2;
       const endAngle = startAngle + (Math.PI * 2 * p);
       ctx.strokeStyle = "#ff5722";
@@ -964,23 +952,23 @@
 
       ctx.textAlign = "center";
       ctx.fillStyle = "#111111";
-      ctx.font = "900 48px 'JetBrains Mono'";
-      ctx.fillText(`${Math.floor(p * 100)}%`, cx, cy + 10);
-      ctx.fillStyle = "#777777";
-      ctx.font = "700 16px 'Noto Sans TC'";
-      ctx.fillText("目標自主達成率", cx, cy + 40);
+      ctx.font = "900 58px 'JetBrains Mono'";
+      ctx.fillText(`${Math.floor(p * 100)}%`, cx, cy + 12);
+      ctx.fillStyle = "#666666";
+      ctx.font = "800 20px 'Noto Sans TC'";
+      ctx.fillText("目標自主達成率", cx, cy + 46);
 
-      // Night Terminal Logs
-      const logY = y + 320;
+      // Night Terminal Logs (Boosted to 16px/18px!)
+      const logY = y + 310;
       ctx.fillStyle = "#1e1e1e";
       ctx.beginPath();
-      ctx.roundRect(x, logY, w, 290, 16);
+      ctx.roundRect(x, logY, w, 290, 18);
       ctx.fill();
 
       ctx.fillStyle = "#ffffff";
-      ctx.font = "800 16px 'JetBrains Mono'";
+      ctx.font = "900 18px 'JetBrains Mono'";
       ctx.textAlign = "left";
-      ctx.fillText("🌙 /goal NIGHT AUTONOMOUS SESSION", x + 28, logY + 40);
+      ctx.fillText("🌙 /goal NIGHT AUTONOMOUS SESSION", x + 32, logY + 44);
 
       const logs = [
         { text: "[02:14:10] 啟動夜間模式：大專案自動拆解 12 項子任務", color: "#888888" },
@@ -994,97 +982,98 @@
         const itemP = clamp((f - i * 15) / 20, 0, 1);
         if (itemP > 0) {
           ctx.fillStyle = lg.color;
-          ctx.font = "600 14px 'JetBrains Mono'";
-          ctx.fillText(lg.text, x + 28, logY + 84 + i * 40);
+          ctx.font = "700 16px 'JetBrains Mono'";
+          ctx.fillText(lg.text, x + 32, logY + 90 + i * 40);
         }
       });
 
-      drawCalloutBadgePortrait(cx, y + 680, "🚀 /goal：夜間無人值守，自主修復報錯直到 100% 達成！");
+      drawCalloutBadgePortrait(cx, y + 640, "🚀 /goal：夜間無人值守，自主修復報錯直到 100% 達成！");
       ctx.restore();
     }
 
-    // --- Chart 6: /btw (Parallel Sticky Note) ---
+    // --- Chart 6: /btw (Parallel Sticky Note · Large Text) ---
     function drawChart6_Btw(x, y, w, h, f) {
       ctx.save();
       const p = spring(clamp(f / 20, 0, 1), 130, 12);
       const cx = x + w / 2;
 
-      // Left: Main Task Flow (Dimmed/Protected)
+      // Left: Main Task Flow
       const mainW = 460;
       ctx.fillStyle = "#ffffff";
       ctx.strokeStyle = "rgba(0,0,0,0.08)";
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.roundRect(x, y + 40, mainW, 540, 16);
+      ctx.roundRect(x, y + 30, mainW, 540, 18);
       ctx.fill();
       ctx.stroke();
 
-      ctx.fillStyle = "#555555";
-      ctx.font = "800 17px 'Noto Sans TC'";
-      ctx.fillText("🔒 主任務脈絡 (執行中 · 隔離保護)", x + 24, y + 80);
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 20px 'Noto Sans TC'";
+      ctx.fillText("🔒 主任務脈絡 (執行中 · 隔離保護)", x + 28, y + 74);
 
       const mainSteps = [
         "1. 數據清洗管線建立中...",
-        "2. 生成 1800 幀動態圖表...",
+        "2. 生成 2400 幀動態圖表...",
         "3. 封裝 MP4 視訊與音軌..."
       ];
       mainSteps.forEach((st, i) => {
-        ctx.fillStyle = "#888888";
-        ctx.font = "600 15px 'Noto Sans TC'";
-        ctx.fillText(st, x + 24, y + 130 + i * 50);
+        ctx.fillStyle = "#666666";
+        ctx.font = "700 18px 'Noto Sans TC'";
+        ctx.fillText(st, x + 28, y + 130 + i * 56);
       });
 
-      // Right: Glowing Yellow Sticky Note (/btw)
+      // Right: Yellow Sticky Note (Boosted to 24px and 22px!)
       const noteX = x + 500;
       const noteW = 460;
       ctx.fillStyle = "#fff9c4";
       ctx.strokeStyle = "#fbc02d";
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
-      ctx.roundRect(noteX, y + 40, noteW * p, 540, 16);
+      ctx.roundRect(noteX, y + 30, noteW * p, 540, 18);
       ctx.fill();
       ctx.stroke();
 
       ctx.fillStyle = "#f57f17";
-      ctx.font = "900 18px 'JetBrains Mono'";
-      ctx.fillText("💬 /btw 平行小紙條", noteX + 24, y + 80);
+      ctx.font = "900 22px 'JetBrains Mono'";
+      ctx.fillText("💬 /btw 平行小紙條", noteX + 28, y + 74);
 
       ctx.fillStyle = "#111111";
-      ctx.font = "800 20px 'Noto Sans TC'";
-      ctx.fillText("「順便問一下，", noteX + 24, y + 140);
-      ctx.fillText("剛剛那個指標的中文名稱是什麼？」", noteX + 24, y + 180);
+      ctx.font = "900 24px 'Noto Sans TC'";
+      ctx.fillText("「順便問一下，", noteX + 28, y + 140);
+      ctx.fillText("剛剛那個指標的中文名稱是什麼？」", noteX + 28, y + 185);
 
       ctx.fillStyle = "#2e7d32";
-      ctx.font = "700 18px 'Noto Sans TC'";
-      ctx.fillText("AI 即時回覆：", noteX + 24, y + 260);
+      ctx.font = "800 20px 'Noto Sans TC'";
+      ctx.fillText("AI 即時回覆：", noteX + 28, y + 270);
       ctx.fillStyle = "#111111";
-      ctx.fillText("「是『商業大盤成交額』！", noteX + 24, y + 300);
-      ctx.fillText("主任務完全不受干擾，繼續執行中！」", noteX + 24, y + 340);
+      ctx.font = "900 22px 'Noto Sans TC'";
+      ctx.fillText("「是『商業大盤成交額』！", noteX + 28, y + 315);
+      ctx.fillText("主任務完全不受干擾，繼續執行中！」", noteX + 28, y + 360);
 
-      drawCalloutBadgePortrait(cx, y + 680, "💬 /btw：像傳小紙條一樣隨手問，完全不污染主對話！");
+      drawCalloutBadgePortrait(cx, y + 640, "💬 /btw：像傳小紙條一樣隨手問，完全不污染主對話！");
       ctx.restore();
     }
 
-    // --- Chart 7: /teamwork (Multi-Agent Swarm) ---
+    // --- Chart 7: /teamwork (Multi-Agent Swarm · Large Text) ---
     function drawChart7_Teamwork(x, y, w, h, f) {
       ctx.save();
       const p = spring(clamp(f / 20, 0, 1), 130, 12);
       const cx = x + w / 2;
-      const cy = y + 180;
+      const cy = y + 170;
 
       // Commander Agent
       ctx.fillStyle = "#111111";
       ctx.beginPath();
-      ctx.arc(cx, cy, 60 * p, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 68 * p, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = "#ffffff";
-      ctx.font = "900 18px 'JetBrains Mono'";
+      ctx.font = "900 22px 'JetBrains Mono'";
       ctx.textAlign = "center";
       ctx.fillText("LEADER", cx, cy - 4);
-      ctx.font = "700 14px 'Noto Sans TC'";
-      ctx.fillText("指揮代理", cx, cy + 18);
+      ctx.font = "800 16px 'Noto Sans TC'";
+      ctx.fillText("指揮代理", cx, cy + 22);
 
-      // 3 Specialist Subagents below
+      // 3 Subagents below (Boosted to 22px and 16px!)
       const agents = [
         { role: "爬蟲專家", desc: "/browser 採集", x: cx - 300, y: y + 420, color: "#ff5722" },
         { role: "數據架構師", desc: "/boost 驗算", x: cx, y: y + 420, color: "#2196f3" },
@@ -1092,101 +1081,99 @@
       ];
 
       agents.forEach((ag) => {
-        // Line
         ctx.strokeStyle = ag.color;
-        ctx.lineWidth = 2.5;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(cx, cy);
         ctx.lineTo(ag.x, ag.y);
         ctx.stroke();
 
-        // Card
         ctx.fillStyle = "#ffffff";
         ctx.strokeStyle = ag.color;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
-        ctx.roundRect(ag.x - 110, ag.y - 45, 220, 90, 14);
+        ctx.roundRect(ag.x - 120, ag.y - 50, 240, 100, 16);
         ctx.fill();
         ctx.stroke();
 
         ctx.fillStyle = "#111111";
-        ctx.font = "800 18px 'Noto Sans TC'";
+        ctx.font = "900 22px 'Noto Sans TC'";
         ctx.textAlign = "center";
         ctx.fillText(ag.role, ag.x, ag.y - 6);
 
-        ctx.fillStyle = "#666666";
-        ctx.font = "600 14px 'JetBrains Mono'";
-        ctx.fillText(ag.desc, ag.x, ag.y + 22);
+        ctx.fillStyle = "#555555";
+        ctx.font = "700 16px 'JetBrains Mono'";
+        ctx.fillText(ag.desc, ag.x, ag.y + 26);
       });
 
-      drawCalloutBadgePortrait(cx, y + 680, "👥 /teamwork：召喚代理人特遣隊，多工並行戰力爆發！");
+      drawCalloutBadgePortrait(cx, y + 640, "👥 /teamwork：召喚代理人特遣隊，多工並行戰力爆發！");
       ctx.restore();
     }
 
-    // --- Chart 8: /compact (Context Compression) ---
+    // --- Chart 8: /compact (Context Compression · Large Text) ---
     function drawChart8_Compact(x, y, w, h, f) {
       ctx.save();
       const p = spring(clamp(f / 20, 0, 1), 130, 12);
       const cx = x + w / 2;
 
-      // Before Bar (Long & Heavy, Red)
-      const barY1 = y + 130;
+      // Before Bar
+      const barY1 = y + 120;
       ctx.fillStyle = "#111111";
-      ctx.font = "800 20px 'Noto Sans TC'";
+      ctx.font = "900 24px 'Noto Sans TC'";
       ctx.fillText("壓縮前：歷史記憶膨脹 (對話容易延遲)", x + 30, barY1 - 20);
 
       ctx.fillStyle = "#ff5252";
       ctx.beginPath();
-      ctx.roundRect(x + 30, barY1, (w - 60) * 0.95, 60, 12);
+      ctx.roundRect(x + 30, barY1, (w - 60) * 0.95, 66, 14);
       ctx.fill();
       ctx.fillStyle = "#ffffff";
-      ctx.font = "800 20px 'JetBrains Mono'";
-      ctx.fillText("98% Context Full (128,000 Tokens)", x + 50, barY1 + 38);
+      ctx.font = "900 24px 'JetBrains Mono'";
+      ctx.fillText("98% Context Full (128,000 Tokens)", x + 56, barY1 + 42);
 
       // Down Arrow
       ctx.fillStyle = "#ff5722";
-      ctx.font = "900 36px 'JetBrains Mono'";
+      ctx.font = "900 40px 'JetBrains Mono'";
       ctx.textAlign = "center";
       ctx.fillText("⬇ /compact 智能提煉 ⬇", cx, y + 270);
       ctx.textAlign = "left";
 
-      // After Bar (Compact & Slim, Green)
+      // After Bar
       const barY2 = y + 330;
       ctx.fillStyle = "#111111";
-      ctx.font = "800 20px 'Noto Sans TC'";
+      ctx.font = "900 24px 'Noto Sans TC'";
       ctx.fillText("壓縮後：萃取核心共識 (釋放 85% 空間！)", x + 30, barY2 - 20);
 
       ctx.fillStyle = "#4caf50";
       ctx.beginPath();
-      ctx.roundRect(x + 30, barY2, Math.max(120, (w - 60) * 0.15 * p), 60, 12);
+      ctx.roundRect(x + 30, barY2, Math.max(160, (w - 60) * 0.15 * p), 66, 14);
       ctx.fill();
       ctx.fillStyle = "#ffffff";
-      ctx.font = "800 20px 'JetBrains Mono'";
-      ctx.fillText("15% (輕盈如飛)", x + 50, barY2 + 38);
+      ctx.font = "900 24px 'JetBrains Mono'";
+      ctx.fillText("15% (輕盈如飛)", x + 56, barY2 + 42);
 
-      drawCalloutBadgePortrait(cx, y + 680, "📦 /compact：一秒為大腦瘦身，聊再久也不會卡頓！");
+      drawCalloutBadgePortrait(cx, y + 640, "📦 /compact：一秒為大腦瘦身，聊再久也不會卡頓！");
       ctx.restore();
     }
 
-    // --- Chart 9: /learn & Grand Finale ---
+    // --- Chart 9: /learn (Persistent Knowledge · Large Text) ---
     function drawChart9_Learn(x, y, w, h, f) {
       ctx.save();
       const p = spring(clamp(f / 20, 0, 1), 130, 12);
       const cx = x + w / 2;
-      const cy = y + 200;
+      const cy = y + 180;
 
-      // Glowing Knowledge Crystal
+      // Glowing Crystal
       ctx.fillStyle = "#ff5722";
       ctx.beginPath();
-      ctx.arc(cx, cy, 70 * p, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 75 * p, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.fillStyle = "#ffffff";
-      ctx.font = "900 32px 'JetBrains Mono'";
+      ctx.font = "900 38px 'JetBrains Mono'";
       ctx.textAlign = "center";
-      ctx.fillText("/learn", cx, cy + 10);
+      ctx.fillText("/learn", cx, cy + 12);
 
-      // 3 Permanent Memory Blocks
+      // 3 Permanent Memory Blocks (Boosted to 24px and 20px!)
       const memories = [
         { title: "公司內部報表格式規範", tag: "永久記住" },
         { title: "個人專屬 Python 代碼風格", tag: "永久記住" },
@@ -1194,56 +1181,56 @@
       ];
 
       memories.forEach((mem, i) => {
-        const my = y + 330 + i * 85;
+        const my = y + 310 + i * 92;
         ctx.fillStyle = "#ffffff";
         ctx.strokeStyle = "#ff5722";
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 1.8;
         ctx.beginPath();
-        ctx.roundRect(x + 30, my, w - 60, 72, 12);
+        ctx.roundRect(x + 30, my, w - 60, 78, 14);
         ctx.fill();
         ctx.stroke();
 
         ctx.fillStyle = "#111111";
-        ctx.font = "800 18px 'Noto Sans TC'";
+        ctx.font = "900 24px 'Noto Sans TC'";
         ctx.textAlign = "left";
-        ctx.fillText(`🧠 ${mem.title}`, x + 50, my + 44);
+        ctx.fillText(`🧠 ${mem.title}`, x + 54, my + 48);
 
         ctx.fillStyle = "#4caf50";
-        ctx.font = "800 15px 'Noto Sans TC'";
+        ctx.font = "900 20px 'Noto Sans TC'";
         ctx.textAlign = "right";
-        ctx.fillText(`✓ ${mem.tag}`, x + w - 60, my + 44);
+        ctx.fillText(`✓ ${mem.tag}`, x + w - 60, my + 48);
       });
 
-      drawCalloutBadgePortrait(cx, y + 680, "✨ /learn：一次教會終生受用，打造專屬最強 AI 副手！");
+      drawCalloutBadgePortrait(cx, y + 640, "✨ /learn：一次教會終生受用，打造專屬最強 AI 副手！");
       ctx.restore();
     }
 
     function drawCalloutBadgePortrait(x, y, text) {
       ctx.save();
-      ctx.font = "700 18px 'Noto Sans TC'";
+      ctx.font = "900 22px 'Noto Sans TC'";
       const textW = ctx.measureText(text).width;
-      const boxW = Math.min(960, textW + 48);
-      const boxH = 50;
+      const boxW = Math.min(960, textW + 52);
+      const boxH = 58;
 
       ctx.fillStyle = "#ffffff";
       ctx.strokeStyle = "#ff5722";
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
-      ctx.roundRect(x - boxW / 2, y - boxH / 2, boxW, boxH, 12);
+      ctx.roundRect(x - boxW / 2, y - boxH / 2, boxW, boxH, 14);
       ctx.fill();
       ctx.stroke();
 
       ctx.fillStyle = "#ff5722";
       ctx.textAlign = "center";
-      ctx.fillText(text, x, y + 6);
+      ctx.fillText(text, x, y + 8);
       ctx.restore();
     }
 
-    // --- Bottom Switch Dock (10 Buttons in 2 rows x 5 columns) ---
+    // --- Bottom Switch Dock (10 Buttons in 2 rows x 5 columns · Boosted to 20px font!) ---
     function drawBottomSwitchDockPortrait10(activeIdx, localF) {
       ctx.save();
       const dockW = 960;
-      const dockH = 150;
+      const dockH = 160;
       const dockX = (CANVAS_WIDTH - dockW) / 2;
       const dockY = CANVAS_HEIGHT - 210;
 
@@ -1271,28 +1258,28 @@
         if (isActive) {
           ctx.fillStyle = "#ff5722";
           ctx.beginPath();
-          ctx.roundRect(bx, by, btnW, btnH, 10);
+          ctx.roundRect(bx, by, btnW, btnH, 12);
           ctx.fill();
 
           // Progress line
           const progressW = btnW * (localF / FRAMES_PER_ATOM);
           ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-          ctx.fillRect(bx + 6, by + 3, progressW - 12, 3);
+          ctx.fillRect(bx + 6, by + 4, progressW - 12, 4);
 
           ctx.fillStyle = "#ffffff";
-          ctx.font = "900 16px 'JetBrains Mono'";
+          ctx.font = "900 20px 'JetBrains Mono'";
         } else {
           ctx.fillStyle = "#f4f4f2";
           ctx.beginPath();
-          ctx.roundRect(bx, by, btnW, btnH, 10);
+          ctx.roundRect(bx, by, btnW, btnH, 12);
           ctx.fill();
 
-          ctx.fillStyle = "#555555";
-          ctx.font = "700 15px 'JetBrains Mono'";
+          ctx.fillStyle = "#444444";
+          ctx.font = "800 18px 'JetBrains Mono'";
         }
 
         ctx.textAlign = "center";
-        ctx.fillText(SWITCH_LABELS[i], bx + btnW / 2, by + btnH / 2 + 5);
+        ctx.fillText(SWITCH_LABELS[i], bx + btnW / 2, by + btnH / 2 + 7);
       }
       ctx.restore();
     }
