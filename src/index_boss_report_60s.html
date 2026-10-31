@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>向主管匯報：今日 AI 工作流程實戰成果 (60s Boss Report)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #f4f4f2;
+      --text-black: #111111;
+      --text-gray: #666666;
+      --accent-orange: #ff5722;
+      --switch-gray: #d4d4d0;
+      --border-light: rgba(0, 0, 0, 0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #e8e8e4;
+      color: var(--text-black);
+      font-family: 'Plus Jakarta Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 40px;
+    }
+    header {
+      width: 100%;
+      max-width: 1360px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      margin-bottom: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111111;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge-tag {
+      background: var(--accent-orange);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+    .viewport-card {
+      width: 100%;
+      max-width: 1360px;
+      background: var(--bg-cream);
+      border-radius: 16px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.08);
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      position: relative;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .controls-panel {
+      width: 100%;
+      max-width: 1360px;
+      margin-top: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 16px 24px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+    .timeline-row { margin-bottom: 12px; }
+    .timeline-bar-wrapper {
+      position: relative;
+      width: 100%;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .timeline-track {
+      width: 100%;
+      height: 6px;
+      background: #e2e2de;
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+    }
+    .timeline-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-orange);
+    }
+    .timeline-thumb {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: var(--accent-orange);
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      top: 4px;
+      left: 0%;
+      pointer-events: none;
+    }
+    .buttons-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .btn {
+      background: #f4f4f2;
+      border: 1px solid #d4d4d0;
+      color: #111111;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: var(--accent-orange);
+      border: none;
+      color: #ffffff;
+    }
+    .timecode {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #666666;
+      padding: 0 8px;
+    }
+    .timecode b { color: #111111; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-title">
+      <span>AI 工作流成果匯報 · 60 秒極速總結</span>
+      <span class="badge-tag">60s / 120 BPM / Gemini 3.8 Charon 繁中男聲</span>
+    </div>
+    <div style="font-size: 12px; color: #666; font-family: 'JetBrains Mono', monospace;">
+      Executive Briefing Architecture · Minimalist White & Orange
+    </div>
+  </header>
+
+  <div class="viewport-card">
+    <canvas id="motionCanvas" width="1920" height="1080"></canvas>
+  </div>
+
+  <div class="controls-panel">
+    <div class="timeline-row">
+      <div class="timeline-bar-wrapper" id="timelineWrapper">
+        <div class="timeline-track">
+          <div class="timeline-fill" id="timelineFill"></div>
+        </div>
+        <div class="timeline-thumb" id="timelineThumb"></div>
+      </div>
+    </div>
+
+    <div class="buttons-row">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button class="btn btn-primary" id="btnPlayPause">▶ 播放 (Play)</button>
+        <button class="btn" id="btnRestart">↺ 重播</button>
+        <div class="timecode">
+          <b id="timeCurrent">00:00.00</b> / <span id="timeTotal">01:00.00</span>
+        </div>
+      </div>
+      <div>
+        <span style="font-size: 12px; color: #777;">60.0s Full HD 1080p · 1800 Frames</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CANVAS_WIDTH = 1920;
+    const CANVAS_HEIGHT = 1080;
+    const FPS = 30;
+    const DURATION_SEC = 60.0;
+    const TOTAL_FRAMES = FPS * DURATION_SEC; // 1800 frames
+    const SEC_PER_ATOM = 10.0;
+    const FRAMES_PER_ATOM = FPS * SEC_PER_ATOM; // 300 frames each
+
+    const canvas = document.getElementById('motionCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const ATOMS = [
+      {
+        num: "01.",
+        title: "流程升級",
+        enTitle: "WORKFLOW UPGRADE",
+        summary: "— 人工耗時 40h → AI 自動化 15m",
+        formula: "efficiency_gain = +98.3% · status = COMPLETED",
+        explanation: "今天跳脫單純對話問答，將日常繁重業務重構為 Agent 自主工作流。從資料採集到報告產出，總工時降幅達 98%，釋放核心腦力。"
+      },
+      {
+        num: "02.",
+        title: "資料清洗",
+        enTitle: "DATA REFINEMENT",
+        summary: "— 髒資料自動修復 · 算術雙重驗算",
+        formula: "reconciliation = PASS · delta = 0 · anti_hallucination",
+        explanation: "面對最雜亂的業務報表，AI 秒速補正缺失值與格式，並強制執行交叉驗算，細項加總與總體量嚴格勾稽，徹底告別數字幻覺。"
+      },
+      {
+        num: "03.",
+        title: "流程封裝",
+        enTitle: "SKILL PACKAGING",
+        summary: "— 三套專屬 Skill · 隨調隨用",
+        formula: "role + constraints + few_shot = reusable_assets",
+        explanation: "將公文企劃審核、學生專案評閱與會議待辦萃取，結構化封裝為獨立 Skill。SOP 固化為提示詞工程資產，團隊全員一鍵複用。"
+      },
+      {
+        num: "04.",
+        title: "現代建站",
+        enTitle: "AGENTIC DASHBOARD",
+        summary: "— 自然語言搭建 · 100% 離線運作",
+        formula: "sheetjs_local + canvas_60fps + privacy_first",
+        explanation: "運用 Antigravity 透過自然語言構建互動工作台。拖入 Excel 即可離線解構 7 大圖型與統計指標，機敏資料絕不出本機。"
+      },
+      {
+        num: "05.",
+        title: "工具串接",
+        enTitle: "MCP CONNECTORS",
+        summary: "— 直連 Google 雲端 · 打破資料孤島",
+        formula: "model_context_protocol == true · apis = 6",
+        explanation: "以 MCP 協定打通 Google Workspace，直接連動 Drive 檔案檢索、Sheets 讀寫與 Gmail 實時通訊，真正賦予 AI 雙手操作生產力工具。"
+      },
+      {
+        num: "06.",
+        title: "成果閉環",
+        enTitle: "DECISION CLOSURE",
+        summary: "— 全自動動態短片 · 決策閉環",
+        formula: "data → insight → video → executive_action",
+        explanation: "所有分析成果全自動渲染為專業 60 秒動態短片與旁白混音。從原始數據、深度洞察到高光交付，為團隊建立完整的生產力閉環！"
+      }
+    ];
+
+    const SWITCH_LABELS = [
+      "01. 流程升級",
+      "02. 資料清洗",
+      "03. 流程封裝",
+      "04. 現代建站",
+      "05. 工具串接",
+      "06. 成果閉環"
+    ];
+
+    let currentFrame = 0;
+    let isPlaying = false;
+    let audioObj = null;
+
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+    function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+    function spring(t, stiffness = 120, damping = 12) {
+      if (t <= 0) return 0;
+      if (t >= 1) return 1;
+      const omega = Math.sqrt(stiffness);
+      const decay = Math.exp(-damping * t * 0.5);
+      return 1 - decay * Math.cos(omega * t);
+    }
+
+    function wrapText(context, text, x, y, maxWidth, lineHeight) {
+      let line = '';
+      for (let n = 0; n < text.length; n++) {
+        const testLine = line + text[n];
+        const metrics = context.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          context.fillText(line, x, y);
+          line = text[n];
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      context.fillText(line, x, y);
+    }
+
+    // -------------------------------------------------------------
+    // MAIN DRAW FUNCTION FOR FRAME `f` (0 <= f < 1800)
+    // -------------------------------------------------------------
+    function drawFrame(f) {
+      f = clamp(f, 0, TOTAL_FRAMES - 1);
+      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // Clean Minimalist Off-white Canvas Background
+      ctx.fillStyle = "#f4f4f2";
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // Active Stage
+      const atomIdx = clamp(Math.floor(f / FRAMES_PER_ATOM), 0, 5);
+      const localF = f % FRAMES_PER_ATOM;
+      const atom = ATOMS[atomIdx];
+
+      // 1. Top Navigation Bar
+      drawTopNav(atomIdx + 1, f);
+
+      // 2. Left Explanation Column (White Card with Orange Accent)
+      drawLeftInfoColumn(atom, localF);
+
+      // 3. Right Visual Analytics Graphics
+      const rightX = 720;
+      const rightY = 140;
+      const rightW = 1080;
+      const rightH = 750;
+
+      switch(atomIdx) {
+        case 0: drawChart0_WorkflowUpgrade(rightX, rightY, rightW, rightH, localF); break;
+        case 1: drawChart1_DataRefinement(rightX, rightY, rightW, rightH, localF); break;
+        case 2: drawChart2_SkillPackaging(rightX, rightY, rightW, rightH, localF); break;
+        case 3: drawChart3_AgenticDashboard(rightX, rightY, rightW, rightH, localF); break;
+        case 4: drawChart4_McpEcosystem(rightX, rightY, rightW, rightH, localF); break;
+        case 5: drawChart5_DecisionClosure(rightX, rightY, rightW, rightH, localF); break;
+      }
+
+      // 4. Bottom Switch Dock (6 Sliders turning bright orange)
+      drawBottomSwitchDock(atomIdx, localF);
+    }
+
+    function drawTopNav(atomNum, f) {
+      ctx.save();
+      // Orange tiny square logo
+      ctx.fillStyle = "#ff5722";
+      ctx.fillRect(80, 36, 20, 20);
+
+      ctx.fillStyle = "#111111";
+      ctx.font = "800 16px 'Plus Jakarta Sans'";
+      ctx.fillText("AI WORKFLOW EXECUTIVE REPORT", 112, 52);
+
+      ctx.fillStyle = "#666666";
+      ctx.font = "600 15px 'Noto Sans TC'";
+      ctx.fillText("向主管匯報 · 今日實戰成果總結", 395, 52);
+
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#444444";
+      ctx.font = "600 15px 'Noto Sans TC'";
+      ctx.fillText(`階段 ${atomNum} / 6`, CANVAS_WIDTH - 180, 52);
+
+      ctx.font = "700 15px 'JetBrains Mono'";
+      ctx.fillStyle = "#ff5722";
+      ctx.fillText("·  120 BPM", CANVAS_WIDTH - 80, 52);
+      ctx.restore();
+    }
+
+    function drawLeftInfoColumn(atom, localF) {
+      ctx.save();
+      const leftX = 100;
+      const topY = 250;
+
+      const enterT = easeOutCubic(clamp(localF / 18, 0, 1));
+      ctx.translate(0, (1 - enterT) * 20);
+
+      // Giant Number with Orange Dot
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 118px 'Plus Jakarta Sans'";
+      ctx.letterSpacing = "-0.04em";
+      ctx.fillText(atom.num.replace('.', ''), leftX, topY);
+
+      const numWidth = ctx.measureText(atom.num.replace('.', '')).width;
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.arc(leftX + numWidth + 18, topY - 16, 13, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bold Title
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 54px 'Noto Sans TC'";
+      ctx.fillText(atom.title, leftX, topY + 76);
+
+      // English Subtitle
+      ctx.fillStyle = "#777777";
+      ctx.font = "700 17px 'JetBrains Mono'";
+      ctx.fillText(atom.enTitle, leftX, topY + 114);
+
+      // Summary with Orange Dash
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "700 24px 'Noto Sans TC'";
+      ctx.fillText("—", leftX, topY + 170);
+
+      ctx.fillStyle = "#111111";
+      ctx.fillText(atom.summary.replace('— ', ''), leftX + 36, topY + 170);
+
+      // Formula capsule
+      ctx.fillStyle = "#666666";
+      ctx.font = "600 16px 'JetBrains Mono'";
+      ctx.fillText(atom.formula, leftX, topY + 215);
+
+      // Analytical Insight Card (White box with orange left border)
+      const boxY = topY + 260;
+      const boxW = 540;
+      const boxH = 175;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(leftX, boxY, boxW, boxH, 12);
+      ctx.fill();
+      ctx.stroke();
+
+      // Orange stripe
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.roundRect(leftX, boxY, 6, boxH, [12, 0, 0, 12]);
+      ctx.fill();
+
+      // Card Header
+      ctx.fillStyle = "#111111";
+      ctx.font = "700 18px 'Noto Sans TC'";
+      ctx.fillText("💡 成果匯報指引 (Executive Summary)", leftX + 26, boxY + 38);
+
+      // Card Body
+      ctx.fillStyle = "#333333";
+      ctx.font = "500 17px/1.65 'Noto Sans TC'";
+      wrapText(ctx, atom.explanation, leftX + 26, boxY + 74, boxW - 52, 28);
+
+      ctx.restore();
+    }
+
+    // --- Chart 0: 流程升級 (Bar Comparison) ---
+    function drawChart0_WorkflowUpgrade(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 25, 0, 1), 140, 12);
+
+      const barY1 = y + 180;
+      const barY2 = y + 360;
+      const maxW = 620;
+
+      // 1. Traditional Manual Bar (Gray, 40h)
+      ctx.fillStyle = "#777777";
+      ctx.font = "700 20px 'Noto Sans TC'";
+      ctx.fillText("傳統人工作業流程 (人工耗時 40 小時)", x + 60, barY1 - 20);
+
+      ctx.fillStyle = "#e0e0dc";
+      ctx.beginPath();
+      ctx.roundRect(x + 60, barY1, maxW * p, 46, 8);
+      ctx.fill();
+
+      ctx.fillStyle = "#555555";
+      ctx.font = "800 18px 'JetBrains Mono'";
+      ctx.fillText("40.0h (100%)", x + 80 + maxW * p, barY1 + 30);
+
+      // 2. AI Automated Workflow (Bright Orange, 15m)
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "800 24px 'Noto Sans TC'";
+      ctx.fillText("AI 自動化工作流 (僅需 15 分鐘)", x + 60, barY2 - 20);
+
+      const targetW = maxW * 0.05; // tiny fraction
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.roundRect(x + 60, barY2, Math.max(18, targetW * p), 52, 8);
+      ctx.fill();
+
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "900 26px 'JetBrains Mono'";
+      ctx.fillText("0.25h (節省 98.3% 工時！)", x + 90 + Math.max(18, targetW * p), barY2 + 36);
+
+      // Giant Callout Badge
+      drawCalloutBadge(x + w / 2, y + 540, "⚡ 效率躍升：從 40 小時手工整理 ➔ 15 分鐘全自動閉環");
+      ctx.restore();
+    }
+
+    // --- Chart 1: 資料清洗 (Trend Line & Reconciliation Badge) ---
+    function drawChart1_DataRefinement(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 25, 0, 1), 130, 12);
+
+      const pts = [
+        { x: x + 80, y: y + 420 },
+        { x: x + 240, y: y + 360 },
+        { x: x + 400, y: y + 260 },
+        { x: x + 560, y: y + 300 },
+        { x: x + 720, y: y + 180 },
+        { x: x + 880, y: y + 140 }
+      ];
+
+      // Draw Gradient Area
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, y + 480);
+      for (let i = 0; i < pts.length; i++) {
+        const curY = (y + 480) - ((y + 480) - pts[i].y) * p;
+        ctx.lineTo(pts[i].x, curY);
+      }
+      ctx.lineTo(pts[pts.length - 1].x, y + 480);
+      ctx.closePath();
+      const grad = ctx.createLinearGradient(0, y + 140, 0, y + 480);
+      grad.addColorStop(0, "rgba(255, 87, 34, 0.28)");
+      grad.addColorStop(1, "rgba(255, 87, 34, 0.0)");
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Draw Stroke Line
+      ctx.beginPath();
+      for (let i = 0; i < pts.length; i++) {
+        const curY = (y + 480) - ((y + 480) - pts[i].y) * p;
+        if (i === 0) ctx.moveTo(pts[i].x, curY);
+        else ctx.lineTo(pts[i].x, curY);
+      }
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Points and Values
+      for (let i = 0; i < pts.length; i++) {
+        const curY = (y + 480) - ((y + 480) - pts[i].y) * p;
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#ff5722";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(pts[i].x, curY, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // Reconciliation Badge
+      drawCalloutBadge(x + w / 2, y + 540, "✅ 交叉算術勾稽：細項加總 == 總額 (差額=0，通過防幻覺核對)");
+      ctx.restore();
+    }
+
+    // --- Chart 2: 流程封裝 (Scatter & 3 Skill Chips) ---
+    function drawChart2_SkillPackaging(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 25, 0, 1), 140, 12);
+
+      // Regression line
+      ctx.beginPath();
+      ctx.moveTo(x + 100, y + 440);
+      ctx.lineTo(x + 100 + 780 * p, (y + 440) - 300 * p);
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 3.5;
+      ctx.setLineDash([8, 6]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 3 Large Floating Skill Cards
+      const skills = [
+        { name: "01. 公文與行政企劃審核器", desc: "主旨/說明/擬辦 標準化規範", sx: x + 160, sy: y + 160 },
+        { name: "02. 學生專案評閱回饋器", desc: "三明治回饋法 · 評分矩陣 Rubric", sx: x + 480, sy: y + 260 },
+        { name: "03. 會議紀錄與待辦萃取器", desc: "責任到人 · 時程與產出矩陣", sx: x + 260, sy: y + 380 }
+      ];
+
+      skills.forEach((sk, i) => {
+        const delayP = spring(clamp((f - i * 6) / 20, 0, 1), 140, 12);
+        ctx.save();
+        ctx.translate(sk.sx, sk.sy + (1 - delayP) * 30);
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#ff5722";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(0, 0, 320, 84, 12);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#111111";
+        ctx.font = "800 17px 'Noto Sans TC'";
+        ctx.fillText(sk.name, 18, 32);
+
+        ctx.fillStyle = "#777777";
+        ctx.font = "600 14px 'Noto Sans TC'";
+        ctx.fillText(sk.desc, 18, 60);
+        ctx.restore();
+      });
+
+      drawCalloutBadge(x + w / 2, y + 540, "⚙️ SOP 結構化資產：角色 + 邊界約束 + Few-Shot 少樣本示範");
+      ctx.restore();
+    }
+
+    // --- Chart 3: 現代建站 (Donut Chart 100% Offline) ---
+    function drawChart3_AgenticDashboard(x, y, w, h, f) {
+      ctx.save();
+      const cx = x + w / 2;
+      const cy = y + 270;
+      const rOuter = 180;
+      const rInner = 110;
+      const p = spring(clamp(f / 25, 0, 1), 130, 12);
+
+      // Donut Segments
+      const slices = [
+        { pct: 0.45, color: "#ff5722", label: "7大原子圖表引擎" },
+        { pct: 0.35, color: "#111111", label: "SheetJS 本地解析" },
+        { pct: 0.20, color: "#888888", label: "AI 智慧問答小助手" }
+      ];
+
+      let startAng = -Math.PI / 2;
+      slices.forEach((sl) => {
+        const sweep = sl.pct * Math.PI * 2 * p;
+        ctx.beginPath();
+        ctx.arc(cx, cy, rOuter, startAng, startAng + sweep);
+        ctx.arc(cx, cy, rInner, startAng + sweep, startAng, true);
+        ctx.closePath();
+        ctx.fillStyle = sl.color;
+        ctx.fill();
+        startAng += sweep;
+      });
+
+      // Center Text
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 36px 'JetBrains Mono'";
+      ctx.fillText("100%", cx, cy + 6);
+      ctx.fillStyle = "#777777";
+      ctx.font = "700 16px 'Noto Sans TC'";
+      ctx.fillText("本地離線運作", cx, cy + 34);
+
+      drawCalloutBadge(x + w / 2, y + 540, "🌐 自然語言無代碼建站：瀏覽器拖曳即跑 · 隱私資料絕不出本機");
+      ctx.restore();
+    }
+
+    // --- Chart 4: 工具串接 (Radar 6-Axis Ecosystem) ---
+    function drawChart4_McpEcosystem(x, y, w, h, f) {
+      ctx.save();
+      const cx = x + w / 2;
+      const cy = y + 270;
+      const maxR = 170;
+      const p = spring(clamp(f / 25, 0, 1), 130, 12);
+
+      const labels = ["Drive 雲端", "Sheets 表格", "Docs 文件", "Slides 簡報", "Gmail 郵件", "Calendar 日曆"];
+      const n = labels.length;
+
+      // Draw Spiderweb circles
+      ctx.strokeStyle = "#e0e0dc";
+      ctx.lineWidth = 1;
+      for (let r = 1; r <= 4; r++) {
+        ctx.beginPath();
+        for (let i = 0; i < n; i++) {
+          const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+          const rad = (maxR * r) / 4;
+          const px = cx + Math.cos(a) * rad;
+          const py = cy + Math.sin(a) * rad;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
+
+      // Draw Filled Radar Area
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) {
+        const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+        const rad = maxR * 0.95 * p;
+        const px = cx + Math.cos(a) * rad;
+        const py = cy + Math.sin(a) * rad;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fillStyle = "rgba(255, 87, 34, 0.35)";
+      ctx.fill();
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Labels around
+      ctx.fillStyle = "#111111";
+      ctx.font = "800 18px 'Noto Sans TC'";
+      ctx.textAlign = "center";
+      for (let i = 0; i < n; i++) {
+        const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+        const rad = maxR + 32;
+        ctx.fillText(labels[i], cx + Math.cos(a) * rad, cy + Math.sin(a) * rad + 6);
+      }
+
+      drawCalloutBadge(x + w / 2, y + 540, "🔗 MCP 協議直通全生態：打破資料孤島 · 實現行政教學端到端全自動");
+      ctx.restore();
+    }
+
+    // --- Chart 5: 成果閉環 (3D Ring & Grand Finale) ---
+    function drawChart5_DecisionClosure(x, y, w, h, f) {
+      ctx.save();
+      const cx = x + w / 2;
+      const cy = y + 250;
+      const rot = f * 0.03;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      for (let i = 0; i < 6; i++) {
+        const ang = rot + (i * Math.PI * 2) / 6;
+        const rx = Math.cos(ang) * 160;
+        const ry = Math.sin(ang) * 70;
+
+        ctx.fillStyle = "#ff5722";
+        ctx.beginPath();
+        ctx.arc(rx, ry, 12, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 42px 'Noto Sans TC'";
+      ctx.fillText("好分析，是用圖表洞見真實趨勢", cx, cy + 160);
+
+      ctx.font = "800 24px 'Plus Jakarta Sans'";
+      ctx.fillStyle = "#ff5722";
+      ctx.fillText("AI WORKFLOW • FULL PRODUCTIVITY LOOP", cx, cy + 208);
+
+      drawCalloutBadge(x + w / 2, y + 540, "🚀 全日結業交付：Agent + Skill + MCP + Dashboard + 60s 數據短片");
+      ctx.restore();
+    }
+
+    function drawCalloutBadge(x, y, text) {
+      ctx.save();
+      ctx.font = "700 17px 'Noto Sans TC'";
+      const textW = ctx.measureText(text).width;
+      const boxW = textW + 36;
+      const boxH = 44;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.roundRect(x - boxW / 2, y - boxH / 2, boxW, boxH, 10);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#ff5722";
+      ctx.textAlign = "center";
+      ctx.fillText(text, x, y + 6);
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------
+    // BOTTOM SWITCH DOCK (6 SLIDERS)
+    // -------------------------------------------------------------
+    function drawBottomSwitchDock(activeIdx, localF) {
+      const dockY = 960;
+      const startX = 320;
+      const spacing = 250;
+
+      for (let i = 0; i < 6; i++) {
+        const sx = startX + i * spacing;
+        const isSwitchedOn = (activeIdx > i) || (activeIdx === i && localF > 8) || (activeIdx === 5);
+
+        const pillW = 68;
+        const pillH = 34;
+
+        ctx.save();
+        ctx.fillStyle = isSwitchedOn ? "#ff5722" : "#d8d8d4";
+        ctx.beginPath();
+        ctx.roundRect(sx - pillW / 2, dockY - pillH / 2, pillW, pillH, pillH / 2);
+        ctx.fill();
+
+        const knobD = 26;
+        const knobLeftX = sx - pillW / 2 + 4 + knobD / 2;
+        const knobRightX = sx + pillW / 2 - 4 - knobD / 2;
+
+        let knobX = knobLeftX;
+        if (isSwitchedOn) {
+          if (activeIdx === i) {
+            const slideT = spring(clamp((localF - 8) / 20, 0, 1), 140, 12);
+            knobX = knobLeftX + (knobRightX - knobLeftX) * slideT;
+          } else {
+            knobX = knobRightX;
+          }
+        }
+
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(knobX, dockY, knobD / 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.textAlign = "center";
+        ctx.fillStyle = isSwitchedOn ? "#111111" : "#777777";
+        ctx.font = isSwitchedOn ? "800 17px 'Noto Sans TC'" : "600 17px 'Noto Sans TC'";
+        ctx.fillText(SWITCH_LABELS[i], sx, dockY + 42);
+        ctx.restore();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // CONTROLS & BROWSER INTERACTION
+    // -------------------------------------------------------------
+    function updateTimeline(f) {
+      const pct = (f / (TOTAL_FRAMES - 1)) * 100;
+      document.getElementById('timelineFill').style.width = pct + '%';
+      document.getElementById('timelineThumb').style.left = pct + '%';
+
+      const sec = (f / FPS);
+      const mm = String(Math.floor(sec / 60)).padStart(2, '0');
+      const ss = String(Math.floor(sec % 60)).padStart(2, '0');
+      const ms = String(Math.floor((sec % 1) * 100)).padStart(2, '0');
+      document.getElementById('timeCurrent').innerText = `${mm}:${ss}.${ms}`;
+    }
+
+    function renderLoop() {
+      if (!isPlaying) return;
+      drawFrame(currentFrame);
+      updateTimeline(currentFrame);
+      currentFrame++;
+      if (currentFrame >= TOTAL_FRAMES) {
+        currentFrame = TOTAL_FRAMES - 1;
+        isPlaying = false;
+        document.getElementById('btnPlayPause').innerText = '▶ 播放 (Play)';
+        return;
+      }
+      requestAnimationFrame(renderLoop);
+    }
+
+    document.getElementById('btnPlayPause').addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      document.getElementById('btnPlayPause').innerText = isPlaying ? '⏸ 暫停' : '▶ 播放 (Play)';
+      if (isPlaying) {
+        if (currentFrame >= TOTAL_FRAMES - 1) currentFrame = 0;
+        renderLoop();
+      }
+    });
+
+    document.getElementById('btnRestart').addEventListener('click', () => {
+      currentFrame = 0;
+      drawFrame(0);
+      updateTimeline(0);
+      if (!isPlaying) {
+        isPlaying = true;
+        document.getElementById('btnPlayPause').innerText = '⏸ 暫停';
+        renderLoop();
+      }
+    });
+
+    // Expose for Headless Chrome Puppeteer
+    window.renderFrame = function(frameIndex) {
+      drawFrame(frameIndex);
+      return true;
+    };
+
+    // Initial render
+    drawFrame(0);
+    updateTimeline(0);
+  </script>
+</body>
+</html>
