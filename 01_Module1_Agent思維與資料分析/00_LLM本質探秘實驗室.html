@@ -582,11 +582,11 @@
           <option value="gemini">⚡ 直連 Google Gemini API</option>
         </select>
         <select id="openrouterModelSelect" class="select-clean" style="display: none;" onchange="handleModelChange()">
-          <option value="openai/gpt-4o">openai/gpt-4o</option>
-          <option value="openai/gpt-4o-mini">openai/gpt-4o-mini</option>
+          <option value="deepseek/deepseek-chat">deepseek/deepseek-chat (💥易破防實測推薦)</option>
+          <option value="meta-llama/llama-3.3-70b-instruct">meta-llama/llama-3.3-70b (💥易破防實測推薦)</option>
+          <option value="openai/gpt-4o">openai/gpt-4o (🛡️強安全防禦)</option>
+          <option value="openai/gpt-4o-mini">openai/gpt-4o-mini (🛡️高拒答率)</option>
           <option value="anthropic/claude-3.5-sonnet">anthropic/claude-3.5-sonnet</option>
-          <option value="deepseek/deepseek-chat">deepseek/deepseek-chat</option>
-          <option value="google/gemini-2.0-flash-001">google/gemini-2.0-flash-001</option>
         </select>
         <div id="apiKeyGroup" style="display: flex; align-items: center; gap: 0.4rem;">
           <input type="password" id="apiKeyInput" class="input-clean" placeholder="輸入 API Key (選填)">
@@ -1121,7 +1121,7 @@ print("Reconciliation: PASS")
     let currentProvider = localStorage.getItem('llm_lab_provider') || 'simulation';
     let geminiApiKey = localStorage.getItem('llm_lab_gemini_key') || '';
     let openrouterApiKey = localStorage.getItem('llm_lab_openrouter_key') || '';
-    let selectedModel = localStorage.getItem('llm_lab_openrouter_model') || 'openai/gpt-4o';
+    let selectedModel = localStorage.getItem('llm_lab_openrouter_model') || 'deepseek/deepseek-chat';
 
     // -------------------------------------------------------------
     // UI 初始化與事件監聽
