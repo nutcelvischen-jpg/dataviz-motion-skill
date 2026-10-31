@@ -244,35 +244,62 @@
 
     <!-- MODULE 1 PANE -->
     <div id="mod1" class="tab-pane active">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">📌 任務一：髒資料智慧清洗與格式規範化</div>
-          <span class="card-badge">Module 1 實作</span>
+      <!-- Real-World Datasets Showcase Banner -->
+      <div class="card" style="border: 2px solid #3b82f6; background: #eff6ff;">
+        <div class="card-header" style="border-bottom-color: #bfdbfe;">
+          <div class="card-title" style="color: #1e40af;">🌐 真實世界級公開資料庫實戰（已同步至教材庫）</div>
+          <span class="card-badge" style="background: #2563eb; color: white;">權威官方數據</span>
         </div>
-        <p>上傳練習資料檔 <code>sample_dirty_data.csv</code>，並複製以下提示詞貼給 AI 模型執行清洗：</p>
-        
-        <div class="prompt-box">
-          <div class="prompt-box-top">
-            <span class="prompt-label">PROMPT 1-1：資料清洗指令</span>
-            <button class="copy-btn" onclick="copyPrompt('p1_1', this)">📋 一鍵複製 Prompt</button>
-          </div>
-          <pre id="p1_1">你是一位資深商業數據分析專家。我已上傳一份包含行政與業務指標的原始數據檔案。請為我執行嚴謹的數據清洗與標準化，規則如下：
-
-1. 檢查並處理缺失值（Missing Values）：若非關鍵欄位則標記「無資料」，若為數值指標則計算中位數填補或特別標示。
-2. 數值清理：去除文字欄位中的多餘前後空白；將含逗號千分位的字串（例如 "1,250,000"）轉為純數字型態。
-3. 日期格式統一：將所有日期欄位一律轉換為標準的 YYYY-MM-DD 格式。
-4. 異常值檢查：檢視數值是否出現不合理的負數或極端離群值，並條列指出。
-5. 請直接產出一份清洗乾淨後的 CSV 格式內容供我下載，並以簡要清單條列你剛才修復了哪些問題。</pre>
-        </div>
-
-        <div class="tips-box">
-          <strong>💡 講師小提醒：</strong> 若使用 Claude，可點擊「Artifacts」預覽清洗後的乾淨表格；若使用 ChatGPT，其 Python Code Interpreter 會在背景自動執行 Pandas 程式碼。
+        <p style="color: #1e3a8a; font-size: 14.5px;">本工作坊全面導入<strong>政府與證交所權威公開資料集</strong>，徹底告別玩具假資料，學員可依個人專業領域選擇實戰賽道：</p>
+        <div class="btn-group" style="margin-top: 12px;">
+          <a class="action-btn" style="background: #ffffff; border-color: #2563eb; color: #1e40af;" href="../01_Module1_Agent思維與資料分析/real_world_datasets/實戰挑戰_臺灣上市公司營收統計_1088家真實髒資料.csv" download>
+            📈 【商管/金融賽道】臺灣證交所 1,088 家上市公司營收（含千分位髒污）
+          </a>
+          <a class="action-btn" style="background: #ffffff; border-color: #059669; color: #065f46;" href="../01_Module1_Agent思維與資料分析/real_world_datasets/實戰挑戰_113學年度大專校院學生統計_737筆真實髒資料.csv" download>
+            🎓 【高教/校務治理賽道】教育部 113 學年全台 140 所大學學生統計（737筆）
+          </a>
+          <a class="action-btn" style="background: #ffffff; border-color: #94a3b8; color: #475569;" href="../01_Module1_Agent思維與資料分析/sample_dirty_data.csv" download>
+            ☕ 【新手入門熱身】校園活動經費報銷（12 筆迷你題）
+          </a>
         </div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title">📌 任務二：多維度洞察與防幻覺核對（Cross-Verification）</div>
+          <div class="card-title">📌 任務一：1,088 家上市公司真實營收資料清洗與標準化</div>
+          <span class="card-badge">Module 1 實作</span>
+        </div>
+        <p>上傳真實資料檔 <code>實戰挑戰_臺灣上市公司營收統計_1088家真實髒資料.csv</code>，並複製以下提示詞貼給 AI 模型執行清洗：</p>
+        
+        <div class="prompt-box">
+          <div class="prompt-box-top">
+            <span class="prompt-label">PROMPT 1-1：大數據清洗與轉型指令</span>
+            <button class="copy-btn" onclick="copyPrompt('p1_1', this)">📋 一鍵複製 Prompt</button>
+          </div>
+          <pre id="p1_1">你是一位資深商業與金融數據工程專家。我已經上傳了一份由臺灣證券交易所 (TWSE) 彙整的真實市場檔案 `實戰挑戰_臺灣上市公司營收統計_1088家真實髒資料.csv`（共 1,088 家上市公司）。
+
+請仔細檢查數據結構，並調用代碼執行器（Python / Pandas）完成嚴格清洗：
+
+### 執行規則：
+1. 去除空白：去除「公司名稱」、「產業別」等文字欄位的所有前後贅餘空白（Trim Whitespace）。
+2. 千分位字串數值化：
+   - 將包含逗號千分位的營收數字（例如 "14,321,556"）強制轉換為純數值 Float / Int。
+   - 檢查「營業收入-去年當月營收」，若為 "-" 或 "NaN"，轉換為空值，統計時標註為缺少同期數據。
+3. 日期紀年標準化：
+   - 檢查「資料年月」欄位，將民國格式（如 11509 或 115/09）統一精準換算為 ISO 格式 2026-09。
+4. 輸出品質報表：
+   - 列出資料清洗修復摘要（總行數、修復了幾筆字串、轉換了幾筆數值）。
+   - 產出乾淨版的 CSV 內容供下載。</pre>
+        </div>
+
+        <div class="tips-box">
+          <strong>💡 講師小提醒：</strong> 面對 1,000+ 筆真實數據，傳統手動 Excel 清洗容易當機或看漏；AI Agent 透過撰寫 Python 腳本可在 3 秒內完成批量清洗與資料結構校驗。
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📌 任務二：全市場產業板塊探索分析與防幻覺核對（Cross-Verification）</div>
           <span class="card-badge">防幻覺關鍵技巧</span>
         </div>
         <p>為避免 AI 產生「看似合理但數字算錯」的幻覺，執行以下交叉核對提示詞：</p>
@@ -282,16 +309,17 @@
             <span class="prompt-label">PROMPT 1-2：算術防幻覺與摘要報告</span>
             <button class="copy-btn" onclick="copyPrompt('p1_2', this)">📋 一鍵複製 Prompt</button>
           </div>
-          <pre id="p1_2">請根據剛才清洗完成的資料集，進行深入的探索性數據分析（EDA），並嚴格執行「雙重驗算（Cross-Verification）」：
+          <pre id="p1_2">請根據剛才清洗完成的 1,088 家上市公司營收資料集，執行多維度探索性分析（EDA），並嚴格執行「雙重驗算（Cross-Verification）」：
 
-1. 計算以下關鍵指標：
-   - 各類別的總體量與佔比（%）
-   - 月度成長率（MoM %）與極大值、極小值
-   - 核心指標之間的相關性（計算皮爾森相關係數 r 值）
+1. 計算關鍵維度：
+   - 計算各「產業別」（半導體、電腦週邊、金融保險、觀光等）的「當月總營收」與佔全市場比例（%）。
+   - 找出各產業平均年增率（YoY %）最高與最低的前三大板塊。
+   - 列出全市場營收成長最強勁的前五大指標企業。
 2. 【嚴格防幻覺核對機制】：
-   - 請展示你的具體算式（公式、分子與分母）。
-   - 請以表格列出「類別總和」是否嚴格等於「各項目加總」，並註明驗算通過（Pass）。
-3. 提供 3 點高價值的管理決策建議，語言需客觀具體，杜絕空泛形容詞。</pre>
+   - 加總勾稽：將「全市場 1,088 家個別公司營收總和 S1」與「各產業分類彙總總和 S2」進行比對，驗證 S1 - S2 差額是否嚴格為 0。
+   - 比率透明化：凡涉及佔比（%）與成長率，必須清楚標註【分子 / 分母 = 計算結果】。
+   - 請註明驗算通過 [PASS 驗算無誤]。
+3. 提供 3 點高價值的產業景氣與集中度決策建議，語言需客觀具體，杜絕空泛形容詞。</pre>
         </div>
       </div>
     </div>
