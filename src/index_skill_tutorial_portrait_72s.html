@@ -208,9 +208,11 @@
         durSec: 13,
         tag: "💡 痛點破局",
         headline: "別再重複教 AI！",
-        highlight: "SOP 封裝成「外掛卡匣」",
-        sub: "告別每次手打 500 字，插上卡匣 AI 就會做！",
-        pill: "💡 規則寫入卡匣，AI 插上就會做！"
+        highlight: "一秒插上「專屬外掛」",
+        sub: "告別每次手打 500 字，插上卡匣 AI 就會！",
+        pill: "🔥 規則寫入卡匣，AI 插上就會做！",
+        tagColor: "#ef4444",
+        highlightColor: "#ff5722"
       },
       {
         id: "02",
@@ -218,19 +220,23 @@
         durSec: 13,
         tag: "📁 結構解密",
         headline: "一個資料夾 ＝ 一個 Skill",
-        highlight: "SKILL.md ＋ 漸進式載入",
-        sub: "任務觸發才一秒載入，平時 0 佔用、零耗 Token！",
-        pill: "📁 資料夾放進專案，AI 立刻學會新技能！"
+        highlight: "3 大核心檔案結構",
+        sub: "任務觸發才一秒載入，平常 0 佔用、零耗 Token！",
+        pill: "📁 資料夾放進專案，AI 立刻學會新技能！",
+        tagColor: "#7c3aed",
+        highlightColor: "#8b5cf6"
       },
       {
         id: "03",
         startSec: 26,
         durSec: 17,
         tag: "💻 流程封裝",
-        headline: "做了半天的流程 ➔ 秒變 Skill！",
-        highlight: "流程跑通？一句話固化成外掛",
-        sub: "別每次重頭教！一句話把「成功流程」封裝為「永久資產」！",
-        pill: "💡 流程跑通別重來！一句話把「成果」封裝為「外掛」！"
+        headline: "做了半天？一秒變外掛！",
+        highlight: "剛跑通的流程 ➔ 永久資產",
+        sub: "別每次重頭教！一句話把「成功流程」封裝為外掛！",
+        pill: "💡 流程跑通別重來！一句話封裝成外掛！",
+        tagColor: "#0284c7",
+        highlightColor: "#06b6d4"
       },
       {
         id: "04",
@@ -238,9 +244,11 @@
         durSec: 16,
         tag: "⚡ 一秒喚醒",
         headline: "隨口一句話，外掛自動跑！",
-        highlight: "丟入雜亂報表 ➔ 自動精準對帳",
+        highlight: "丟入雜亂報表 ➔ 1 秒交付",
         sub: "說一句「幫我對帳」，AI 自動喚醒專屬 Skill！",
-        pill: "⚡ 隨口一句「幫我對帳」，專屬 Skill 零失誤驗算！"
+        pill: "⚡ 一句話「幫我對帳」，零失誤驗算！",
+        tagColor: "#059669",
+        highlightColor: "#10b981"
       },
       {
         id: "05",
@@ -248,9 +256,11 @@
         durSec: 13,
         tag: "🚀 團隊升級",
         headline: "成為 AI 工作流架構師",
-        highlight: "Git 一鍵共享 ➔ 全團隊戰力翻倍",
+        highlight: "Git 一鍵共享 ➔ 戰力翻倍",
         sub: "個人經驗永久固化為團隊資產，經驗傳承零斷層！",
-        pill: "✨ 不做手動打工人，升級打造專屬 AI 團隊！"
+        pill: "✨ 擺脫重複打工，打造專屬 AI 軍團！",
+        tagColor: "#d97706",
+        highlightColor: "#f59e0b"
       }
     ];
 
@@ -346,10 +356,10 @@
       }
 
       // 4. Bottom Floating Golden Pill (32px Bold)
-      drawCalloutBadgePortrait(CANVAS_WIDTH / 2, 1665, scene.pill);
+      drawCalloutBadgePortrait(CANVAS_WIDTH / 2, 1665, scene.pill, scene.tagColor);
 
       // 5. Bottom Switch Dock (5 Large 22px Buttons)
-      drawBottomSwitchDock5(sceneIdx, localSec / scene.durSec);
+      drawBottomSwitchDock5(sceneIdx, localSec / scene.durSec, scene.tagColor);
     }
 
     function drawTopNav(sceneNum, f) {
@@ -397,7 +407,7 @@
       ctx.translate(0, (1 - enterT) * 16);
 
       // Top Tag Badge Pill
-      ctx.fillStyle = "#ff5722";
+      ctx.fillStyle = scene.tagColor || "#ff5722";
       ctx.beginPath();
       ctx.roundRect(leftX, topY, 260, 54, 14);
       ctx.fill();
@@ -414,8 +424,8 @@
       ctx.letterSpacing = "-0.03em";
       ctx.fillText(scene.headline, leftX, topY + 134);
 
-      // Highlight Line (54px vibrant orange)
-      ctx.fillStyle = "#ff5722";
+      // Highlight Line (52px vibrant theme color)
+      ctx.fillStyle = scene.highlightColor || "#ff5722";
       ctx.font = "900 52px 'Noto Sans TC'";
       ctx.fillText(scene.highlight, leftX, topY + 204);
 
@@ -427,7 +437,7 @@
       ctx.restore();
     }
 
-    // --- Scene 0: 痛點破局 (Two Big Vibrant Side-by-Side Hero Cards · 50% Text Cut) ---
+    // --- Scene 0: 痛點破局 (Two Big Vibrant Side-by-Side Hero Cards · Ultra-Minimal) ---
     function drawScene0_PainPointVsSkill(x, y, w, h, f) {
       ctx.save();
       const p = spring(clamp(f / 20, 0, 1), 130, 12);
@@ -441,16 +451,16 @@
       // LEFT BOX: 傳統痛點 (Manual Prompting)
       // ==========================================
       const leftBoxX = x;
-      ctx.fillStyle = "#fff5f5";
-      ctx.strokeStyle = "#f87171";
-      ctx.lineWidth = 3.5;
+      ctx.fillStyle = "#fff1f2";
+      ctx.strokeStyle = "#f43f5e";
+      ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.roundRect(leftBoxX, boxY, boxW, boxH, 22);
       ctx.fill();
       ctx.stroke();
 
       // Red Top Tag Header
-      ctx.fillStyle = "#ef4444";
+      ctx.fillStyle = "#e11d48";
       ctx.beginPath();
       ctx.roundRect(leftBoxX, boxY, boxW, 76, [22, 22, 0, 0]);
       ctx.fill();
@@ -461,56 +471,49 @@
       ctx.fillText("❌ 傳統痛點：手動重教", leftBoxX + boxW / 2, boxY + 48);
 
       // Icon & Big Heading
-      ctx.font = "80px 'Apple Color Emoji', sans-serif";
-      ctx.fillText("😫", leftBoxX + boxW / 2, boxY + 190);
+      ctx.font = "88px 'Apple Color Emoji', sans-serif";
+      ctx.fillText("😫", leftBoxX + boxW / 2, boxY + 195);
 
-      ctx.fillStyle = "#991b1b";
-      ctx.font = "900 42px 'Noto Sans TC'";
-      ctx.fillText("每天手打 500 字", leftBoxX + boxW / 2, boxY + 265);
+      ctx.fillStyle = "#881337";
+      ctx.font = "900 46px 'Noto Sans TC'";
+      ctx.fillText("手打 500 字", leftBoxX + boxW / 2, boxY + 270);
 
-      ctx.fillStyle = "#dc2626";
+      ctx.fillStyle = "#be123c";
       ctx.font = "800 28px 'Noto Sans TC'";
-      ctx.fillText("每次對話都要從頭教起！", leftBoxX + boxW / 2, boxY + 312);
+      ctx.fillText("每次對話重頭教起！", leftBoxX + boxW / 2, boxY + 318);
 
-      // 2 High-Impact Cards (Minimalist & Punchy)
-      const painCards = [
-        { icon: "⚠️", title: "規則容易漏交代", desc: "AI 格式跑掉，越改越心累" },
-        { icon: "💸", title: "浪費大量 Token", desc: "每次重複貼上，又慢又費錢" }
+      // 2 Ultra-Minimal High-Impact Cards
+      const painPills = [
+        { icon: "⚠️", title: "規則容易漏交代", color: "#9f1239", border: "#fca5a5" },
+        { icon: "💸", title: "白白浪費 Token", color: "#9f1239", border: "#fca5a5" }
       ];
 
-      painCards.forEach((pc, idx) => {
-        const cy = boxY + 360 + idx * 240;
+      painPills.forEach((pp, idx) => {
+        const cy = boxY + 370 + idx * 220;
         ctx.fillStyle = "#ffffff";
-        ctx.strokeStyle = "#fca5a5";
-        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = pp.border;
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.roundRect(leftBoxX + 24, cy, boxW - 48, 205, 18);
+        ctx.roundRect(leftBoxX + 24, cy, boxW - 48, 180, 18);
         ctx.fill();
         ctx.stroke();
 
-        ctx.textAlign = "left";
-        ctx.fillStyle = "#991b1b";
-        ctx.font = "900 34px 'Noto Sans TC'";
-        ctx.fillText(`${pc.icon} ${pc.title}`, leftBoxX + 50, cy + 78);
-
-        ctx.fillStyle = "#475569";
-        ctx.font = "800 26px 'Noto Sans TC'";
-        ctx.fillText(pc.desc, leftBoxX + 50, cy + 140);
+        ctx.textAlign = "center";
+        ctx.fillStyle = pp.color;
+        ctx.font = "900 36px 'Noto Sans TC'";
+        ctx.fillText(`${pp.icon} ${pp.title}`, leftBoxX + boxW / 2, cy + 104);
       });
 
-      // Bottom Warning Pill
-      ctx.fillStyle = "#fee2e2";
-      ctx.strokeStyle = "#ef4444";
-      ctx.lineWidth = 2.5;
+      // Bottom Warning Pill (Solid Vibrant Red Fill!)
+      ctx.fillStyle = "#e11d48";
       ctx.beginPath();
       ctx.roundRect(leftBoxX + 24, boxY + boxH - 145, boxW - 48, 100, 16);
       ctx.fill();
-      ctx.stroke();
 
       ctx.textAlign = "center";
-      ctx.fillStyle = "#dc2626";
-      ctx.font = "900 32px 'Noto Sans TC'";
-      ctx.fillText("😫 每天手動打工 · 效率極低", leftBoxX + boxW / 2, boxY + boxH - 84);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 28px 'Noto Sans TC'";
+      ctx.fillText("😫 每天重複打工 · 效率極低", leftBoxX + boxW / 2, boxY + boxH - 84);
 
       // ==========================================
       // RIGHT BOX: Antigravity Skill (一鍵專屬外掛)
@@ -519,9 +522,9 @@
       ctx.save();
       ctx.translate(0, (1 - p) * 16);
 
-      ctx.fillStyle = "#fffaf5";
+      ctx.fillStyle = "#fff7ed";
       ctx.strokeStyle = "#ff5722";
-      ctx.lineWidth = 4;
+      ctx.lineWidth = 4.5;
       ctx.beginPath();
       ctx.roundRect(rightBoxX, boxY, boxW, boxH, 22);
       ctx.fill();
@@ -536,70 +539,63 @@
       ctx.fillStyle = "#ffffff";
       ctx.font = "900 28px 'Noto Sans TC'";
       ctx.textAlign = "center";
-      ctx.fillText("⚡ Antigravity Skill", rightBoxX + boxW / 2, boxY + 48);
+      ctx.fillText("⚡ 專屬外掛卡匣", rightBoxX + boxW / 2, boxY + 48);
 
       // Icon & Big Heading
-      ctx.font = "80px 'Apple Color Emoji', sans-serif";
-      ctx.fillText("🎮", rightBoxX + boxW / 2, boxY + 190);
+      ctx.font = "88px 'Apple Color Emoji', sans-serif";
+      ctx.fillText("⚡", rightBoxX + boxW / 2, boxY + 195);
+
+      ctx.fillStyle = "#9a3412";
+      ctx.font = "900 46px 'Noto Sans TC'";
+      ctx.fillText("插上卡匣秒變專家", rightBoxX + boxW / 2, boxY + 270);
 
       ctx.fillStyle = "#c2410c";
-      ctx.font = "900 42px 'Noto Sans TC'";
-      ctx.fillText("插上卡匣秒生效", rightBoxX + boxW / 2, boxY + 265);
-
-      ctx.fillStyle = "#ea580c";
       ctx.font = "800 28px 'Noto Sans TC'";
-      ctx.fillText("專業工作流程永久固化！", rightBoxX + boxW / 2, boxY + 312);
+      ctx.fillText("工作流程永久固化！", rightBoxX + boxW / 2, boxY + 318);
 
-      // 2 High-Impact Cards (Minimalist & Punchy)
-      const skillCards = [
-        { icon: "🎯", title: "一句話自動喚醒", desc: "說「幫我對帳」，零出錯執行" },
-        { icon: "🚀", title: "漸進式載入黑科技", desc: "平時 0 佔用 · 零耗 Token" }
+      // 2 Ultra-Minimal High-Impact Cards
+      const skillPills = [
+        { icon: "🎯", title: "SOP 永久固化", color: "#15803d", bg: "#f0fdf4", border: "#22c55e" },
+        { icon: "🚀", title: "一句話秒自動執行", color: "#0369a1", bg: "#f0f9ff", border: "#0ea5e9" }
       ];
 
-      skillCards.forEach((sc, idx) => {
-        const cy = boxY + 360 + idx * 240;
-        ctx.fillStyle = "#ffffff";
-        ctx.strokeStyle = "#fed7aa";
-        ctx.lineWidth = 2.5;
+      skillPills.forEach((sp, idx) => {
+        const cy = boxY + 370 + idx * 220;
+        ctx.fillStyle = sp.bg;
+        ctx.strokeStyle = sp.border;
+        ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.roundRect(rightBoxX + 24, cy, boxW - 48, 205, 18);
+        ctx.roundRect(rightBoxX + 24, cy, boxW - 48, 180, 18);
         ctx.fill();
         ctx.stroke();
 
-        ctx.textAlign = "left";
-        ctx.fillStyle = "#15803d";
-        ctx.font = "900 34px 'Noto Sans TC'";
-        ctx.fillText(`${sc.icon} ${sc.title}`, rightBoxX + 50, cy + 78);
-
-        ctx.fillStyle = "#334155";
-        ctx.font = "800 26px 'Noto Sans TC'";
-        ctx.fillText(sc.desc, rightBoxX + 50, cy + 140);
+        ctx.textAlign = "center";
+        ctx.fillStyle = sp.color;
+        ctx.font = "900 36px 'Noto Sans TC'";
+        ctx.fillText(`${sp.icon} ${sp.title}`, rightBoxX + boxW / 2, cy + 104);
       });
 
-      // Bottom Success Pill
-      ctx.fillStyle = "#ecfdf5";
-      ctx.strokeStyle = "#10b981";
-      ctx.lineWidth = 2.5;
+      // Bottom Success Pill (Solid Vibrant Emerald Fill!)
+      ctx.fillStyle = "#10b981";
       ctx.beginPath();
       ctx.roundRect(rightBoxX + 24, boxY + boxH - 145, boxW - 48, 100, 16);
       ctx.fill();
-      ctx.stroke();
 
       ctx.textAlign = "center";
-      ctx.fillStyle = "#15803d";
-      ctx.font = "900 32px 'Noto Sans TC'";
-      ctx.fillText("🎉 效率翻 10 倍 · 告別打工！", rightBoxX + boxW / 2, boxY + boxH - 84);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 28px 'Noto Sans TC'";
+      ctx.fillText("🎉 效率飆升 10 倍 · 告別打工！", rightBoxX + boxW / 2, boxY + boxH - 84);
 
       ctx.restore();
       ctx.restore();
     }
 
-    // --- Scene 1: 檔案秘密 (Folder Structure & Progressive Disclosure) ---
+    // --- Scene 1: 檔案秘密 (Folder Structure & Progressive Disclosure · Ultra-Minimal & Rich) ---
     function drawScene1_FolderStructure(x, y, w, h, f) {
       ctx.save();
       const p = spring(clamp(f / 20, 0, 1), 130, 12);
 
-      // Main Big Card
+      // Main Container Card
       ctx.fillStyle = "#ffffff";
       ctx.strokeStyle = "rgba(0,0,0,0.08)";
       ctx.lineWidth = 2;
@@ -614,38 +610,41 @@
       ctx.roundRect(x, y, w, 86, [24, 24, 0, 0]);
       ctx.fill();
 
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "#38bdf8";
       ctx.font = "900 32px 'JetBrains Mono'";
       ctx.fillText("📁 .agents/skills/excel-auditor/", x + 44, y + 55);
 
-      // 3 Giant Architectural Component Cards (Height 215px each · 50% Text Cut)
+      // 3 Giant Architectural Component Cards (Height 215px each · Ultra-Minimal)
       const components = [
         {
           icon: "⭐",
           name: "SKILL.md",
-          badge: "【核心大腦】",
-          badgeColor: "#ea580c",
+          badge: "核心大腦",
+          badgeBg: "#ea580c",
           bgColor: "#fff7ed",
-          borderColor: "#ff5722",
-          desc: "定義 YAML 前言標頭 ＋ 業務 SOP 步驟規範"
+          borderColor: "#f97316",
+          titleColor: "#c2410c",
+          punchline: "👉 業務 SOP ＋ 規則標準永久固化"
         },
         {
           icon: "🐍",
           name: "scripts/",
-          badge: "【自動工具】",
-          badgeColor: "#059669",
+          badge: "專用工具",
+          badgeBg: "#059669",
           bgColor: "#f0fdf4",
           borderColor: "#10b981",
-          desc: "收錄 Python 勾稽腳本，專門自動清洗髒資料"
+          titleColor: "#047857",
+          punchline: "👉 Python 自動化腳本，清洗髒資料"
         },
         {
           icon: "📊",
           name: "examples/",
-          badge: "【參考範本】",
-          badgeColor: "#0284c7",
+          badge: "標準範本",
+          badgeBg: "#0284c7",
           bgColor: "#f0f9ff",
           borderColor: "#0ea5e9",
-          desc: "存放標準合格報表與公司規章文件 (Few-shot)"
+          titleColor: "#0369a1",
+          punchline: "👉 標準合格報表，AI 零失誤對齊"
         }
       ];
 
@@ -653,71 +652,71 @@
         const cy = y + 115 + idx * 240;
         ctx.fillStyle = cp.bgColor;
         ctx.strokeStyle = cp.borderColor;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 3.5;
         ctx.beginPath();
         ctx.roundRect(x + 32, cy, w - 64, 215, 20);
         ctx.fill();
         ctx.stroke();
 
         ctx.textAlign = "left";
-        ctx.fillStyle = cp.badgeColor;
-        ctx.font = "900 42px 'JetBrains Mono'";
-        ctx.fillText(`${cp.icon} ${cp.name}`, x + 64, cy + 72);
+        ctx.fillStyle = cp.titleColor;
+        ctx.font = "900 44px 'JetBrains Mono'";
+        ctx.fillText(`${cp.icon} ${cp.name}`, x + 64, cy + 74);
 
-        // Badge pill
-        ctx.fillStyle = cp.badgeColor;
+        // Solid Badge pill
+        ctx.fillStyle = cp.badgeBg;
         ctx.beginPath();
-        ctx.roundRect(x + w - 240, cy + 30, 176, 52, 14);
+        ctx.roundRect(x + w - 230, cy + 30, 166, 52, 14);
         ctx.fill();
 
         ctx.fillStyle = "#ffffff";
         ctx.font = "900 26px 'Noto Sans TC'";
         ctx.textAlign = "center";
-        ctx.fillText(cp.badge, x + w - 152, cy + 66);
+        ctx.fillText(cp.badge, x + w - 147, cy + 66);
         ctx.textAlign = "left";
 
         ctx.fillStyle = "#1e293b";
-        ctx.font = "800 32px 'Noto Sans TC'";
-        ctx.fillText(cp.desc, x + 64, cy + 148);
+        ctx.font = "900 34px 'Noto Sans TC'";
+        ctx.fillText(cp.punchline, x + 64, cy + 152);
       });
 
-      // Bottom Mega Feature Banner (Electric Violet #7c3aed, Height 195px)
+      // Bottom Mega Feature Banner (Solid Electric Violet / Indigo Fill!)
       const bannerY = y + 845;
-      ctx.fillStyle = "#f5f3ff";
-      ctx.strokeStyle = "#7c3aed";
-      ctx.lineWidth = 3.5;
+      const grad = ctx.createLinearGradient(x + 32, bannerY, x + w - 32, bannerY + 195);
+      grad.addColorStop(0, "#7c3aed");
+      grad.addColorStop(1, "#4f46e5");
+      ctx.fillStyle = grad;
       ctx.beginPath();
       ctx.roundRect(x + 32, bannerY, w - 64, 195, 20);
       ctx.fill();
-      ctx.stroke();
 
-      ctx.fillStyle = "#7c3aed";
-      ctx.font = "900 36px 'Noto Sans TC'";
-      ctx.fillText("⚡ 漸進式載入黑科技 (Progressive Disclosure)", x + 64, bannerY + 68);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 38px 'Noto Sans TC'";
+      ctx.fillText("⚡ 漸進式載入黑科技", x + 64, bannerY + 70);
 
-      ctx.fillStyle = "#334155";
+      ctx.fillStyle = "#ede9fe";
       ctx.font = "800 30px 'Noto Sans TC'";
-      ctx.fillText("平常 0 佔用零耗 Token · 任務觸發才一秒載入全套 SOP！", x + 64, bannerY + 134);
+      ctx.fillText("平常 0 佔用零耗 Token · 任務觸發 1 秒載入全套 SOP！", x + 64, bannerY + 136);
 
       ctx.restore();
     }
 
-    // --- Scene 2: 實戰創建 (Live Antigravity Screen Recording Mockup) ---
+    // --- Scene 2: 實戰創建 (Live Antigravity Screen Recording Mockup · Ultra-Minimal & Cyber Navy) ---
     function drawScene2_LiveScreenCreation(x, y, w, h, f) {
       ctx.save();
       const p = spring(clamp(f / 20, 0, 1), 130, 12);
 
-      // Dark Terminal Window
-      ctx.fillStyle = "#0f172a";
-      ctx.strokeStyle = "rgba(0,0,0,0.2)";
-      ctx.lineWidth = 2;
+      // Dark Cyber Navy Window
+      ctx.fillStyle = "#0a0f1d";
+      ctx.strokeStyle = "rgba(56, 189, 248, 0.25)";
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
       ctx.roundRect(x, y, w, h, 24);
       ctx.fill();
       ctx.stroke();
 
       // Top title bar with Mac dots & Pipeline Header
-      ctx.fillStyle = "#1e293b";
+      ctx.fillStyle = "#111827";
       ctx.beginPath();
       ctx.roundRect(x, y, w, 76, [24, 24, 0, 0]);
       ctx.fill();
@@ -729,11 +728,11 @@
         ctx.fill();
       });
 
-      ctx.fillStyle = "#94a3b8";
+      ctx.fillStyle = "#38bdf8";
       ctx.font = "900 24px 'JetBrains Mono'";
       ctx.fillText("WORKFLOW PIPELINE · 流程轉化為 Skill 實戰架構", x + 150, y + 46);
 
-      // --- STAGE 01: 做了半天 · 流程摸索與驗證完成 ---
+      // --- STAGE 01: 摸索半天 · 流程跑通 ---
       const p1 = spring(clamp(f / 16, 0, 1), 140, 12);
       const y1 = y + 80;
       const h1 = 195;
@@ -744,40 +743,37 @@
       ctx.translate(0, (1 - p1) * 20);
       ctx.globalAlpha = clamp(f / 10, 0, 1);
 
-      ctx.fillStyle = "#1e293b";
+      ctx.fillStyle = "#111827";
       ctx.strokeStyle = "#f97316";
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.roundRect(x1, y1, w1, h1, 18);
       ctx.fill();
       ctx.stroke();
 
       // Stage 1 Header Badge
-      ctx.fillStyle = "#ffedd5";
+      ctx.fillStyle = "#ea580c";
       ctx.beginPath();
-      ctx.roundRect(x1 + 24, y1 + 14, 540, 38, 10);
+      ctx.roundRect(x1 + 24, y1 + 14, 460, 40, 10);
       ctx.fill();
 
-      ctx.fillStyle = "#c2410c";
+      ctx.fillStyle = "#ffffff";
       ctx.font = "900 24px 'Noto Sans TC'";
-      ctx.fillText("😫【階段 01】摸索半天 · 流程大功告成", x1 + 40, y1 + 41);
+      ctx.fillText("😫【階段 01】摸索半天 · 流程跑通", x1 + 40, y1 + 42);
 
-      // Stage 1 Bullet lines (50% Text Cut · Punchy)
-      ctx.fillStyle = "#f1f5f9";
+      // Stage 1 Bullets (Punchy)
+      ctx.fillStyle = "#f8fafc";
       ctx.font = "800 28px 'Noto Sans TC'";
       ctx.fillText("📊 報表清洗 ➔ 缺值補 0、格式標準化", x1 + 28, y1 + 92);
       ctx.fillText("🐍 Python 勾稽 ➔ 排除誤差、總額對齊", x1 + 28, y1 + 132);
 
       // Stage 1 PASS badge
-      ctx.fillStyle = "rgba(34, 197, 94, 0.2)";
-      ctx.strokeStyle = "#22c55e";
-      ctx.lineWidth = 1.8;
+      ctx.fillStyle = "#10b981";
       ctx.beginPath();
       ctx.roundRect(x1 + 24, y1 + 148, w1 - 48, 34, 8);
       ctx.fill();
-      ctx.stroke();
 
-      ctx.fillStyle = "#4ade80";
+      ctx.fillStyle = "#ffffff";
       ctx.font = "900 22px 'Noto Sans TC'";
       ctx.fillText("✓ PASS: 總額完全吻合 ($4,829,320) · 流程跑通！", x1 + 42, y1 + 172);
       ctx.restore();
@@ -805,7 +801,7 @@
 
       ctx.fillStyle = "#0284c7";
       ctx.strokeStyle = "#38bdf8";
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 3.5;
       ctx.beginPath();
       ctx.roundRect(x2, y2, w2, h2, 18);
       ctx.fill();
@@ -819,7 +815,7 @@
       // Connector 2 down arrow indicator
       const pArrow2 = clamp((f - 40) / 12, 0, 1);
       if (pArrow2 > 0) {
-        ctx.fillStyle = "#a855f7";
+        ctx.fillStyle = "#c084fc";
         ctx.font = "900 22px 'Noto Sans TC'";
         ctx.textAlign = "center";
         ctx.fillText("▼ AI 自動解析 SOP & 封裝卡匣", x + w / 2, y + 436);
@@ -837,40 +833,37 @@
       ctx.translate(0, (1 - p3) * 20);
       ctx.globalAlpha = clamp((f - 42) / 10, 0, 1);
 
-      ctx.fillStyle = "#1e293b";
+      ctx.fillStyle = "#111827";
       ctx.strokeStyle = "#a855f7";
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.roundRect(x3, y3, w3, h3, 18);
       ctx.fill();
       ctx.stroke();
 
       // Stage 2 Header Badge
-      ctx.fillStyle = "#f3e8ff";
+      ctx.fillStyle = "#9333ea";
       ctx.beginPath();
-      ctx.roundRect(x3 + 24, y3 + 14, 540, 38, 10);
+      ctx.roundRect(x3 + 24, y3 + 14, 480, 40, 10);
       ctx.fill();
 
-      ctx.fillStyle = "#7e22ce";
+      ctx.fillStyle = "#ffffff";
       ctx.font = "900 24px 'Noto Sans TC'";
-      ctx.fillText("🤖【階段 02】AI 萃取 SOP · 自動建立卡匣", x3 + 40, y3 + 41);
+      ctx.fillText("🤖【階段 02】AI 萃取 SOP · 自動建立卡匣", x3 + 40, y3 + 42);
 
-      // Stage 2 Bullet lines (50% Text Cut · Punchy)
-      ctx.fillStyle = "#f1f5f9";
+      // Stage 2 Bullets (Punchy)
+      ctx.fillStyle = "#f8fafc";
       ctx.font = "800 28px 'Noto Sans TC'";
       ctx.fillText("⭐ 自動生成 SKILL.md ➔ 固化執行規則", x3 + 28, y3 + 92);
       ctx.fillText("🐍 自動封裝 scripts/ ➔ 收錄專用工具", x3 + 28, y3 + 132);
 
       // Stage 2 Success Badge
-      ctx.fillStyle = "rgba(168, 85, 247, 0.2)";
-      ctx.strokeStyle = "#a855f7";
-      ctx.lineWidth = 1.8;
+      ctx.fillStyle = "#7c3aed";
       ctx.beginPath();
       ctx.roundRect(x3 + 24, y3 + 148, w3 - 48, 36, 8);
       ctx.fill();
-      ctx.stroke();
 
-      ctx.fillStyle = "#d8b4fe";
+      ctx.fillStyle = "#ffffff";
       ctx.font = "900 22px 'JetBrains Mono', 'Noto Sans TC'";
       ctx.fillText("✨ SUCCESS: [excel-auditor] 已掛載生效！", x3 + 42, y3 + 174);
       ctx.restore();
@@ -879,12 +872,15 @@
       const pPill2 = clamp((f - 65) / 12, 0, 1);
       const y_b2 = y + 682;
       if (pPill2 > 0) {
-        ctx.fillStyle = "#334155";
+        ctx.fillStyle = "#1e293b";
+        ctx.strokeStyle = "#475569";
+        ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.roundRect(x + (w - 600) / 2, y_b2, 600, 42, 21);
         ctx.fill();
+        ctx.stroke();
 
-        ctx.fillStyle = "#cbd5e1";
+        ctx.fillStyle = "#38bdf8";
         ctx.font = "800 24px 'Noto Sans TC'";
         ctx.textAlign = "center";
         ctx.fillText("⚡ 永久固化在本地專案 · 從此插卡即用！", x + w / 2, y_b2 + 29);
@@ -902,8 +898,8 @@
       ctx.translate(0, (1 - p4) * 20);
       ctx.globalAlpha = clamp((f - 70) / 10, 0, 1);
 
-      ctx.fillStyle = "rgba(34, 197, 94, 0.15)";
-      ctx.strokeStyle = "#22c55e";
+      ctx.fillStyle = "rgba(16, 185, 129, 0.15)";
+      ctx.strokeStyle = "#10b981";
       ctx.lineWidth = 3.5;
       ctx.beginPath();
       ctx.roundRect(x4, y4, w4, h4, 20);
@@ -911,26 +907,26 @@
       ctx.stroke();
 
       // Stage 3 Header Badge
-      ctx.fillStyle = "#dcfce7";
+      ctx.fillStyle = "#10b981";
       ctx.beginPath();
-      ctx.roundRect(x4 + 24, y4 + 18, 540, 44, 10);
+      ctx.roundRect(x4 + 24, y4 + 18, 500, 44, 10);
       ctx.fill();
 
-      ctx.fillStyle = "#15803d";
+      ctx.fillStyle = "#ffffff";
       ctx.font = "900 26px 'Noto Sans TC'";
       ctx.fillText("🚀【階段 03】永久有感 · 隨口一句話秒跑", x4 + 40, y4 + 49);
 
-      // Stage 3 Bullet lines (50% Text Cut · Punchy)
+      // Stage 3 Bullets
       ctx.fillStyle = "#ffffff";
       ctx.font = "900 32px 'Noto Sans TC'";
       ctx.fillText("🎯 明天新對話？隨口說一句：「幫我對帳」", x4 + 28, y4 + 104);
 
-      ctx.fillStyle = "#bbf7d0";
+      ctx.fillStyle = "#a7f3d0";
       ctx.font = "800 28px 'Noto Sans TC'";
-      ctx.fillText("⚡ AI 自動調用專屬卡匣，照標準 1 秒交付！", x4 + 28, y4 + 148);
+      ctx.fillText("⚡ AI 自動調用專屬外掛，照標準 1 秒交付！", x4 + 28, y4 + 148);
 
       // Stage 3 Big Impact Banner
-      ctx.fillStyle = "#16a34a";
+      ctx.fillStyle = "#10b981";
       ctx.beginPath();
       ctx.roundRect(x4 + 24, y4 + 186, w4 - 48, 70, 14);
       ctx.fill();
@@ -944,14 +940,14 @@
 
       // Terminal blinking prompt at bottom
       const blink = Math.floor(f / 10) % 2 === 0 ? "█" : "";
-      ctx.fillStyle = "#c084fc";
+      ctx.fillStyle = "#38bdf8";
       ctx.font = "900 30px 'JetBrains Mono'";
       ctx.fillText(`$ agy ready ${blink}`, x + 50, y + h - 45);
 
       ctx.restore();
     }
 
-    // --- Scene 3: 一秒喚醒 (Live Triggering & Execution) ---
+    // --- Scene 3: 一秒喚醒 (Live Triggering & Execution · Rich Multi-Color Steps) ---
     function drawScene3_LiveExecution(x, y, w, h, f) {
       ctx.save();
       const p = spring(clamp(f / 20, 0, 1), 130, 12);
@@ -976,78 +972,90 @@
       ctx.arc(x + 50, y + 43, 12, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "#38bdf8";
       ctx.font = "900 30px 'JetBrains Mono'";
       ctx.fillText("SKILL AUTO-TRIGGERED: [excel-auditor] ACTIVE", x + 84, y + 54);
 
-      // User Trigger Card (50% Text Cut · Punchy)
+      // User Trigger Card (Vibrant Orange Theme)
       const userCardY = y + 115;
       ctx.fillStyle = "#fff7ed";
       ctx.strokeStyle = "#ff5722";
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 3.5;
       ctx.beginPath();
       ctx.roundRect(x + 36, userCardY, w - 72, 175, 20);
       ctx.fill();
       ctx.stroke();
 
-      ctx.fillStyle = "#ea580c";
-      ctx.font = "900 42px 'Noto Sans TC'";
-      ctx.fillText("💬 使用者隨口說：「幫我對帳」", x + 64, userCardY + 74);
+      ctx.fillStyle = "#c2410c";
+      ctx.font = "900 44px 'Noto Sans TC'";
+      ctx.fillText("💬 隨口一句話：「幫我對帳」", x + 64, userCardY + 74);
 
-      ctx.fillStyle = "#64748b";
-      ctx.font = "800 28px 'Noto Sans TC'";
-      ctx.fillText("📄 自動掛載 2026_Q1_業務報表.xlsx ➔ 喚醒專屬外掛", x + 64, userCardY + 130);
+      ctx.fillStyle = "#9a3412";
+      ctx.font = "800 30px 'Noto Sans TC'";
+      ctx.fillText("📄 掛載業務報表 ➔ 喚醒專屬外掛", x + 64, userCardY + 130);
 
-      // 4 SOP Execution Steps (Height 145px each · 50% Text Cut)
+      // 4 SOP Execution Steps (Multi-Color Palette)
       const auditSteps = [
-        { label: "SOP 01: 缺值自動補 0 ＋ 日期標準化", status: "✓ PASS", color: "#16a34a" },
-        { label: "SOP 02: 執行 scripts/audit.py 勾稽", status: "✓ PASS", color: "#16a34a" },
-        { label: "SOP 03: 總額交叉驗算 (差額 = 0)", status: "✓ PASS", color: "#16a34a" },
-        { label: "SOP 04: 交付乾淨 CSV 與動態視覺化", status: "✓ DONE", color: "#ea580c" }
+        { label: "SOP 01: 缺值補 0 ＋ 日期格式化", status: "✓ PASS", color: "#0284c7", bg: "#f0f9ff", border: "#0ea5e9" },
+        { label: "SOP 02: 執行 scripts/audit.py 勾稽", status: "✓ PASS", color: "#7c3aed", bg: "#f5f3ff", border: "#a855f7" },
+        { label: "SOP 03: 總額交叉驗算 (差額 = 0)", status: "✓ PASS", color: "#ea580c", bg: "#fff7ed", border: "#f97316" },
+        { label: "SOP 04: 自動交付乾淨報表與視覺化", status: "✓ DONE", color: "#059669", bg: "#f0fdf4", border: "#10b981" }
       ];
 
       auditSteps.forEach((st, idx) => {
         const sy = userCardY + 205 + idx * 155;
         const stepP = clamp((f - idx * 15) / 20, 0, 1);
 
-        ctx.fillStyle = "#f8fafc";
-        ctx.strokeStyle = "rgba(0,0,0,0.08)";
-        ctx.lineWidth = 2;
+        ctx.fillStyle = st.bg;
+        ctx.strokeStyle = st.border;
+        ctx.lineWidth = 2.5;
         ctx.beginPath();
         ctx.roundRect(x + 36, sy, (w - 72) * stepP, 135, 18);
         ctx.fill();
         ctx.stroke();
 
+        // Left accent stripe
+        ctx.fillStyle = st.color;
+        ctx.beginPath();
+        ctx.roundRect(x + 36, sy, 10, 135, [18, 0, 0, 18]);
+        ctx.fill();
+
         ctx.fillStyle = "#0f172a";
         ctx.font = "900 32px 'Noto Sans TC'";
-        ctx.fillText(st.label, x + 64, sy + 80);
+        ctx.fillText(st.label, x + 68, sy + 80);
 
+        // Status pill
         ctx.fillStyle = st.color;
-        ctx.font = "900 30px 'JetBrains Mono'";
-        ctx.textAlign = "right";
-        ctx.fillText(st.status, x + w - 64, sy + 80);
+        ctx.beginPath();
+        ctx.roundRect(x + w - 210, sy + 44, 140, 48, 12);
+        ctx.fill();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "900 24px 'JetBrains Mono'";
+        ctx.textAlign = "center";
+        ctx.fillText(st.status, x + w - 140, sy + 76);
         ctx.textAlign = "left";
       });
 
-      // Bottom Victory Box
+      // Bottom Victory Box (Solid Vibrant Emerald Gradient)
       const victoryY = y + h - 120;
-      ctx.fillStyle = "#ecfdf5";
-      ctx.strokeStyle = "#10b981";
-      ctx.lineWidth = 2.5;
+      const vGrad = ctx.createLinearGradient(x + 36, victoryY, x + w - 36, victoryY + 85);
+      vGrad.addColorStop(0, "#10b981");
+      vGrad.addColorStop(1, "#059669");
+      ctx.fillStyle = vGrad;
       ctx.beginPath();
       ctx.roundRect(x + 36, victoryY, w - 72, 85, 16);
       ctx.fill();
-      ctx.stroke();
 
       ctx.textAlign = "center";
-      ctx.fillStyle = "#15803d";
-      ctx.font = "900 34px 'Noto Sans TC'";
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 36px 'Noto Sans TC'";
       ctx.fillText("🎉 零重複教學 · 1 秒自動交付成果！", x + w / 2, victoryY + 54);
 
       ctx.restore();
     }
 
-    // --- Scene 4: 團隊升級 (Architect Elevation & Git Collaboration · 50% Text Cut) ---
+    // --- Scene 4: 團隊升級 (Architect Elevation & Git Collaboration · Ultra-Vibrant) ---
     function drawScene4_ArchitectElevation(x, y, w, h, f) {
       ctx.save();
       const p = spring(clamp(f / 20, 0, 1), 130, 12);
@@ -1055,57 +1063,60 @@
 
       // Grand Container
       ctx.fillStyle = "#ffffff";
-      ctx.strokeStyle = "#ff5722";
+      ctx.strokeStyle = "#f59e0b";
       ctx.lineWidth = 3.5;
       ctx.beginPath();
       ctx.roundRect(x, y, w, h, 24);
       ctx.fill();
       ctx.stroke();
 
-      // Top Trophy Header (Hermès Orange Gradient)
+      // Top Trophy Header (Vibrant Gold & Orange Gradient)
       const trophyY = y + 32;
-      ctx.fillStyle = "#ff5722";
+      const tGrad = ctx.createLinearGradient(x + 32, trophyY, x + w - 32, trophyY + 210);
+      tGrad.addColorStop(0, "#ff5722");
+      tGrad.addColorStop(1, "#f59e0b");
+      ctx.fillStyle = tGrad;
       ctx.beginPath();
       ctx.roundRect(x + 32, trophyY, w - 64, 210, 20);
       ctx.fill();
 
       ctx.textAlign = "center";
-      ctx.font = "64px 'Apple Color Emoji', sans-serif";
-      ctx.fillText("👑", cx, trophyY + 74);
+      ctx.font = "68px 'Apple Color Emoji', sans-serif";
+      ctx.fillText("👑", cx, trophyY + 76);
 
       ctx.fillStyle = "#ffffff";
-      ctx.font = "900 44px 'Noto Sans TC'";
-      ctx.fillText("升級為 AI 工作流架構師", cx, trophyY + 138);
+      ctx.font = "900 48px 'Noto Sans TC'";
+      ctx.fillText("升級為 AI 工作流架構師", cx, trophyY + 140);
 
-      ctx.fillStyle = "#ffedd5";
+      ctx.fillStyle = "#fffbeb";
       ctx.font = "800 28px 'Noto Sans TC'";
-      ctx.fillText("把個人日常經驗，永久固化為團隊數位資產！", cx, trophyY + 182);
+      ctx.fillText("把個人經驗 ➔ 永久固化為團隊數位資產！", cx, trophyY + 184);
 
-      // 3 Giant Super Cards (50% Text Cut · Punchy)
+      // 3 Giant Super Cards (Ultra-Punchy & Rich Colors)
       const teamCards = [
         {
           icon: "📦",
           title: "Git 一鍵版本共享",
-          desc: "團隊全員一鍵 Pull，秒同步同款專家外掛！",
+          desc: "👉 團隊全員秒同步，戰力即刻翻倍！",
           bgColor: "#f5f3ff",
           borderColor: "#7c3aed",
-          titleColor: "#7c3aed"
+          titleColor: "#6d28d9"
         },
         {
           icon: "⚙️",
           title: "告別重複手動打工",
-          desc: "專業標準固化本地專案，經驗傳承零斷層！",
+          desc: "👉 專業標準固化專案，經驗傳承零斷層！",
           bgColor: "#f0fdf4",
           borderColor: "#059669",
-          titleColor: "#059669"
+          titleColor: "#047857"
         },
         {
           icon: "🚀",
           title: "打造百萬級 AI 軍團",
-          desc: "結合 /boost 與 MCP，團隊戰力直接翻十倍！",
+          desc: "👉 結合 /boost 與 MCP，團隊戰力翻十倍！",
           bgColor: "#fff1f2",
           borderColor: "#e11d48",
-          titleColor: "#e11d48"
+          titleColor: "#be123c"
         }
       ];
 
@@ -1113,7 +1124,7 @@
         const by = trophyY + 235 + i * 225;
         ctx.fillStyle = tc.bgColor;
         ctx.strokeStyle = tc.borderColor;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 3.5;
         ctx.beginPath();
         ctx.roundRect(x + 32, by, w - 64, 205, 20);
         ctx.fill();
@@ -1121,56 +1132,58 @@
 
         ctx.textAlign = "left";
         ctx.fillStyle = tc.titleColor;
-        ctx.font = "900 40px 'Noto Sans TC'";
+        ctx.font = "900 42px 'Noto Sans TC'";
         ctx.fillText(`${tc.icon} ${tc.title}`, x + 64, by + 76);
 
         ctx.fillStyle = "#334155";
-        ctx.font = "800 32px 'Noto Sans TC'";
-        ctx.fillText(tc.desc, x + 64, by + 142);
+        ctx.font = "900 32px 'Noto Sans TC'";
+        ctx.fillText(tc.desc, x + 64, by + 144);
       });
 
-      // Bottom Elevation Pill
+      // Bottom Elevation Pill (Solid Violet Gradient)
       const botPillY = y + h - 120;
-      ctx.fillStyle = "#fff7ed";
-      ctx.strokeStyle = "#ea580c";
-      ctx.lineWidth = 2.5;
+      const bGrad = ctx.createLinearGradient(x + 32, botPillY, x + w - 32, botPillY + 85);
+      bGrad.addColorStop(0, "#7c3aed");
+      bGrad.addColorStop(1, "#4f46e5");
+      ctx.fillStyle = bGrad;
       ctx.beginPath();
       ctx.roundRect(x + 32, botPillY, w - 64, 85, 16);
       ctx.fill();
-      ctx.stroke();
 
       ctx.textAlign = "center";
-      ctx.fillStyle = "#ea580c";
-      ctx.font = "900 32px 'Noto Sans TC'";
-      ctx.fillText("✨ 不再當手動打工族，升級成為 AI 工作流架構師！", cx, botPillY + 54);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 34px 'Noto Sans TC'";
+      ctx.fillText("✨ 擺脫重複打工 · 升級專屬 AI 架構師！", cx, botPillY + 54);
 
       ctx.restore();
     }
 
-    function drawCalloutBadgePortrait(x, y, text) {
+    function drawCalloutBadgePortrait(x, y, text, color) {
       ctx.save();
+      const themeColor = color || "#ff5722";
       ctx.font = "900 30px 'Noto Sans TC'";
       const textW = ctx.measureText(text).width;
       const boxW = Math.min(960, textW + 72);
       const boxH = 76;
 
       ctx.fillStyle = "#ffffff";
-      ctx.strokeStyle = "#ff5722";
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = themeColor;
+      ctx.lineWidth = 3.5;
       ctx.beginPath();
       ctx.roundRect(x - boxW / 2, y - boxH / 2, boxW, boxH, 18);
       ctx.fill();
       ctx.stroke();
 
-      ctx.fillStyle = "#ff5722";
+      ctx.fillStyle = themeColor;
       ctx.textAlign = "center";
       ctx.fillText(text, x, y + 10);
       ctx.restore();
     }
 
     // --- Bottom Switch Dock (5 Large Buttons) ---
-    function drawBottomSwitchDock5(activeIdx, localProgress) {
+    function drawBottomSwitchDock5(activeIdx, localProgress, activeColor) {
       ctx.save();
+      const themeColor = activeColor || "#ff5722";
       const dockW = 960;
       const dockH = 88;
       const dockX = (CANVAS_WIDTH - dockW) / 2;
@@ -1195,7 +1208,7 @@
         const isActive = (i === activeIdx);
 
         if (isActive) {
-          ctx.fillStyle = "#ff5722";
+          ctx.fillStyle = themeColor;
           ctx.beginPath();
           ctx.roundRect(bx, by, btnW, btnH, 14);
           ctx.fill();
