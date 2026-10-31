@@ -7,6 +7,9 @@
 
 本手冊透過真實天價帳單案例、前後端架構對比與 Mermaid 流程圖，為大專師生與職場人士建立正確的 AI 資安防線。
 
+> 🎨 **高解析度架構演進圖（Diagram Design 規範）**：已為本手冊專門製作出版級 SVG 架構圖，完整呈現 `Before 致命直連` ➔ `Changes 重構日誌` ➔ `After 後端代理`：
+> 🔗 **[點此直接開啟高解析互動架構圖解 (diagram_api_security_architecture.html)](file://./01_Module1_Agent思維與資料分析/diagram_api_security_architecture.html)**
+
 ---
 
 ## 一、 真實慘案：為什麼會產生 5.3 億元天價帳單？
