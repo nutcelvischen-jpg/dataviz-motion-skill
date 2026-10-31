@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antigravity 十大斜線神指令全攻略 (9:16 直式 80s)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #f4f4f2;
+      --text-black: #111111;
+      --text-gray: #666666;
+      --accent-orange: #ff5722;
+      --switch-gray: #d4d4d0;
+      --border-light: rgba(0, 0, 0, 0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1e1e1e;
+      color: var(--text-black);
+      font-family: 'Plus Jakarta Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 40px;
+    }
+    header {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      margin-bottom: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #111111;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-tag {
+      background: var(--accent-orange);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .viewport-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--bg-cream);
+      border-radius: 20px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+      aspect-ratio: 9 / 16;
+      display: flex;
+      position: relative;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .controls-panel {
+      width: 100%;
+      max-width: 520px;
+      margin-top: 16px;
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 14px 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .timeline-row { margin-bottom: 12px; }
+    .timeline-bar-wrapper {
+      position: relative;
+      width: 100%;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .timeline-track {
+      width: 100%;
+      height: 6px;
+      background: #e2e2de;
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+    }
+    .timeline-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-orange);
+    }
+    .timeline-thumb {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: var(--accent-orange);
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      top: 4px;
+      left: 0%;
+      pointer-events: none;
+    }
+    .buttons-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .btn {
+      background: #f4f4f2;
+      border: 1px solid #d4d4d0;
+      color: #111111;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary {
+      background: var(--accent-orange);
+      border: none;
+      color: #ffffff;
+    }
+    .timecode {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #666666;
+    }
+    .timecode b { color: #111111; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-title">
+      <span>⚡ Antigravity 斜線全家桶</span>
+      <span class="badge-tag">9:16 直式 80s</span>
+    </div>
+    <div style="font-size: 12px; color: #666666;">
+      1080×1920 / 10 大神指令
+    </div>
+  </header>
+
+  <main class="viewport-card">
+    <canvas id="motionCanvas" width="1080" height="1920"></canvas>
+  </main>
+
+  <section class="controls-panel">
+    <div class="timeline-row">
+      <div class="timeline-bar-wrapper" id="timelineWrapper">
+        <div class="timeline-track">
+          <div class="timeline-fill" id="timelineFill"></div>
+        </div>
+        <div class="timeline-thumb" id="timelineThumb"></div>
+      </div>
+    </div>
+    <div class="buttons-row">
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button class="btn btn-primary" id="playBtn">▶ 播放</button>
+        <button class="btn" id="restartBtn">↺ 重播</button>
+        <span class="timecode" id="timeDisplay">00:00 / 01:20</span>
+      </div>
+      <div style="display: flex; gap: 3px; flex-wrap: wrap;">
+        <button class="btn" onclick="jumpToAtom(0)">plan</button>
+        <button class="btn" onclick="jumpToAtom(1)">grill</button>
+        <button class="btn" onclick="jumpToAtom(2)">browser</button>
+        <button class="btn" onclick="jumpToAtom(3)">boost</button>
+        <button class="btn" onclick="jumpToAtom(4)">sched</button>
+        <button class="btn" onclick="jumpToAtom(5)">goal</button>
+        <button class="btn" onclick="jumpToAtom(6)">btw</button>
+        <button class="btn" onclick="jumpToAtom(7)">team</button>
+        <button class="btn" onclick="jumpToAtom(8)">compact</button>
+        <button class="btn" onclick="jumpToAtom(9)">learn</button>
+      </div>
+    </div>
+  </section>
+
+  <audio id="bgmAudio" src="../master_soundtrack_slash_commands_80s.wav" preload="auto"></audio>
+
+  <script>
+    const CANVAS_WIDTH = 1080;
+    const CANVAS_HEIGHT = 1920;
+    const FPS = 30;
+    const DURATION_SEC = 80;
+    const TOTAL_FRAMES = FPS * DURATION_SEC; // 2400 frames
+    const SEC_PER_ATOM = 8.0;
+    const FRAMES_PER_ATOM = FPS * SEC_PER_ATOM; // 240 frames each
+
+    const canvas = document.getElementById('motionCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const ATOMS = [
+      {
+        num: "01.",
+        cmd: "/plan",
+        title: "戰略藍圖架構師",
+        enTitle: "STRATEGIC PLANNER",
+        summary: "— 分步拆解執行藍圖 · 謀定而後動",
+        formula: "spec → milestones → dependency_graph → steps",
+        explanation: "面對複雜大型專案，先輸入 /plan！AI 不盲目下手，而是先幫你拆解為嚴謹的里程碑、相依性分析與驗證條件，把思路理清才動工！"
+      },
+      {
+        num: "02.",
+        cmd: "/grill-me",
+        title: "魔鬼靈魂拷問官",
+        enTitle: "REQUIREMENTS GRILLER",
+        summary: "— 主動發問深挖盲點 · 對齊共識",
+        formula: "ask_questions() → clarify_ambiguity → 100%_alignment",
+        explanation: "卡關或需求不明確？輸入 /grill-me，AI 瞬間化身高規格面試官！主動拋出靈魂提問，逼問邊界條件與使用場景，幫你把企劃死角全部挖出來！"
+      },
+      {
+        num: "03.",
+        cmd: "/browser",
+        title: "真機上網採集手",
+        enTitle: "BROWSER AUTOMATION",
+        summary: "— 視覺化操作網頁 · 採集點閱填表",
+        formula: "open_page() → click() → extract_table() → save()",
+        explanation: "輸入 /browser，AI 像真人一樣打開 Chrome！自動跨頁搜尋、點擊分頁抓報表、甚至自動填寫表單，所有外部資料一秒抓進來！"
+      },
+      {
+        num: "04.",
+        cmd: "/boost",
+        title: "深度推理學霸腦",
+        enTitle: "DEEP REASONING THINKER",
+        summary: "— 多角度推演驗算 · 徹底根除幻覺",
+        formula: "extended_thinking + cross_verify = zero_hallucination",
+        explanation: "遇到棘手算法、複雜公式與深奧統計？輸入 /boost，啟動學霸推理大腦！多視角推演、代碼交叉勾稽，杜絕胡說八道，算數絕不出錯！"
+      },
+      {
+        num: "05.",
+        cmd: "/schedule",
+        title: "定時排程小鬧鐘",
+        enTitle: "CRON & AUTOMATION",
+        summary: "— 定時循環巡檢 · 晨間自動報表",
+        formula: "cron('0 9 * * *') → fetch_data() → send_report()",
+        explanation: "想每天早上自動收到彙總郵件？輸入 /schedule，AI 變身貼心定時秘書！支援精準 Cron 排程與定時巡檢，時間一到自動執行！"
+      },
+      {
+        num: "06.",
+        cmd: "/goal",
+        title: "夜間無人值守員",
+        enTitle: "AUTONOMOUS GOAL RUNNER",
+        summary: "— 自主除錯跑批 · 直到 100% 達成",
+        formula: "while (!goal_met) { plan(); code(); fix_bugs(); }",
+        explanation: "大專案交給它，下班放心睡！輸入 /goal 進入無人值守模式，AI 遇錯看日誌自動修復、反覆重試直到所有測試通過，早起直接收成果！"
+      },
+      {
+        num: "07.",
+        cmd: "/btw",
+        title: "平行時空小紙條",
+        enTitle: "SIDE INQUIRY NOTE",
+        summary: "— 隨手插話問問題 · 不污染主任務",
+        formula: "side_channel(query) ⊥ main_trajectory_context",
+        explanation: "大任務執行中，突然想順便問個小問題？用 /btw 傳遞平行小紙條！快速解答，完全不打斷主任務進度，也不會污染主上下文！"
+      },
+      {
+        num: "08.",
+        cmd: "/teamwork",
+        title: "多代理特遣戰隊",
+        enTitle: "MULTI-AGENT SWARM",
+        summary: "— 召喚子代理軍團 · 分工協同作戰",
+        formula: "commander → [researcher, coder, reviewer]",
+        explanation: "單打獨鬥不夠快？輸入 /teamwork，指揮官 AI 一鍵分發任務給多位 Subagent！爬蟲、編程、審核同步並行，生產力十倍爆發！"
+      },
+      {
+        num: "09.",
+        cmd: "/compact",
+        title: "大腦記憶壓縮術",
+        enTitle: "CONTEXT COMPACTION",
+        summary: "— 一鍵智慧瘦身 · 對話輕盈如飛",
+        formula: "compress(raw_history) → dense_summary (tokens -80%)",
+        explanation: "聊了一整天對話快卡住了？輸入 /compact！AI 自動把幾萬字的歷史過程提煉成精華記憶，清出龐大空間，讓思維再次輕快如初！"
+      },
+      {
+        num: "10.",
+        cmd: "/learn",
+        title: "經驗固化專屬默契",
+        enTitle: "PERSISTENT KNOWLEDGE",
+        summary: "— 教過一次記住一生 · 越用越懂你",
+        formula: "user_correction → persist_rule() → permanent_memory",
+        explanation: "好不容易調教好的偏好與規範，不想每次重複教？下達 /learn，AI 永久記住你的喜好與工作流，打造專屬於你的最強副手！"
+      }
+    ];
+
+    const SWITCH_LABELS = [
+      "/plan", "/grill-me", "/browser", "/boost", "/schedule",
+      "/goal", "/btw", "/teamwork", "/compact", "/learn"
+    ];
+
+    let currentFrame = 0;
+    let isPlaying = false;
+    let audioObj = null;
+
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+    function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+    function spring(t, stiffness = 130, damping = 12) {
+      if (t <= 0) return 0;
+      if (t >= 1) return 1;
+      const omega = Math.sqrt(stiffness);
+      const decay = Math.exp(-damping * t * 0.5);
+      return 1 - decay * Math.cos(omega * t);
+    }
+
+    function wrapText(context, text, x, y, maxWidth, lineHeight) {
+      let line = '';
+      for (let n = 0; n < text.length; n++) {
+        const testLine = line + text[n];
+        const metrics = context.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          context.fillText(line, x, y);
+          line = text[n];
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      context.fillText(line, x, y);
+    }
+
+    // -------------------------------------------------------------
+    // MAIN DRAW FUNCTION FOR FRAME `f` (0 <= f < 2400)
+    // -------------------------------------------------------------
+    function drawFrame(f) {
+      f = clamp(f, 0, TOTAL_FRAMES - 1);
+      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // Clean Minimalist Off-white Canvas Background
+      ctx.fillStyle = "#f4f4f2";
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      // Active Stage
+      const atomIdx = clamp(Math.floor(f / FRAMES_PER_ATOM), 0, 9);
+      const localF = f % FRAMES_PER_ATOM;
+      const atom = ATOMS[atomIdx];
+
+      // 1. Top Navigation Bar (SafeArea adapted)
+      drawTopNav(atomIdx + 1, f);
+
+      // 2. Upper Explanation Section
+      drawUpperInfoSection(atom, localF);
+
+      // 3. Middle Visual Graphics Area (960 x 820)
+      const graphX = 60;
+      const graphY = 820;
+      const graphW = 960;
+      const graphH = 800;
+
+      switch(atomIdx) {
+        case 0: drawChart0_Plan(graphX, graphY, graphW, graphH, localF); break;
+        case 1: drawChart1_GrillMe(graphX, graphY, graphW, graphH, localF); break;
+        case 2: drawChart2_Browser(graphX, graphY, graphW, graphH, localF); break;
+        case 3: drawChart3_Boost(graphX, graphY, graphW, graphH, localF); break;
+        case 4: drawChart4_Schedule(graphX, graphY, graphW, graphH, localF); break;
+        case 5: drawChart5_Goal(graphX, graphY, graphW, graphH, localF); break;
+        case 6: drawChart6_Btw(graphX, graphY, graphW, graphH, localF); break;
+        case 7: drawChart7_Teamwork(graphX, graphY, graphW, graphH, localF); break;
+        case 8: drawChart8_Compact(graphX, graphY, graphW, graphH, localF); break;
+        case 9: drawChart9_Learn(graphX, graphY, graphW, graphH, localF); break;
+      }
+
+      // 4. Bottom Switch Dock (10 Command Pills: 2 rows x 5 cols)
+      drawBottomSwitchDockPortrait10(atomIdx, localF);
+    }
+
+    function drawTopNav(atomNum, f) {
+      ctx.save();
+      // Top header bar
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0,0,0,0.06)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(60, 80, 960, 72, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      // Orange tiny square logo
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.roundRect(84, 104, 24, 24, 6);
+      ctx.fill();
+
+      ctx.fillStyle = "#111111";
+      ctx.font = "800 20px 'Plus Jakarta Sans'";
+      ctx.textAlign = "left";
+      ctx.fillText("ANTIGRAVITY", 120, 122);
+
+      ctx.fillStyle = "#666666";
+      ctx.font = "600 17px 'Noto Sans TC'";
+      ctx.fillText("十大斜線指令全家桶", 270, 122);
+
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#111111";
+      ctx.font = "800 18px 'Noto Sans TC'";
+      ctx.fillText(`招式 ${String(atomNum).padStart(2, '0')} / 10`, 910, 122);
+
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "700 16px 'JetBrains Mono'";
+      ctx.fillText("· 126BPM", 996, 122);
+      ctx.restore();
+    }
+
+    function drawUpperInfoSection(atom, localF) {
+      ctx.save();
+      const leftX = 60;
+      const topY = 275;
+
+      const enterT = easeOutCubic(clamp(localF / 16, 0, 1));
+      ctx.translate(0, (1 - enterT) * 16);
+
+      // Giant Number with Orange Dot
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 102px 'Plus Jakarta Sans'";
+      ctx.letterSpacing = "-0.04em";
+      ctx.fillText(atom.num.replace('.', ''), leftX, topY);
+
+      const numWidth = ctx.measureText(atom.num.replace('.', '')).width;
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.arc(leftX + numWidth + 18, topY - 16, 13, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Command Badge (e.g. /plan)
+      const badgeX = leftX + numWidth + 48;
+      const badgeY = topY - 65;
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.roundRect(badgeX, badgeY, 180, 42, 10);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 24px 'JetBrains Mono'";
+      ctx.textAlign = "center";
+      ctx.fillText(atom.cmd, badgeX + 90, badgeY + 30);
+      ctx.textAlign = "left";
+
+      // Bold Title & English Tag
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 44px 'Noto Sans TC'";
+      ctx.fillText(atom.title, badgeX + 195, topY - 30);
+
+      ctx.fillStyle = "#777777";
+      ctx.font = "700 18px 'JetBrains Mono'";
+      ctx.fillText(atom.enTitle, leftX + numWidth + 50, topY + 12);
+
+      // Summary with Orange Dash
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "700 24px 'Noto Sans TC'";
+      ctx.fillText("—", leftX, topY + 65);
+
+      ctx.fillStyle = "#111111";
+      ctx.font = "800 24px 'Noto Sans TC'";
+      ctx.fillText(atom.summary.replace('— ', ''), leftX + 34, topY + 65);
+
+      // Formula capsule
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "700 16px 'JetBrains Mono'";
+      ctx.fillText("⚡ " + atom.formula, leftX, topY + 104);
+
+      // White Key Takeaway Card with orange border
+      const cardY = topY + 125;
+      const cardW = 960;
+      const cardH = 170;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(leftX, cardY, cardW, cardH, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      // Left orange accent stripe
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.roundRect(leftX, cardY, 8, cardH, [16, 0, 0, 16]);
+      ctx.fill();
+
+      // Card Header
+      ctx.fillStyle = "#111111";
+      ctx.font = "800 19px 'Noto Sans TC'";
+      ctx.fillText(`✨ ${atom.cmd} 小白白話速解`, leftX + 28, cardY + 38);
+
+      // Card Body
+      ctx.fillStyle = "#333333";
+      ctx.font = "500 19px/1.65 'Noto Sans TC'";
+      wrapText(ctx, atom.explanation, leftX + 28, cardY + 76, cardW - 56, 30);
+
+      ctx.restore();
+    }
+
+    // --- Chart 0: /plan (Strategic Blueprint Architect) ---
+    function drawChart0_Plan(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 20, 0, 1), 140, 12);
+      const cx = x + w / 2;
+
+      // Blueprint Container
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(x, y + 20, w, 580, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      // Header Bar
+      ctx.fillStyle = "#f8f8f6";
+      ctx.beginPath();
+      ctx.roundRect(x, y + 20, w, 52, [16, 16, 0, 0]);
+      ctx.fill();
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "800 16px 'JetBrains Mono'";
+      ctx.fillText("📋 PLAN SPECIFICATION & ARCHITECTURE BREAKDOWN", x + 28, y + 52);
+
+      // 4 Milestone Cards
+      const milestones = [
+        { id: "M1", title: "需求與資料來源定義", detail: "鎖定 10 家財經公開資料庫 API", pct: "100%", color: "#4caf50" },
+        { id: "M2", title: "自動清洗與算術勾稽", detail: "建立 Pandas & DuckDB 交叉校驗管線", pct: "100%", color: "#4caf50" },
+        { id: "M3", title: "前端儀表板與短片生成", detail: "封裝 Canvas 60FPS 渲染管線", pct: "85%", color: "#ff9800" },
+        { id: "M4", title: "端到端交付與測試驗收", detail: "執行 1800 幀全量回歸測試", pct: "進行中", color: "#ff5722" }
+      ];
+
+      milestones.forEach((m, idx) => {
+        const my = y + 100 + idx * 115;
+        const mp = spring(clamp((f - idx * 6) / 18, 0, 1), 140, 12);
+
+        ctx.fillStyle = "#fafaf8";
+        ctx.strokeStyle = "rgba(0,0,0,0.06)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(x + 30, my, (w - 60) * mp, 95, 12);
+        ctx.fill();
+        ctx.stroke();
+
+        // Left Tag
+        ctx.fillStyle = m.color;
+        ctx.beginPath();
+        ctx.roundRect(x + 48, my + 24, 48, 48, 8);
+        ctx.fill();
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "900 16px 'JetBrains Mono'";
+        ctx.textAlign = "center";
+        ctx.fillText(m.id, x + 72, my + 54);
+        ctx.textAlign = "left";
+
+        ctx.fillStyle = "#111111";
+        ctx.font = "800 20px 'Noto Sans TC'";
+        ctx.fillText(m.title, x + 115, my + 44);
+
+        ctx.fillStyle = "#777777";
+        ctx.font = "600 15px 'Noto Sans TC'";
+        ctx.fillText(m.detail, x + 115, my + 72);
+
+        // Status badge
+        ctx.fillStyle = m.color;
+        ctx.font = "800 16px 'JetBrains Mono'";
+        ctx.textAlign = "right";
+        ctx.fillText(m.pct, x + w - 60, my + 54);
+        ctx.textAlign = "left";
+      });
+
+      drawCalloutBadgePortrait(cx, y + 680, "🎯 /plan：先謀而後動！先產出嚴密藍圖，絕不瞎寫走彎路！");
+      ctx.restore();
+    }
+
+    // --- Chart 1: /grill-me (Devil Interviewer) ---
+    function drawChart1_GrillMe(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 20, 0, 1), 130, 12);
+      const cx = x + w / 2;
+
+      // Interview Dialogue Container
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(x, y + 20, w, 580, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      // Top Title Bar
+      ctx.fillStyle = "#111111";
+      ctx.beginPath();
+      ctx.roundRect(x, y + 20, w, 52, [16, 16, 0, 0]);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "800 16px 'JetBrains Mono'";
+      ctx.fillText("🔥 /grill-me INTERACTIVE REQUIREMENT INTERVIEW", x + 28, y + 52);
+
+      // 3 Intense Questions from AI
+      const qList = [
+        { q: "「你預期使用者在斷網時該看到什麼？離線緩存策略為何？」", tag: "邊界異常處理" },
+        { q: "「資料量如果突然從 1 萬筆爆發到 100 萬筆，效能極限在哪？」", tag: "容量壓力測試" },
+        { q: "「最終主管看報表，最在乎的唯一核心指標是哪一項？」", tag: "商業決策目標" }
+      ];
+
+      qList.forEach((item, idx) => {
+        const qy = y + 100 + idx * 135;
+        const qp = spring(clamp((f - idx * 6) / 18, 0, 1), 140, 12);
+
+        // Speech Bubble
+        ctx.fillStyle = "#fff5f0";
+        ctx.strokeStyle = "#ff5722";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(x + 30, qy, (w - 60) * qp, 115, 14);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#ff5722";
+        ctx.font = "800 14px 'Noto Sans TC'";
+        ctx.fillText(`🚨 靈魂拷問 0${idx + 1} · ${item.tag}`, x + 55, qy + 36);
+
+        ctx.fillStyle = "#111111";
+        ctx.font = "800 18px 'Noto Sans TC'";
+        ctx.fillText(item.q, x + 55, qy + 74);
+      });
+
+      // Bottom Consensus Badge
+      ctx.fillStyle = "#4caf50";
+      ctx.beginPath();
+      ctx.roundRect(x + 30, y + 510, w - 60, 60, 12);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "800 18px 'Noto Sans TC'";
+      ctx.textAlign = "center";
+      ctx.fillText("✓ 需求盲點全部對齊 · 達成 100% 開發共識！", cx, y + 546);
+
+      drawCalloutBadgePortrait(cx, y + 680, "🔥 /grill-me：AI 當面試官靈魂拷問，逼出最完美的專案架構！");
+      ctx.restore();
+    }
+
+    // --- Chart 2: /browser (Headless Chrome) ---
+    function drawChart2_Browser(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 20, 0, 1), 130, 12);
+      const cx = x + w / 2;
+
+      const winX = x;
+      const winY = y + 20;
+      const winW = w;
+      const winH = 580;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0,0,0,0.1)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(winX, winY, winW, winH, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#f0f0ed";
+      ctx.beginPath();
+      ctx.roundRect(winX, winY, winW, 52, [16, 16, 0, 0]);
+      ctx.fill();
+
+      // Window dots
+      ["#ff5f56", "#ffbd2e", "#27c93f"].forEach((c, i) => {
+        ctx.fillStyle = c;
+        ctx.beginPath();
+        ctx.arc(winX + 28 + i * 20, winY + 26, 6, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Address Bar
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.roundRect(winX + 104, winY + 10, winW - 130, 32, 8);
+      ctx.fill();
+
+      ctx.fillStyle = "#555555";
+      ctx.font = "600 14px 'JetBrains Mono'";
+      ctx.textAlign = "left";
+      ctx.fillText("🔒 https://data.gov.tw/realtime-export.csv", winX + 120, winY + 31);
+
+      // Data Rows
+      const rows = [
+        { name: "商業大盤成交額即時採集", val: "$4,829,320", status: "✓ 下載完畢" },
+        { name: "各分部行政審核表單自動填寫", val: "100 筆入庫", status: "✓ 表單提交" },
+        { name: "多頁動態驗證碼自適應破解", val: "Pass 2FA", status: "✓ 自動登入" }
+      ];
+
+      rows.forEach((r, idx) => {
+        const ry = winY + 90 + idx * 120;
+        ctx.fillStyle = "#fbfbf9";
+        ctx.strokeStyle = "rgba(0,0,0,0.06)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(winX + 24, ry, winW - 48, 95, 12);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#111111";
+        ctx.font = "800 20px 'Noto Sans TC'";
+        ctx.fillText(r.name, winX + 48, ry + 42);
+
+        ctx.font = "800 22px 'JetBrains Mono'";
+        ctx.fillStyle = "#ff5722";
+        ctx.fillText(r.val, winX + 48, ry + 74);
+
+        ctx.fillStyle = "rgba(255, 87, 34, 0.15)";
+        ctx.beginPath();
+        ctx.roundRect(winX + winW - 200, ry + 30, 160, 38, 8);
+        ctx.fill();
+        ctx.fillStyle = "#ff5722";
+        ctx.font = "800 16px 'Noto Sans TC'";
+        ctx.textAlign = "center";
+        ctx.fillText(r.status, winX + winW - 120, ry + 55);
+        ctx.textAlign = "left";
+      });
+
+      // Animated Mouse Cursor Clicking
+      const cursorX = winX + winW - 140 + Math.sin(f * 0.1) * 12;
+      const cursorY = winY + 470 + Math.cos(f * 0.1) * 12;
+      const wave = (f * 3) % 40;
+
+      ctx.strokeStyle = `rgba(255, 87, 34, ${1 - wave / 40})`;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(cursorX, cursorY, wave, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = "#111111";
+      ctx.beginPath();
+      ctx.moveTo(cursorX, cursorY);
+      ctx.lineTo(cursorX + 20, cursorY + 16);
+      ctx.lineTo(cursorX + 10, cursorY + 18);
+      ctx.lineTo(cursorX + 16, cursorY + 28);
+      ctx.lineTo(cursorX + 8, cursorY + 30);
+      ctx.lineTo(cursorX + 3, cursorY + 20);
+      ctx.lineTo(cursorX - 4, cursorY + 25);
+      ctx.closePath();
+      ctx.fill();
+
+      drawCalloutBadgePortrait(cx, y + 680, "🌐 /browser：自己開瀏覽器、自動跨頁採集與填表！");
+      ctx.restore();
+    }
+
+    // --- Chart 3: /boost (Deep Reasoning) ---
+    function drawChart3_Boost(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 20, 0, 1), 130, 12);
+      const cx = x + w / 2;
+
+      // Reasoning Graph Nodes arranged in a circle
+      const nodeR = 190 * p;
+      const nodes = [
+        { label: "問題拆解", ang: -Math.PI / 2 },
+        { label: "多角推演", ang: -Math.PI / 2 + (Math.PI * 2) / 5 },
+        { label: "交叉算術", ang: -Math.PI / 2 + (Math.PI * 4) / 5 },
+        { label: "代碼自測", ang: -Math.PI / 2 + (Math.PI * 6) / 5 },
+        { label: "確定輸出", ang: -Math.PI / 2 + (Math.PI * 8) / 5 }
+      ];
+
+      const nodePts = nodes.map(nd => ({
+        label: nd.label,
+        x: cx + Math.cos(nd.ang) * nodeR,
+        y: y + 210 + Math.sin(nd.ang) * nodeR
+      }));
+
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for (let i = 0; i < nodePts.length; i++) {
+        const next = nodePts[(i + 1) % nodePts.length];
+        if (i === 0) ctx.moveTo(nodePts[i].x, nodePts[i].y);
+        ctx.lineTo(next.x, next.y);
+      }
+      ctx.stroke();
+
+      // Traveling pulse
+      const pulseT = (f * 0.05) % 1;
+      const idx = Math.floor(f * 0.05) % nodePts.length;
+      const nextIdx = (idx + 1) % nodePts.length;
+      const px = nodePts[idx].x + (nodePts[nextIdx].x - nodePts[idx].x) * pulseT;
+      const py = nodePts[idx].y + (nodePts[nextIdx].y - nodePts[idx].y) * pulseT;
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.arc(px, py, 9, 0, Math.PI * 2);
+      ctx.fill();
+
+      nodePts.forEach((nd, i) => {
+        const delayP = spring(clamp((f - i * 5) / 18, 0, 1), 140, 12);
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#111111";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(nd.x, nd.y, 40 * delayP, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#ff5722";
+        ctx.beginPath();
+        ctx.arc(nd.x, nd.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#111111";
+        ctx.font = "800 15px 'Noto Sans TC'";
+        ctx.textAlign = "center";
+        ctx.fillText(nd.label, nd.x, nd.y + 56);
+      });
+
+      // Verification Card below
+      const cardY = y + 430;
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(x, cardY, w, 175, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      const checks = [
+        "✓ 數學公式核對：細項加總與大盤母體 100% 勾稽吻合",
+        "✓ 程式邊界測試：無 NaN、無未定義欄位、防幻覺機制啟動",
+        "✓ 深度思維鏈：多輪推導覆核，杜絕傳統 AI 瞎掰胡扯"
+      ];
+
+      checks.forEach((chk, i) => {
+        ctx.fillStyle = "#111111";
+        ctx.font = "700 18px 'Noto Sans TC'";
+        ctx.textAlign = "left";
+        ctx.fillText(chk, x + 30, cardY + 46 + i * 46);
+      });
+
+      drawCalloutBadgePortrait(cx, y + 680, "🧠 /boost：啟動學霸深度推理，複雜問題反覆驗算零誤差！");
+      ctx.restore();
+    }
+
+    // --- Chart 4: /schedule (Cron & Automation Alarm) ---
+    function drawChart4_Schedule(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 20, 0, 1), 130, 12);
+      const cx = x + w / 2;
+
+      // Clock Simulation
+      const clockY = y + 150;
+      const clockR = 85;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(cx, clockY, clockR, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Rotating Hands
+      const secAng = (f * 0.15);
+      const minAng = (f * 0.02);
+
+      // Minute hand
+      ctx.strokeStyle = "#111111";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(cx, clockY);
+      ctx.lineTo(cx + Math.cos(minAng) * 50, clockY + Math.sin(minAng) * 50);
+      ctx.stroke();
+
+      // Second hand
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(cx, clockY);
+      ctx.lineTo(cx + Math.cos(secAng) * 65, clockY + Math.sin(secAng) * 65);
+      ctx.stroke();
+
+      // Center Pin
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.arc(cx, clockY, 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3 Scheduled Cron Tasks below
+      const tasks = [
+        { time: "09:00 AM", cron: "0 9 * * 1-5", task: "每日開盤數據採集與趨勢簡報", active: true },
+        { time: "01:00 PM", cron: "0 13 * * *", task: "校園與行政公文待辦進度巡檢", active: true },
+        { time: "06:00 PM", cron: "0 18 * * 5", task: "週報表自動合成並寄送全體主管", active: true }
+      ];
+
+      tasks.forEach((t, i) => {
+        const ty = y + 270 + i * 110;
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "rgba(0,0,0,0.08)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(x, ty, w, 92, 14);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#ff5722";
+        ctx.font = "800 20px 'JetBrains Mono'";
+        ctx.fillText(t.time, x + 30, ty + 40);
+
+        ctx.fillStyle = "#888888";
+        ctx.font = "600 13px 'JetBrains Mono'";
+        ctx.fillText(`cron: "${t.cron}"`, x + 30, ty + 68);
+
+        ctx.fillStyle = "#111111";
+        ctx.font = "800 18px 'Noto Sans TC'";
+        ctx.fillText(t.task, x + 190, ty + 50);
+
+        // Status badge
+        ctx.fillStyle = "#4caf50";
+        ctx.beginPath();
+        ctx.roundRect(x + w - 160, ty + 26, 130, 36, 8);
+        ctx.fill();
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "800 15px 'Noto Sans TC'";
+        ctx.textAlign = "center";
+        ctx.fillText("● 運行中", x + w - 95, ty + 50);
+        ctx.textAlign = "left";
+      });
+
+      drawCalloutBadgePortrait(cx, y + 680, "⏰ /schedule：設定自動循環排程，時間一到自動幹活！");
+      ctx.restore();
+    }
+
+    // --- Chart 5: /goal (Night Autonomous Runner) ---
+    function drawChart5_Goal(x, y, w, h, f) {
+      ctx.save();
+      const p = clamp(f / 200, 0, 1);
+      const cx = x + w / 2;
+      const cy = y + 170;
+      const radius = 110;
+
+      // Circular Track
+      ctx.lineWidth = 18;
+      ctx.strokeStyle = "#e8e8e4";
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Progress Arc
+      const startAngle = -Math.PI / 2;
+      const endAngle = startAngle + (Math.PI * 2 * p);
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, startAngle, endAngle);
+      ctx.stroke();
+      ctx.lineCap = "butt";
+
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#111111";
+      ctx.font = "900 48px 'JetBrains Mono'";
+      ctx.fillText(`${Math.floor(p * 100)}%`, cx, cy + 10);
+      ctx.fillStyle = "#777777";
+      ctx.font = "700 16px 'Noto Sans TC'";
+      ctx.fillText("目標自主達成率", cx, cy + 40);
+
+      // Night Terminal Logs
+      const logY = y + 320;
+      ctx.fillStyle = "#1e1e1e";
+      ctx.beginPath();
+      ctx.roundRect(x, logY, w, 290, 16);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "800 16px 'JetBrains Mono'";
+      ctx.textAlign = "left";
+      ctx.fillText("🌙 /goal NIGHT AUTONOMOUS SESSION", x + 28, logY + 40);
+
+      const logs = [
+        { text: "[02:14:10] 啟動夜間模式：大專案自動拆解 12 項子任務", color: "#888888" },
+        { text: "[02:28:45] 子任務 #4 單元測試異常：Auto Fixing...", color: "#ff9800" },
+        { text: "[02:29:02] 自主修復代碼完成 · 重新編譯通過！", color: "#4caf50" },
+        { text: "[02:45:18] 批量抓取與數據清洗：10,000 筆入庫", color: "#888888" },
+        { text: "[03:10:00] 全部測試通過 · 產出完整交付包", color: "#ff5722" }
+      ];
+
+      logs.forEach((lg, i) => {
+        const itemP = clamp((f - i * 15) / 20, 0, 1);
+        if (itemP > 0) {
+          ctx.fillStyle = lg.color;
+          ctx.font = "600 14px 'JetBrains Mono'";
+          ctx.fillText(lg.text, x + 28, logY + 84 + i * 40);
+        }
+      });
+
+      drawCalloutBadgePortrait(cx, y + 680, "🚀 /goal：夜間無人值守，自主修復報錯直到 100% 達成！");
+      ctx.restore();
+    }
+
+    // --- Chart 6: /btw (Parallel Sticky Note) ---
+    function drawChart6_Btw(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 20, 0, 1), 130, 12);
+      const cx = x + w / 2;
+
+      // Left: Main Task Flow (Dimmed/Protected)
+      const mainW = 460;
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(x, y + 40, mainW, 540, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#555555";
+      ctx.font = "800 17px 'Noto Sans TC'";
+      ctx.fillText("🔒 主任務脈絡 (執行中 · 隔離保護)", x + 24, y + 80);
+
+      const mainSteps = [
+        "1. 數據清洗管線建立中...",
+        "2. 生成 1800 幀動態圖表...",
+        "3. 封裝 MP4 視訊與音軌..."
+      ];
+      mainSteps.forEach((st, i) => {
+        ctx.fillStyle = "#888888";
+        ctx.font = "600 15px 'Noto Sans TC'";
+        ctx.fillText(st, x + 24, y + 130 + i * 50);
+      });
+
+      // Right: Glowing Yellow Sticky Note (/btw)
+      const noteX = x + 500;
+      const noteW = 460;
+      ctx.fillStyle = "#fff9c4";
+      ctx.strokeStyle = "#fbc02d";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(noteX, y + 40, noteW * p, 540, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#f57f17";
+      ctx.font = "900 18px 'JetBrains Mono'";
+      ctx.fillText("💬 /btw 平行小紙條", noteX + 24, y + 80);
+
+      ctx.fillStyle = "#111111";
+      ctx.font = "800 20px 'Noto Sans TC'";
+      ctx.fillText("「順便問一下，", noteX + 24, y + 140);
+      ctx.fillText("剛剛那個指標的中文名稱是什麼？」", noteX + 24, y + 180);
+
+      ctx.fillStyle = "#2e7d32";
+      ctx.font = "700 18px 'Noto Sans TC'";
+      ctx.fillText("AI 即時回覆：", noteX + 24, y + 260);
+      ctx.fillStyle = "#111111";
+      ctx.fillText("「是『商業大盤成交額』！", noteX + 24, y + 300);
+      ctx.fillText("主任務完全不受干擾，繼續執行中！」", noteX + 24, y + 340);
+
+      drawCalloutBadgePortrait(cx, y + 680, "💬 /btw：像傳小紙條一樣隨手問，完全不污染主對話！");
+      ctx.restore();
+    }
+
+    // --- Chart 7: /teamwork (Multi-Agent Swarm) ---
+    function drawChart7_Teamwork(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 20, 0, 1), 130, 12);
+      const cx = x + w / 2;
+      const cy = y + 180;
+
+      // Commander Agent
+      ctx.fillStyle = "#111111";
+      ctx.beginPath();
+      ctx.arc(cx, cy, 60 * p, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 18px 'JetBrains Mono'";
+      ctx.textAlign = "center";
+      ctx.fillText("LEADER", cx, cy - 4);
+      ctx.font = "700 14px 'Noto Sans TC'";
+      ctx.fillText("指揮代理", cx, cy + 18);
+
+      // 3 Specialist Subagents below
+      const agents = [
+        { role: "爬蟲專家", desc: "/browser 採集", x: cx - 300, y: y + 420, color: "#ff5722" },
+        { role: "數據架構師", desc: "/boost 驗算", x: cx, y: y + 420, color: "#2196f3" },
+        { role: "渲染導演", desc: "Canvas 短片", x: cx + 300, y: y + 420, color: "#4caf50" }
+      ];
+
+      agents.forEach((ag) => {
+        // Line
+        ctx.strokeStyle = ag.color;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(ag.x, ag.y);
+        ctx.stroke();
+
+        // Card
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = ag.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(ag.x - 110, ag.y - 45, 220, 90, 14);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#111111";
+        ctx.font = "800 18px 'Noto Sans TC'";
+        ctx.textAlign = "center";
+        ctx.fillText(ag.role, ag.x, ag.y - 6);
+
+        ctx.fillStyle = "#666666";
+        ctx.font = "600 14px 'JetBrains Mono'";
+        ctx.fillText(ag.desc, ag.x, ag.y + 22);
+      });
+
+      drawCalloutBadgePortrait(cx, y + 680, "👥 /teamwork：召喚代理人特遣隊，多工並行戰力爆發！");
+      ctx.restore();
+    }
+
+    // --- Chart 8: /compact (Context Compression) ---
+    function drawChart8_Compact(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 20, 0, 1), 130, 12);
+      const cx = x + w / 2;
+
+      // Before Bar (Long & Heavy, Red)
+      const barY1 = y + 130;
+      ctx.fillStyle = "#111111";
+      ctx.font = "800 20px 'Noto Sans TC'";
+      ctx.fillText("壓縮前：歷史記憶膨脹 (對話容易延遲)", x + 30, barY1 - 20);
+
+      ctx.fillStyle = "#ff5252";
+      ctx.beginPath();
+      ctx.roundRect(x + 30, barY1, (w - 60) * 0.95, 60, 12);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "800 20px 'JetBrains Mono'";
+      ctx.fillText("98% Context Full (128,000 Tokens)", x + 50, barY1 + 38);
+
+      // Down Arrow
+      ctx.fillStyle = "#ff5722";
+      ctx.font = "900 36px 'JetBrains Mono'";
+      ctx.textAlign = "center";
+      ctx.fillText("⬇ /compact 智能提煉 ⬇", cx, y + 270);
+      ctx.textAlign = "left";
+
+      // After Bar (Compact & Slim, Green)
+      const barY2 = y + 330;
+      ctx.fillStyle = "#111111";
+      ctx.font = "800 20px 'Noto Sans TC'";
+      ctx.fillText("壓縮後：萃取核心共識 (釋放 85% 空間！)", x + 30, barY2 - 20);
+
+      ctx.fillStyle = "#4caf50";
+      ctx.beginPath();
+      ctx.roundRect(x + 30, barY2, Math.max(120, (w - 60) * 0.15 * p), 60, 12);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "800 20px 'JetBrains Mono'";
+      ctx.fillText("15% (輕盈如飛)", x + 50, barY2 + 38);
+
+      drawCalloutBadgePortrait(cx, y + 680, "📦 /compact：一秒為大腦瘦身，聊再久也不會卡頓！");
+      ctx.restore();
+    }
+
+    // --- Chart 9: /learn & Grand Finale ---
+    function drawChart9_Learn(x, y, w, h, f) {
+      ctx.save();
+      const p = spring(clamp(f / 20, 0, 1), 130, 12);
+      const cx = x + w / 2;
+      const cy = y + 200;
+
+      // Glowing Knowledge Crystal
+      ctx.fillStyle = "#ff5722";
+      ctx.beginPath();
+      ctx.arc(cx, cy, 70 * p, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 32px 'JetBrains Mono'";
+      ctx.textAlign = "center";
+      ctx.fillText("/learn", cx, cy + 10);
+
+      // 3 Permanent Memory Blocks
+      const memories = [
+        { title: "公司內部報表格式規範", tag: "永久記住" },
+        { title: "個人專屬 Python 代碼風格", tag: "永久記住" },
+        { title: "跨系統 API 授權與配置", tag: "永久記住" }
+      ];
+
+      memories.forEach((mem, i) => {
+        const my = y + 330 + i * 85;
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#ff5722";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(x + 30, my, w - 60, 72, 12);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#111111";
+        ctx.font = "800 18px 'Noto Sans TC'";
+        ctx.textAlign = "left";
+        ctx.fillText(`🧠 ${mem.title}`, x + 50, my + 44);
+
+        ctx.fillStyle = "#4caf50";
+        ctx.font = "800 15px 'Noto Sans TC'";
+        ctx.textAlign = "right";
+        ctx.fillText(`✓ ${mem.tag}`, x + w - 60, my + 44);
+      });
+
+      drawCalloutBadgePortrait(cx, y + 680, "✨ /learn：一次教會終生受用，打造專屬最強 AI 副手！");
+      ctx.restore();
+    }
+
+    function drawCalloutBadgePortrait(x, y, text) {
+      ctx.save();
+      ctx.font = "700 18px 'Noto Sans TC'";
+      const textW = ctx.measureText(text).width;
+      const boxW = Math.min(960, textW + 48);
+      const boxH = 50;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#ff5722";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(x - boxW / 2, y - boxH / 2, boxW, boxH, 12);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#ff5722";
+      ctx.textAlign = "center";
+      ctx.fillText(text, x, y + 6);
+      ctx.restore();
+    }
+
+    // --- Bottom Switch Dock (10 Buttons in 2 rows x 5 columns) ---
+    function drawBottomSwitchDockPortrait10(activeIdx, localF) {
+      ctx.save();
+      const dockW = 960;
+      const dockH = 150;
+      const dockX = (CANVAS_WIDTH - dockW) / 2;
+      const dockY = CANVAS_HEIGHT - 210;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(dockX, dockY, dockW, dockH, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      const pad = 8;
+      const cols = 5;
+      const rows = 2;
+      const btnW = (dockW - pad * (cols + 1)) / cols;
+      const btnH = (dockH - pad * (rows + 1)) / rows;
+
+      for (let i = 0; i < 10; i++) {
+        const r = Math.floor(i / cols);
+        const c = i % cols;
+        const bx = dockX + pad + c * (btnW + pad);
+        const by = dockY + pad + r * (btnH + pad);
+        const isActive = (i === activeIdx);
+
+        if (isActive) {
+          ctx.fillStyle = "#ff5722";
+          ctx.beginPath();
+          ctx.roundRect(bx, by, btnW, btnH, 10);
+          ctx.fill();
+
+          // Progress line
+          const progressW = btnW * (localF / FRAMES_PER_ATOM);
+          ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+          ctx.fillRect(bx + 6, by + 3, progressW - 12, 3);
+
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "900 16px 'JetBrains Mono'";
+        } else {
+          ctx.fillStyle = "#f4f4f2";
+          ctx.beginPath();
+          ctx.roundRect(bx, by, btnW, btnH, 10);
+          ctx.fill();
+
+          ctx.fillStyle = "#555555";
+          ctx.font = "700 15px 'JetBrains Mono'";
+        }
+
+        ctx.textAlign = "center";
+        ctx.fillText(SWITCH_LABELS[i], bx + btnW / 2, by + btnH / 2 + 5);
+      }
+      ctx.restore();
+    }
+
+    // -------------------------------------------------------------
+    // INTERACTIVE PLAYER CONTROLS
+    // -------------------------------------------------------------
+    const playBtn = document.getElementById('playBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const timelineWrapper = document.getElementById('timelineWrapper');
+    const timelineFill = document.getElementById('timelineFill');
+    const timelineThumb = document.getElementById('timelineThumb');
+    audioObj = document.getElementById('bgmAudio');
+
+    function updateUI() {
+      const pct = (currentFrame / (TOTAL_FRAMES - 1)) * 100;
+      timelineFill.style.width = pct + '%';
+      timelineThumb.style.left = pct + '%';
+
+      const sec = Math.floor(currentFrame / FPS);
+      const m = String(Math.floor(sec / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      timeDisplay.innerHTML = `${m}:${s} / 01:20 (格: ${currentFrame})`;
+    }
+
+    function renderLoop() {
+      if (isPlaying) {
+        if (audioObj && !audioObj.paused) {
+          currentFrame = Math.floor(audioObj.currentTime * FPS);
+        } else {
+          currentFrame++;
+        }
+
+        if (currentFrame >= TOTAL_FRAMES) {
+          currentFrame = TOTAL_FRAMES - 1;
+          pause();
+        }
+        drawFrame(currentFrame);
+        updateUI();
+        requestAnimationFrame(renderLoop);
+      }
+    }
+
+    function play() {
+      if (isPlaying) return;
+      isPlaying = true;
+      playBtn.textContent = "⏸ 暫停";
+      playBtn.classList.remove('btn-primary');
+      if (audioObj) {
+        audioObj.currentTime = currentFrame / FPS;
+        audioObj.play().catch(e => console.log('Audio autoplay prevented:', e));
+      }
+      requestAnimationFrame(renderLoop);
+    }
+
+    function pause() {
+      isPlaying = false;
+      playBtn.textContent = "▶ 播放";
+      playBtn.classList.add('btn-primary');
+      if (audioObj) audioObj.pause();
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (isPlaying) pause();
+      else play();
+    });
+
+    restartBtn.addEventListener('click', () => {
+      pause();
+      currentFrame = 0;
+      if (audioObj) audioObj.currentTime = 0;
+      drawFrame(0);
+      updateUI();
+      play();
+    });
+
+    timelineWrapper.addEventListener('click', (e) => {
+      const rect = timelineWrapper.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const ratio = clamp(clickX / rect.width, 0, 1);
+      currentFrame = Math.floor(ratio * TOTAL_FRAMES);
+      if (audioObj) audioObj.currentTime = currentFrame / FPS;
+      drawFrame(currentFrame);
+      updateUI();
+    });
+
+    window.jumpToAtom = function(idx) {
+      currentFrame = idx * FRAMES_PER_ATOM;
+      if (audioObj) audioObj.currentTime = currentFrame / FPS;
+      drawFrame(currentFrame);
+      updateUI();
+    };
+
+    window.renderFrame = function(f) {
+      drawFrame(f);
+    };
+
+    document.fonts.ready.then(() => {
+      drawFrame(0);
+      updateUI();
+    });
+  </script>
+</body>
+</html>
