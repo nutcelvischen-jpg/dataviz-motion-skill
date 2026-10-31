@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM 無記憶本質：對話歷史打包重送時序圖 | Diagram Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #fcfbf7;
+      --paper-2: #f5f3ec;
+      --ink: #1a1917;
+      --ink-strong: #111111;
+      --muted: #5e5953;
+      --soft: #78746d;
+      --rule: rgba(45, 40, 35, 0.12);
+      --rule-solid: #d5d1c8;
+      --accent: #c2410c;
+      --accent-tint: rgba(194, 65, 12, 0.08);
+      --link: #1d4ed8;
+      --font-title: 'Instrument Serif', 'Noto Serif TC', serif;
+      --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Geist Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      padding: 40px 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .editorial-wrapper {
+      width: 100%;
+      max-width: 1080px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .diagram-header {
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 20px;
+    }
+
+    .diagram-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .diagram-tag::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .diagram-title {
+      font-family: var(--font-title);
+      font-size: 32px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .diagram-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 800px;
+    }
+
+    .diagram-container {
+      width: 100%;
+      overflow-x: auto;
+      background: var(--paper-2);
+      border: 1px solid var(--rule-solid);
+      border-radius: 6px;
+      padding: 16px;
+    }
+
+    svg {
+      width: 100%;
+      min-width: 960px;
+      height: auto;
+      display: block;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .summary-card {
+      background: var(--paper-2);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 16px;
+    }
+
+    .summary-card.focal {
+      border-color: var(--accent);
+      background: var(--accent-tint);
+    }
+
+    .summary-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .summary-card.focal .summary-label {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .summary-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .summary-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media print {
+      .diagram-container { overflow-x: visible; }
+      svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="editorial-wrapper">
+  <!-- Header -->
+  <header class="diagram-header">
+    <div class="diagram-tag">Sequence Diagram · Semantic Pattern: Stateless Request-Response</div>
+    <h1 class="diagram-title">大語言模型無記憶本質：對話歷史打包重送時序圖</h1>
+    <p class="diagram-subtitle">
+      模型本身是完全無狀態的靜態函數 \( y = f(x) \)。前端看似具有「長期記憶」的連貫對話，實際上是客戶端在背後將所有歷史對話打包成巨大陣列重複遞交，這導致 Token 消耗呈二次方 \( O(N^2) \) 暴增與上下文稀釋。
+    </p>
+  </header>
+
+  <!-- SVG Diagram -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 960 620" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Arrowhead: Sync Call (link) -->
+        <marker id="arrow-sync" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#1d4ed8"/>
+        </marker>
+        <!-- Arrowhead: Sync Call (muted) -->
+        <marker id="arrow-muted" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#5e5953"/>
+        </marker>
+        <!-- Arrowhead: Return (dashed return) -->
+        <marker id="arrow-return" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#5e5953"/>
+        </marker>
+        <!-- Arrowhead: Accent (Focal Response) -->
+        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#c2410c"/>
+        </marker>
+      </defs>
+
+      <!-- ACTORS (Top Row) -->
+      <!-- Actor 1: User / Browser -->
+      <g transform="translate(140, 24)">
+        <rect x="-80" y="0" width="160" height="44" rx="4" fill="#fcfbf7" stroke="#1a1917" stroke-width="1.2"/>
+        <text x="0" y="20" fill="#1a1917" font-family="'Geist', sans-serif" font-size="12" font-weight="600" text-anchor="middle">使用者瀏覽器</text>
+        <text x="0" y="34" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">Client · Web UI</text>
+      </g>
+
+      <!-- Actor 2: Session Buffer / Context Packager -->
+      <g transform="translate(480, 24)">
+        <rect x="-90" y="0" width="180" height="44" rx="4" fill="#fcfbf7" stroke="#1a1917" stroke-width="1.2"/>
+        <text x="0" y="20" fill="#1a1917" font-family="'Geist', sans-serif" font-size="12" font-weight="600" text-anchor="middle">對話緩存打包器</text>
+        <text x="0" y="34" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">Session State · Messages[]</text>
+      </g>
+
+      <!-- Actor 3: Stateless LLM Server (Focal) -->
+      <g transform="translate(820, 24)">
+        <rect x="-90" y="0" width="180" height="44" rx="4" fill="#fcfbf7" stroke="#c2410c" stroke-width="1.8"/>
+        <rect x="-90" y="0" width="180" height="44" rx="4" fill="rgba(194, 65, 12, 0.05)"/>
+        <text x="0" y="20" fill="#c2410c" font-family="'Geist', sans-serif" font-size="12" font-weight="600" text-anchor="middle">無狀態 LLM 模型核心</text>
+        <text x="0" y="34" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">Stateless Engine · Zero Memory</text>
+      </g>
+
+      <!-- LIFELINES -->
+      <line x1="140" y1="68" x2="140" y2="580" stroke="rgba(45, 40, 35, 0.2)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="480" y1="68" x2="480" y2="580" stroke="rgba(45, 40, 35, 0.2)" stroke-width="1" stroke-dasharray="3,3"/>
+      <line x1="820" y1="68" x2="820" y2="580" stroke="rgba(45, 40, 35, 0.2)" stroke-width="1" stroke-dasharray="3,3"/>
+
+      <!-- ==================== TURN 1 ==================== -->
+      <!-- Label: Turn 1 -->
+      <rect x="50" y="85" width="60" height="18" rx="2" fill="#e5e3dc"/>
+      <text x="80" y="98" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" text-anchor="middle">TURN 01</text>
+
+      <!-- 1.1 User inputs "我是台北人" -->
+      <line x1="140" y1="115" x2="476" y2="115" stroke="#1d4ed8" stroke-width="1.2" marker-end="url(#arrow-sync)"/>
+      <rect x="230" y="104" width="160" height="16" fill="#f5f3ec"/>
+      <text x="310" y="116" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">輸入: 「我是台北人」</text>
+
+      <!-- Activation at Buffer -->
+      <rect x="476" y="115" width="8" height="65" fill="rgba(45,40,35,0.06)" stroke="#5e5953" stroke-width="0.8"/>
+
+      <!-- 1.2 Buffer forwards payload [U1] to LLM -->
+      <line x1="484" y1="135" x2="816" y2="135" stroke="#1d4ed8" stroke-width="1.2" marker-end="url(#arrow-sync)"/>
+      <rect x="550" y="124" width="200" height="16" fill="#f5f3ec"/>
+      <text x="650" y="136" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">POST /v1/chat: [Prompt 1] (25 tokens)</text>
+
+      <!-- Activation at LLM -->
+      <rect x="816" y="135" width="8" height="35" fill="rgba(194,65,12,0.12)" stroke="#c2410c" stroke-width="0.8"/>
+
+      <!-- 1.3 LLM returns R1 -->
+      <line x1="816" y1="165" x2="484" y2="165" stroke="#5e5953" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-return)"/>
+      <rect x="560" y="154" width="180" height="16" fill="#f5f3ec"/>
+      <text x="650" y="166" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">回應: 「你好！請問有何需求？」</text>
+
+      <!-- 1.4 Buffer renders R1 to User -->
+      <line x1="476" y1="180" x2="144" y2="180" stroke="#5e5953" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-return)"/>
+      <rect x="235" y="169" width="150" height="16" fill="#f5f3ec"/>
+      <text x="310" y="181" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">畫面呈現回應 (歷程歸檔)</text>
+
+      <!-- ==================== TURN 2 ==================== -->
+      <!-- Label: Turn 2 -->
+      <rect x="50" y="215" width="60" height="18" rx="2" fill="#e5e3dc"/>
+      <text x="80" y="228" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" text-anchor="middle">TURN 02</text>
+
+      <!-- 2.1 User inputs "我剛剛說我是哪裡人？" -->
+      <line x1="140" y1="245" x2="476" y2="245" stroke="#1d4ed8" stroke-width="1.2" marker-end="url(#arrow-sync)"/>
+      <rect x="210" y="234" width="200" height="16" fill="#f5f3ec"/>
+      <text x="310" y="246" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">詢問: 「我剛剛說我是哪裡人？」</text>
+
+      <!-- Activation at Buffer -->
+      <rect x="476" y="245" width="8" height="95" fill="rgba(45,40,35,0.06)" stroke="#5e5953" stroke-width="0.8"/>
+
+      <!-- 2.2 Buffer self-pack (The Illusion) -->
+      <path d="M 484 260 L 515 260 L 515 278 L 484 278" fill="none" stroke="#5e5953" stroke-width="1"/>
+      <rect x="520" y="261" width="180" height="16" fill="#f5f3ec"/>
+      <text x="610" y="273" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9">重組歷史: [U1, R1, U2] (白紙重開)</text>
+
+      <!-- 2.3 Buffer sends BLOATED payload to LLM -->
+      <line x1="484" y1="300" x2="816" y2="300" stroke="#1d4ed8" stroke-width="1.2" marker-end="url(#arrow-sync)"/>
+      <rect x="535" y="289" width="230" height="16" fill="#f5f3ec"/>
+      <text x="650" y="301" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">POST /v1/chat: [U1+R1+U2] (140 tokens)</text>
+
+      <!-- Activation at LLM -->
+      <rect x="816" y="300" width="8" height="35" fill="rgba(194,65,12,0.12)" stroke="#c2410c" stroke-width="0.8"/>
+
+      <!-- 2.4 LLM answers R2 (FOCAL ACCENT) -->
+      <line x1="816" y1="330" x2="484" y2="330" stroke="#c2410c" stroke-width="1.4" stroke-dasharray="4,3" marker-end="url(#arrow-accent)"/>
+      <rect x="550" y="319" width="200" height="16" fill="#f5f3ec"/>
+      <text x="650" y="331" fill="#c2410c" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" text-anchor="middle">成功回答: 「您剛剛說您是台北人！」</text>
+
+      <!-- 2.5 Buffer returns to User -->
+      <line x1="476" y1="340" x2="144" y2="340" stroke="#5e5953" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-return)"/>
+      <rect x="235" y="329" width="150" height="16" fill="#f5f3ec"/>
+      <text x="310" y="341" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">產生「AI 記性真好」的錯覺</text>
+
+      <!-- ==================== COMBINED FRAGMENT: LOOP (N TURNS EXPANSION) ==================== -->
+      <rect x="100" y="375" width="760" height="180" rx="4" fill="rgba(45, 40, 35, 0.02)" stroke="rgba(45, 40, 35, 0.22)" stroke-width="1"/>
+      <!-- Operator tab -->
+      <rect x="100" y="375" width="48" height="18" rx="2" fill="#fcfbf7" stroke="rgba(45, 40, 35, 0.22)" stroke-width="1"/>
+      <text x="124" y="388" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="8" font-weight="600" text-anchor="middle" letter-spacing="0.12em">LOOP</text>
+      <!-- Guard -->
+      <text x="160" y="388" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="8">[對話持續進行至 N 輪 · 歷史累加]</text>
+
+      <!-- Inside Loop Details -->
+      <!-- Message at N turns -->
+      <line x1="140" y1="420" x2="476" y2="420" stroke="#1d4ed8" stroke-width="1.2" marker-end="url(#arrow-sync)"/>
+      <rect x="230" y="409" width="160" height="16" fill="#f5f3ec"/>
+      <text x="310" y="421" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">輪次 N: 延伸對話問題</text>
+
+      <rect x="476" y="420" width="8" height="80" fill="rgba(45,40,35,0.06)" stroke="#5e5953" stroke-width="0.8"/>
+
+      <!-- Giant Payload Arrow -->
+      <line x1="484" y1="450" x2="816" y2="450" stroke="#c2410c" stroke-width="1.8" marker-end="url(#arrow-accent)"/>
+      <rect x="515" y="438" width="270" height="18" fill="#f5f3ec" stroke="#c2410c" stroke-width="0.8" rx="2"/>
+      <text x="650" y="451" fill="#c2410c" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" text-anchor="middle">⚠️ 巨大封包: [U1+R1+...+UN] (數萬 Tokens)</text>
+
+      <!-- Danger annotations inside Loop -->
+      <text x="480" y="485" fill="#5e5953" font-family="'Geist', sans-serif" font-size="11" text-anchor="middle">
+        • <tspan font-weight="600" fill="#c2410c">Token 成本呈二次方 O(N²)</tspan>：每說一句話都在替前 100 句話重複付費
+      </text>
+      <text x="480" y="505" fill="#5e5953" font-family="'Geist', sans-serif" font-size="11" text-anchor="middle">
+        • <tspan font-weight="600">上下文稀釋（Context Drift）</tspan>：開頭設定的 SOP 與原則被後方龐大文字沖淡遺忘
+      </text>
+      <text x="480" y="525" fill="#5e5953" font-family="'Geist', sans-serif" font-size="11" text-anchor="middle">
+        • <tspan font-weight="600">視窗截斷（Window Overflow）</tspan>：超越模型限制時最早期對話被粗暴刪除失憶
+      </text>
+    </svg>
+  </div>
+
+  <!-- Summary Cards -->
+  <footer class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-label">01 / ARCHITECTURE</div>
+      <div class="summary-title">API 本質是無狀態白紙</div>
+      <div class="summary-desc">
+        大語言模型伺服器內部沒有用戶的 Session 記憶庫。每次 API 調用都是一次獨立的冷啟動矩陣計算，對話歷史由客戶端全額承擔。
+      </div>
+    </div>
+    <div class="summary-card focal">
+      <div class="summary-label">02 / COST & COMPLEXITY</div>
+      <div class="summary-title">成本 O(N²) 二次方暴增</div>
+      <div class="summary-desc">
+        第 1 輪傳送 1 句話，第 10 輪傳送前 10 句話。隨對話拉長，API 帳單指數級飆升，且早期指令逐漸被淹沒（Lost in the Middle）。
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">03 / AGENT TAKEAWAY</div>
+      <div class="summary-title">漸進式載入（Progressive）</div>
+      <div class="summary-desc">
+        在 Module 2 製作自訂 Skill 與 Agent 時，切忌將整本厚重的 SOP 塞在對話開頭，必須透過動態卡匣在精準節點按需加載。
+      </div>
+    </div>
+  </footer>
+</div>
+
+</body>
+</html>
