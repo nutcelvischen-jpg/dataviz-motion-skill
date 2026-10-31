@@ -226,11 +226,11 @@
         id: "03",
         startSec: 26,
         durSec: 17,
-        tag: "💻 實戰創建",
-        headline: "一句話，AI 自己寫 Skill！",
-        highlight: "免手動建目錄 · AI 全自動封裝",
-        sub: "說出你的工作需求，AI 自動建立目錄、代碼與 SOP！",
-        pill: "💬 說出需求，Antigravity 自動幫你寫完整個 Skill！"
+        tag: "💻 流程封裝",
+        headline: "做了半天的流程 ➔ 秒變 Skill！",
+        highlight: "流程摸索大功告成？一鍵固化為專屬外掛",
+        sub: "別每次重頭教！一句話把「成功流程」封裝為「永久資產」！",
+        pill: "💡 流程跑通別重來！一句話把「成果」封裝成「外掛」！"
       },
       {
         id: "04",
@@ -257,7 +257,7 @@
     const SWITCH_LABELS = [
       "01. 痛點",
       "02. 結構",
-      "03. 創建",
+      "03. 流程",
       "04. 喚醒",
       "05. 升級"
     ];
@@ -718,104 +718,237 @@
       ctx.fill();
       ctx.stroke();
 
-      // Top title bar with Mac dots
+      // Top title bar with Mac dots & Pipeline Header
       ctx.fillStyle = "#1e293b";
       ctx.beginPath();
-      ctx.roundRect(x, y, w, 80, [24, 24, 0, 0]);
+      ctx.roundRect(x, y, w, 76, [24, 24, 0, 0]);
       ctx.fill();
 
       ["#ff5f56", "#ffbd2e", "#27c93f"].forEach((c, i) => {
         ctx.fillStyle = c;
         ctx.beginPath();
-        ctx.arc(x + 44 + i * 28, y + 40, 9, 0, Math.PI * 2);
+        ctx.arc(x + 44 + i * 28, y + 38, 9, 0, Math.PI * 2);
         ctx.fill();
       });
 
       ctx.fillStyle = "#94a3b8";
-      ctx.font = "800 24px 'JetBrains Mono'";
-      ctx.fillText("Antigravity 2.0 · Live Prompt-to-Skill Workflow", x + 150, y + 48);
+      ctx.font = "900 24px 'JetBrains Mono'";
+      ctx.fillText("WORKFLOW PIPELINE · 流程轉化為 Skill 實戰架構", x + 150, y + 46);
 
-      // 1. User Prompt Card
-      const userY = y + 115;
+      // --- STAGE 01: 做了半天 · 流程摸索與驗證完成 ---
+      const p1 = spring(clamp(f / 16, 0, 1), 140, 12);
+      const y1 = y + 92;
+      const h1 = 220;
+      const w1 = w - 60;
+      const x1 = x + 30;
+
+      ctx.save();
+      ctx.translate(0, (1 - p1) * 20);
+      ctx.globalAlpha = clamp(f / 10, 0, 1);
+
       ctx.fillStyle = "#1e293b";
+      ctx.strokeStyle = "#f97316";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.roundRect(x1, y1, w1, h1, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      // Stage 1 Header Badge
+      ctx.fillStyle = "#ffedd5";
+      ctx.beginPath();
+      ctx.roundRect(x1 + 24, y1 + 18, 560, 42, 10);
+      ctx.fill();
+
+      ctx.fillStyle = "#c2410c";
+      ctx.font = "900 24px 'Noto Sans TC'";
+      ctx.fillText("😫【階段 01】反覆調校除錯 · 流程大功告成", x1 + 40, y1 + 47);
+
+      // Stage 1 Bullet lines
+      ctx.fillStyle = "#f1f5f9";
+      ctx.font = "800 28px 'Noto Sans TC'";
+      ctx.fillText("📊 丟入雜亂業務報表 ➔ 缺值自動補 0、統一日期格式", x1 + 28, y1 + 104);
+      ctx.fillText("🐍 跑 Python 交叉勾稽 ➔ 排除 NaN、總額精準對齊", x1 + 28, y1 + 146);
+
+      // Stage 1 PASS badge
+      ctx.fillStyle = "rgba(34, 197, 94, 0.2)";
+      ctx.strokeStyle = "#22c55e";
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.roundRect(x1 + 24, y1 + 168, w1 - 48, 38, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#4ade80";
+      ctx.font = "900 24px 'Noto Sans TC'";
+      ctx.fillText("✓ 流程驗證大成功！細項加總完全吻合 ($4,829,320) · PASS", x1 + 42, y1 + 195);
+      ctx.restore();
+
+      // Connector 1 down arrow indicator
+      const pArrow1 = clamp((f - 18) / 12, 0, 1);
+      if (pArrow1 > 0) {
+        ctx.fillStyle = "#38bdf8";
+        ctx.font = "900 22px 'Noto Sans TC'";
+        ctx.textAlign = "center";
+        ctx.fillText("▼ 一鍵封裝轉換指令", x + w / 2, y1 + h1 + 19);
+        ctx.textAlign = "left";
+      }
+
+      // --- CONNECTOR 01: 轉折靈魂點（說話氣泡）---
+      const p2 = spring(clamp((f - 24) / 16, 0, 1), 140, 12);
+      const y2 = y + 332;
+      const h2 = 86;
+      const w2 = w - 60;
+      const x2 = x + 30;
+
+      ctx.save();
+      ctx.translate(0, (1 - p2) * 20);
+      ctx.globalAlpha = clamp((f - 20) / 10, 0, 1);
+
+      ctx.fillStyle = "#0284c7";
       ctx.strokeStyle = "#38bdf8";
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.roundRect(x + 36, userY, w - 72, 145, 18);
+      ctx.roundRect(x2, y2, w2, h2, 18);
       ctx.fill();
       ctx.stroke();
 
-      ctx.fillStyle = "#94a3b8";
-      ctx.font = "900 26px 'Noto Sans TC'";
-      ctx.fillText("💬 你對 AI 說：", x + 64, userY + 48);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 32px 'Noto Sans TC'";
+      ctx.fillText("💬 你對 AI 說：「把剛剛這套流程做成專屬 Skill！」", x2 + 30, y2 + 55);
+      ctx.restore();
 
-      ctx.fillStyle = "#38bdf8";
-      ctx.font = "900 36px 'Noto Sans TC'";
-      ctx.fillText("「把剛剛驗算 Excel 的流程做成專屬 Skill！」", x + 64, userY + 104);
+      // Connector 2 down arrow indicator
+      const pArrow2 = clamp((f - 40) / 12, 0, 1);
+      if (pArrow2 > 0) {
+        ctx.fillStyle = "#a855f7";
+        ctx.font = "900 22px 'Noto Sans TC'";
+        ctx.textAlign = "center";
+        ctx.fillText("▼ AI 自動解析 SOP & 封裝卡匣", x + w / 2, y2 + h2 + 19);
+        ctx.textAlign = "left";
+      }
 
-      // 2. AI Response
-      const aiY = userY + 175;
+      // --- STAGE 02: AI 全自動萃取封裝 ---
+      const p3 = spring(clamp((f - 46) / 16, 0, 1), 140, 12);
+      const y3 = y + 442;
+      const h3 = 224;
+      const w3 = w - 60;
+      const x3 = x + 30;
+
+      ctx.save();
+      ctx.translate(0, (1 - p3) * 20);
+      ctx.globalAlpha = clamp((f - 42) / 10, 0, 1);
+
       ctx.fillStyle = "#1e293b";
-      ctx.strokeStyle = "#fb923c";
+      ctx.strokeStyle = "#a855f7";
       ctx.lineWidth = 2.5;
       ctx.beginPath();
-      ctx.roundRect(x + 36, aiY, w - 72, 145, 18);
+      ctx.roundRect(x3, y3, w3, h3, 18);
       ctx.fill();
       ctx.stroke();
 
-      ctx.fillStyle = "#fb923c";
-      ctx.font = "900 28px 'Noto Sans TC'";
-      ctx.fillText("🤖 Antigravity 收到！", x + 64, aiY + 48);
+      // Stage 2 Header Badge
+      ctx.fillStyle = "#f3e8ff";
+      ctx.beginPath();
+      ctx.roundRect(x3 + 24, y3 + 18, 560, 42, 10);
+      ctx.fill();
 
-      ctx.fillStyle = "#fdba74";
-      ctx.font = "800 32px 'Noto Sans TC'";
-      ctx.fillText("正在為您自動建立結構化 Skill 資產...", x + 64, aiY + 104);
+      ctx.fillStyle = "#7e22ce";
+      ctx.font = "900 24px 'Noto Sans TC'";
+      ctx.fillText("🤖【階段 02】AI 萃取 SOP · 自動建立卡匣結構", x3 + 40, y3 + 47);
 
-      // 3. Automated Steps (Green Checkmarks)
-      const steps = [
-        "[✓] 建立專屬目錄: .agents/skills/excel-auditor/",
-        "[✓] 自動生成靈魂檔案: SKILL.md (含 SOP 步驟規範)",
-        "[✓] 封裝自動化工具: scripts/audit_helper.py"
-      ];
+      // Stage 2 Bullet lines
+      ctx.fillStyle = "#f1f5f9";
+      ctx.font = "800 28px 'Noto Sans TC'";
+      ctx.fillText("⭐ 自動生成 SKILL.md ➔ 固化審核標準與執行規則", x3 + 28, y3 + 102);
+      ctx.fillText("🐍 自動封裝 scripts/audit.py ➔ 收錄驗算專用小工具", x3 + 28, y3 + 142);
 
-      steps.forEach((st, i) => {
-        const sy = aiY + 175 + i * 92;
-        const itemP = clamp((f - i * 18) / 20, 0, 1);
-        if (itemP > 0) {
-          ctx.fillStyle = "#1e293b";
-          ctx.beginPath();
-          ctx.roundRect(x + 36, sy, w - 72, 74, 14);
-          ctx.fill();
+      // Stage 2 Success Badge
+      ctx.fillStyle = "rgba(168, 85, 247, 0.2)";
+      ctx.strokeStyle = "#a855f7";
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.roundRect(x3 + 24, y3 + 164, w3 - 48, 42, 8);
+      ctx.fill();
+      ctx.stroke();
 
-          ctx.fillStyle = "#4ade80";
-          ctx.font = "800 28px 'JetBrains Mono'";
-          ctx.fillText(st, x + 64, sy + 48);
-        }
-      });
+      ctx.fillStyle = "#d8b4fe";
+      ctx.font = "900 24px 'JetBrains Mono', 'Noto Sans TC'";
+      ctx.fillText("✨ SUCCESS: .agents/skills/excel-auditor/ 已掛載生效！", x3 + 42, y3 + 193);
+      ctx.restore();
 
-      // 4. Huge Glowing Success Box
-      const successY = aiY + 475;
+      // --- CONNECTOR 02: 固化指示 ---
+      const pPill2 = clamp((f - 65) / 12, 0, 1);
+      const y_b2 = y + 678;
+      if (pPill2 > 0) {
+        ctx.fillStyle = "#334155";
+        ctx.beginPath();
+        ctx.roundRect(x + (w - 600) / 2, y_b2, 600, 42, 21);
+        ctx.fill();
+
+        ctx.fillStyle = "#cbd5e1";
+        ctx.font = "800 24px 'Noto Sans TC'";
+        ctx.textAlign = "center";
+        ctx.fillText("⚡ 永久固化在本地專案 · 從此插卡即用！", x + w / 2, y_b2 + 29);
+        ctx.textAlign = "left";
+      }
+
+      // --- STAGE 03: 弄成 Skill · 永久有感・一句話秒跑 ---
+      const p4 = spring(clamp((f - 75) / 16, 0, 1), 140, 12);
+      const y4 = y + 732;
+      const h4 = 280;
+      const w4 = w - 60;
+      const x4 = x + 30;
+
+      ctx.save();
+      ctx.translate(0, (1 - p4) * 20);
+      ctx.globalAlpha = clamp((f - 70) / 10, 0, 1);
+
       ctx.fillStyle = "rgba(34, 197, 94, 0.15)";
       ctx.strokeStyle = "#22c55e";
       ctx.lineWidth = 3.5;
       ctx.beginPath();
-      ctx.roundRect(x + 36, successY, w - 72, 185, 20);
+      ctx.roundRect(x4, y4, w4, h4, 20);
       ctx.fill();
       ctx.stroke();
 
-      ctx.fillStyle = "#22c55e";
-      ctx.font = "900 32px 'JetBrains Mono', 'Noto Sans TC'";
-      ctx.fillText("✨ SUCCESS: [excel-auditor] 已掛載生效！", x + 60, successY + 68);
+      // Stage 3 Header Badge
+      ctx.fillStyle = "#dcfce7";
+      ctx.beginPath();
+      ctx.roundRect(x4 + 24, y4 + 18, 560, 44, 10);
+      ctx.fill();
 
-      ctx.fillStyle = "#86efac";
+      ctx.fillStyle = "#15803d";
+      ctx.font = "900 26px 'Noto Sans TC'";
+      ctx.fillText("🚀【階段 03】永久有感 · 隨口一句話自動喚醒", x4 + 40, y4 + 49);
+
+      // Stage 3 Bullet lines
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 30px 'Noto Sans TC'";
+      ctx.fillText("🎯 明天開新對話？直接說「幫我對帳」，零重複打字！", x4 + 28, y4 + 104);
+
+      ctx.fillStyle = "#bbf7d0";
       ctx.font = "800 28px 'Noto Sans TC'";
-      ctx.fillText("隨時隨地隨口一句話，AI 立刻調用專家外掛！", x + 64, successY + 128);
+      ctx.fillText("⚡ AI 自動掛載專屬卡匣，照剛才調好的 SOP 1 秒交付！", x4 + 28, y4 + 148);
 
-      // Blinking Prompt
+      // Stage 3 Big Impact Banner
+      ctx.fillStyle = "#16a34a";
+      ctx.beginPath();
+      ctx.roundRect(x4 + 24, y4 + 186, w4 - 48, 70, 14);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 34px 'Noto Sans TC'";
+      ctx.textAlign = "center";
+      ctx.fillText("🎉 摸索一次，終生受用 · 效率翻 10 倍！", x4 + w4 / 2, y4 + 232);
+      ctx.textAlign = "left";
+      ctx.restore();
+
+      // Terminal blinking prompt at bottom
       const blink = Math.floor(f / 10) % 2 === 0 ? "█" : "";
       ctx.fillStyle = "#c084fc";
-      ctx.font = "900 34px 'JetBrains Mono'";
-      ctx.fillText(`$ agy ready ${blink}`, x + 50, y + h - 50);
+      ctx.font = "900 30px 'JetBrains Mono'";
+      ctx.fillText(`$ agy ready ${blink}`, x + 50, y + h - 45);
 
       ctx.restore();
     }
