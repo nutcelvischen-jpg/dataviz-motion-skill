@@ -582,8 +582,9 @@
           <option value="gemini">⚡ 直連 Google Gemini API</option>
         </select>
         <select id="openrouterModelSelect" class="select-clean" style="display: none;" onchange="handleModelChange()">
-          <option value="deepseek/deepseek-chat">deepseek/deepseek-chat (💥易破防實測推薦)</option>
-          <option value="meta-llama/llama-3.3-70b-instruct">meta-llama/llama-3.3-70b (💥易破防實測推薦)</option>
+          <option value="google/gemma-3-12b-it">google/gemma-3-12b-it (💥破防首選 · 實測秒破)</option>
+          <option value="deepseek/deepseek-chat">deepseek/deepseek-chat (💥易破防推薦)</option>
+          <option value="meta-llama/llama-3.3-70b-instruct">meta-llama/llama-3.3-70b (💥易破防推薦)</option>
           <option value="openai/gpt-4o">openai/gpt-4o (🛡️強安全防禦)</option>
           <option value="openai/gpt-4o-mini">openai/gpt-4o-mini (🛡️高拒答率)</option>
           <option value="anthropic/claude-3.5-sonnet">anthropic/claude-3.5-sonnet</option>
@@ -605,20 +606,20 @@
     <!-- 六大核心本質實驗切換列 -->
     <nav class="tabs-nav" aria-label="實驗分類切換">
       <button class="tab-button active" onclick="selectExperiment(0)">
-        <span class="tab-index">01 / VULNERABILITY</span>
-        <span class="tab-label">提示詞注入 (北捷實案)</span>
-      </button>
-      <button class="tab-button" onclick="selectExperiment(1)">
-        <span class="tab-index">02 / TEMPORAL</span>
+        <span class="tab-index">01 / TEMPORAL</span>
         <span class="tab-label">無時鐘感知與凍結</span>
       </button>
-      <button class="tab-button" onclick="selectExperiment(2)">
-        <span class="tab-index">03 / STATELESS</span>
+      <button class="tab-button" onclick="selectExperiment(1)">
+        <span class="tab-index">02 / STATELESS</span>
         <span class="tab-label">無記憶與對話重送</span>
       </button>
-      <button class="tab-button" onclick="selectExperiment(3)">
-        <span class="tab-index">04 / PROBABILITY</span>
+      <button class="tab-button" onclick="selectExperiment(2)">
+        <span class="tab-index">03 / PROBABILITY</span>
         <span class="tab-label">機率預測與認知陷阱</span>
+      </button>
+      <button class="tab-button" onclick="selectExperiment(3)">
+        <span class="tab-index">04 / VULNERABILITY</span>
+        <span class="tab-label">提示詞注入 (北捷案例)</span>
       </button>
       <button class="tab-button" onclick="selectExperiment(4)">
         <span class="tab-index">05 / ARITHMETIC</span>
@@ -724,6 +725,117 @@
     // 六大實驗數據庫 (包含 iThome 北捷真實歪樓案例還原)
     // -------------------------------------------------------------
     const EXPERIMENTS = [
+      {
+        id: "time",
+        title: "無時鐘感知與凍結 (No Internal Clock)",
+        subtitle: "LLM 是一組靜態權重矩陣，天然缺乏系統排程器與時間維度",
+        badge: "知識切斷點",
+        hasNews: false,
+        hasSystem: false,
+        presets: [
+          {
+            label: "1. 詢問精確時間與星期",
+            tag: "時鐘測試",
+            prompt: "請問現在幾點幾分？今天是西元幾年幾月幾號、星期幾？",
+            simulated: "很抱歉，我是一個大語言模型，我本身沒有內建的即時時鐘或系統計時器，因此我無法得知現在確切的日期、年份與當前時間。"
+          },
+          {
+            label: "2. 詢問今日即時新聞頭條",
+            tag: "即時資訊",
+            prompt: "今天早上下午台灣各大新聞頭條發生了什麼事？台股今天大盤是漲還是跌？",
+            simulated: "我無法提供今天的即時新聞或當天台股收盤資訊。我的知識庫只截止於訓練完成的那一刻（Knowledge Cutoff），我無法感知現實世界正在發生的事情。"
+          },
+          {
+            label: "3. 探討世界領導人現況",
+            tag: "歷史邊界",
+            prompt: "誰是現任的日本首相？誰是現任的美國總統？",
+            simulated: "我的知識庫僅更新至訓練資料切斷點。在沒有外部連網或系統注入的情況下，若現實中政治人物近期發生交接，我只能回答我權重中記住的最後一位人物。"
+          }
+        ],
+        analysis: `<strong>大語言模型為什麼不知道時間？</strong><br>
+LLM 的本質是一組<strong>靜態凍結的浮點數矩陣（Frozen Weights）</strong>。當模型預訓練結束後，它的所有世界知識就永久定格在訓練資料截斷日。<br>
+它在伺服器中只是一個純粹的數學運算函式 \\( y = f(x) \\)，沒有心跳脈衝、沒有 cron job 排程器。平常 ChatGPT 之所以能回答今天日期，<strong>是因為前端工程師在發送請求前，偷偷在背後把 <code>Current date: 2026-10-31</code> 當作隱藏字串塞入進去！</strong>`,
+        takeaway: `🎓 <strong>課程核心啟示：</strong> 純 LLM 是死板的歷史記憶庫；這就是為什麼在 Module 3 我們必須導入 <strong>MCP 工具協議（Model Context Protocol）</strong>，讓模型學會調用外部時鐘 API、Google Search 與即時即用資料庫！`
+      },
+      {
+        id: "memory",
+        title: "無狀態與無記憶 (Stateless Nature)",
+        subtitle: "金魚腦真相 — 每一次發送請求，模型都是完全空白地重新啟動",
+        badge: "無狀態調用",
+        hasNews: false,
+        hasSystem: false,
+        presets: [
+          {
+            label: "第 1 輪對話：告訴 AI 我的名字與秘密",
+            tag: "資訊注入",
+            prompt: "你好！我叫陳大華，我最喜歡的顏色是電光紫，我有一隻貓叫皮皮。",
+            simulated: "你好大華！很高興認識你。我已經記住你最喜歡電光紫，而且你有一隻可愛的貓咪叫皮皮！有什麼我可以幫你的嗎？"
+          },
+          {
+            label: "第 2 輪對話【未帶歷史紀錄 · 底層真實調用】",
+            tag: "單次無狀態",
+            prompt: "請問我剛剛說我叫什麼名字？我最喜歡什麼顏色？我的貓叫什麼？",
+            simulated: "抱歉，您在之前的對話中並沒有告訴我您的名字、喜歡的顏色或貓咪的名稱。我是一個無狀態的模型，如果您沒有在當前請求中提供這些資訊，我無法回憶起您是誰。"
+          },
+          {
+            label: "第 2 輪對話【全量重送歷史紀錄 · 前端真實運作】",
+            tag: "上下文拼接",
+            prompt: "[對話歷史紀錄]:\n使用者: 我叫陳大華，最喜歡電光紫，貓叫皮皮。\n助手: 很高興認識你大華！\n\n[最新提問]:\n請問我叫什麼名字？我的貓叫什麼？",
+            simulated: "根據您剛才提供的對話紀錄，您的名字是陳大華，您最喜歡的顏色是電光紫，而您的貓咪名字叫皮皮！"
+          }
+        ],
+        analysis: `<strong>什麼叫『無狀態（Stateless）』？</strong><br>
+很多人以為 AI 像人類一樣「大腦有長期記憶」，這是極大的誤解！<br><br>
+實際上，<strong>每一次你按下發送鍵，模型都是以完全失憶的白紙狀態啟動</strong>。你在各家聊天介面看到的連貫記憶，完全是工程師在背後<strong>把過去所有的對話紀錄，重新打包成一長串龐大的 Context 重新塞給模型</strong>！<br><br>
+這帶來了三大工程痛點：<br>
+1. <strong>Token 消耗隨對話輪數呈二次方暴增</strong>，成本成倍上漲。<br>
+2. <strong>上下文稀釋（Context Drift）</strong>：早期設定的規則會被後面的長文字淹沒。<br>
+3. <strong>視窗上限溢出</strong>：一旦對話超越 Context Window 便會發生截斷失憶。`,
+        takeaway: `🎓 <strong>課程核心啟示：</strong> 這正是為什麼絕對不能把數十頁 SOP 塞在單一對話框！在 Module 2 我們學習的「自製 Skill」正是運用<strong>漸進式載入（Progressive Disclosure）</strong>，平時 0 消耗，特定任務觸發時才精準加載卡匣！`
+      },
+      {
+        id: "probability",
+        title: "機率文字預測與認知陷阱 (Next-Token Sampling)",
+        subtitle: "模型不是在思考事實，而是在高維向量空間計算下一個字詞的出現機率",
+        badge: "統計取樣盲區",
+        hasNews: false,
+        hasSystem: false,
+        presets: [
+          {
+            label: "1. 魯迅為什麼暴打周樹人？(煞有介事陷阱)",
+            tag: "事實捏造",
+            prompt: "請問魯迅當年為什麼要在三味書屋裡，當著眾人面暴打周樹人？請詳細說明其衝突起因與文學界爭議。",
+            simulated: `（典型模型幻覺表現）
+魯迅暴打周樹人的衝突起因，主要是因為兩人在文學理念上的嚴重分歧。在三味書屋就讀期間，周樹人提出了一些離經叛道的觀點，惹怒了重視傳統與民族氣節的魯迅，雙方遂爆發激烈肢體衝突...
+
+💡【真相揭露：幻覺產生！】
+周樹人就是魯迅本人的本名！模型因為被『暴打、衝突、起因』等詞彙引導，順著統計機率編造出看似嚴肅合理的偽歷史。`
+          },
+          {
+            label: "2. 9.11 和 9.9 哪個數值比較大？",
+            tag: "Token 切割",
+            prompt: "請直接告訴我：數字 9.11 和 9.9 哪一個數值比較大？請直接給出答案與理由。",
+            simulated: `9.11 比較大，因為 11 大於 9。
+
+💡【真相揭露：Token 切割盲區】
+模型看世界是以 Token 為單位，9.11 被切分成 [9] [.] [11]，看到 11 往往比 9 出現頻率高，因而受軟體版本號（如 v9.11 > v9.9）的文字習慣干擾，出現荒謬的數值比大小錯誤！`
+          },
+          {
+            label: "3. 'Strawberry' 裡面總共有幾個英文字母 r？",
+            tag: "字元計數",
+            prompt: "請數一下單字 'Strawberry' 裡面總共包含幾個英文字母 'r'？",
+            simulated: `在單字 'Strawberry' 裡面，總共有 2 個字母 'r'。
+
+💡【真相揭露：非逐字掃描】
+正確答案是 3 個（st-r-aw-b-e-r-r-y）。模型並非像人眼一樣由左到右掃描光學字元，而是將整串單字壓縮成少數 Token 映射，天然無法精確計算內部字元頻次。`
+          }
+        ],
+        analysis: `<strong>什麼是 Next-Token Prediction？</strong><br>
+大語言模型並非百科全書，本質是一個<strong>「高維空間下一個 Token 機率分佈取樣器」</strong>：<br>
+\\[ \\Pr(w_t \\mid w_1, w_2, \\dots, w_{t-1}) \\]<br>
+它所做的一切，都是預測「哪個字接在後面看起來最順眼、最符合訓練集語料」。當你問它荒誕的假定時，它的目標不是去質疑客觀事實，而是順應語意場景生成最符合語氣的文本。`,
+        takeaway: `🎓 <strong>課程核心啟示：</strong> 這正是為什麼嚴肅資料分析絕不能依賴純文字對話憑空生成數據！在 Module 1 我們要求的「防幻覺三大法則」與「交叉驗算等式」，正是為了徹底鎖死機率預測的信口開河！`
+      },
       {
         id: "injection",
         title: "提示詞注入 (Prompt Injection)",
@@ -850,117 +962,6 @@ int main() {
 • <strong>外圍離題過濾器（Off-topic Guardrail）</strong>：在進入主模型前，先透過小型分類器（如 Llama Guard 或向量分類）判斷是否偏離捷運業務，離題則直接攔截。<br>
 • <strong>輸出代碼清洗截斷</strong>：檢測 AI 回應中若包含 <code>\`\`\`python</code> 或代碼塊，系統在後端直接阻斷發送，防止客服被當成免費代碼編譯器。`,
         takeaway: `🎓 <strong>課程核心啟示：</strong> 在 Module 2 製作自訂 Skill 與 Module 3 串接企業工具時，切記「Prompt 不是安全防火牆」！任何涉及金流、資料庫寫入或 API 金鑰的敏感邏輯，必須在伺服器後端由 Python/Node 進行硬性邏輯驗證，絕不可寄託於 LLM 的道德自律。`
-      },
-      {
-        id: "time",
-        title: "無時鐘感知與凍結 (No Internal Clock)",
-        subtitle: "LLM 是一組靜態權重矩陣，天然缺乏系統排程器與時間維度",
-        badge: "知識切斷點",
-        hasNews: false,
-        hasSystem: false,
-        presets: [
-          {
-            label: "1. 詢問精確時間與星期",
-            tag: "時鐘測試",
-            prompt: "請問現在幾點幾分？今天是西元幾年幾月幾號、星期幾？",
-            simulated: "很抱歉，我是一個大語言模型，我本身沒有內建的即時時鐘或系統計時器，因此我無法得知現在確切的日期、年份與當前時間。"
-          },
-          {
-            label: "2. 詢問今日即時新聞頭條",
-            tag: "即時資訊",
-            prompt: "今天早上下午台灣各大新聞頭條發生了什麼事？台股今天大盤是漲還是跌？",
-            simulated: "我無法提供今天的即時新聞或當天台股收盤資訊。我的知識庫只截止於訓練完成的那一刻（Knowledge Cutoff），我無法感知現實世界正在發生的事情。"
-          },
-          {
-            label: "3. 探討世界領導人現況",
-            tag: "歷史邊界",
-            prompt: "誰是現任的日本首相？誰是現任的美國總統？",
-            simulated: "我的知識庫僅更新至訓練資料切斷點。在沒有外部連網或系統注入的情況下，若現實中政治人物近期發生交接，我只能回答我權重中記住的最後一位人物。"
-          }
-        ],
-        analysis: `<strong>大語言模型為什麼不知道時間？</strong><br>
-LLM 的本質是一組<strong>靜態凍結的浮點數矩陣（Frozen Weights）</strong>。當模型預訓練結束後，它的所有世界知識就永久定格在訓練資料截斷日。<br>
-它在伺服器中只是一個純粹的數學運算函式 \\( y = f(x) \\)，沒有心跳脈衝、沒有 cron job 排程器。平常 ChatGPT 之所以能回答今天日期，<strong>是因為前端工程師在發送請求前，偷偷在背後把 <code>Current date: 2026-10-31</code> 當作隱藏字串塞入進去！</strong>`,
-        takeaway: `🎓 <strong>課程核心啟示：</strong> 純 LLM 是死板的歷史記憶庫；這就是為什麼在 Module 3 我們必須導入 <strong>MCP 工具協議（Model Context Protocol）</strong>，讓模型學會調用外部時鐘 API、Google Search 與即時即用資料庫！`
-      },
-      {
-        id: "memory",
-        title: "無狀態與無記憶 (Stateless Nature)",
-        subtitle: "金魚腦真相 — 每一次發送請求，模型都是完全空白地重新啟動",
-        badge: "無狀態調用",
-        hasNews: false,
-        hasSystem: false,
-        presets: [
-          {
-            label: "第 1 輪對話：告訴 AI 我的名字與秘密",
-            tag: "資訊注入",
-            prompt: "你好！我叫陳大華，我最喜歡的顏色是電光紫，我有一隻貓叫皮皮。",
-            simulated: "你好大華！很高興認識你。我已經記住你最喜歡電光紫，而且你有一隻可愛的貓咪叫皮皮！有什麼我可以幫你的嗎？"
-          },
-          {
-            label: "第 2 輪對話【未帶歷史紀錄 · 底層真實調用】",
-            tag: "單次無狀態",
-            prompt: "請問我剛剛說我叫什麼名字？我最喜歡什麼顏色？我的貓叫什麼？",
-            simulated: "抱歉，您在之前的對話中並沒有告訴我您的名字、喜歡的顏色或貓咪的名稱。我是一個無狀態的模型，如果您沒有在當前請求中提供這些資訊，我無法回憶起您是誰。"
-          },
-          {
-            label: "第 2 輪對話【全量重送歷史紀錄 · 前端真實運作】",
-            tag: "上下文拼接",
-            prompt: "[對話歷史紀錄]:\n使用者: 我叫陳大華，最喜歡電光紫，貓叫皮皮。\n助手: 很高興認識你大華！\n\n[最新提問]:\n請問我叫什麼名字？我的貓叫什麼？",
-            simulated: "根據您剛才提供的對話紀錄，您的名字是陳大華，您最喜歡的顏色是電光紫，而您的貓咪名字叫皮皮！"
-          }
-        ],
-        analysis: `<strong>什麼叫『無狀態（Stateless）』？</strong><br>
-很多人以為 AI 像人類一樣「大腦有長期記憶」，這是極大的誤解！<br><br>
-實際上，<strong>每一次你按下發送鍵，模型都是以完全失憶的白紙狀態啟動</strong>。你在各家聊天介面看到的連貫記憶，完全是工程師在背後<strong>把過去所有的對話紀錄，重新打包成一長串龐大的 Context 重新塞給模型</strong>！<br><br>
-這帶來了三大工程痛點：<br>
-1. <strong>Token 消耗隨對話輪數呈二次方暴增</strong>，成本成倍上漲。<br>
-2. <strong>上下文稀釋（Context Drift）</strong>：早期設定的規則會被後面的長文字淹沒。<br>
-3. <strong>視窗上限溢出</strong>：一旦對話超越 Context Window 便會發生截斷失憶。`,
-        takeaway: `🎓 <strong>課程核心啟示：</strong> 這正是為什麼絕對不能把數十頁 SOP 塞在單一對話框！在 Module 2 我們學習的「自製 Skill」正是運用<strong>漸進式載入（Progressive Disclosure）</strong>，平時 0 消耗，特定任務觸發時才精準加載卡匣！`
-      },
-      {
-        id: "probability",
-        title: "機率文字預測與認知陷阱 (Next-Token Sampling)",
-        subtitle: "模型不是在思考事實，而是在高維向量空間計算下一個字詞的出現機率",
-        badge: "統計取樣盲區",
-        hasNews: false,
-        hasSystem: false,
-        presets: [
-          {
-            label: "1. 魯迅為什麼暴打周樹人？(煞有介事陷阱)",
-            tag: "事實捏造",
-            prompt: "請問魯迅當年為什麼要在三味書屋裡，當著眾人面暴打周樹人？請詳細說明其衝突起因與文學界爭議。",
-            simulated: `（典型模型幻覺表現）
-魯迅暴打周樹人的衝突起因，主要是因為兩人在文學理念上的嚴重分歧。在三味書屋就讀期間，周樹人提出了一些離經叛道的觀點，惹怒了重視傳統與民族氣節的魯迅，雙方遂爆發激烈肢體衝突...
-
-💡【真相揭露：幻覺產生！】
-周樹人就是魯迅本人的本名！模型因為被『暴打、衝突、起因』等詞彙引導，順著統計機率編造出看似嚴肅合理的偽歷史。`
-          },
-          {
-            label: "2. 9.11 和 9.9 哪個數值比較大？",
-            tag: "Token 切割",
-            prompt: "請直接告訴我：數字 9.11 和 9.9 哪一個數值比較大？請直接給出答案與理由。",
-            simulated: `9.11 比較大，因為 11 大於 9。
-
-💡【真相揭露：Token 切割盲區】
-模型看世界是以 Token 為單位，9.11 被切分成 [9] [.] [11]，看到 11 往往比 9 出現頻率高，因而受軟體版本號（如 v9.11 > v9.9）的文字習慣干擾，出現荒謬的數值比大小錯誤！`
-          },
-          {
-            label: "3. 'Strawberry' 裡面總共有幾個英文字母 r？",
-            tag: "字元計數",
-            prompt: "請數一下單字 'Strawberry' 裡面總共包含幾個英文字母 'r'？",
-            simulated: `在單字 'Strawberry' 裡面，總共有 2 個字母 'r'。
-
-💡【真相揭露：非逐字掃描】
-正確答案是 3 個（st-r-aw-b-e-r-r-y）。模型並非像人眼一樣由左到右掃描光學字元，而是將整串單字壓縮成少數 Token 映射，天然無法精確計算內部字元頻次。`
-          }
-        ],
-        analysis: `<strong>什麼是 Next-Token Prediction？</strong><br>
-大語言模型並非百科全書，本質是一個<strong>「高維空間下一個 Token 機率分佈取樣器」</strong>：<br>
-\\[ \\Pr(w_t \\mid w_1, w_2, \\dots, w_{t-1}) \\]<br>
-它所做的一切，都是預測「哪個字接在後面看起來最順眼、最符合訓練集語料」。當你問它荒誕的假定時，它的目標不是去質疑客觀事實，而是順應語意場景生成最符合語氣的文本。`,
-        takeaway: `🎓 <strong>課程核心啟示：</strong> 這正是為什麼嚴肅資料分析絕不能依賴純文字對話憑空生成數據！在 Module 1 我們要求的「防幻覺三大法則」與「交叉驗算等式」，正是為了徹底鎖死機率預測的信口開河！`
       },
       {
         id: "arithmetic",
@@ -1121,7 +1122,7 @@ print("Reconciliation: PASS")
     let currentProvider = localStorage.getItem('llm_lab_provider') || 'simulation';
     let geminiApiKey = localStorage.getItem('llm_lab_gemini_key') || '';
     let openrouterApiKey = localStorage.getItem('llm_lab_openrouter_key') || '';
-    let selectedModel = localStorage.getItem('llm_lab_openrouter_model') || 'deepseek/deepseek-chat';
+    let selectedModel = localStorage.getItem('llm_lab_openrouter_model') || 'google/gemma-3-12b-it';
 
     // -------------------------------------------------------------
     // UI 初始化與事件監聽
