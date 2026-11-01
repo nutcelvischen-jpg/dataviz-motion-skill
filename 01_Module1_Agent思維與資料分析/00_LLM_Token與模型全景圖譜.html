@@ -171,6 +171,7 @@
     /* Section Headings */
     .section-block {
       padding: 56px 0 20px;
+      scroll-margin-top: 64px;
     }
     .section-header {
       margin-bottom: 24px;
@@ -689,6 +690,293 @@
       .glossary-grid { grid-template-columns: 1fr; }
       .models-grid { grid-template-columns: 1fr; }
     }
+  
+    /* ============================================================
+       🍓 STRAWBERRY VISUAL PARADOX LAB (雙軌可視化流程)
+       ============================================================ */
+    .strawberry-deep-dive {
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 8px;
+      padding: 24px;
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    .strawberry-header {
+      margin-bottom: 20px;
+    }
+    .strawberry-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-coral);
+      background: rgba(194, 65, 12, 0.08);
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .strawberry-title {
+      font-family: var(--font-title);
+      font-size: 26px;
+      color: var(--ink);
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+    .strawberry-subtitle {
+      font-size: 13px;
+      color: var(--ink-secondary);
+      line-height: 1.6;
+    }
+
+    .dual-track-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 820px) {
+      .dual-track-container { grid-template-columns: 1fr; }
+    }
+
+    .track-card {
+      background: var(--paper-tint);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .track-card.track-human {
+      border-left: 4px solid var(--accent-green);
+    }
+    .track-card.track-ai {
+      border-left: 4px solid var(--accent-coral);
+    }
+
+    .track-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--rule-solid);
+    }
+    .track-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .tag-human { color: var(--accent-green); }
+    .tag-ai { color: var(--accent-coral); }
+    .track-status {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--accent-green);
+      background: rgba(21, 128, 61, 0.08);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .track-status.warn {
+      color: var(--accent-coral);
+      background: rgba(194, 65, 12, 0.08);
+    }
+
+    .flow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .flow-step {
+      display: flex;
+      gap: 12px;
+      background: var(--paper-card);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-muted);
+      min-width: 20px;
+    }
+    .step-content {
+      flex: 1;
+    }
+    .step-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .step-desc {
+      font-size: 11px;
+      color: var(--ink-secondary);
+      line-height: 1.5;
+    }
+
+    /* Visual Letters for Human */
+    .char-boxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 8px;
+    }
+    .char-box {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      background: #f1f5f9;
+      color: #334155;
+      padding: 4px 8px;
+      border-radius: 3px;
+      border: 1px solid #cbd5e1;
+      position: relative;
+    }
+    .char-box.hit-r {
+      background: #dcfce7;
+      color: #166534;
+      border-color: #86efac;
+      box-shadow: 0 0 0 1px #86efac;
+    }
+    .r-badge {
+      position: absolute;
+      top: -8px;
+      right: -6px;
+      font-size: 9px;
+      font-weight: 800;
+      background: #166534;
+      color: #fff;
+      border-radius: 10px;
+      padding: 0 4px;
+      line-height: 14px;
+    }
+
+    /* Visual Chunks for AI */
+    .token-boxes {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .token-chunk {
+      display: flex;
+      flex-direction: column;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+    }
+    .token-chunk.t-c1 {
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+    }
+    .token-chunk.t-c2 {
+      background: #ffedd5;
+      border: 1px solid #fdba74;
+    }
+    .token-chunk .t-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .token-chunk .t-id {
+      font-size: 9px;
+      color: var(--ink-secondary);
+    }
+    .t-plus {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--ink-muted);
+    }
+
+    .vector-box {
+      background: #1a1917;
+      color: #a8a29e;
+      border-radius: 4px;
+      padding: 6px 10px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      line-height: 1.5;
+      margin-top: 6px;
+    }
+    .vector-box code { color: #facc15; }
+
+    .result-badge-human {
+      margin-top: 8px;
+      background: rgba(21, 128, 61, 0.1);
+      color: var(--accent-green);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(21, 128, 61, 0.25);
+    }
+    .result-badge-ai {
+      margin-top: 8px;
+      background: rgba(194, 65, 12, 0.1);
+      color: var(--accent-coral);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(194, 65, 12, 0.25);
+    }
+
+    /* 3 Engineering Fixes Grid */
+    .fixes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+      background: var(--paper-tint);
+      padding: 16px;
+      border-radius: 6px;
+      border: 1px solid var(--rule);
+    }
+    @media (max-width: 768px) {
+      .fixes-grid { grid-template-columns: 1fr; }
+    }
+    .fix-card {
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 5px;
+      padding: 12px;
+    }
+    .fix-num {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent-coral);
+      background: rgba(194, 65, 12, 0.08);
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-bottom: 6px;
+    }
+    .fix-card h4 {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .fix-card p {
+      font-size: 11px;
+      color: var(--ink-secondary);
+      line-height: 1.5;
+    }
+    .fix-card code {
+      font-family: var(--font-mono);
+      background: var(--paper-tint);
+      padding: 1px 4px;
+      border-radius: 2px;
+      color: var(--accent-coral);
+    }
+
   </style>
 </head>
 <body>
@@ -787,13 +1075,142 @@
       </div>
 
       <!-- Strawberry Paradox Notice -->
-      <div id="strawberry" class="paradox-banner">
-        <div class="paradox-icon">🍓</div>
-        <div class="paradox-content">
-          <h4>經典認知陷阱：為什麼早期 ChatGPT 數不出「strawberry」裡面有幾個「r」？</h4>
-          <p>
-            因為在 BPE Tokenizer 的詞彙庫中，「strawberry」直接被切割為兩個獨立 Token：<code>straw</code> (Token ID 11245) 與 <code>berry</code> (Token ID 32884)！模型從頭到尾根本「看不見」單獨的英文字母 <code>r</code>，它看到的是兩個語意向量。當你要求它數字母時，它只能憑統計機率猜測，因而頻繁出錯！這正是 Tokenize 機制帶來的結構性特徵。
+      <div id="strawberry" class="strawberry-deep-dive">
+        <div class="strawberry-header">
+          <div class="strawberry-badge">🍓 經典字母計數陷阱視覺解密 · THE STRAWBERRY PARADOX</div>
+          <h3 class="strawberry-title">為什麼大語言模型連小學生都會的「數字母」都數錯？</h3>
+          <p class="strawberry-subtitle">
+            你問早期 ChatGPT：「strawberry 裡面有幾個 r？」它會自信地回答「2 個」。這絕非 AI 智商低，而是分詞壓縮帶來的<strong>「感官盲區（Sensory Blindness）」</strong>！請跟隨下方雙軌流程圖，看清人類眼睛與神經網路的認知鴻溝：
           </p>
+        </div>
+
+        <!-- Dual Track Visual Flow -->
+        <div class="dual-track-container">
+          
+          <!-- Track 1: Human Eye Optical Scan -->
+          <div class="track-card track-human">
+            <div class="track-header">
+              <span class="track-tag tag-human">👁️ 人類認知路徑 · 字元級光學掃描 (100% 確定)</span>
+              <span class="track-status">零認知盲區</span>
+            </div>
+
+            <div class="flow-steps">
+              <div class="flow-step">
+                <div class="step-num">01</div>
+                <div class="step-content">
+                  <div class="step-title">視網膜光學感應與字元分離</div>
+                  <div class="step-desc">人類肉眼一眼望去，單字被拆解為 10 個清晰分離的英文字母實體：</div>
+                  <div class="char-boxes">
+                    <span class="char-box">s</span>
+                    <span class="char-box">t</span>
+                    <span class="char-box hit-r">r<span class="r-badge">#1</span></span>
+                    <span class="char-box">a</span>
+                    <span class="char-box">w</span>
+                    <span class="char-box">b</span>
+                    <span class="char-box">e</span>
+                    <span class="char-box hit-r">r<span class="r-badge">#2</span></span>
+                    <span class="char-box hit-r">r<span class="r-badge">#3</span></span>
+                    <span class="char-box">y</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flow-step">
+                <div class="step-num">02</div>
+                <div class="step-content">
+                  <div class="step-title">大腦指針循序點名比對 (Pointer Scan)</div>
+                  <div class="step-desc">
+                    視線由左至右移動：第 3 位是 <code>'r'</code>，第 8 位是 <code>'r'</code>，第 9 位是 <code>'r'</code>。
+                  </div>
+                </div>
+              </div>
+
+              <div class="flow-step">
+                <div class="step-num">03</div>
+                <div class="step-content">
+                  <div class="step-title">確定性算術相加</div>
+                  <div class="step-desc">大腦將 3 次命中做累加：<code>1 + 1 + 1 = 3</code>。</div>
+                  <div class="result-badge-human">🎯 人類結論：精確命中 3 個 'r' (毫無負擔)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Track 2: LLM BPE Tokenizer Vector -->
+          <div class="track-card track-ai">
+            <div class="track-header">
+              <span class="track-tag tag-ai">🤖 LLM 運算路徑 · BPE 分詞黑盒子 (結構性盲區)</span>
+              <span class="track-status warn">字母實體完全消失</span>
+            </div>
+
+            <div class="flow-steps">
+              <div class="flow-step">
+                <div class="step-num">01</div>
+                <div class="step-content">
+                  <div class="step-title">BPE 切詞機查字典切塊 (Tokenize)</div>
+                  <div class="step-desc">Tokenizer 追求高壓縮率，將單字直接切成 2 塊語義積木：</div>
+                  <div class="token-boxes">
+                    <span class="token-chunk t-c1">
+                      <span class="t-name">Token #1: "straw"</span>
+                      <span class="t-id">ID: 11245</span>
+                    </span>
+                    <span class="t-plus">+</span>
+                    <span class="token-chunk t-c2">
+                      <span class="t-name">Token #2: "berry"</span>
+                      <span class="t-id">ID: 32884</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flow-step">
+                <div class="step-num">02</div>
+                <div class="step-content">
+                  <div class="step-title">神經網路高維向量化 (Embedding)</div>
+                  <div class="step-desc">
+                    Token 被轉換為 4096 維數學浮點數向量。<strong>英文字母完全被封閉在語義箱子裡</strong>，模型內部根本看不見字母拼寫！
+                  </div>
+                  <div class="vector-box">
+                    <code>straw ➔ [ 0.34, -0.81, 0.45, ... ] (稻草/吸管概念)</code><br>
+                    <code>berry ➔ [ -0.14, 0.77, 0.62, ... ] (莓果概念)</code>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flow-step">
+                <div class="step-num">03</div>
+                <div class="step-content">
+                  <div class="step-title">注意力偏誤與機率猜測 (Blind Guessing)</div>
+                  <div class="step-desc">
+                    模型沒有顯微鏡拆箱看字母！在語料中 "berry" 經常與 "double-r" (如 blueberry) 高度共現，注意力強烈指向「2」，脫口而出「有 2 個」，直接把前面 "straw" 的第 1 個 r 給忘了！
+                  </div>
+                  <div class="result-badge-ai">⚠️ 傳統 LLM 結論：頻繁猜錯為「2 個 'r'」</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Engineering Fixes -->
+        <div style="font-weight: 700; font-size: 13px; color: var(--ink); margin-top: 18px; margin-bottom: 6px;">
+          🛠️ 工程實務：徹底破解 Strawberry 陷阱的三大招式
+        </div>
+        <div class="fixes-grid">
+          <div class="fix-card">
+            <div class="fix-num">招式 1</div>
+            <h4>提示詞物理拆字 (Token Splitting)</h4>
+            <p>指示 Prompt：「請把 strawberry 每個字母用空格分開：<code>s t r a w b e r r y</code> 再數」。強制 Tokenizer 將每個字母切成 1 個 Token，模型重獲視力！</p>
+          </div>
+          <div class="fix-card">
+            <div class="fix-num">招式 2</div>
+            <h4>工具調用與 Python 執行 (Tool Calling)</h4>
+            <p>讓 AI 撰寫代碼執行：<code>"strawberry".count("r") ➔ 3</code>。以確定性程式消除機率幻覺，此為 Module 1 數據分析核心理念！</p>
+          </div>
+          <div class="fix-card">
+            <div class="fix-num">招式 3</div>
+            <h4>新一代 Reasoning 思維模型</h4>
+            <p>使用 DeepSeek-R1、Claude 3.7 Sonnet 或 o3-mini。模型在 <code>&lt;think&gt;</code> 內建思維鏈中自主拆解字母驗算，自帶自我審查與反思！</p>
+          </div>
         </div>
       </div>
 
@@ -946,47 +1363,47 @@
 
     <!-- Models Grid -->
     <div class="models-grid" id="modelsGrid">
-      <!-- OpenAI -->
+      <!-- 1. OpenAI -->
       <div class="model-card" data-category="frontier">
         <div class="model-card-top">
           <div class="model-header">
-            <span class="model-company">OPENAI · 美國</span>
-            <span class="model-tag-pill tag-cloud">雲端多模態旗艦</span>
+            <span class="model-company">OPENAI · 美國 (FRONTIER & REASONING)</span>
+            <span class="model-tag-pill tag-cloud">雙軌旗艦 · o3 推理 / 4.5 Orion</span>
           </div>
-          <div class="model-name">GPT-4o & GPT-4o-mini</div>
+          <div class="model-name">OpenAI o3, o3-mini & GPT-4.5 Orion</div>
           <p class="model-summary">
-            全球商業落地最廣泛的旗艦模型。原生全模態架構（文字、視覺、音訊同源處理），具備頂級指令遵循能力與極低延遲。
+            OpenAI 形成「強化推理」與「超大預訓練」雙軌格局：<strong>o3 & o3-mini</strong> 具備可調思維深度（Low/Med/High）、視覺深度推理與代碼執行，GPQA Diamond 達 87.7%；<strong>GPT-4.5 (研發代號 Orion)</strong> 為萬億級無監督學習旗艦，專精情感直覺、常識理解與極低幻覺；<strong>GPT-4o</strong> 則為全模態即時交互標竿。業界亦高度關注次世代統一架構（GPT-5/6 及實驗代號如 Luna/Terra 等多模態自主 Agent 專案）。
           </p>
           <div class="model-specs">
             <div class="spec-item">
               <span class="spec-label">上下文視窗</span>
-              <span class="spec-value">128K Tokens</span>
+              <span class="spec-value">128K ~ 200K Tokens</span>
             </div>
             <div class="spec-item">
               <span class="spec-label">輸入價格</span>
-              <span class="spec-value">$2.50 / $0.15 (mini)</span>
+              <span class="spec-value">$1.10 (o3-mini) / $2.50 (4o)</span>
             </div>
             <div class="spec-item">
               <span class="spec-label">核心強項</span>
-              <span class="spec-value">通用智能 · 生態豐富</span>
+              <span class="spec-value">STEM 頂級推理 · 工具生態完整</span>
             </div>
           </div>
         </div>
         <div class="model-strengths">
-          <strong>適合場景：</strong> 企業級穩定生產環境、複雜多步驟 Agent 推理、結構化 JSON Schema 強制輸出。
+          <strong>適合場景：</strong> 高難度程式庫架構推演、多步驟 Agent 自主規劃、高準確性金融/法律決策。
         </div>
       </div>
 
-      <!-- Anthropic Claude -->
+      <!-- 2. Anthropic Claude -->
       <div class="model-card" data-category="frontier">
         <div class="model-card-top">
           <div class="model-header">
-            <span class="model-company">ANTHROPIC · 美國</span>
-            <span class="model-tag-pill tag-cloud">編程與邏輯天花板</span>
+            <span class="model-company">ANTHROPIC · 美國 (HYBRID REASONING)</span>
+            <span class="model-tag-pill tag-cloud">混合推理 · 編程工程首選</span>
           </div>
-          <div class="model-name">Claude 3.5 Sonnet</div>
+          <div class="model-name">Claude 3.7 Sonnet & 3.5 Sonnet / Haiku</div>
           <p class="model-summary">
-            由前 OpenAI 核心成員創立，目前在軟體工程（SWE-bench）與複雜長文本代碼生成領域公認的第一把交椅。文筆自然典雅，AI 味最淡。
+            最新發布全球首款<strong>混合推理（Hybrid Reasoning）</strong>旗艦 <strong>Claude 3.7 Sonnet</strong>！允許開發者自由調節 Extended Thinking 思維時間，在 SWE-bench Verified 創下全球軟體工程紀錄，搭配官方 Claude Code 工具成為全球頂級工程師標配；文筆自然高雅、無 AI 公式化痕跡。高階 3.5 Opus 與次世代架構探索（Fable）亦是業界焦點。
           </p>
           <div class="model-specs">
             <div class="spec-item">
@@ -995,60 +1412,60 @@
             </div>
             <div class="spec-item">
               <span class="spec-label">輸入價格</span>
-              <span class="spec-value">$3.00 / 1M</span>
+              <span class="spec-value">$3.00 / 1M ($0.80 Haiku)</span>
             </div>
             <div class="spec-item">
               <span class="spec-label">核心強項</span>
-              <span class="spec-value">寫 Code · 深度推理</span>
+              <span class="spec-value">全端寫 Code · 深度混合思考</span>
             </div>
           </div>
         </div>
         <div class="model-strengths">
-          <strong>適合場景：</strong> 專業代碼重構、大型專案架構審查、長篇學術研究論文閱讀與分析。
+          <strong>適合場景：</strong> 全端架構重構、複雜代碼庫修復、長篇商業報告與論文無痕改寫。
         </div>
       </div>
 
-      <!-- Google Gemini -->
+      <!-- 3. Google Gemini -->
       <div class="model-card" data-category="frontier">
         <div class="model-card-top">
           <div class="model-header">
-            <span class="model-company">GOOGLE DEEPMIND · 美國</span>
-            <span class="model-tag-pill tag-cloud">超長上下文之王</span>
+            <span class="model-company">GOOGLE DEEPMIND · 美國 (MULTIMODAL & CO-REASONING)</span>
+            <span class="model-tag-pill tag-cloud">200萬超長窗 · Flash 極速多模態</span>
           </div>
-          <div class="model-name">Gemini 1.5 / 2.5 Pro & Flash</div>
+          <div class="model-name">Gemini 2.0 Flash / Flash Thinking · 2.0 Pro</div>
           <p class="model-summary">
-            以業界首創的「百萬級超長上下文」震撼業界。可一次性載入 1 小時影片、數百頁財報或整套程式庫；結合 Google 搜尋與工作區生態。
+            以業界首創的「百萬級原生多模態超長上下文」（最高 200 萬 Token）領跑！<strong>Gemini 2.0 Flash</strong> 達成端到端極速影音理解；<strong>Gemini 2.0 Flash Thinking Experimental</strong> 則結合了 Flash 極速與透明思維鏈（CoT）推理；<strong>Gemini 2.0 Pro</strong> 專精高難度提示詞與複雜程式工程。內部持續推進 Argon、Carbon 前瞻實驗，技術儲備直指 Gemini 3.x 世代。
           </p>
           <div class="model-specs">
             <div class="spec-item">
               <span class="spec-label">上下文視窗</span>
-              <span class="spec-value">1M ~ 2M Tokens</span>
+              <span class="spec-value">1M ~ 2M Tokens (百萬級)</span>
             </div>
             <div class="spec-item">
               <span class="spec-label">輸入價格</span>
-              <span class="spec-value">$1.25 / $0.075 (Flash)</span>
+              <span class="spec-value">$0.075 (Flash) / $1.25 (Pro)</span>
             </div>
             <div class="spec-item">
               <span class="spec-label">核心強項</span>
-              <span class="spec-value">200萬超長窗 · 影音分析</span>
+              <span class="spec-value">200萬超長窗 · 影音同源理解</span>
             </div>
           </div>
         </div>
         <div class="model-strengths">
-          <strong>適合場景：</strong> 全年財務年報交叉勾稽、多小時錄音與影片轉錄、巨型專案完整代碼庫靜態分析。
+          <strong>適合場景：</strong> 整年財報即時勾稽、小時級影片轉錄、巨型代碼庫靜態全量分析。
         </div>
       </div>
 
-      <!-- DeepSeek -->
+      <!-- 4. DeepSeek -->
       <div class="model-card" data-category="open">
         <div class="model-card-top">
           <div class="model-header">
-            <span class="model-company">DEEPSEEK · 中國杭州</span>
-            <span class="model-tag-pill tag-open">極致性價比 · 開源巨震</span>
+            <span class="model-company">DEEPSEEK · 中國杭州 (OPEN-WEIGHT DISRUPTION)</span>
+            <span class="model-tag-pill tag-open">開源 MoE 巨震 · 純 RL 滿血推理</span>
           </div>
-          <div class="model-name">DeepSeek-V3 & DeepSeek-R1</div>
+          <div class="model-name">DeepSeek-V3 & DeepSeek-R1 (671B MoE)</div>
           <p class="model-summary">
-            2025 年引發全球 AI 界震撼的黑馬。採用創新的 Multi-head Latent Attention (MLA) 與 DeepSeekMoE 架構，以僅有美國巨頭十分之一的成本實現匹敵頂級閉源模型的能力！R1 更在數學推理上達標頂峰。
+            引發全球 AI 產業格局劇震的開源奇蹟！<strong>DeepSeek-V3</strong> 擁有 671B 總參數與 37B 啟動參數，首創 MLA 多頭潛在注意力機制與無輔助損失負載平衡，訓練成本僅約 600 萬美元；<strong>DeepSeek-R1</strong> 透過大規模純強化學習（Pure RL）訓練出足以抗衡西方頂級閉源模型（o1/o3）的滿血推理能力，價格僅其二十分之一，並開源全套權重供本機部署。
           </p>
           <div class="model-specs">
             <div class="spec-item">
@@ -1057,29 +1474,29 @@
             </div>
             <div class="spec-item">
               <span class="spec-label">輸入價格</span>
-              <span class="spec-value">$0.14 / 1M (極便宜)</span>
+              <span class="spec-value">$0.14 / 1M (開源權重免費)</span>
             </div>
             <div class="spec-item">
               <span class="spec-label">核心強項</span>
-              <span class="spec-value">數學推理 · 1/20 成本</span>
+              <span class="spec-value">純 RL 推理 · 極致性價比</span>
             </div>
           </div>
         </div>
         <div class="model-strengths">
-          <strong>適合場景：</strong> 高並發批次資料分析、算術與演算法競賽、預算敏感型專案的最佳首選。
+          <strong>適合場景：</strong> 大規模批次數據清洗、演算法與數學競賽、預算敏感型企業私有化部署。
         </div>
       </div>
 
-      <!-- Alibaba Qwen -->
+      <!-- 5. Alibaba Qwen -->
       <div class="model-card" data-category="open">
         <div class="model-card-top">
           <div class="model-header">
-            <span class="model-company">ALIBABA CLOUD (阿里巴巴) · 中國</span>
-            <span class="model-tag-pill tag-open">開源社群全尺寸霸主</span>
+            <span class="model-company">ALIBABA CLOUD (阿里巴巴) · 中國 (OPEN & MAX)</span>
+            <span class="model-tag-pill tag-open">開源全尺寸霸主 · 萬億 MoE 旗艦</span>
           </div>
-          <div class="model-name">Qwen 2.5 (通義千問)</div>
+          <div class="model-name">Qwen 2.5-Max · Qwen 2.5-Coder (32B)</div>
           <p class="model-summary">
-            全球開源社群下載量最高的開源家族之一，涵蓋從 0.5B、7B、14B 到 72B 全尺寸模型。在多語言支援、中文語境、數學與代碼能力均位列開源榜首。
+            阿里巴巴旗下通義千問旗艦矩陣。<strong>Qwen 2.5-Max</strong> 作為千億/萬億級 MoE 模型，在國際權威基準直追 GPT-4o 與 Claude 3.5 Sonnet；開源端則涵蓋 0.5B 至 72B 全尺寸，其中 <strong>Qwen 2.5-Coder (32B)</strong> 被譽為開源寫 Code 最強神獸。在多語言支援、工具調用（Tool Calling）與數學能力上表現極為穩健。
           </p>
           <div class="model-specs">
             <div class="spec-item">
@@ -1087,35 +1504,35 @@
               <span class="spec-value">128K Tokens</span>
             </div>
             <div class="spec-item">
-              <span class="spec-label">開源授權</span>
-              <span class="spec-value">Apache 2.0 (多數開源)</span>
+              <span class="spec-label">授權形態</span>
+              <span class="spec-value">開源 Apache 2.0 / 雲端 API</span>
             </div>
             <div class="spec-item">
               <span class="spec-label">核心強項</span>
-              <span class="spec-value">地端自建 · 跨尺寸部署</span>
+              <span class="spec-value">全尺寸覆蓋 · 工具調用成熟</span>
             </div>
           </div>
         </div>
         <div class="model-strengths">
-          <strong>適合場景：</strong> 企業私有化地端部署、邊緣設備運行（7B）、金融與多語言本地化微調。
+          <strong>適合場景：</strong> 企業私有化本地部屬、邊緣輕量設備運行、中文與多語言在地化微調。
         </div>
       </div>
 
-      <!-- Moonshot Kimi -->
+      <!-- 6. Moonshot Kimi -->
       <div class="model-card" data-category="open">
         <div class="model-card-top">
           <div class="model-header">
-            <span class="model-company">MOONSHOT AI (月之暗面) · 中國北京</span>
-            <span class="model-tag-pill tag-cloud">中文長文本開拓者</span>
+            <span class="model-company">MOONSHOT AI (月之暗面) · 中國北京 (LONG-CONTEXT RL)</span>
+            <span class="model-tag-pill tag-cloud">長上下文 RL 推理 · 200萬長文本</span>
           </div>
-          <div class="model-name">Kimi (Moonshot v1)</div>
+          <div class="model-name">Kimi k1.5 · Kimi Chat (200萬長文本)</div>
           <p class="model-summary">
-            以 20 萬字無損超長上下文一戰成名。專注於中文長篇閱讀、專業法律合同解讀、網頁即時搜尋與整理，深受華語圈知識工作者歡迎。
+            華語圈長文本先驅。推出全新一代多模態推理模型 <strong>Kimi k1.5</strong>，專注於「長上下文強化學習（Long-Context RL）」，在無需複雜搜尋樹的情況下，透過大規模長思維鏈訓練，在 AIME 數學與 LiveCodeBench 上大幅超越傳統基準；Kimi Chat 支援 200 萬字無損長篇解讀。
           </p>
           <div class="model-specs">
             <div class="spec-item">
               <span class="spec-label">上下文視窗</span>
-              <span class="spec-value">200K Tokens</span>
+              <span class="spec-value">200 萬 Tokens</span>
             </div>
             <div class="spec-item">
               <span class="spec-label">部署形態</span>
@@ -1123,74 +1540,74 @@
             </div>
             <div class="spec-item">
               <span class="spec-label">核心強項</span>
-              <span class="spec-value">中文文案 · 文檔摘要</span>
+              <span class="spec-value">長思維強化學習 · 中文文案契約</span>
             </div>
           </div>
         </div>
         <div class="model-strengths">
-          <strong>適合場景：</strong> 幾十萬字投行研報梳理、中文合約風險審查、互聯網新聞熱點即時聯網搜集。
+          <strong>適合場景：</strong> 超長法律合同審查、長篇投行研報梳理、互聯網多模態檢索。
         </div>
       </div>
 
-      <!-- MiniMax -->
+      <!-- 7. MiniMax -->
       <div class="model-card" data-category="open">
         <div class="model-card-top">
           <div class="model-header">
-            <span class="model-company">MINIMAX (名之夢) · 中國上海</span>
-            <span class="model-tag-pill tag-cloud">多模態與海螺 AI</span>
+            <span class="model-company">MINIMAX (名之夢) · 中國上海 (HYBRID ATTENTION & VIDEO)</span>
+            <span class="model-tag-pill tag-cloud">400萬超長窗 · 擬真多模態</span>
           </div>
-          <div class="model-name">MiniMax-abab 6.5 & 海螺</div>
+          <div class="model-name">MiniMax-Text-01 (4M 上下文) · 海螺 AI</div>
           <p class="model-summary">
-            擁有自主研發的 MoE 架構語言模型，並在「語音合成（TTS）」與「高擬真視頻生成（Video-01）」領域名列前茅。旗下海螺 AI 具備強大的長對話陪伴與創作能力。
+            中國最具自主架構野心的 AI 獨角獸之一。<strong>MiniMax-Text-01</strong> 採用獨創的 Lightning Attention + Softmax Attention 混合架構，支援高達 <strong>400 萬 Tokens</strong> 的天文級上下文視窗！在多模態領域，旗下海螺 AI (Hailuo AI) 在語音合成（TTS）與 Video-01 高擬真影片生成領域名列世界前茅。
           </p>
           <div class="model-specs">
             <div class="spec-item">
               <span class="spec-label">上下文視窗</span>
-              <span class="spec-value">245K Tokens</span>
+              <span class="spec-value">400 萬 Tokens (4M)</span>
             </div>
             <div class="spec-item">
-              <span class="spec-label">多模態</span>
-              <span class="spec-value">文字 · 語音 · 視頻</span>
+              <span class="spec-label">多模態能力</span>
+              <span class="spec-value">文字 · 超擬真人聲 · 視頻 Video-01</span>
             </div>
             <div class="spec-item">
               <span class="spec-label">核心強項</span>
-              <span class="spec-value">擬真人聲 · 角色扮演</span>
+              <span class="spec-value">400萬混合注意 · 擬真視訊語音</span>
             </div>
           </div>
         </div>
         <div class="model-strengths">
-          <strong>適合場景：</strong> 互動式語音客服、數位人播報配音、多模態創意故事創作與娛樂社交應用。
+          <strong>適合場景：</strong> 超長歷史資料一次性載入、多模態娛樂與互動有聲陪伴、高品質視頻短片生成。
         </div>
       </div>
 
-      <!-- Ollama Local Engine -->
+      <!-- 8. Ollama Local Engine -->
       <div class="model-card" data-category="local">
         <div class="model-card-top">
           <div class="model-header">
-            <span class="model-company">OLLAMA · 開源工具</span>
-            <span class="model-tag-pill tag-local">地端離線引擎霸主</span>
+            <span class="model-company">OLLAMA · 開源生態 (LOCAL & AIR-GAPPED)</span>
+            <span class="model-tag-pill tag-local">100% 離線隱私 · 零費用地端引擎</span>
           </div>
-          <div class="model-name">Ollama (Local LLM Engine)</div>
+          <div class="model-name">Ollama (支援 DeepSeek-R1-Distill, Qwen 2.5, Llama 3.3)</div>
           <p class="model-summary">
-            不是單一模型，而是「讓你在自己電腦一行指令跑大模型」的最佳工具！支援 Llama 3、Qwen 2.5、DeepSeek-R1-Distill、Gemma 等，提供本機 11434 端口與標準 OpenAI 相容 API。
+            全球最受歡迎的本機模型執行引擎。透過 GGUF 4-bit 量化與 llama.cpp 底層優化，讓普通筆電（如 Apple Silicon M 系列晶片或 NVIDIA RTX 顯示卡）免聯網、一行指令即可本機秒開 DeepSeek-R1-Distill、Qwen 2.5-Coder、Llama 3.3 等頂級開源模型。提供相容 OpenAI 的本地 11434 端口。
           </p>
           <div class="model-specs">
             <div class="spec-item">
               <span class="spec-label">運行環境</span>
-              <span class="spec-value">Mac (Apple Silicon) / Linux / Win</span>
+              <span class="spec-value">Mac (Apple Silicon) / Linux / Windows</span>
             </div>
             <div class="spec-item">
               <span class="spec-label">Token 費用</span>
-              <span class="spec-value">$0.00 (完全免費)</span>
+              <span class="spec-value">$0.00 (完全免費無限推論)</span>
             </div>
             <div class="spec-item">
-              <span class="spec-label">網路需求</span>
-              <span class="spec-value">100% 離線可用</span>
+              <span class="spec-label">核心強項</span>
+              <span class="spec-value">100% 物理離線 · 零資料外洩</span>
             </div>
           </div>
         </div>
         <div class="model-strengths">
-          <strong>適合場景：</strong> 機密財務資料不聯網分析、個人電腦離線助手、無網路環境或機密隔離區（Air-Gapped）。
+          <strong>適合場景：</strong> 高機密財務/醫療資料分析、拔掉網路線（Air-gapped）作業、無月租個人 Agent。
         </div>
       </div>
     </div>
@@ -1246,7 +1663,7 @@
           <!-- Node 3: Supercomputer GPU Cluster -->
           <rect x="25" y="265" width="380" height="85" rx="4" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.6"/>
           <text x="40" y="292" fill="#1d4ed8" font-family="'Geist', sans-serif" font-size="12" font-weight="600">數萬張 H100 / TPU 超級叢集</text>
-          <text x="40" y="310" fill="#1a1917" font-family="'Geist Mono', monospace" font-size="9">GPT-4o / Claude 3.5 Sonnet / Gemini Pro</text>
+          <text x="40" y="310" fill="#1a1917" font-family="'Geist Mono', monospace" font-size="9">o3 / Claude 3.7 Sonnet / Gemini 2.0 / R1</text>
           <text x="40" y="328" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">數千億 MoE 頂級參數 · 智能推理天花板</text>
           <text x="40" y="342" fill="#15803d" font-family="'Geist Mono', monospace" font-size="8">零本機硬體門檻 · 即開即用</text>
 
@@ -1286,7 +1703,7 @@
           <!-- Node 3: Local Hardware Hardware (GPU/VRAM) -->
           <rect x="25" y="265" width="380" height="85" rx="4" fill="#ffffff" stroke="#c2410c" stroke-width="1.6"/>
           <text x="40" y="292" fill="#c2410c" font-family="'Geist', sans-serif" font-size="12" font-weight="600">本機晶片與顯存（Apple Silicon / RTX）</text>
-          <text x="40" y="310" fill="#1a1917" font-family="'Geist Mono', monospace" font-size="9">Llama 3.3 (8B/70B) · Qwen 2.5 · DeepSeek-R1-Distill</text>
+          <text x="40" y="310" fill="#1a1917" font-family="'Geist Mono', monospace" font-size="9">DeepSeek-R1-Distill · Qwen 2.5 · Llama 3.3</text>
           <text x="40" y="328" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">資料 100% 留存在內部磁碟 · 零外洩風險</text>
           <text x="40" y="342" fill="#c2410c" font-family="'Geist Mono', monospace" font-size="8">依賴本地顯存 (8GB 跑 7B, 24GB+ 跑 32B/70B)</text>
 
@@ -1392,12 +1809,16 @@
     };
 
     const PRICING_MODELS = [
-      { name: "DeepSeek-V3", vendor: "DeepSeek", costPerM: 0.14, color: "#15803d" },
-      { name: "Gemini 2.5 Flash", vendor: "Google", costPerM: 0.075, color: "#1d4ed8" },
+      { name: "Gemini 2.0 Flash", vendor: "Google DeepMind", costPerM: 0.075, color: "#1d4ed8" },
+      { name: "DeepSeek-V3 / R1", vendor: "DeepSeek (中國杭州)", costPerM: 0.14, color: "#15803d" },
       { name: "GPT-4o-mini", vendor: "OpenAI", costPerM: 0.15, color: "#c2410c" },
       { name: "Claude 3.5 Haiku", vendor: "Anthropic", costPerM: 0.80, color: "#7e22ce" },
+      { name: "OpenAI o3-mini", vendor: "OpenAI (STEM 推理)", costPerM: 1.10, color: "#ea580c" },
+      { name: "Qwen 2.5-Max", vendor: "Alibaba Cloud", costPerM: 1.60, color: "#0284c7" },
       { name: "GPT-4o", vendor: "OpenAI", costPerM: 2.50, color: "#1a1917" },
-      { name: "Claude 3.5 Sonnet", vendor: "Anthropic", costPerM: 3.00, color: "#7e22ce" }
+      { name: "Claude 3.7 Sonnet", vendor: "Anthropic (混合推理)", costPerM: 3.00, color: "#7e22ce" },
+      { name: "GPT-4.5 (Orion)", vendor: "OpenAI (旗艦無監督)", costPerM: 75.00, color: "#475569" },
+      { name: "Ollama (Local)", vendor: "本機離線私有化", costPerM: 0.00, color: "#16a34a" }
     ];
 
     function setPreset(key) {
