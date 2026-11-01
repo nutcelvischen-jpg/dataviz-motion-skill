@@ -2729,34 +2729,34 @@ You are an interactive CLI tool that helps users with software engineering tasks
         </div>
       </div>
 
-      <!-- 7. Moonshot Kimi K3.1 Pro -->
+      <!-- 7. Moonshot Kimi (月之暗面) -->
       <div class="model-card" data-category="open local">
         <div class="model-card-top">
           <div class="model-header">
-            <span class="model-company">MOONSHOT AI (月之暗面) · 中國北京 (LATENT MOE & 3D PARAMETRIC)</span>
-            <span class="model-tag-pill tag-open">3T 級 MoE · KDA 稀疏注意力 · 3D Make 列印</span>
+            <span class="model-company">MOONSHOT AI (月之暗面) · 中國 (LONG-CONTEXT & 3D MULTIMODAL)</span>
+            <span class="model-tag-pill tag-open">長文本神器 · 百萬字長文精讀 · 3D 空間建模</span>
           </div>
-          <div class="model-name">Kimi K3.1 Pro & Kimi K3 (3T 級開放權重)</div>
+          <div class="model-name">Kimi 系列 · 月之暗面 (長文本研讀之王)</div>
           <p class="model-summary">
-            總參數達 2.8T~3.0T（激活 104B），全球最大開放權重之一。獨創 <strong>KDA（Kimi Delta Attention）</strong> 結合 24 層門控 MLA 與 Attention Residuals，構建 896 個專家（16 路由 + 2 共享）Stable LatentMoE；內建 401M MoonViT-V2 原生視覺編碼器；長程多文檔 OfficeQA Pro v2 達 64.4，空間參數建模 BenchCAD 達 92.7%，上線具備實體 3D 列印導出能力的 <strong>3D Make</strong> 功能。
+            <strong>Kimi</strong> 是由清華學霸楊植麟創立的中國知名 AI 公司「月之暗面（Moonshot AI）」研發。在華人圈以<strong>「超長文本閱讀理解之王」</strong>極速爆紅，最核心的標誌性能力是一鍵讀入幾十萬字的多份財務報表、整套法律合約、大部頭學術論文或整本小說，秒速完成深度研讀、交叉比對與精準提煉。底層採用先進的<strong>混合專家（MoE）架構</strong>，具備 100 萬字（1M Tokens）超大上下文吞吐量，並支援圖片視覺分析與實體 3D 列印空間建模（3D Make）。
           </p>
           <div class="model-specs">
             <div class="spec-item">
-              <span class="spec-label">上下文視窗</span>
-              <span class="spec-value">1,048K Tokens (1M 脈絡)</span>
+              <span class="spec-label">創辦機構</span>
+              <span class="spec-value">月之暗面 (Moonshot AI)</span>
             </div>
             <div class="spec-item">
-              <span class="spec-label">雲端 API 費率</span>
-              <span class="spec-value">入 $2.00 / 出 $10.00 (Highspeed)</span>
+              <span class="spec-label">上下文長度</span>
+              <span class="spec-value">1,000,000 Tokens (百萬字精讀)</span>
             </div>
             <div class="spec-item">
-              <span class="spec-label">授權與部署</span>
-              <span class="spec-value">Kimi License 開放權重 (32× H100)</span>
+              <span class="spec-label">核心特長</span>
+              <span class="spec-value">超長文檔交叉比對 · 財報論文提煉</span>
             </div>
           </div>
         </div>
         <div class="model-strengths">
-          <strong>適合場景：</strong> 長程複雜工程審計、財報多文檔核對、實體 3D 參數化生成、高階私有雲算力節點。
+          <strong>適合場景：</strong> 多份超長合約/財報交叉比對、長篇論文深度總結、辦公文檔自動化、3D 空間建模。
         </div>
       </div>
 
@@ -2963,7 +2963,7 @@ You are an interactive CLI tool that helps users with software engineering tasks
             <td><span class="country-tag tag-cn">中國</span></td>
             <td><span class="country-tag tag-open-license">開放權重 (Kimi 許可)</span></td>
             <td class="mono-cell">1,048K Tokens</td>
-            <td>3T 級 MoE (104B 激活)；KDA+MLA 896專家；原生多模態與 3D 空間建模</td>
+            <td>月之暗面旗艦 MoE；百萬長文本理解；長篇論文財報精讀；3D 空間建模</td>
           </tr>
           <tr>
             <td><strong>MiniMax</strong></td>
@@ -3172,7 +3172,7 @@ You are an interactive CLI tool that helps users with software engineering tasks
             隨著序列長度普遍跨越百萬（1M Context）門檻，二次方計算複雜度與巨量 KV 快取（KV Cache）顯存霸佔成為最大瓶頸。中國研發團隊在演算法與底層系統軟體提出了三大原創解法：<br>
             • <strong>DeepSeek DSA（稀疏注意力）</strong>：在 Token 維度進行特徵壓縮與稀疏索引，打破長序列顯存瓶頸。<br>
             • <strong>MiniMax MSA（塊稀疏注意力）</strong>：預填充（Prefill）速度提升 9 倍、解碼（Decode）速度提升逾 15 倍。<br>
-            • <strong>月之暗面 KDA + AttnRes</strong>：結合門控 MLA 構建穩定 LatentMoE，成功支撐起 896 個專家的高度稀疏路由。<br><br>
+            • <strong>月之暗面 (Kimi) 稀疏混合專家</strong>：高效率長序列專家路由架構，專門支撐百萬字長文精讀與低延遲推理。<br><br>
             這證明前沿模型的擴展已從單純堆疊密集參數，全面轉向演算法架構、通訊拓撲與專用硬體的緊密協同。
           </p>
         </div>
@@ -3677,6 +3677,102 @@ You are an interactive CLI tool that helps users with software engineering tasks
           </div>
 
         </div>
+
+
+        <!-- ============================================================
+             08. FINE-TUNING (洗模型) & LORA (低秩適應) + UNSLOTH AI
+             ============================================================ -->
+        <div style="margin-top: 28px; background: #fdfefe; border: 1.5px solid #bbf7d0; border-radius: 8px; padding: 22px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="background: #16a34a; color: #fff; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; font-family: var(--font-mono);">08 / MODEL ADAPTATION</span>
+              <strong style="font-size: 18px; color: var(--ink);">Fine-tuning（洗模型 / 微調）與 LoRA：如何給 AI 大腦裝專屬外掛？</strong>
+            </div>
+            <a href="https://unsloth.ai" target="_blank" style="font-size: 12px; color: #15803d; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #86efac; padding: 4px 10px; border-radius: 20px; background: #f0fdf4;">
+              🦥 探索 Unsloth AI 官網 ➔
+            </a>
+          </div>
+
+          <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.6; margin-bottom: 14px;">
+            很多人問：大模型已經很聰明，為什麼還需要<strong>「Fine-tune（微調，業界俗稱洗模型）」</strong>？又為什麼現在所有人都在用 <strong>LoRA</strong> 與 <strong>Unsloth</strong>？
+          </div>
+
+          <!-- Conceptual Comparison Grid -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 18px;">
+            
+            <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px;">
+              <strong style="font-size: 13px; color: #1e293b;">🎓 預訓練（Pre-training）＝ 讀完大學通識</strong>
+              <p style="font-size: 12px; color: #64748b; line-height: 1.6; margin-top: 6px;">
+                花費幾千萬美元、幾萬張 GPU 讀完全世界維基百科與互聯網。模型什麼都懂一點，是通才，但不懂您公司的專屬名詞、隱私數據與特殊業務格式。
+              </p>
+            </div>
+
+            <div style="background: #fff; border: 1.5px solid #86efac; border-radius: 6px; padding: 14px;">
+              <strong style="font-size: 13px; color: #15803d;">🎯 微調（Fine-tuning / 洗模型）＝ 企業崗前培訓</strong>
+              <p style="font-size: 12px; color: #475569; line-height: 1.6; margin-top: 6px;">
+                拿自家公司的 1,000 條客服對話、法務審查標準或醫療病例，對模型進行<strong>「定向特訓」</strong>。讓它一張口就是道地的行業行話、死守固定 JSON 格式！
+              </p>
+            </div>
+
+            <div style="background: #fff; border: 2px solid #16a34a; border-radius: 6px; padding: 14px; box-shadow: 0 2px 8px rgba(22,163,74,0.08);">
+              <strong style="font-size: 13px; color: #166534;">🧩 LoRA（低秩適應）＝ 輕量熱插拔外掛</strong>
+              <p style="font-size: 12px; color: #14532d; line-height: 1.6; margin-top: 6px;">
+                傳統微調要把 80 億個參數全改一遍（顯存爆炸）。<strong>LoRA 完全凍結原本大腦，只在旁邊插上兩個極小矩陣（參數不到 1%）</strong>！幾十 MB 的外掛包，單張顯卡就能訓完，隨時熱插拔抽換！
+              </p>
+            </div>
+
+          </div>
+
+          <!-- UNSLOTH AI DEEP DIVE CARD -->
+          <div style="background: #ffffff; border: 1.5px solid #86efac; border-radius: 8px; padding: 18px; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">🦥</span>
+                <div>
+                  <strong style="font-size: 16px; color: #15803d;">Unsloth AI（unsloth.ai）：全球開發者狂熱的微調加速神庫</strong>
+                  <div style="font-size: 11px; color: #64748b;">創辦人：Daniel Han &amp; Michael Han 兄弟 · 開源熱門度 No.1</div>
+                </div>
+              </div>
+              <a href="https://github.com/unslothai/unsloth" target="_blank" style="font-size: 11px; color: #0f172a; text-decoration: none; font-weight: 700; background: #f1f5f9; padding: 4px 10px; border-radius: 12px; border: 1px solid #cbd5e1;">
+                GitHub: unslothai/unsloth ★
+              </a>
+            </div>
+
+            <p style="font-size: 13px; color: var(--ink); line-height: 1.6; margin-bottom: 12px;">
+              在過去，就算用 LoRA 微調一個 8B 模型，也需要一張頂級 A100 GPU；而 <strong>Unsloth</strong> 徹底顛覆了這一切！它以<strong>「手寫 OpenAI Triton GPU 算子與純手工推導反向傳播求導」</strong>，徹底消滅了 PyTorch 的記憶體浪費：
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 12px;">
+              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 12px; border-radius: 6px;">
+                <div style="font-size: 11px; color: #166534; font-weight: 700;">🚀 訓練速度飆升</div>
+                <div style="font-size: 20px; font-weight: 800; color: #15803d; font-family: var(--font-mono);">2x ~ 5x 提速</div>
+                <div style="font-size: 11px; color: #166534;">長文本下更高達 30x</div>
+              </div>
+              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 12px; border-radius: 6px;">
+                <div style="font-size: 11px; color: #166534; font-weight: 700;">💾 顯存消耗狂降</div>
+                <div style="font-size: 20px; font-weight: 800; color: #15803d; font-family: var(--font-mono);">-70% ~ 80%</div>
+                <div style="font-size: 11px; color: #166534;">徹底根絕 CUDA OOM 爆顯存</div>
+              </div>
+              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 12px; border-radius: 6px;">
+                <div style="font-size: 11px; color: #166534; font-weight: 700;">🎯 精度損失</div>
+                <div style="font-size: 20px; font-weight: 800; color: #15803d; font-family: var(--font-mono);">0% 零損失</div>
+                <div style="font-size: 11px; color: #166534;">數學精度 100% 吻合</div>
+              </div>
+              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 12px; border-radius: 6px;">
+                <div style="font-size: 11px; color: #166534; font-weight: 700;">💻 平民硬體支援</div>
+                <div style="font-size: 20px; font-weight: 800; color: #15803d; font-family: var(--font-mono);">RTX 3090/4090</div>
+                <div style="font-size: 11px; color: #166534;">免費 Colab T4 亦可微調</div>
+              </div>
+            </div>
+
+            <div style="font-size: 12px; color: #334155; line-height: 1.6;">
+              • <strong>支援全明星陣容</strong>：Llama 3.3/3.2、DeepSeek-R1（支援 GRPO 深度推理微調）、Qwen 2.5、Mistral、Gemma 2。<br>
+              • <strong>1 行代碼導出 GGUF / Ollama</strong>：微調完成後，只要 <code>model.save_pretrained_gguf("my_model", tokenizer)</code>，就能立刻轉成 GGUF 扔進 Ollama 或本機筆電離線運行，打通了「數據 ➔ 微調 ➔ 本機私有化部署」的終極閉環！
+            </div>
+          </div>
+
+        </div>
+
       </div>
 
     </div>
