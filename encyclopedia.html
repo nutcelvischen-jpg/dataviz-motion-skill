@@ -1903,8 +1903,8 @@
         <span class="brand-title">大語言模型通識圖鑑</span>
       </div>
             <nav class="nav-actions">
-        <a href="#pricing" class="nav-link">推論成本試算</a>
         <a href="#glossary" class="nav-link">核心概念與分詞</a>
+        <a href="#pricing" class="nav-link">API 與推論成本</a>
         <a href="#models" class="nav-link">全球模型全景</a>
         <a href="#cloud-vs-local" class="nav-link">雲端 vs 地端</a>
         <a href="#agent-evolution" class="nav-link">Agent 商業矩陣</a>
@@ -1926,8 +1926,8 @@
 
     <!-- Quick Navigation Pills -->
         <div class="section-nav">
-      <a href="#pricing">💰 2026 前沿模型推論成本試算與 API 檢驗器</a>
-      <a href="#glossary">📖 大模型 9 大基石 (含 Token 分詞沙盒與 Strawberry 陷阱)</a>
+      <a href="#glossary">📖 01. 大模型 9 大基石 (含 Token 分詞沙盒與 Strawberry 陷阱)</a>
+      <a href="#pricing">📡 02. 實時 API 試演與 2026 前沿模型推論成本試算</a>
       <a href="#models">🌐 全球主流 10 大模型全景評測</a>
       <a href="#cloud-vs-local">⚖️ 雲端 API vs 地端 Ollama 架構決策</a>
       <a href="#agent-evolution">🤖 2026 自主 AI Agent 產業格局與四大商業旗艦</a>
@@ -1938,126 +1938,10 @@
 
   <!-- SECTION 1: TOKEN & TOKENIZE SANDBOX -->
     <!-- SECTION 1: 2026 FRONTIER MODEL INFERENCE PRICING CALCULATOR & API INSPECTOR -->
-  <section id="pricing" class="container section-block">
-    <div class="section-header">
-      <div class="section-badge">REAL-TIME INFERENCE COST · 01</div>
-      <h2 class="section-title">2026 前沿模型推論成本實時試算與 API 檢驗器</h2>
-      <p class="section-desc">
-        在實際開發與企業部署中，Token 不僅是神經網路的計算量子，更是真金白銀的成本核心。以下即時比對全球 11 大代表性模型之原廠官方費率與 OpenRouter 聚合路由器實價，支援動態輸入量調整與實時 API 底層 Usage 檢驗：
-      </p>
-    </div>
-
-    <!-- Pricing Calculator Card -->
-    <div class="card-editor" style="margin-bottom: 24px;">
-      <!-- Interactive Token Quick-Adjustment Bar -->
-      <div class="card-header-flex" style="flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
-        <div style="font-size: 13px; font-weight: 700; color: var(--ink);">
-          🎛️ 快速選擇試算 Token 量（或點此前往下方 <a href="#token-visualizer-card" style="color: var(--accent-coral); text-decoration: underline; font-weight: 800;">核心概念 02 分詞沙盒</a> 自由輸入文本）：
-        </div>
-        <div class="preset-pills">
-          <button class="pill-btn" onclick="setQuickTokenCount(500)">500 Tokens (短對話)</button>
-          <button class="pill-btn active" id="btnQuick2k" onclick="setQuickTokenCount(2000)">2,000 Tokens (日常文章)</button>
-          <button class="pill-btn" onclick="setQuickTokenCount(8000)">8,000 Tokens (代碼重構)</button>
-          <button class="pill-btn" onclick="setQuickTokenCount(32000)">32,000 Tokens (長篇論文)</button>
-          <button class="pill-btn" onclick="setQuickTokenCount(128000)">128K (全庫檢索)</button>
-        </div>
-      </div>
-
-      <!-- Metrics Row for Pricing -->
-      <div class="metrics-row" style="margin-bottom: 20px;">
-        <div class="metric-box">
-          <div class="metric-label">當前試算 Token 量</div>
-          <div id="statPricingTokens" class="metric-value">2,000</div>
-          <div class="metric-sub">單次請求之 Input Tokens</div>
-        </div>
-        <div class="metric-box">
-          <div class="metric-label">最低單次成本 (DeepSeek-V4.1)</div>
-          <div id="statMinCost" class="metric-value">$0.00028</div>
-          <div class="metric-sub">費率 $0.140 / 1M Tokens</div>
-        </div>
-        <div class="metric-box">
-          <div class="metric-label">最高單次成本 (Claude Opus 5.5)</div>
-          <div id="statMaxCost" class="metric-value">$0.03000</div>
-          <div class="metric-sub">費率 $15.000 / 1M Tokens</div>
-        </div>
-        <div class="metric-box">
-          <div class="metric-label">高低階模型成本懸殊比</div>
-          <div class="metric-value">107 倍</div>
-          <div class="metric-sub">旗艦推理 vs 輕量快速端</div>
-        </div>
-      </div>
-<div class="pricing-toggle-bar">
-        <div style="font-size: 13px; font-weight: 700; color: var(--ink);">
-          📊 2026 前沿旗艦模型推論成本實時試算 (原廠官方 vs OpenRouter 聚合路由器)
-        </div>
-        <div class="pricing-toggle-group">
-          <button id="btnPriceOfficial" class="p-toggle-btn active" onclick="switchPricingMode('official')">🏛️ 原廠官方直連費率</button>
-          <button id="btnPriceOpenRouter" class="p-toggle-btn" onclick="switchPricingMode('openrouter')">🌐 OpenRouter 聚合實價</button>
-        </div>
-      </div>
-
-      <div class="pricing-table-wrapper">
-        <table class="pricing-table">
-          <thead>
-            <tr>
-              <th>模型名稱</th>
-              <th>供應商 / 生態</th>
-              <th id="thInputRate">原廠官方輸入費率 (每 1M TOKENS)</th>
-              <th id="thOpenRouterRate" style="display: none;">OpenRouter 聚合費率 (每 1M TOKENS)</th>
-              <th>本次輸入預估費用 (單次)</th>
-              <th>10 萬次調用累積費用</th>
-              <th>計費特質 / 備註</th>
-            </tr>
-          </thead>
-          <tbody id="pricingRows">
-            <!-- Dynamically populated -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- API LIVE TRIAL SUB-SECTION -->
-    <div id="api-trial" class="api-trial-card">
-      <div class="card-header-flex">
-        <div>
-          <span class="concept-tag" style="color: var(--accent-coral);">LIVE API INSPECTOR</span>
-          <h3 style="font-family: var(--font-title); font-size: 24px; color: var(--ink);">實時 API 試演與底層 Usage 數據檢視</h3>
-        </div>
-        <div style="font-size: 12px; color: var(--ink-secondary);">
-          親眼見證雲端回傳的 <code>prompt_tokens</code> 與 <code>completion_tokens</code>
-        </div>
-      </div>
-
-      <div class="api-controls-grid">
-        <select id="liveModelSelect" class="select-clean" onchange="syncModelKey()">
-          <option value="simulation">🧪 本地教學模擬 (免填 Key · 即時 Token 計算)</option>
-          <option value="openrouter:deepseek/deepseek-r1">deepseek/deepseek-r1 (OpenRouter 滿血推理)</option>
-          <option value="openrouter:deepseek/deepseek-chat">deepseek/deepseek-chat (OpenRouter 萬億 MoE)</option>
-          <option value="openrouter:anthropic/claude-3.7-sonnet">claude-3.7-sonnet (OpenRouter 混合推理)</option>
-          <option value="openrouter:qwen/qwen-2.5-72b-instruct">qwen/qwen-2.5-72b (OpenRouter 開源主力)</option>
-          <option value="openrouter:openai/gpt-4o">openai/gpt-4o (OpenRouter 旗艦全模態)</option>
-          <option value="gemini:gemini-2.0-flash">gemini-2.0-flash (Google Direct 官方直連)</option>
-        </select>
-        <input type="password" id="liveApiKeyInput" class="input-clean" placeholder="填入 API Key（若選擇模擬模式則留空即可）">
-        <button class="btn-action" onclick="executeLiveApiTest()">發送試演 ↗</button>
-      </div>
-
-      <div id="liveOutputBox" class="api-output-box">點擊上方「發送試演」，觀察模型即時生成，並解析底層回傳的 Token 計費物件（usage: prompt_tokens, completion_tokens）。</div>
-
-      <div id="usageBadgeBar" class="usage-badge-bar">
-        <span class="usage-pill" id="pillPromptTokens">Prompt Tokens: -</span>
-        <span class="usage-pill" id="pillCompletionTokens">Completion Tokens: -</span>
-        <span class="usage-pill" id="pillTotalTokens">Total Tokens: -</span>
-        <span class="usage-pill" id="pillActualCost">本次呼叫成本: -</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 2: CORE CONCEPT GLOSSARY -->
   <section id="glossary" class="container section-block">
     <div class="section-header">
-      <div class="section-badge">CORE FOUNDATIONS · 02</div>
-      <h2 class="section-title">大語言模型必懂 7 大核心基石：全流程圖解與心智模型</h2>
+      <div class="section-badge">CORE FOUNDATIONS · 01</div>
+      <h2 class="section-title">大語言模型必懂 9 大核心基石：全流程圖解與互動分詞沙盒</h2>
       <p class="section-desc">
         徹底告別死記硬背的純文字枯燥定義！以下將大語言模型（LLM）的 7 大基礎專有名詞，轉化為直觀的<strong>「物理流程圖（Flowcharts）」</strong>與<strong>「生活化心智模型」</strong>，看懂資料如何從人類文字變為神經網路的機率預測：
       </p>
@@ -2702,6 +2586,122 @@ You are an interactive CLI tool that helps users with software engineering tasks
   </section>
 
   <!-- SECTION 3: GLOBAL MODEL LANDSCAPE -->
+  <section id="pricing" class="container section-block">
+    <div class="section-header">
+      <div class="section-badge">HANDS-ON API & COST · 02</div>
+      <h2 class="section-title">實時 API 試演、Usage 檢驗與 2026 前沿模型推論成本矩陣</h2>
+      <p class="section-desc">
+        在理解了 Token 與神經網路機制後，現在親自動手調用 API！親眼見證雲端回傳的 <code>prompt_tokens</code> 與 <code>completion_tokens</code>，並動態比對全球 11 大前沿模型之官方直連與 OpenRouter 聚合實價：
+      </p>
+    </div>
+
+    <!-- Pricing Calculator Card -->
+    <div class="card-editor" style="margin-bottom: 24px;">
+      <!-- Interactive Token Quick-Adjustment Bar -->
+      <div class="card-header-flex" style="flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--ink);">
+          🎛️ 快速選擇試算 Token 量（或點此前往下方 <a href="#token-visualizer-card" style="color: var(--accent-coral); text-decoration: underline; font-weight: 800;">核心概念 02 分詞沙盒</a> 自由輸入文本）：
+        </div>
+        <div class="preset-pills">
+          <button class="pill-btn" onclick="setQuickTokenCount(500)">500 Tokens (短對話)</button>
+          <button class="pill-btn active" id="btnQuick2k" onclick="setQuickTokenCount(2000)">2,000 Tokens (日常文章)</button>
+          <button class="pill-btn" onclick="setQuickTokenCount(8000)">8,000 Tokens (代碼重構)</button>
+          <button class="pill-btn" onclick="setQuickTokenCount(32000)">32,000 Tokens (長篇論文)</button>
+          <button class="pill-btn" onclick="setQuickTokenCount(128000)">128K (全庫檢索)</button>
+        </div>
+      </div>
+
+      <!-- Metrics Row for Pricing -->
+      <div class="metrics-row" style="margin-bottom: 20px;">
+        <div class="metric-box">
+          <div class="metric-label">當前試算 Token 量</div>
+          <div id="statPricingTokens" class="metric-value">2,000</div>
+          <div class="metric-sub">單次請求之 Input Tokens</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">最低單次成本 (DeepSeek-V4.1)</div>
+          <div id="statMinCost" class="metric-value">$0.00028</div>
+          <div class="metric-sub">費率 $0.140 / 1M Tokens</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">最高單次成本 (Claude Opus 5.5)</div>
+          <div id="statMaxCost" class="metric-value">$0.03000</div>
+          <div class="metric-sub">費率 $15.000 / 1M Tokens</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">高低階模型成本懸殊比</div>
+          <div class="metric-value">107 倍</div>
+          <div class="metric-sub">旗艦推理 vs 輕量快速端</div>
+        </div>
+      </div>
+<div class="pricing-toggle-bar">
+        <div style="font-size: 13px; font-weight: 700; color: var(--ink);">
+          📊 2026 前沿旗艦模型推論成本實時試算 (原廠官方 vs OpenRouter 聚合路由器)
+        </div>
+        <div class="pricing-toggle-group">
+          <button id="btnPriceOfficial" class="p-toggle-btn active" onclick="switchPricingMode('official')">🏛️ 原廠官方直連費率</button>
+          <button id="btnPriceOpenRouter" class="p-toggle-btn" onclick="switchPricingMode('openrouter')">🌐 OpenRouter 聚合實價</button>
+        </div>
+      </div>
+
+      <div class="pricing-table-wrapper">
+        <table class="pricing-table">
+          <thead>
+            <tr>
+              <th>模型名稱</th>
+              <th>供應商 / 生態</th>
+              <th id="thInputRate">原廠官方輸入費率 (每 1M TOKENS)</th>
+              <th id="thOpenRouterRate" style="display: none;">OpenRouter 聚合費率 (每 1M TOKENS)</th>
+              <th>本次輸入預估費用 (單次)</th>
+              <th>10 萬次調用累積費用</th>
+              <th>計費特質 / 備註</th>
+            </tr>
+          </thead>
+          <tbody id="pricingRows">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- API LIVE TRIAL SUB-SECTION -->
+    <div id="api-trial" class="api-trial-card">
+      <div class="card-header-flex">
+        <div>
+          <span class="concept-tag" style="color: var(--accent-coral);">LIVE API INSPECTOR</span>
+          <h3 style="font-family: var(--font-title); font-size: 24px; color: var(--ink);">實時 API 試演與底層 Usage 數據檢視</h3>
+        </div>
+        <div style="font-size: 12px; color: var(--ink-secondary);">
+          親眼見證雲端回傳的 <code>prompt_tokens</code> 與 <code>completion_tokens</code>
+        </div>
+      </div>
+
+      <div class="api-controls-grid">
+        <select id="liveModelSelect" class="select-clean" onchange="syncModelKey()">
+          <option value="simulation">🧪 本地教學模擬 (免填 Key · 即時 Token 計算)</option>
+          <option value="openrouter:deepseek/deepseek-r1">deepseek/deepseek-r1 (OpenRouter 滿血推理)</option>
+          <option value="openrouter:deepseek/deepseek-chat">deepseek/deepseek-chat (OpenRouter 萬億 MoE)</option>
+          <option value="openrouter:anthropic/claude-3.7-sonnet">claude-3.7-sonnet (OpenRouter 混合推理)</option>
+          <option value="openrouter:qwen/qwen-2.5-72b-instruct">qwen/qwen-2.5-72b (OpenRouter 開源主力)</option>
+          <option value="openrouter:openai/gpt-4o">openai/gpt-4o (OpenRouter 旗艦全模態)</option>
+          <option value="gemini:gemini-2.0-flash">gemini-2.0-flash (Google Direct 官方直連)</option>
+        </select>
+        <input type="password" id="liveApiKeyInput" class="input-clean" placeholder="填入 API Key（若選擇模擬模式則留空即可）">
+        <button class="btn-action" onclick="executeLiveApiTest()">發送試演 ↗</button>
+      </div>
+
+      <div id="liveOutputBox" class="api-output-box">點擊上方「發送試演」，觀察模型即時生成，並解析底層回傳的 Token 計費物件（usage: prompt_tokens, completion_tokens）。</div>
+
+      <div id="usageBadgeBar" class="usage-badge-bar">
+        <span class="usage-pill" id="pillPromptTokens">Prompt Tokens: -</span>
+        <span class="usage-pill" id="pillCompletionTokens">Completion Tokens: -</span>
+        <span class="usage-pill" id="pillTotalTokens">Total Tokens: -</span>
+        <span class="usage-pill" id="pillActualCost">本次呼叫成本: -</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: CORE CONCEPT GLOSSARY -->
   <section id="models" class="container section-block">
     <div class="section-header">
       <div class="section-badge">MODEL TAXONOMY · 03</div>
