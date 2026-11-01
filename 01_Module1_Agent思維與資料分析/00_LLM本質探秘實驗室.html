@@ -573,6 +573,7 @@
       <div class="brand-group">
         <h1 class="brand-title">大語言模型本質探秘實驗室</h1>
         <span class="brand-badge">LLM Mechanics &amp; Vulnerability Lab</span>
+        <a href="00_LLM_Token與模型全景圖譜.html" target="_blank" style="font-family: var(--font-mono); font-size: 11px; padding: 4px 10px; background: var(--paper-card); border: 1px solid var(--rule-solid); border-radius: 4px; color: var(--ink-secondary); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; margin-left: 8px;">📖 Token 與全球模型全景圖譜 ↗</a>
       </div>
 
       <div class="config-cluster">
@@ -840,7 +841,14 @@ LLM 的本質是一組<strong>靜態凍結的浮點數矩陣（Frozen Weights）
         analysis: `<strong>什麼是 Next-Token Prediction？</strong><br>
 大語言模型並非百科全書，本質是一個<strong>「高維空間下一個 Token 機率分佈取樣器」</strong>：<br>
 \\[ \\Pr(w_t \\mid w_1, w_2, \\dots, w_{t-1}) \\]<br>
-它所做的一切，都是預測「哪個字接在後面看起來最順眼、最符合訓練集語料」。當你問它荒誕的假定時，它的目標不是去質疑客觀事實，而是順應語意場景生成最符合語氣的文本。`,
+它所做的一切，都是預測「哪個字接在後面看起來最順眼、最符合訓練集語料」。當你問它荒誕的假定時，它的目標不是去質疑客觀事實，而是順應語意場景生成最符合語氣的文本。<br><br>
+<div class="callout-card" style="margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(194, 65, 12, 0.05); border: 1px solid rgba(194, 65, 12, 0.25);">
+  <div>
+    <div style="font-weight: 600; color: #c2410c; margin-bottom: 2px;">🧩 延伸探索：Token、分詞演算法與全球模型全景圖譜</div>
+    <div style="font-size: 12px; color: var(--ink-secondary);">互動式體驗 BPE 分詞色塊、Strawberry 陷阱與 GPT / Claude / Gemini / DeepSeek 實時 API 試演</div>
+  </div>
+  <a href="00_LLM_Token與模型全景圖譜.html" target="_blank" style="padding: 6px 12px; background: #c2410c; color: #fff; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap;">開啟通識圖鑑 ↗</a>
+</div>`,
         takeaway: `🎓 <strong>課程核心啟示：</strong> 這正是為什麼嚴肅資料分析絕不能依賴純文字對話憑空生成數據！在 Module 1 我們要求的「防幻覺三大法則」與「交叉驗算等式」，正是為了徹底鎖死機率預測的信口開河！`
       },
       {
