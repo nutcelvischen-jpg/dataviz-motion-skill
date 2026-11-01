@@ -1981,7 +1981,7 @@
       <!-- Pricing Comparison Table -->
       <div class="pricing-toggle-bar">
         <div style="font-size: 13px; font-weight: 700; color: var(--ink);">
-          📊 10 大代表性模型推論成本實時試算 (原廠官方 vs OpenRouter 聚合路由器)
+          📊 2026 前沿旗艦模型推論成本實時試算 (原廠官方 vs OpenRouter 聚合路由器)
         </div>
         <div class="pricing-toggle-group">
           <button id="btnPriceOfficial" class="p-toggle-btn active" onclick="switchPricingMode('official')">🏛️ 原廠官方直連費率</button>
@@ -2023,13 +2023,13 @@
 
       <div class="api-controls-grid">
         <select id="liveModelSelect" class="select-clean" onchange="syncModelKey()">
-          <option value="simulation">🧪 本地教學模擬 (免填 Key)</option>
-          <option value="openrouter:google/gemma-3-12b-it">google/gemma-3-12b-it (OpenRouter)</option>
-          <option value="openrouter:openai/gpt-4o">openai/gpt-4o (OpenRouter)</option>
-          <option value="openrouter:deepseek/deepseek-chat">deepseek/deepseek-chat (OpenRouter)</option>
-          <option value="openrouter:anthropic/claude-3.5-sonnet">claude-3.5-sonnet (OpenRouter)</option>
-          <option value="openrouter:qwen/qwen-2.5-72b-instruct">qwen/qwen-2.5-72b (OpenRouter)</option>
-          <option value="gemini:gemini-1.5-flash">gemini-1.5-flash (Google Direct)</option>
+          <option value="simulation">🧪 本地教學模擬 (免填 Key · 即時 Token 計算)</option>
+          <option value="openrouter:deepseek/deepseek-r1">deepseek/deepseek-r1 (OpenRouter 滿血推理)</option>
+          <option value="openrouter:deepseek/deepseek-chat">deepseek/deepseek-chat (OpenRouter 萬億 MoE)</option>
+          <option value="openrouter:anthropic/claude-3.7-sonnet">claude-3.7-sonnet (OpenRouter 混合推理)</option>
+          <option value="openrouter:qwen/qwen-2.5-72b-instruct">qwen/qwen-2.5-72b (OpenRouter 開源主力)</option>
+          <option value="openrouter:openai/gpt-4o">openai/gpt-4o (OpenRouter 旗艦全模態)</option>
+          <option value="gemini:gemini-2.0-flash">gemini-2.0-flash (Google Direct 官方直連)</option>
         </select>
         <input type="password" id="liveApiKeyInput" class="input-clean" placeholder="填入 API Key（若選擇模擬模式則留空即可）">
         <button class="btn-action" onclick="executeLiveApiTest()">發送試演 ↗</button>
@@ -4369,86 +4369,94 @@ You are an interactive CLI tool that helps users with software engineering tasks
 
     let currentPricingMode = 'official'; // 'official' or 'openrouter'
 
-    const PRICING_MODELS = [
+        const PRICING_MODELS = [
       {
-        name: "Gemini 2.0 Flash",
-        vendor: "Google DeepMind",
-        officialRate: 0.075,
-        openrouterRate: 0.100, // gemini-2.5-flash-lite on OpenRouter
-        color: "#1d4ed8",
-        note: "性價比之王 · 1M/2M 超長窗"
-      },
-      {
-        name: "DeepSeek-V3 / R1",
+        name: "DeepSeek-V4.1-Flash",
         vendor: "DeepSeek (中國杭州)",
         officialRate: 0.140,
-        openrouterRate: 0.257, // deepseek-chat on OpenRouter
+        openrouterRate: 0.140,
         color: "#15803d",
-        note: "純 RL 滿血推理 · 開源權重免費"
+        note: "自研 DSA 稀疏注意力 · 萬億 MoE 性價比之王"
       },
       {
-        name: "GPT-4o-mini",
-        vendor: "OpenAI",
-        officialRate: 0.150,
-        openrouterRate: 0.150, // Batch 降至 $0.075
-        color: "#c2410c",
-        note: "輕量全模態 · 批次調用折半"
+        name: "DeepSeek-V4-Pro (1.6T MoE)",
+        vendor: "DeepSeek (滿血旗艦)",
+        officialRate: 0.270,
+        openrouterRate: 0.270,
+        color: "#15803d",
+        note: "全量 MIT 開源權重 · 原生 FP4 國產晶片部署"
       },
       {
-        name: "Claude 3.5 Haiku",
-        vendor: "Anthropic",
-        officialRate: 0.800,
-        openrouterRate: 0.100, // claude-haiku-5.5 on OpenRouter
-        color: "#7e22ce",
-        note: "極速響應 · 新一代 Haiku 大幅降價"
-      },
-      {
-        name: "OpenAI o3-mini",
-        vendor: "OpenAI (STEM 推理)",
-        officialRate: 1.100,
-        openrouterRate: 0.550, // Batch $0.55 / Standard $1.10
-        color: "#ea580c",
-        note: "可調思維深度 · 競賽數學編程"
-      },
-      {
-        name: "Qwen 2.5-Max",
+        name: "通義千問 Qwen 3.5 (MoE)",
         vendor: "Alibaba Cloud",
-        officialRate: 1.600,
-        openrouterRate: 0.360, // Qwen-2.5-72B on OpenRouter
+        officialRate: 0.800,
+        openrouterRate: 0.720,
         color: "#0284c7",
-        note: "萬億 MoE 旗艦 · 工具調用成熟"
+        note: "開源全尺寸霸主 · 397B-A17B 架構 · 終端代碼"
       },
       {
-        name: "GPT-4o",
-        vendor: "OpenAI",
+        name: "Moonshot Kimi K3.1 Pro",
+        vendor: "月之暗面 (Moonshot AI)",
+        officialRate: 2.000,
+        openrouterRate: 1.850,
+        color: "#059669",
+        note: "百萬長文研讀之王 · 財報論文深度交叉比對"
+      },
+      {
+        name: "xAI Grok 4.7",
+        vendor: "xAI (伊隆·馬斯克)",
+        officialRate: 2.000,
+        openrouterRate: 2.000,
+        color: "#c2410c",
+        note: "馬斯克 xAI 旗艦 · 打通 X 全球即時社群數據流"
+      },
+      {
+        name: "Meta Muse Wonder",
+        vendor: "Meta (代理商務旗艦)",
         officialRate: 2.500,
-        openrouterRate: 2.500, // Batch $1.25
-        color: "#1a1917",
-        note: "全模態旗艦 · 工具生態最完整"
+        openrouterRate: 2.200,
+        color: "#2563eb",
+        note: "Muse Secure VM 專屬沙盒 · 零點擊商務代購"
       },
       {
-        name: "Claude 3.7 Sonnet",
-        vendor: "Anthropic (混合推理)",
+        name: "Claude Sonnet 5.5",
+        vendor: "Anthropic (工程主力)",
         officialRate: 3.000,
-        openrouterRate: 2.000, // Claude Sonnet 5.5 on OpenRouter
+        openrouterRate: 2.800,
         color: "#7e22ce",
-        note: "混合推理首選 · 編程工程神獸"
+        note: "長程軟體架構重構 · 混合推理高性價比神獸"
       },
       {
-        name: "GPT-4.5 (Orion)",
-        vendor: "OpenAI (旗艦無監督)",
-        officialRate: 75.000,
-        openrouterRate: 15.000, // GPT-5 Pro on OpenRouter
-        color: "#475569",
-        note: "萬億無監督巨型模型 · 極低幻覺"
+        name: "Gemini 4 Argon",
+        vendor: "Google DeepMind",
+        officialRate: 4.000,
+        openrouterRate: 3.500,
+        color: "#1d4ed8",
+        note: "1M 統一脈絡 · 業界首創單次百萬級 Long Decode"
       },
       {
-        name: "Ollama (Local)",
-        vendor: "本機離線私有化",
+        name: "GPT-6 Astra",
+        vendor: "OpenAI (星際之門旗艦)",
+        officialRate: 10.000,
+        openrouterRate: 7.500,
+        color: "#1a1917",
+        note: "10 萬卡 Stargate 訓練 · 循環深度推理 · 1M 上下文"
+      },
+      {
+        name: "Claude Opus 5.5",
+        vendor: "Anthropic (頂級前沿推理)",
+        officialRate: 15.000,
+        openrouterRate: 14.500,
+        color: "#7e22ce",
+        note: "常態自適應思考 · 快取讀取僅 $0.20 (降 60%)"
+      },
+      {
+        name: "Ollama (Local Private)",
+        vendor: "本機地端私有化部署",
         officialRate: 0.000,
         openrouterRate: 0.000,
-        color: "#16a34a",
-        note: "100% 離線免聯網 · 零 Token 帳單"
+        color: "#475569",
+        note: "100% 物理隔離 · 本機硬體免聯網 · 零 Token 帳單"
       }
     ];
 
