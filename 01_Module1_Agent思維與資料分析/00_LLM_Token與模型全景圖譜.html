@@ -1333,6 +1333,67 @@
     }
     .limit-desc strong { color: var(--ink); }
 
+  
+    /* Distillation Diagram */
+    .distill-diagram-box {
+      display: grid;
+      grid-template-columns: 1fr 140px 1fr;
+      align-items: center;
+      gap: 12px;
+      background: var(--paper-tint);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 14px;
+      margin: 12px 0;
+    }
+    @media (max-width: 768px) {
+      .distill-diagram-box { grid-template-columns: 1fr; }
+    }
+    .distill-actor {
+      background: #ffffff;
+      border: 1px solid var(--rule-solid);
+      border-radius: 6px;
+      padding: 12px 14px;
+      text-align: center;
+    }
+    .teacher-box {
+      border-top: 3px solid #7c3aed;
+    }
+    .student-box {
+      border-top: 3px solid #166534;
+    }
+    .actor-icon { font-size: 24px; line-height: 1; margin-bottom: 4px; }
+    .actor-role { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; color: var(--ink-muted); font-weight: 700; }
+    .actor-name { font-size: 13px; font-weight: 700; color: var(--ink); margin: 2px 0 6px; }
+    .actor-desc { font-size: 11px; color: var(--ink-secondary); line-height: 1.4; text-align: left; background: var(--paper-tint); padding: 6px 8px; border-radius: 4px; }
+
+    .distill-transfer {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .transfer-arrow {
+      font-size: 11px;
+      font-weight: 800;
+      color: #7c3aed;
+      font-family: var(--font-mono);
+    }
+    .transfer-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: #7c3aed;
+      background: rgba(124, 58, 237, 0.1);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .transfer-note {
+      font-size: 9px;
+      color: var(--ink-muted);
+      line-height: 1.3;
+    }
+
   </style>
 </head>
 <body>
@@ -2318,6 +2379,54 @@
           <span class="t-pill">Firmus 浸沒式算力工廠</span>
           <span class="t-pill">OpenCloud 開放架構</span>
           <span class="t-pill">NVIDIA GB300 集群</span>
+        </div>
+      </div>
+
+      <!-- Stage 3.5: Knowledge Distillation -->
+      <div class="timeline-card" style="border-left: 4px solid #7c3aed;">
+        <div class="timeline-badge" style="background: rgba(124, 58, 237, 0.08); color: #7c3aed;">2024 ~ 2025 · 模型瘦身與智力移植</div>
+        <div class="timeline-title">時代 03.5：知識蒸餾（Knowledge Distillation）— 名師出高徒的平民化奇蹟</div>
+        <p class="timeline-desc">
+          <strong>【核心本質】</strong> 為什麼現在一台普通 Mac 筆電用 Ollama 跑 14B 小模型，數學推理力竟然能逼近幾千萬美元訓練的閉源頂級旗艦？秘密就在於<strong>「知識蒸餾（Knowledge Distillation）」</strong>！
+        </p>
+
+        <!-- Distillation Teacher-Student Visual Flow -->
+        <div class="distill-diagram-box">
+          <div class="distill-actor teacher-box">
+            <div class="actor-icon">👨‍🏫</div>
+            <div class="actor-role">教師模型 (Teacher Model)</div>
+            <div class="actor-name">DeepSeek-R1 (671B MoE)</div>
+            <div class="actor-desc">
+              智力天花板、推理頂級。<br>
+              但體積大如航空母艦，需要十幾張專業顯卡才能運行，推論成本極其昂貴！
+            </div>
+          </div>
+
+          <div class="distill-transfer">
+            <div class="transfer-arrow">➔ 產出 80 萬筆筆記 ➔</div>
+            <div class="transfer-badge">思考鏈蒸餾 (CoT Distill)</div>
+            <div class="transfer-note">名師把完整的「解題草稿與思考過程」毫無保留寫成教材</div>
+          </div>
+
+          <div class="distill-actor student-box">
+            <div class="actor-icon">🧑‍🎓💻</div>
+            <div class="actor-role">學生模型 (Student Model)</div>
+            <div class="actor-name">Qwen-14B / Llama-8B (Distill)</div>
+            <div class="actor-desc">
+              體積縮小 20~50 倍！<br>
+              吸收名師思維精華，在個人筆電（地端 Ollama）即可 $0 離線運行，推理力驚人！
+            </div>
+          </div>
+        </div>
+
+        <p class="timeline-subtext" style="margin-top: 10px;">
+          <strong>為什麼對長程 Agent 影響巨大？</strong> 如果沒有蒸餾，長期運行的 Agent 每一輪都要呼叫昂貴的 671B 旗艦，成本難以承受；有了蒸餾技術，我們可以把繁重、常規的任務交給經過蒸餾的 14B/32B 小模型在地端運行，推論速度提升 10 倍、Token 成本降低 95%！
+        </p>
+        <div class="timeline-tags">
+          <span class="t-pill" style="color: #7c3aed; border-color: rgba(124, 58, 237, 0.3);">Knowledge Distillation (知識蒸餾)</span>
+          <span class="t-pill">Teacher-Student Network (師生網路)</span>
+          <span class="t-pill">DeepSeek-R1-Distill</span>
+          <span class="t-pill">地端部署平民化</span>
         </div>
       </div>
 
