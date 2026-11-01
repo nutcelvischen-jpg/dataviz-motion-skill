@@ -563,6 +563,66 @@
     @media (max-width: 640px) {
       .tabs-nav { grid-template-columns: 1fr; }
     }
+
+    /* Tokenizer & Model Foundation Styles */
+    .token-stream-mini {
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 4px;
+      padding: 12px;
+      min-height: 75px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0 16px;
+    }
+    .token-chip {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 2px 7px;
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid rgba(0,0,0,0.08);
+      cursor: default;
+    }
+    .token-idx { font-size: 9px; opacity: 0.55; user-select: none; }
+    .t-col-0 { background: #fee2e2; color: #991b1b; }
+    .t-col-1 { background: #ffedd5; color: #9a3412; }
+    .t-col-2 { background: #fef3c7; color: #92400e; }
+    .t-col-3 { background: #ecfccb; color: #3f6212; }
+    .t-col-4 { background: #dcfce7; color: #166534; }
+    .t-col-5 { background: #e0e7ff; color: #3730a3; }
+    .t-col-6 { background: #fae8ff; color: #86198f; }
+    .t-col-7 { background: #f1f5f9; color: #334155; }
+
+    .token-metrics-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .metric-mini {
+      background: var(--paper-tint);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 8px 10px;
+    }
+    .metric-mini-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+    }
+    .metric-mini-val {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 2px;
+    }
+
   </style>
 </head>
 <body>
@@ -607,26 +667,30 @@
     <!-- 六大核心本質實驗切換列 -->
     <nav class="tabs-nav" aria-label="實驗分類切換">
       <button class="tab-button active" onclick="selectExperiment(0)">
+        <span class="tab-index">00 / FOUNDATIONS</span>
+        <span class="tab-label">Token分詞與全球模型生態</span>
+      </button>
+      <button class="tab-button" onclick="selectExperiment(1)">
         <span class="tab-index">01 / TEMPORAL</span>
         <span class="tab-label">無時鐘感知與凍結</span>
       </button>
-      <button class="tab-button" onclick="selectExperiment(1)">
+      <button class="tab-button" onclick="selectExperiment(2)">
         <span class="tab-index">02 / STATELESS</span>
         <span class="tab-label">無記憶與對話重送</span>
       </button>
-      <button class="tab-button" onclick="selectExperiment(2)">
+      <button class="tab-button" onclick="selectExperiment(3)">
         <span class="tab-index">03 / PROBABILITY</span>
         <span class="tab-label">機率預測與認知陷阱</span>
       </button>
-      <button class="tab-button" onclick="selectExperiment(3)">
+      <button class="tab-button" onclick="selectExperiment(4)">
         <span class="tab-index">04 / VULNERABILITY</span>
         <span class="tab-label">提示詞注入 (北捷案例)</span>
       </button>
-      <button class="tab-button" onclick="selectExperiment(4)">
+      <button class="tab-button" onclick="selectExperiment(5)">
         <span class="tab-index">05 / ARITHMETIC</span>
         <span class="tab-label">純口算盲區與代碼</span>
       </button>
-      <button class="tab-button" onclick="selectExperiment(5)">
+      <button class="tab-button" onclick="selectExperiment(6)">
         <span class="tab-index">06 / SECURITY</span>
         <span class="tab-label">API 外洩與前後端</span>
       </button>
@@ -680,8 +744,32 @@
         <div class="presets-stack" id="presetList"></div>
 
         <!-- 自由輸入測試區 -->
-        <span class="section-label">或輸入自訂提示詞實測：</span>
-        <textarea id="promptInput" class="prompt-box" placeholder="在此輸入測試對話..."></textarea>
+        <!-- 專屬 Tokenizer 視覺化模組 (於 Tab 00 展開) -->
+        <div id="tokenizerModule" style="display: none; margin-bottom: 14px;">
+          <div class="token-metrics-bar">
+            <div class="metric-mini">
+              <div class="metric-mini-label">Token 數</div>
+              <div id="labTokens" class="metric-mini-val">0</div>
+            </div>
+            <div class="metric-mini">
+              <div class="metric-mini-label">字元數</div>
+              <div id="labChars" class="metric-mini-val">0</div>
+            </div>
+            <div class="metric-mini">
+              <div class="metric-mini-label">字/Token比</div>
+              <div id="labRatio" class="metric-mini-val">0.00</div>
+            </div>
+            <div class="metric-mini">
+              <div class="metric-mini-label">100萬次成本</div>
+              <div id="labCost" class="metric-mini-val">USD 0.00</div>
+            </div>
+          </div>
+          <div style="font-size: 11px; color: var(--ink-secondary); font-weight: 600; margin-bottom: 4px;">即時 BPE 分詞切片視覺化：</div>
+          <div id="labTokenVisualizer" class="token-stream-mini"></div>
+        </div>
+
+        <span class="section-label" id="promptInputLabel">或輸入自訂提示詞實測：</span>
+        <textarea id="promptInput" class="prompt-box" placeholder="在此輸入測試對話..." oninput="onPromptInputChanged()"></textarea>
 
         <div class="btn-action-row">
           <button class="btn-secondary" onclick="clearInput()">清空</button>
@@ -726,6 +814,78 @@
     // 六大實驗數據庫 (包含 iThome 北捷真實歪樓案例還原)
     // -------------------------------------------------------------
     const EXPERIMENTS = [
+      {
+        id: "tokens",
+        title: "Token 分詞、核心名詞與全球大模型全景",
+        subtitle: "大語言模型底層計量單位、BPE 分詞演算法、6 大必懂名詞與全球主流模型生態圖譜",
+        badge: "基礎通識與全景",
+        hasNews: false,
+        hasSystem: false,
+        presets: [
+          {
+            label: "1. 🇹🇼 繁體中文與 Token 膨脹（探討為何中文字消耗更多 Token）",
+            tag: "中文字詞",
+            prompt: "大語言模型本質上是一組凍結的浮點數權重矩陣，每一次對話都在根據機率預測下一個 Token！",
+            simulated: `【Token 本質解析】
+這段文字包含 46 個繁體中文字元，在 BPE 分詞器下被切分為 41 個 Tokens。
+
+💡【重要觀念：中英文 Token 成本差異】
+由於主流 LLM（GPT-4o、Claude 3.5）訓練語料以英語為主，英文字詞（例如 'model'）通常 1 個單字對應 1 個 Token；而繁體中文在多字元編碼字典中，每個漢字平均需要 1.2 ~ 2.0 個 Token！這代表傳送同樣資訊量的繁中文件，企業的 API 帳單可能比英文高出 30%~80%！`
+          },
+          {
+            label: "2. 🍓 Strawberry 字母計數陷阱（探討為什麼 BPE 看不見字母）",
+            tag: "BPE 特性",
+            prompt: "How many letters 'r' are there in the word strawberry?",
+            simulated: `在單字 'strawberry' 中總共有 3 個字母 'r'。
+
+💡【為什麼早期 ChatGPT 經常數成 2 個？】
+在 BPE Tokenizer 詞庫中，'strawberry' 直接被切分成兩個獨立語意塊：[straw] (ID: 11245) + [berry] (ID: 32884)！模型從頭到尾根本沒有「單獨看見英文字母 r」的物理視角，它看見的是兩個代表語意的向量。當你要求它數字母時，它只能憑記憶猜測，這正是 Token 物理邊界帶來的結構性現象！`
+          },
+          {
+            label: "3. 🐍 Python 代碼與特殊符號 Token 切分",
+            tag: "代碼切片",
+            prompt: "import pandas as pd\nimport numpy as np\ndf = pd.read_csv('sales.csv')\nprint(df.groupby('region')['revenue'].sum())",
+            simulated: `【Python 代碼 Token 解析】
+代碼中的縮排、空格、引號與底線都會被精準切分為特定 Token。在 Module 1 中，我們強迫 AI 撰寫 Pandas 代碼執行數值運算，正是藉由這種語法結構的高確定性，徹底杜絕口算幻覺！`
+          },
+          {
+            label: "4. 🇺🇸 經典英語長句與次詞元 (Subwords) 拆解",
+            tag: "Subwords",
+            prompt: "Language models are next-token probability samplers trained on massive text corpora using Byte-Pair Encoding.",
+            simulated: `【英語 Subwords 解析】
+英文單字常被拆為「詞根 + 詞綴」（如 probabil-ity, sampl-ers）。BPE 演算法藉由此機制，能夠以有限的 10 萬~20 萬詞彙庫，組合出世界上無限的字詞！`
+          }
+        ],
+        analysis: `<strong>一、 什麼是 Token？（LLM 的物理計量單位）</strong><br>
+電腦只能運算數字。當你輸入文字時，模型必須先透過 <strong>Byte-Pair Encoding (BPE)</strong> 分詞器將文字切割為一連串數字編號（Token IDs）。Token 是雲端 API 唯一的計費單位，也是 Context Window 的容量衡量標準。<br><br>
+
+<strong>二、 大語言模型必懂 6 大核心專有名詞：</strong><br>
+• <strong>Token & Tokenize</strong>：資訊的最小粒子。1 英文單字 ≈ 1.3 Tokens；1 中文字 ≈ 1.5 Tokens。<br>
+• <strong>API Key</strong>：雲端呼叫的數位身分證與信用卡扣款憑證，嚴禁寫死在前端原始碼中。<br>
+• <strong>Context Window（上下文視窗）</strong>：模型單次運算能容納的最大 Token 上限（從早期 4K 到 Gemini 的 200 萬）。<br>
+• <strong>Temperature（採樣溫度）</strong>：0.0 時最嚴謹確定（適合數據分析）；1.0 時最發散創意。<br>
+• <strong>Embeddings（向量嵌入）</strong>：文字在高維幾何空間的位置，是 RAG 檢索增強生成的數學底層。<br>
+• <strong>System Prompt（系統提示詞）</strong>：最高指導方針，但並非不可逾越的物理防火牆。<br><br>
+
+<strong>三、 全球 8 大主流大模型全景生態：</strong><br>
+• <strong>OpenAI (GPT-4o / GPT-4o-mini)</strong>：全球通用多模態旗艦，生態最完整、工具調用最成熟。<br>
+• <strong>Anthropic (Claude 3.5 Sonnet)</strong>：軟體工程與長篇代碼天花板，文筆典雅自然。<br>
+• <strong>Google (Gemini 1.5 / 2.5 Pro & Flash)</strong>：百萬超長上下文之王（可一次載入 1 小時影片與整本財報）。<br>
+• <strong>DeepSeek (DeepSeek-V3 / R1)</strong>：極致性價比（價格僅美國 1/20）、MoE 開源巨震、頂級數學推理。<br>
+• <strong>Alibaba (Qwen 2.5 通義千問)</strong>：開源社群全尺寸霸主（0.5B 至 72B），數學與代碼極強。<br>
+• <strong>Moonshot AI (Kimi)</strong>：中文長文本開拓者，合約審查與長篇投行研報梳理首選。<br>
+• <strong>MiniMax (abab 6.5 / 海螺)</strong>：中文多模態與高擬真語音生成（TTS）、視頻創作代表。<br>
+• <strong>Ollama</strong>：地端離線引擎霸主，讓個人電腦一行指令跑開源大模型，零費用且 100% 隱私離線。<br><br>
+
+<div class="callout-card" style="margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(194, 65, 12, 0.05); border: 1px solid rgba(194, 65, 12, 0.25);">
+  <div>
+    <div style="font-weight: 600; color: #c2410c; margin-bottom: 2px;">📖 全功能專題：大語言模型通識圖鑑獨立全景頁</div>
+    <div style="font-size: 12px; color: var(--ink-secondary);">前往獨立專題頁，查看完整的地端 (Ollama) vs 雲端 (Cloud API) 向量架構圖與五維決策矩陣</div>
+  </div>
+  <a href="00_LLM_Token與模型全景圖譜.html" target="_blank" style="padding: 6px 12px; background: #c2410c; color: #fff; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap;">開啟獨立全景圖鑑 ↗</a>
+</div>`,
+        takeaway: `🎓 <strong>課程核心啟示：</strong> 搞懂 Token 是掌握 AI 資料分析與 Agent 開發的基石！在 Module 1 中，我們學會控管 Token 成本與防幻覺；在 Module 2 與 3 中，我們將利用這些主流模型（或地端 Ollama）打造專屬於你企業的自動化 Agent！`
+      },
       {
         id: "time",
         title: "無時鐘感知與凍結 (No Internal Clock)",
@@ -1269,9 +1429,94 @@ print("Reconciliation: PASS")
       }
     }
 
+    
+    let lastApiUsage = null;
+
+    
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function simulateTokensLab(text) {
+      if (!text) return [];
+      const regex = /([a-zA-Z]+|[0-9]+|[\u4e00-\u9fa5]|[\u3040-\u30ff]|[\uac00-\ud7af]|[\n\r]+|[ \t]+|[^\s\w\u4e00-\u9fa5])/g;
+      const rawMatches = text.match(regex) || [];
+      const tokens = [];
+
+      rawMatches.forEach(m => {
+        if (/^[a-zA-Z]{6,}$/.test(m)) {
+          if (m.toLowerCase() === "strawberry") {
+            tokens.push("straw");
+            tokens.push("berry");
+          } else if (m.toLowerCase() === "tokenization") {
+            tokens.push("token");
+            tokens.push("ization");
+          } else {
+            const mid = Math.floor(m.length / 2);
+            tokens.push(m.slice(0, mid));
+            tokens.push(m.slice(mid));
+          }
+        } else {
+          tokens.push(m);
+        }
+      });
+      return tokens;
+    }
+
+    function updateLabTokenizer() {
+      const text = document.getElementById('promptInput').value;
+      const tokens = simulateTokensLab(text);
+      const tokenCount = tokens.length;
+      const charCount = text.length;
+      const ratio = charCount > 0 ? (charCount / (tokenCount || 1)).toFixed(2) : "0.00";
+      const cost1M = ((tokenCount * 0.15) / 1000).toFixed(4);
+
+      document.getElementById('labTokens').textContent = tokenCount;
+      document.getElementById('labChars').textContent = charCount;
+      document.getElementById('labRatio').textContent = ratio;
+      document.getElementById('labCost').textContent = 'USD ' + cost1M;
+
+      const container = document.getElementById('labTokenVisualizer');
+      if (!container) return;
+      container.innerHTML = '';
+      if (tokens.length === 0) {
+        container.innerHTML = '<span style="color: var(--ink-muted); font-size: 11px;">輸入文字後即刻呈現彩色 Token 切片...</span>';
+      } else {
+        tokens.forEach((t, i) => {
+          const chip = document.createElement('span');
+          chip.className = 'token-chip t-col-' + (i % 8);
+          let displayStr = t;
+          if (t === '\n') displayStr = '↵';
+          else if (t === ' ') displayStr = '␣';
+          else if (/^\s+$/.test(t)) displayStr = '␣'.repeat(t.length);
+          chip.innerHTML = escapeHtml(displayStr) + '<span class="token-idx">#' + (i + 1) + '</span>';
+          chip.title = 'Token #' + (i + 1) + ' | 長度: ' + t.length + ' 字元';
+          container.appendChild(chip);
+        });
+      }
+    }
+
+    function onPromptInputChanged() {
+      if (currentExpIdx === 0) {
+        updateLabTokenizer();
+      }
+    }
+
     function selectExperiment(idx) {
       currentExpIdx = idx;
       const exp = EXPERIMENTS[idx];
+
+      // Toggle Tokenizer module if tokens experiment
+      const tokMod = document.getElementById('tokenizerModule');
+      if (tokMod) {
+        if (exp.id === 'tokens') {
+          tokMod.style.display = 'block';
+          updateLabTokenizer();
+        } else {
+          tokMod.style.display = 'none';
+        }
+      }
 
       // 更新 Tab 狀態
       document.querySelectorAll('.tab-button').forEach((tab, i) => {
@@ -1336,6 +1581,7 @@ print("Reconciliation: PASS")
       const exp = EXPERIMENTS[currentExpIdx];
       const preset = exp.presets[pIdx];
       document.getElementById('promptInput').value = preset.prompt;
+      if (exp.id === 'tokens') updateLabTokenizer();
 
       const hasKey = (currentProvider === 'openrouter' && openrouterApiKey) || (currentProvider === 'gemini' && geminiApiKey);
       if (currentProvider === 'simulation' || !hasKey) {
@@ -1394,6 +1640,12 @@ print("Reconciliation: PASS")
           resText = await callGeminiApi(prompt, sysInstruction);
         }
 
+                if (lastApiUsage) {
+          resText += '\n\n================ [底層 API Usage 計費物件] ================\n' +
+            '• 輸入 Token (prompt_tokens): ' + lastApiUsage.prompt_tokens + '\n' +
+            '• 輸出 Token (completion_tokens): ' + lastApiUsage.completion_tokens + '\n' +
+            '• 總消耗 Token (total_tokens): ' + lastApiUsage.total_tokens;
+        }
         out.textContent = resText;
       } catch (err) {
         out.textContent = `❌ API 調用失敗：\n${err.message}\n\n建議確認 API Key 是否有效，或切換回「🧪 教室免 Key 模擬實測」模式繼續課程實作。`;
@@ -1427,6 +1679,16 @@ print("Reconciliation: PASS")
       }
 
       const data = await response.json();
+      if (data.usageMetadata) {
+        lastApiUsage = {
+          prompt_tokens: data.usageMetadata.promptTokenCount,
+          completion_tokens: data.usageMetadata.candidatesTokenCount,
+          total_tokens: data.usageMetadata.totalTokenCount
+        };
+      }
+      if (data.usage) {
+        lastApiUsage = data.usage;
+      }
       const choice = data.choices?.[0];
       if (choice?.message?.content) {
         return choice.message.content;
