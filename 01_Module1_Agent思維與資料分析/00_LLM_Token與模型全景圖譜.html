@@ -1064,6 +1064,275 @@
       line-height: 1.5;
     }
 
+  
+    /* ============================================================
+       🚀 SECTION 05: AGENT EVOLUTION & DURATION HORIZONS
+       ============================================================ */
+    .evolution-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+    .timeline-card {
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 8px;
+      padding: 22px 24px;
+      transition: all 0.2s ease;
+    }
+    .timeline-card:hover {
+      border-color: var(--ink);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .timeline-card-focal {
+      border-left: 5px solid var(--accent-coral);
+      background: #fffdf9;
+    }
+    .timeline-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      background: var(--paper-tint);
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      border: 1px solid var(--rule);
+    }
+    .timeline-title {
+      font-family: var(--font-title);
+      font-size: 24px;
+      color: var(--ink);
+      line-height: 1.25;
+      margin-bottom: 10px;
+    }
+    .timeline-desc {
+      font-size: 13px;
+      color: var(--ink);
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .timeline-subtext {
+      font-size: 12px;
+      color: var(--ink-secondary);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    .timeline-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .t-pill {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 3px;
+      background: var(--paper-tint);
+      color: var(--ink-secondary);
+      border: 1px solid var(--rule);
+    }
+    .t-pill.tag-focal {
+      background: rgba(194, 65, 12, 0.08);
+      color: var(--accent-coral);
+      border-color: rgba(194, 65, 12, 0.2);
+    }
+    .timeline-bottleneck {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #991b1b;
+      background: #fef2f2;
+      border: 1px solid #fee2e2;
+      border-radius: 4px;
+      padding: 6px 10px;
+      line-height: 1.5;
+    }
+
+    /* Loop Diagram in Stage 5 */
+    .loop-diagram-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: var(--paper-tint);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin: 12px 0;
+    }
+    .loop-step {
+      background: #ffffff;
+      border: 1px solid var(--rule-solid);
+      border-radius: 4px;
+      padding: 8px 12px;
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.3;
+      flex: 1;
+      min-width: 90px;
+    }
+    .loop-step strong { color: var(--accent-coral); font-family: var(--font-mono); }
+    .loop-step span { font-size: 10px; color: var(--ink-secondary); }
+    .loop-arrow {
+      color: var(--accent-coral);
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    /* Duration Deep Dive Section */
+    .duration-deepdive {
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 8px;
+      padding: 28px 24px;
+      margin-top: 24px;
+    }
+    .duration-header { margin-bottom: 22px; }
+    .duration-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      background: rgba(29, 78, 216, 0.08);
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .duration-title {
+      font-family: var(--font-title);
+      font-size: 28px;
+      color: var(--ink);
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+    .duration-desc {
+      font-size: 13px;
+      color: var(--ink-secondary);
+      line-height: 1.6;
+    }
+
+    /* 4 Tiers Grid */
+    .tiers-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1024px) {
+      .tiers-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .tiers-grid { grid-template-columns: 1fr; }
+    }
+
+    .tier-card {
+      background: var(--paper-tint);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .tier-card.tier-focal {
+      background: #ffffff;
+      border: 1px solid var(--accent-coral);
+      box-shadow: 0 4px 12px rgba(194, 65, 12, 0.08);
+    }
+    .tier-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .tier-pill {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+    .tier-1 { background: #e2e8f0; color: #475569; }
+    .tier-2 { background: #ffedd5; color: #c2410c; }
+    .tier-3 { background: #e0e7ff; color: #3730a3; }
+    .tier-4 { background: #dcfce7; color: #166534; }
+    .tier-time {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .tier-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .tier-content {
+      font-size: 11px;
+      color: var(--ink-secondary);
+      line-height: 1.5;
+      flex: 1;
+      margin-bottom: 12px;
+    }
+    .tier-spec {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--ink-muted);
+      border-top: 1px dashed var(--rule-solid);
+      padding-top: 8px;
+    }
+
+    /* Limits Box */
+    .limits-box {
+      background: var(--paper-tint);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 18px 20px;
+    }
+    .limits-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 860px) {
+      .limits-grid { grid-template-columns: 1fr; }
+    }
+    .limit-item {
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 5px;
+      padding: 14px;
+    }
+    .limit-num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent-coral);
+      margin-bottom: 4px;
+    }
+    .limit-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .limit-desc {
+      font-size: 11px;
+      color: var(--ink-secondary);
+      line-height: 1.5;
+    }
+    .limit-desc strong { color: var(--ink); }
+
   </style>
 </head>
 <body>
@@ -1081,6 +1350,7 @@
         <a href="#glossary" class="nav-link">核心概念</a>
         <a href="#models" class="nav-link">全球模型全景</a>
         <a href="#cloud-vs-local" class="nav-link">雲端 vs 地端</a>
+        <a href="#agent-evolution" class="nav-link">Agent 演進與時長</a>
         <a href="00_LLM本質探秘實驗室.html" class="nav-link active-pill">🔬 前往本質實驗室 ↗</a>
       </nav>
     </div>
@@ -1102,6 +1372,7 @@
       <a href="#glossary">📖 6 大基礎專有名詞詞典</a>
       <a href="#models">🌐 全球主流 8 大模型全景評測</a>
       <a href="#cloud-vs-local">⚖️ 雲端 API vs 地端 Ollama 架構決策</a>
+      <a href="#agent-evolution">🤖 從 Prompt 到現代 Agent Loop &amp; 執行時長全景</a>
     </div>
   </section>
 
@@ -1979,6 +2250,232 @@
           </tr>
         </tbody>
       </table>
+    </div>
+  </section>
+
+  
+  <!-- SECTION 5: THE AGENT EVOLUTION & DURATION HORIZONS -->
+  <section id="agent-evolution" class="container section-block">
+    <div class="section-header">
+      <div class="section-badge">AUTONOMOUS SYSTEMS · 05</div>
+      <h2 class="section-title">從 AI、Prompt 到現代 Agent Loop 的技術演進史，與「Agent 能執行多久的工作？」</h2>
+      <p class="section-desc">
+        人工智能在短短三年間，從單純的「提示詞工程（Prompt Engineering）」演進為「上下文工程（Context Engineering）」，再到今日以「執行座（Harness）」與「自主循環（Loop）」驅動的 AI Agent。本章節為您梳理這段波瀾壯闊的演進脈絡，並深度解答實戰中最關鍵的工程命題：<strong>Agent 到底能持續自主工作多久？</strong>
+      </p>
+    </div>
+
+    <!-- PART 1: 5 大歷史躍遷時代 (Timeline / Stage Cards) -->
+    <div class="evolution-timeline">
+      
+      <!-- Stage 1 -->
+      <div class="timeline-card">
+        <div class="timeline-badge">2022 ~ 2023 · 蠻荒探索期</div>
+        <div class="timeline-title">時代 01：AI 與 Prompt Engineering（提示詞工程）</div>
+        <p class="timeline-desc">
+          <strong>【核心本質】</strong> 大模型（GPT-3.5）橫空出世，但它只能被動「一問一答（One-shot）」。人類是唯一的操盤手，靠著絞盡腦汁發明各種提示詞技巧（如 Few-shot 少樣本示範、角色扮演、Chain of Thought 思維鏈）來引導模型。
+        </p>
+        <div class="timeline-tags">
+          <span class="t-pill">AI (人工智能)</span>
+          <span class="t-pill">Prompt Engineering</span>
+          <span class="t-pill">One-Shot Q&amp;A</span>
+        </div>
+        <div class="timeline-bottleneck">
+          ⚠️ <strong>局限與瓶頸</strong>：模型沒有手腳，無法聯網、無法執行代碼；Prompt 稍微改動一個字，回覆就面目全非，極不穩定。
+        </div>
+      </div>
+
+      <!-- Stage 2 -->
+      <div class="timeline-card">
+        <div class="timeline-badge">2023 ~ 2024 · 物理擴容期</div>
+        <div class="timeline-title">時代 02：Context Window 與 Context Engineering（上下文工程）</div>
+        <p class="timeline-desc">
+          <strong>【核心本質】</strong> 模型記憶視窗（Context Window）從 4K (GPT-3) 物理暴增至 128K (GPT-4o)、200 萬 (Gemini 2.0) 乃至 400 萬 (MiniMax)。業界深刻認知到：<strong>「寫好一句 Prompt，不如做好 Context Engineering（上下文工程）」</strong>！
+        </p>
+        <p class="timeline-subtext">
+          工程師不再手工修飾文字，而是建立系統架構：動態檢索 RAG 知識庫切片、歷史對話修剪（Pruning）、工具定義（Tool Schema）注入，將最關鍵的資訊像樂高積木一樣動態組裝給大腦。
+        </p>
+        <div class="timeline-tags">
+          <span class="t-pill">Context Window (物理視窗)</span>
+          <span class="t-pill">Context Engineering (上下文工程)</span>
+          <span class="t-pill">RAG 檢索增強</span>
+        </div>
+        <div class="timeline-bottleneck">
+          ⚠️ <strong>局限與瓶頸</strong>：即便有了百萬視窗，模型依然是「靜態閱讀者」，依然不知道真實世界的最新變化，無法自己驗證答案。
+        </div>
+      </div>
+
+      <!-- Stage 3 -->
+      <div class="timeline-card">
+        <div class="timeline-badge">2024 · 算力基建革命</div>
+        <div class="timeline-title">時代 03：OpenCloud 與 Firmus（高密度浸沒式算力雲）</div>
+        <p class="timeline-desc">
+          <strong>【核心本質】</strong> 萬億級 MoE 模型與長程 Agent 推理全面爆發，傳統資料中心的散熱與電網遭遇物理極限。<strong>Firmus Technologies</strong> 與 <strong>OpenCloud</strong> 開放架構應運而生：
+        </p>
+        <p class="timeline-subtext">
+          <strong>Firmus</strong> 在亞太（新加坡、印尼、馬來西亞）利用全浸沒式冷卻（Immersion Cooling）打造超高密度 AI 工廠，承載 NVIDIA Grace-Blackwell GB300 / GB200 NVL72 萬卡集群；而 <strong>OpenCloud</strong> 則打破專屬封閉雲綁定，讓開源旗艦（DeepSeek-V3/R1, Qwen 2.5）能在異質雲端彈性調度，為長程 Agent 提供源源不絕的算力生命線。
+        </p>
+        <div class="timeline-tags">
+          <span class="t-pill">Firmus 浸沒式算力工廠</span>
+          <span class="t-pill">OpenCloud 開放架構</span>
+          <span class="t-pill">NVIDIA GB300 集群</span>
+        </div>
+      </div>
+
+      <!-- Stage 4 -->
+      <div class="timeline-card">
+        <div class="timeline-badge">2024 ~ 2025 · 具身基座期</div>
+        <div class="timeline-title">時代 04：工具調用與 Agent Harness（執行基座與韁繩）</div>
+        <p class="timeline-desc">
+          <strong>【核心本質】</strong> 什麼是 <strong>Harness</strong>？就像太空船的發射底座，或戰馬的韁繩！純 LLM 只是一個漂浮的大腦，而 <strong>Agent Harness</strong> 是賦予它的「操作系統、安全盔甲與工具底座」：
+        </p>
+        <p class="timeline-subtext">
+          Harness 包含：Linux 沙盒環境、Python 代碼執行器、檔案讀寫權限、安全護欄（Safety Guardrails 防止惡意注入）、以及自動單元測試評測基座（Evaluation Harness）。NVIDIA OpenShell 架構中的 CPU Harness 便專門負責調度和管控 Tool Calling。
+        </p>
+        <div class="timeline-tags">
+          <span class="t-pill">Harness (執行座/測試座)</span>
+          <span class="t-pill">Tool Calling (工具調用)</span>
+          <span class="t-pill">Safety Guardrails</span>
+        </div>
+      </div>
+
+      <!-- Stage 5 -->
+      <div class="timeline-card timeline-card-focal">
+        <div class="timeline-badge" style="background: rgba(194,65,12,0.12); color: var(--accent-coral);">2025 ~ 2026 · 現代自主閉環</div>
+        <div class="timeline-title" style="color: var(--accent-coral);">時代 05：Agent、自主循環（Loop）與圖形多模態（Graphic / Generative UI）</div>
+        <p class="timeline-desc">
+          <strong>【核心本質】</strong> 現代 Agent 的靈魂，就在於 <strong>Loop（自主閉環迭代）</strong>！
+        </p>
+        <div class="loop-diagram-box">
+          <div class="loop-step">🎯 <strong>Goal</strong><br><span>設定目標</span></div>
+          <div class="loop-arrow">➔</div>
+          <div class="loop-step">🧠 <strong>Think</strong><br><span>思考規劃</span></div>
+          <div class="loop-arrow">➔</div>
+          <div class="loop-step">⚡ <strong>Act</strong><br><span>執行工具/代碼</span></div>
+          <div class="loop-arrow">➔</div>
+          <div class="loop-step">👁️ <strong>Observe</strong><br><span>觀察回傳與報錯</span></div>
+          <div class="loop-arrow">➔</div>
+          <div class="loop-step">🔄 <strong>Reflect &amp; Loop</strong><br><span>自我除錯循環</span></div>
+        </div>
+        <p class="timeline-subtext" style="margin-top: 10px;">
+          <strong>Graphic（圖形化與 Generative UI）</strong>：現代 Agent 擁有了「眼睛與畫筆」——它不僅能讀寫代碼，還能主動截圖瀏覽器畫面排查前端 Bug，讀取複雜數據視覺化圖表（Graphic Charts），並即時動態生成互動式網頁與圖表直接呈現給人類！
+        </p>
+        <div class="timeline-tags">
+          <span class="t-pill tag-focal">Agent (智慧代理人)</span>
+          <span class="t-pill tag-focal">The Autonomous Loop (閉環循環)</span>
+          <span class="t-pill tag-focal">Graphic / Generative UI</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PART 2: 【深度專題】Agent 到底可以持續執行多久的工作？ -->
+    <div class="duration-deepdive">
+      <div class="duration-header">
+        <div class="duration-badge">OPERATIONAL HORIZONS</div>
+        <h3 class="duration-title">🕒 實戰核心命題：Agent 到底可以持續執行多久的工作？</h3>
+        <p class="duration-desc">
+          「我能叫 Agent 幫我自動寫一整晚代碼嗎？它能永久 24 小時守護伺服器嗎？」這取決於它的<strong>運行層級（Operational Horizons）</strong>與底層架構支撐：
+        </p>
+      </div>
+
+      <!-- 4 Duration Tiers Grid -->
+      <div class="tiers-grid">
+        
+        <!-- Tier 1 -->
+        <div class="tier-card">
+          <div class="tier-header">
+            <span class="tier-pill tier-1">LEVEL 1 · 即時任務</span>
+            <span class="tier-time">數秒 ~ 2 分鐘</span>
+          </div>
+          <h4 class="tier-name">單次請求型 (Instant Task)</h4>
+          <p class="tier-content">
+            • <strong>典型任務</strong>：查詢天氣、股票報價、單次 SQL 語法產出、中英文互譯。<br>
+            • <strong>運作機制</strong>：單次 HTTP POST 請求與輕量 Tool Calling。受限於前端網頁與 API 閘道器的超時機制（如 60s Timeout）。
+          </p>
+          <div class="tier-spec">架構限制：無狀態，一次性完成即結束</div>
+        </div>
+
+        <!-- Tier 2 -->
+        <div class="tier-card tier-focal">
+          <div class="tier-header">
+            <span class="tier-pill tier-2">LEVEL 2 · 深度自主任務</span>
+            <span class="tier-time">10 分鐘 ~ 2 小時</span>
+          </div>
+          <h4 class="tier-name">自主循環型 (Autonomous Loop)</h4>
+          <p class="tier-content">
+            • <strong>典型任務</strong>：讀取 30 個代碼檔案修復 Bug、爬取整站數據清洗、撰寫 15 頁行銷分析報告並自我校對驗證。<br>
+            • <strong>運作機制</strong>：<strong>連續自主 Loop（20 ~ 100 輪 iterations）</strong>。Agent 在沙盒中寫代碼 ➔ 跑單元測試 ➔ 看到報錯 ➔ 自行修改代碼 ➔ 重新跑測試直到全綠燈！代表：Claude Code, Devin, Antigravity。
+          </p>
+          <div class="tier-spec" style="color: var(--accent-coral);">架構支撐：沙盒終端 (Harness) + 工具反饋閉環</div>
+        </div>
+
+        <!-- Tier 3 -->
+        <div class="tier-card">
+          <div class="tier-header">
+            <span class="tier-pill tier-3">LEVEL 3 · 長程背景排程</span>
+            <span class="tier-time">數小時 ~ 數天</span>
+          </div>
+          <h4 class="tier-name">排程批次型 (Scheduled Runner)</h4>
+          <p class="tier-content">
+            • <strong>典型任務</strong>：跨夜執行 5,000 筆測試案例回歸分析、全天候社群輿情監控整理、每週一自動讀取 CRM 與財報產出週報。<br>
+            • <strong>運作機制</strong>：<strong>非同步背景工作（Async Task / Background Worker）</strong>。必須具備狀態持久化（State Persistence，如 SQLite/Postgres Checkpoint）、心跳機制與斷點續傳。即使當機重啟，進度也不遺失。
+          </p>
+          <div class="tier-spec">架構支撐：非同步排程 (Cron) + 狀態快照保存</div>
+        </div>
+
+        <!-- Tier 4 -->
+        <div class="tier-card">
+          <div class="tier-header">
+            <span class="tier-pill tier-4">LEVEL 4 · 永久常駐守護</span>
+            <span class="tier-time">數週 ~ 永久常駐 (24/7)</span>
+          </div>
+          <h4 class="tier-name">數位員工型 (Standing Agent)</h4>
+          <p class="tier-content">
+            • <strong>典型任務</strong>：企業 7x24 小時智慧資安入侵偵測、自適應資料庫死鎖排查、全天候高頻量化風控監控。<br>
+            • <strong>運作機制</strong>：<strong>分散式多代理人系統（Multi-Agent System）</strong>。多個 Agent 輪班交接（Handoffs），搭配長短期分層記憶（Memory RAG）與心跳探針，永續運行。
+          </p>
+          <div class="tier-spec">架構支撐：Multi-Agent 協作 + 分層記憶 + 心跳健康檢查</div>
+        </div>
+
+      </div>
+
+      <!-- 3 Breaking Points & Defenses -->
+      <div class="limits-box">
+        <h4 style="font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          <span>🛑 決定 Agent「能活多久、能跑多久」的三大物理工程極限與防禦策略：</span>
+        </h4>
+        <div class="limits-grid">
+          
+          <div class="limit-item">
+            <div class="limit-num">極限 01</div>
+            <div class="limit-title">💸 Token 經濟成本牆 (Cost Wall)</div>
+            <p class="limit-desc">
+              若 Agent 陷入死循環（如寫錯代碼不斷重試 300 次），每輪都在重送數萬 Token 歷史小抄，一個晚上就能燒掉數百美元！<br>
+              <strong>🛡️ 工程防禦</strong>：在 Harness 中加設 <strong>最大迭代限制（Max Turns Limit，如最多 30 步）</strong> 與 <strong>預算熔斷機制（Budget Circuit Breaker）</strong>。
+            </p>
+          </div>
+
+          <div class="limit-item">
+            <div class="limit-num">極限 02</div>
+            <div class="limit-title">🧠 上下文衰減與渙散 (Context Drift)</div>
+            <p class="limit-desc">
+              當對話循環累積數十輪、塞滿上萬行終端報錯後，大模型注意力會被早期雜訊嚴重稀釋，產生嚴重的記憶混淆與幻覺。<br>
+              <strong>🛡️ 工程防禦</strong>：<strong>動態上下文修剪（Context Pruning）</strong> 與 <strong>階段里程碑總結（Milestone Summarization）</strong>，定期清洗大腦雜訊。
+            </p>
+          </div>
+
+          <div class="limit-item">
+            <div class="limit-num">極限 03</div>
+            <div class="limit-title">⚠️ 錯誤串聯與不可逆風險 (Error Cascading)</div>
+            <p class="limit-desc">
+              自主運行 3 小時的 Agent，如果在第 1 小時就誤解了業務方向，後續的所有操作都是錯上加錯，甚至誤刪生產資料庫！<br>
+              <strong>🛡️ 工程防禦</strong>：<strong>人類介入確認（Human-in-the-Loop）</strong>。對高危操作（刪除、付款、部署上線）強制彈出確認按鈕（Proceed），未確認絕不執行。
+            </p>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   </section>
 
