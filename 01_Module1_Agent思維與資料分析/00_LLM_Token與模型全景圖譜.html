@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大語言模型通識圖鑑：Token、分詞演算法與全球模型全景圖譜</title>
+  <!-- Google Fonts: Editorial Serif + Clean Sans + Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #fbfaf6;
+      --paper-card: #ffffff;
+      --paper-tint: #f5f3ec;
+      --paper-accent-tint: rgba(194, 65, 12, 0.06);
+      --ink: #1a1917;
+      --ink-secondary: #5e5953;
+      --ink-muted: #8c867e;
+      --rule: rgba(45, 40, 35, 0.12);
+      --rule-solid: #dedad2;
+      --accent-coral: #c2410c;
+      --accent-blue: #1d4ed8;
+      --accent-green: #15803d;
+      --accent-purple: #7e22ce;
+      --font-title: 'Instrument Serif', 'Noto Serif TC', Georgia, serif;
+      --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Geist Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 80px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Navigation Bar */
+    .top-nav {
+      border-bottom: 1px solid var(--rule);
+      background: rgba(251, 250, 246, 0.92);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .top-nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 64px;
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: var(--paper-tint);
+      border: 1px solid var(--rule-solid);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+    .brand-title {
+      font-family: var(--font-title);
+      font-size: 21px;
+      font-weight: 400;
+      color: var(--ink);
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-link {
+      font-size: 13px;
+      color: var(--ink-secondary);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+      font-weight: 500;
+    }
+    .nav-link:hover {
+      color: var(--ink);
+      background: var(--paper-tint);
+    }
+    .nav-link.active-pill {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    /* Hero Header */
+    .hero-section {
+      padding: 56px 0 36px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent-coral);
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      background: var(--accent-coral);
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .hero-title {
+      font-family: var(--font-title);
+      font-size: 46px;
+      line-height: 1.15;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 16px;
+    }
+    .hero-desc {
+      font-size: 16px;
+      color: var(--ink-secondary);
+      max-width: 860px;
+      line-height: 1.7;
+    }
+
+    .section-nav {
+      display: flex;
+      gap: 8px;
+      margin-top: 24px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .section-nav a {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 6px 14px;
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 4px;
+      color: var(--ink-secondary);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .section-nav a:hover {
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+
+    /* Section Headings */
+    .section-block {
+      padding: 56px 0 20px;
+    }
+    .section-header {
+      margin-bottom: 24px;
+    }
+    .section-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent-blue);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .section-title {
+      font-family: var(--font-title);
+      font-size: 32px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .section-desc {
+      font-size: 14px;
+      color: var(--ink-secondary);
+      max-width: 760px;
+    }
+
+    /* Tokenizer Sandbox Card */
+    .card-editor {
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 6px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .card-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .card-title-sub {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .preset-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .pill-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      background: var(--paper-tint);
+      border: 1px solid var(--rule-solid);
+      border-radius: 3px;
+      cursor: pointer;
+      color: var(--ink-secondary);
+      transition: all 0.15s;
+    }
+    .pill-btn:hover {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    .editor-textarea {
+      width: 100%;
+      height: 110px;
+      padding: 14px;
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.6;
+      background: var(--paper);
+      border: 1px solid var(--rule-solid);
+      border-radius: 4px;
+      color: var(--ink);
+      resize: vertical;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+    .editor-textarea:focus {
+      outline: none;
+      border-color: var(--ink);
+    }
+
+    /* Metrics Grid */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .metric-box {
+      background: var(--paper-tint);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 12px 14px;
+    }
+    .metric-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      margin-bottom: 4px;
+    }
+    .metric-value {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .metric-sub {
+      font-size: 11px;
+      color: var(--ink-secondary);
+      margin-top: 2px;
+    }
+
+    /* Token Visualizer Canvas */
+    .token-stream-box {
+      background: var(--paper);
+      border: 1px solid var(--rule-solid);
+      border-radius: 4px;
+      padding: 16px;
+      min-height: 120px;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .token-chip {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(0,0,0,0.08);
+      position: relative;
+      cursor: default;
+      transition: transform 0.1s;
+    }
+    .token-chip:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    }
+    .token-idx {
+      font-size: 9px;
+      opacity: 0.5;
+      user-select: none;
+    }
+
+    /* Token Pastel Palette */
+    .t-col-0 { background: #fee2e2; color: #991b1b; }
+    .t-col-1 { background: #ffedd5; color: #9a3412; }
+    .t-col-2 { background: #fef3c7; color: #92400e; }
+    .t-col-3 { background: #ecfccb; color: #3f6212; }
+    .t-col-4 { background: #dcfce7; color: #166534; }
+    .t-col-5 { background: #e0e7ff; color: #3730a3; }
+    .t-col-6 { background: #fae8ff; color: #86198f; }
+    .t-col-7 { background: #f1f5f9; color: #334155; }
+
+    /* Strawberry Paradox Notice */
+    .paradox-banner {
+      background: var(--paper-accent-tint);
+      border: 1px solid rgba(194, 65, 12, 0.25);
+      border-radius: 4px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .paradox-icon { font-size: 20px; line-height: 1; }
+    .paradox-content h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-coral);
+      margin-bottom: 4px;
+    }
+    .paradox-content p {
+      font-size: 12px;
+      color: var(--ink-secondary);
+      line-height: 1.6;
+    }
+
+    /* Pricing Estimate Table */
+    .pricing-table-wrapper {
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+    .pricing-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+    .pricing-table th, .pricing-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .pricing-table th {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+      background: var(--paper-tint);
+    }
+    .pricing-table td.mono { font-family: var(--font-mono); }
+
+    /* API Live Trial Section */
+    .api-trial-card {
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 6px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+    .api-controls-grid {
+      display: grid;
+      grid-template-columns: 200px 1fr 120px;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .select-clean, .input-clean {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 8px 12px;
+      background: var(--paper);
+      border: 1px solid var(--rule-solid);
+      border-radius: 4px;
+      color: var(--ink);
+    }
+    .btn-action {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-action:hover { opacity: 0.85; }
+    .api-output-box {
+      background: var(--paper);
+      border: 1px solid var(--rule-solid);
+      border-radius: 4px;
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink);
+      white-space: pre-wrap;
+      line-height: 1.6;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+    .usage-badge-bar {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .usage-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      background: var(--paper-tint);
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      color: var(--ink-secondary);
+    }
+
+    /* Core Concept Cards Grid */
+    .glossary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .concept-card {
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 6px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+    .concept-card:hover {
+      border-color: var(--ink);
+      transform: translateY(-2px);
+    }
+    .concept-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-blue);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .concept-term {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .concept-desc {
+      font-size: 13px;
+      color: var(--ink-secondary);
+      line-height: 1.6;
+    }
+    .concept-formula {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: var(--paper-tint);
+      padding: 6px 10px;
+      border-radius: 3px;
+      margin-top: 10px;
+      color: var(--ink);
+      border: 1px solid var(--rule);
+    }
+
+    /* Model Landscape Section */
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 8px 16px;
+      border-radius: 4px;
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      color: var(--ink-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    .models-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .model-card {
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 6px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+    .model-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      border-color: var(--rule-solid);
+    }
+    .model-card-top { margin-bottom: 14px; }
+    .model-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .model-company {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-muted);
+    }
+    .model-name {
+      font-family: var(--font-title);
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .model-tag-pill {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+    .tag-cloud { background: rgba(29, 78, 216, 0.08); color: var(--accent-blue); }
+    .tag-open { background: rgba(21, 128, 61, 0.08); color: var(--accent-green); }
+    .tag-local { background: rgba(194, 65, 12, 0.08); color: var(--accent-coral); }
+
+    .model-summary {
+      font-size: 13px;
+      color: var(--ink-secondary);
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+    .model-specs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      background: var(--paper-tint);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 14px;
+    }
+    .spec-item { display: flex; flex-direction: column; }
+    .spec-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+    }
+    .spec-value {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-top: 2px;
+    }
+    .model-strengths {
+      font-size: 12px;
+      color: var(--ink-secondary);
+      line-height: 1.6;
+    }
+    .model-strengths strong { color: var(--ink); }
+
+    /* SVG Diagram Container */
+    .diagram-container {
+      width: 100%;
+      overflow-x: auto;
+      background: var(--paper-tint);
+      border: 1px solid var(--rule-solid);
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    svg {
+      width: 100%;
+      min-width: 960px;
+      height: auto;
+      display: block;
+    }
+
+    /* Comparison Table */
+    .compare-container {
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 6px;
+      padding: 24px;
+      overflow-x: auto;
+    }
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .compare-table th, .compare-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--rule);
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare-table th {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--paper-tint);
+      color: var(--ink);
+    }
+    .compare-table th.cloud-col {
+      color: var(--accent-blue);
+      border-bottom: 2px solid var(--accent-blue);
+    }
+    .compare-table th.local-col {
+      color: var(--accent-coral);
+      border-bottom: 2px solid var(--accent-coral);
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--rule);
+      margin-top: 60px;
+      padding-top: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--ink-muted);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .hero-title { font-size: 34px; }
+      .metrics-row { grid-template-columns: repeat(2, 1fr); }
+      .api-controls-grid { grid-template-columns: 1fr; }
+      .glossary-grid { grid-template-columns: 1fr; }
+      .models-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="top-nav">
+    <div class="container top-nav-inner">
+      <div class="brand-group">
+        <span class="brand-badge">MODULE 01</span>
+        <span class="brand-title">大語言模型通識圖鑑</span>
+      </div>
+      <nav class="nav-actions">
+        <a href="#tokenizer" class="nav-link">Token 視覺化</a>
+        <a href="#api-trial" class="nav-link">實時 API 試演</a>
+        <a href="#glossary" class="nav-link">核心概念</a>
+        <a href="#models" class="nav-link">全球模型全景</a>
+        <a href="#cloud-vs-local" class="nav-link">雲端 vs 地端</a>
+        <a href="00_LLM本質探秘實驗室.html" class="nav-link active-pill">🔬 前往本質實驗室 ↗</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="container hero-section">
+    <div class="eyebrow">Visual AI Encyclopedia · 語言模型本質與生態</div>
+    <h1 class="hero-title">Token、分詞演算法與全球大模型全景圖譜</h1>
+    <p class="hero-desc">
+      大語言模型（LLM）不是百科全書資料庫，而是高維空間的字詞機率取樣器。在進入嚴謹的資料分析與 Agent 工具調用前，徹底搞懂 Token 的物理切分機制、API 計費邏輯，以及全球雲端巨頭（OpenAI, Gemini, Claude）與開源開拓者（DeepSeek, Qwen, Ollama）的版圖佈局。
+    </p>
+
+    <!-- Quick Navigation Pills -->
+    <div class="section-nav">
+      <a href="#tokenizer">⚡ 互動式 Tokenizer 分詞沙盒</a>
+      <a href="#api-trial">📡 實時 API 調用與 Usage 試演</a>
+      <a href="#strawberry">🍓 為什麼 AI 數不出 strawberry 的 r？</a>
+      <a href="#glossary">📖 6 大基礎專有名詞詞典</a>
+      <a href="#models">🌐 全球主流 8 大模型全景評測</a>
+      <a href="#cloud-vs-local">⚖️ 雲端 API vs 地端 Ollama 架構決策</a>
+    </div>
+  </section>
+
+  <!-- SECTION 1: TOKEN & TOKENIZE SANDBOX -->
+  <section id="tokenizer" class="container section-block">
+    <div class="section-header">
+      <div class="section-badge">INTERACTIVE EXPLORER · 01</div>
+      <h2 class="section-title">Token 是什麼？互動式分詞與成本試算沙盒</h2>
+      <p class="section-desc">
+        電腦只認得二進制數字，無法直接理解人類文字。LLM 透過 <strong>Byte-Pair Encoding (BPE)</strong> 演算法將文字切分成「詞元（Token）」。英文字詞通常 1 個單字切成 1~2 個 Token；繁體中文因多字元編碼，每個字約消耗 1.2~2.0 個 Token！
+      </p>
+    </div>
+
+    <div class="card-editor">
+      <div class="card-header-flex">
+        <span class="card-title-sub">輸入任意文字，即時查看 BPE 分詞色塊與計費：</span>
+        <div class="preset-pills">
+          <button class="pill-btn" onclick="setPreset('chinese')">🇹🇼 繁體中文字詞</button>
+          <button class="pill-btn" onclick="setPreset('english')">🇺🇸 經典英語段落</button>
+          <button class="pill-btn" onclick="setPreset('strawberry')">🍓 Strawberry 計數陷阱</button>
+          <button class="pill-btn" onclick="setPreset('code')">🐍 Python 資料分析代碼</button>
+        </div>
+      </div>
+
+      <textarea id="tokenInput" class="editor-textarea" placeholder="在此輸入任何文字，觀察下方的即時 Token 切割..." oninput="updateTokenizer()">大語言模型本質上是一組凍結的浮點數權重矩陣，每一次對話都在根據機率預測下一個 Token！</textarea>
+
+      <!-- Metrics Row -->
+      <div class="metrics-row">
+        <div class="metric-box">
+          <div class="metric-label">Token 總數 (Tokens)</div>
+          <div id="statTokens" class="metric-value">42</div>
+          <div class="metric-sub">API 計費的基本量子單位</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">字元數 (Characters)</div>
+          <div id="statChars" class="metric-value">46</div>
+          <div class="metric-sub">包含標點符號與空格</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">字元 / Token 轉換比率</div>
+          <div id="statRatio" class="metric-value">1.10</div>
+          <div class="metric-sub">中文字平均需消耗更多 Token</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">預估輸入成本 (100萬次)</div>
+          <div id="statCost" class="metric-value">$0.105</div>
+          <div class="metric-sub">以 GPT-4o-mini ($0.15/M) 試算</div>
+        </div>
+      </div>
+
+      <!-- Live Token Stream Display -->
+      <div class="card-header-flex" style="margin-bottom: 8px;">
+        <span class="card-title-sub" style="font-size: 12px; color: var(--ink-secondary);">分詞切片視覺化（每個色塊代表模型眼中獨立的 Token）：</span>
+        <span id="tokenPillCount" style="font-family: var(--font-mono); font-size: 11px; color: var(--ink-muted);">共 42 個 Tokens</span>
+      </div>
+      <div id="tokenVisualizer" class="token-stream-box">
+        <!-- Generated Dynamically -->
+      </div>
+
+      <!-- Strawberry Paradox Notice -->
+      <div id="strawberry" class="paradox-banner">
+        <div class="paradox-icon">🍓</div>
+        <div class="paradox-content">
+          <h4>經典認知陷阱：為什麼早期 ChatGPT 數不出「strawberry」裡面有幾個「r」？</h4>
+          <p>
+            因為在 BPE Tokenizer 的詞彙庫中，「strawberry」直接被切割為兩個獨立 Token：<code>straw</code> (Token ID 11245) 與 <code>berry</code> (Token ID 32884)！模型從頭到尾根本「看不見」單獨的英文字母 <code>r</code>，它看到的是兩個語意向量。當你要求它數字母時，它只能憑統計機率猜測，因而頻繁出錯！這正是 Tokenize 機制帶來的結構性特徵。
+          </p>
+        </div>
+      </div>
+
+      <!-- Pricing Comparison Table -->
+      <div class="pricing-table-wrapper">
+        <table class="pricing-table">
+          <thead>
+            <tr>
+              <th>模型名稱</th>
+              <th>供應商 / 生態</th>
+              <th>當前文字輸入費率 (每 1M Tokens)</th>
+              <th>本次輸入預估費用 (單次)</th>
+              <th>10 萬次調用累積費用</th>
+            </tr>
+          </thead>
+          <tbody id="pricingRows">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- API LIVE TRIAL SUB-SECTION -->
+    <div id="api-trial" class="api-trial-card">
+      <div class="card-header-flex">
+        <div>
+          <span class="concept-tag" style="color: var(--accent-coral);">LIVE API INSPECTOR</span>
+          <h3 style="font-family: var(--font-title); font-size: 24px; color: var(--ink);">實時 API 試演與底層 Usage 數據檢視</h3>
+        </div>
+        <div style="font-size: 12px; color: var(--ink-secondary);">
+          親眼見證雲端回傳的 <code>prompt_tokens</code> 與 <code>completion_tokens</code>
+        </div>
+      </div>
+
+      <div class="api-controls-grid">
+        <select id="liveModelSelect" class="select-clean" onchange="syncModelKey()">
+          <option value="simulation">🧪 本地教學模擬 (免填 Key)</option>
+          <option value="openrouter:google/gemma-3-12b-it">google/gemma-3-12b-it (OpenRouter)</option>
+          <option value="openrouter:openai/gpt-4o">openai/gpt-4o (OpenRouter)</option>
+          <option value="openrouter:deepseek/deepseek-chat">deepseek/deepseek-chat (OpenRouter)</option>
+          <option value="openrouter:anthropic/claude-3.5-sonnet">claude-3.5-sonnet (OpenRouter)</option>
+          <option value="openrouter:qwen/qwen-2.5-72b-instruct">qwen/qwen-2.5-72b (OpenRouter)</option>
+          <option value="gemini:gemini-1.5-flash">gemini-1.5-flash (Google Direct)</option>
+        </select>
+        <input type="password" id="liveApiKeyInput" class="input-clean" placeholder="填入 API Key（若選擇模擬模式則留空即可）">
+        <button class="btn-action" onclick="executeLiveApiTest()">發送試演 ↗</button>
+      </div>
+
+      <div id="liveOutputBox" class="api-output-box">點擊上方「發送試演」，觀察模型即時生成，並解析底層回傳的 Token 計費物件（usage: prompt_tokens, completion_tokens）。</div>
+
+      <div id="usageBadgeBar" class="usage-badge-bar">
+        <span class="usage-pill" id="pillPromptTokens">Prompt Tokens: -</span>
+        <span class="usage-pill" id="pillCompletionTokens">Completion Tokens: -</span>
+        <span class="usage-pill" id="pillTotalTokens">Total Tokens: -</span>
+        <span class="usage-pill" id="pillActualCost">本次呼叫成本: -</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: CORE CONCEPT GLOSSARY -->
+  <section id="glossary" class="container section-block">
+    <div class="section-header">
+      <div class="section-badge">CORE FOUNDATIONS · 02</div>
+      <h2 class="section-title">大語言模型必懂 6 大專有名詞視覺圖解</h2>
+      <p class="section-desc">
+        在進入 Module 1 的資料分析與 Module 2 的自訂 Skill 之前，這些核心詞彙是工程師與 AI 溝通的共同語言：
+      </p>
+    </div>
+
+    <div class="glossary-grid">
+      <!-- Card 1 -->
+      <div class="concept-card">
+        <div class="concept-tag">01 / QUANTUM OF LLM</div>
+        <div class="concept-term">Token（詞元）與 Tokenize</div>
+        <div class="concept-desc">
+          LLM 處理資訊的最小單位。英文通常由詞根、詞綴組成（如 <code>un-believable</code> 切為 2 個），中文常見 1 字對應 1~2 個 Token。Token 數量直接決定 API 帳單與運算延遲。
+        </div>
+        <div class="concept-formula">1 Word ≈ 1.3 Tokens ｜ 1 中文字 ≈ 1.5 Tokens</div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="concept-card">
+        <div class="concept-tag">02 / BILLING & AUTH</div>
+        <div class="concept-term">API Key（金鑰憑證）</div>
+        <div class="concept-desc">
+          你在雲端模型供應商（OpenAI、Anthropic、Google）處的數位身分證與信用卡扣款憑證。具備極高資安敏感性，一旦直接寫死在前端 HTML/JS，會被爬蟲一秒盜刷成千上萬美元！
+        </div>
+        <div class="concept-formula">Headers: {"Authorization": "Bearer sk-..."}</div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="concept-card">
+        <div class="concept-tag">03 / MEMORY CAPACITY</div>
+        <div class="concept-term">Context Window（上下文視窗）</div>
+        <div class="concept-desc">
+          模型單次對話能夠同時「閱讀」與「輸出」的最大 Token 上限。從早期 GPT-3.5 的 4K，進化到 GPT-4o 的 128K，再到 Gemini 1.5/2.5 Pro 的 2,000,000 Tokens（可直接吃下幾十本書或幾小時影片）！
+        </div>
+        <div class="concept-formula">Window = Prompt Tokens + Output Tokens</div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="concept-card">
+        <div class="concept-tag">04 / CREATIVITY TUNING</div>
+        <div class="concept-term">Temperature & Top-P（採樣溫度）</div>
+        <div class="concept-desc">
+          控制模型輸出時的隨機性。<strong>Temperature 越低（如 0.0）</strong>，模型只挑選機率最高的字，回答嚴謹、確定、適合資料分析與算術；<strong>越高（如 0.8~1.0）</strong>，模型會隨機選取邊緣詞彙，適合創意寫作。
+        </div>
+        <div class="concept-formula">P(w) = softmax(z_i / Temperature)</div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="concept-card">
+        <div class="concept-tag">05 / GEOMETRIC SEMANTICS</div>
+        <div class="concept-term">Embeddings（向量嵌入空間）</div>
+        <div class="concept-desc">
+          將文字轉換成數千個維度的浮點數向量（如 1536 維）。在幾何空間中，「國王」與「女王」的向量方向平行於「男人」與「女人」。RAG（檢索增強生成）正是利用餘弦相似度在向量空間找相關文檔。
+        </div>
+        <div class="concept-formula">Similarity = cos(θ) = (A · B) / (||A|| ||B||)</div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="concept-card">
+        <div class="concept-tag">06 / CONTROL LAYER</div>
+        <div class="concept-term">System Prompt（系統提示詞）</div>
+        <div class="concept-desc">
+          在對話最一開始由開發者注入的最高指導方針，規範模型的角色、語氣、輸出格式與邊界。但如同我們在北捷案例所見：<strong>System Prompt 不是物理防火牆</strong>，仍會被惡意 Prompt Injection 繞過！
+        </div>
+        <div class="concept-formula">role: "system", content: "You are an expert analyst..."</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: GLOBAL MODEL LANDSCAPE -->
+  <section id="models" class="container section-block">
+    <div class="section-header">
+      <div class="section-badge">MODEL TAXONOMY · 03</div>
+      <h2 class="section-title">全球主流大模型全景圖譜 (The Modern LLM Landscape)</h2>
+      <p class="section-desc">
+        當今世界的大模型已非單一巨頭獨大，而是形成了「美國雲端旗艦」、「亞洲高性價比開源突破」與「地端隱私引擎」三大陣營：
+      </p>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="filter-tabs">
+      <button class="filter-btn active" onclick="filterModels('all')">全部展示 (8 大代表生態)</button>
+      <button class="filter-btn" onclick="filterModels('frontier')">🇺🇸 美國雲端旗艦 (OpenAI, Anthropic, Google)</button>
+      <button class="filter-btn" onclick="filterModels('open')">⚡ 亞洲開源與性價比黑馬 (DeepSeek, Qwen, Kimi, MiniMax)</button>
+      <button class="filter-btn" onclick="filterModels('local')">🏠 本地地端部署 (Ollama)</button>
+    </div>
+
+    <!-- Models Grid -->
+    <div class="models-grid" id="modelsGrid">
+      <!-- OpenAI -->
+      <div class="model-card" data-category="frontier">
+        <div class="model-card-top">
+          <div class="model-header">
+            <span class="model-company">OPENAI · 美國</span>
+            <span class="model-tag-pill tag-cloud">雲端多模態旗艦</span>
+          </div>
+          <div class="model-name">GPT-4o & GPT-4o-mini</div>
+          <p class="model-summary">
+            全球商業落地最廣泛的旗艦模型。原生全模態架構（文字、視覺、音訊同源處理），具備頂級指令遵循能力與極低延遲。
+          </p>
+          <div class="model-specs">
+            <div class="spec-item">
+              <span class="spec-label">上下文視窗</span>
+              <span class="spec-value">128K Tokens</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">輸入價格</span>
+              <span class="spec-value">$2.50 / $0.15 (mini)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">核心強項</span>
+              <span class="spec-value">通用智能 · 生態豐富</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-strengths">
+          <strong>適合場景：</strong> 企業級穩定生產環境、複雜多步驟 Agent 推理、結構化 JSON Schema 強制輸出。
+        </div>
+      </div>
+
+      <!-- Anthropic Claude -->
+      <div class="model-card" data-category="frontier">
+        <div class="model-card-top">
+          <div class="model-header">
+            <span class="model-company">ANTHROPIC · 美國</span>
+            <span class="model-tag-pill tag-cloud">編程與邏輯天花板</span>
+          </div>
+          <div class="model-name">Claude 3.5 Sonnet</div>
+          <p class="model-summary">
+            由前 OpenAI 核心成員創立，目前在軟體工程（SWE-bench）與複雜長文本代碼生成領域公認的第一把交椅。文筆自然典雅，AI 味最淡。
+          </p>
+          <div class="model-specs">
+            <div class="spec-item">
+              <span class="spec-label">上下文視窗</span>
+              <span class="spec-value">200K Tokens</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">輸入價格</span>
+              <span class="spec-value">$3.00 / 1M</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">核心強項</span>
+              <span class="spec-value">寫 Code · 深度推理</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-strengths">
+          <strong>適合場景：</strong> 專業代碼重構、大型專案架構審查、長篇學術研究論文閱讀與分析。
+        </div>
+      </div>
+
+      <!-- Google Gemini -->
+      <div class="model-card" data-category="frontier">
+        <div class="model-card-top">
+          <div class="model-header">
+            <span class="model-company">GOOGLE DEEPMIND · 美國</span>
+            <span class="model-tag-pill tag-cloud">超長上下文之王</span>
+          </div>
+          <div class="model-name">Gemini 1.5 / 2.5 Pro & Flash</div>
+          <p class="model-summary">
+            以業界首創的「百萬級超長上下文」震撼業界。可一次性載入 1 小時影片、數百頁財報或整套程式庫；結合 Google 搜尋與工作區生態。
+          </p>
+          <div class="model-specs">
+            <div class="spec-item">
+              <span class="spec-label">上下文視窗</span>
+              <span class="spec-value">1M ~ 2M Tokens</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">輸入價格</span>
+              <span class="spec-value">$1.25 / $0.075 (Flash)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">核心強項</span>
+              <span class="spec-value">200萬超長窗 · 影音分析</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-strengths">
+          <strong>適合場景：</strong> 全年財務年報交叉勾稽、多小時錄音與影片轉錄、巨型專案完整代碼庫靜態分析。
+        </div>
+      </div>
+
+      <!-- DeepSeek -->
+      <div class="model-card" data-category="open">
+        <div class="model-card-top">
+          <div class="model-header">
+            <span class="model-company">DEEPSEEK · 中國杭州</span>
+            <span class="model-tag-pill tag-open">極致性價比 · 開源巨震</span>
+          </div>
+          <div class="model-name">DeepSeek-V3 & DeepSeek-R1</div>
+          <p class="model-summary">
+            2025 年引發全球 AI 界震撼的黑馬。採用創新的 Multi-head Latent Attention (MLA) 與 DeepSeekMoE 架構，以僅有美國巨頭十分之一的成本實現匹敵頂級閉源模型的能力！R1 更在數學推理上達標頂峰。
+          </p>
+          <div class="model-specs">
+            <div class="spec-item">
+              <span class="spec-label">上下文視窗</span>
+              <span class="spec-value">64K ~ 128K Tokens</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">輸入價格</span>
+              <span class="spec-value">$0.14 / 1M (極便宜)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">核心強項</span>
+              <span class="spec-value">數學推理 · 1/20 成本</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-strengths">
+          <strong>適合場景：</strong> 高並發批次資料分析、算術與演算法競賽、預算敏感型專案的最佳首選。
+        </div>
+      </div>
+
+      <!-- Alibaba Qwen -->
+      <div class="model-card" data-category="open">
+        <div class="model-card-top">
+          <div class="model-header">
+            <span class="model-company">ALIBABA CLOUD (阿里巴巴) · 中國</span>
+            <span class="model-tag-pill tag-open">開源社群全尺寸霸主</span>
+          </div>
+          <div class="model-name">Qwen 2.5 (通義千問)</div>
+          <p class="model-summary">
+            全球開源社群下載量最高的開源家族之一，涵蓋從 0.5B、7B、14B 到 72B 全尺寸模型。在多語言支援、中文語境、數學與代碼能力均位列開源榜首。
+          </p>
+          <div class="model-specs">
+            <div class="spec-item">
+              <span class="spec-label">上下文視窗</span>
+              <span class="spec-value">128K Tokens</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">開源授權</span>
+              <span class="spec-value">Apache 2.0 (多數開源)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">核心強項</span>
+              <span class="spec-value">地端自建 · 跨尺寸部署</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-strengths">
+          <strong>適合場景：</strong> 企業私有化地端部署、邊緣設備運行（7B）、金融與多語言本地化微調。
+        </div>
+      </div>
+
+      <!-- Moonshot Kimi -->
+      <div class="model-card" data-category="open">
+        <div class="model-card-top">
+          <div class="model-header">
+            <span class="model-company">MOONSHOT AI (月之暗面) · 中國北京</span>
+            <span class="model-tag-pill tag-cloud">中文長文本開拓者</span>
+          </div>
+          <div class="model-name">Kimi (Moonshot v1)</div>
+          <p class="model-summary">
+            以 20 萬字無損超長上下文一戰成名。專注於中文長篇閱讀、專業法律合同解讀、網頁即時搜尋與整理，深受華語圈知識工作者歡迎。
+          </p>
+          <div class="model-specs">
+            <div class="spec-item">
+              <span class="spec-label">上下文視窗</span>
+              <span class="spec-value">200K Tokens</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">部署形態</span>
+              <span class="spec-value">雲端 API & Web/App</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">核心強項</span>
+              <span class="spec-value">中文文案 · 文檔摘要</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-strengths">
+          <strong>適合場景：</strong> 幾十萬字投行研報梳理、中文合約風險審查、互聯網新聞熱點即時聯網搜集。
+        </div>
+      </div>
+
+      <!-- MiniMax -->
+      <div class="model-card" data-category="open">
+        <div class="model-card-top">
+          <div class="model-header">
+            <span class="model-company">MINIMAX (名之夢) · 中國上海</span>
+            <span class="model-tag-pill tag-cloud">多模態與海螺 AI</span>
+          </div>
+          <div class="model-name">MiniMax-abab 6.5 & 海螺</div>
+          <p class="model-summary">
+            擁有自主研發的 MoE 架構語言模型，並在「語音合成（TTS）」與「高擬真視頻生成（Video-01）」領域名列前茅。旗下海螺 AI 具備強大的長對話陪伴與創作能力。
+          </p>
+          <div class="model-specs">
+            <div class="spec-item">
+              <span class="spec-label">上下文視窗</span>
+              <span class="spec-value">245K Tokens</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">多模態</span>
+              <span class="spec-value">文字 · 語音 · 視頻</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">核心強項</span>
+              <span class="spec-value">擬真人聲 · 角色扮演</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-strengths">
+          <strong>適合場景：</strong> 互動式語音客服、數位人播報配音、多模態創意故事創作與娛樂社交應用。
+        </div>
+      </div>
+
+      <!-- Ollama Local Engine -->
+      <div class="model-card" data-category="local">
+        <div class="model-card-top">
+          <div class="model-header">
+            <span class="model-company">OLLAMA · 開源工具</span>
+            <span class="model-tag-pill tag-local">地端離線引擎霸主</span>
+          </div>
+          <div class="model-name">Ollama (Local LLM Engine)</div>
+          <p class="model-summary">
+            不是單一模型，而是「讓你在自己電腦一行指令跑大模型」的最佳工具！支援 Llama 3、Qwen 2.5、DeepSeek-R1-Distill、Gemma 等，提供本機 11434 端口與標準 OpenAI 相容 API。
+          </p>
+          <div class="model-specs">
+            <div class="spec-item">
+              <span class="spec-label">運行環境</span>
+              <span class="spec-value">Mac (Apple Silicon) / Linux / Win</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Token 費用</span>
+              <span class="spec-value">$0.00 (完全免費)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">網路需求</span>
+              <span class="spec-value">100% 離線可用</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-strengths">
+          <strong>適合場景：</strong> 機密財務資料不聯網分析、個人電腦離線助手、無網路環境或機密隔離區（Air-Gapped）。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: CLOUD VS LOCAL ARCHITECTURE DIAGRAM -->
+  <section id="cloud-vs-local" class="container section-block">
+    <div class="section-header">
+      <div class="section-badge">ARCHITECTURE TRADEOFFS · 04</div>
+      <h2 class="section-title">地端模型 (Local / Ollama) vs. 雲端模型 (Cloud API) 架構圖解</h2>
+      <p class="section-desc">
+        身為資料分析師或架構師，什麼時候該呼叫 OpenAI / Claude 雲端 API？什麼時候該在筆電或內網私有化部署 Ollama？關鍵在於權衡五大維度：
+      </p>
+    </div>
+
+    <!-- Editorial SVG Architecture Diagram -->
+    <div class="diagram-container">
+      <svg viewBox="0 0 960 480" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr-cloud" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#1d4ed8"/>
+          </marker>
+          <marker id="arr-local" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#c2410c"/>
+          </marker>
+        </defs>
+
+        <!-- Left Column: Cloud API Pipeline -->
+        <g transform="translate(30, 20)">
+          <rect x="0" y="0" width="430" height="440" rx="6" fill="#fcfbf7" stroke="#1d4ed8" stroke-width="1.2"/>
+          <rect x="16" y="16" width="180" height="22" rx="3" fill="rgba(29, 78, 216, 0.08)"/>
+          <text x="24" y="31" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="9" font-weight="600">CLOUD API · 雲端計量模式</text>
+          
+          <!-- Node 1: Client Browser -->
+          <rect x="25" y="55" width="380" height="60" rx="4" fill="#f5f3ec" stroke="#dedad2" stroke-width="1"/>
+          <text x="40" y="80" fill="#1a1917" font-family="'Geist', sans-serif" font-size="12" font-weight="600">用戶端（Client App / Browser）</text>
+          <text x="40" y="98" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9">攜帶 API Key · 發起 HTTPS POST 請求</text>
+
+          <!-- Arrow 1 -> 2 -->
+          <line x1="215" y1="115" x2="215" y2="148" stroke="#1d4ed8" stroke-width="1.2" marker-end="url(#arr-cloud)"/>
+          <rect x="145" y="124" width="140" height="16" fill="#fcfbf7"/>
+          <text x="215" y="136" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">公網傳輸 (TLS 加密)</text>
+
+          <!-- Node 2: Cloud Ingress & Token Metering -->
+          <rect x="25" y="155" width="380" height="70" rx="4" fill="#f5f3ec" stroke="#1d4ed8" stroke-width="1.2"/>
+          <text x="40" y="180" fill="#1d4ed8" font-family="'Geist', sans-serif" font-size="12" font-weight="600">供應商雲端網關（API Gateway）</text>
+          <text x="40" y="198" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9">身份認證 · 速率限制 (Rate Limit) · Token 計費扣款</text>
+          <text x="40" y="214" fill="#8c867e" font-family="'Geist Mono', monospace" font-size="8">按百萬 Token 計價 ($0.15 ~ $3.00 / 1M)</text>
+
+          <!-- Arrow 2 -> 3 -->
+          <line x1="215" y1="225" x2="215" y2="258" stroke="#1d4ed8" stroke-width="1.2" marker-end="url(#arr-cloud)"/>
+
+          <!-- Node 3: Supercomputer GPU Cluster -->
+          <rect x="25" y="265" width="380" height="85" rx="4" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.6"/>
+          <text x="40" y="292" fill="#1d4ed8" font-family="'Geist', sans-serif" font-size="12" font-weight="600">數萬張 H100 / TPU 超級叢集</text>
+          <text x="40" y="310" fill="#1a1917" font-family="'Geist Mono', monospace" font-size="9">GPT-4o / Claude 3.5 Sonnet / Gemini Pro</text>
+          <text x="40" y="328" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">數千億 MoE 頂級參數 · 智能推理天花板</text>
+          <text x="40" y="342" fill="#15803d" font-family="'Geist Mono', monospace" font-size="8">零本機硬體門檻 · 即開即用</text>
+
+          <!-- Cloud Highlights -->
+          <rect x="25" y="365" width="380" height="60" rx="4" fill="rgba(29, 78, 216, 0.05)" stroke="rgba(29, 78, 216, 0.2)" stroke-width="0.8"/>
+          <text x="38" y="386" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="9" font-weight="600">優勢：</text>
+          <text x="75" y="386" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">智能極致、免運維、支援百萬超長上下文。</text>
+          <text x="38" y="408" fill="#c2410c" font-family="'Geist Mono', monospace" font-size="9" font-weight="600">劣勢：</text>
+          <text x="75" y="408" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">高並發帳單成本持續增加、敏感資料經外部網路。</text>
+        </g>
+
+        <!-- Right Column: Local On-Premise Pipeline -->
+        <g transform="translate(500, 20)">
+          <rect x="0" y="0" width="430" height="440" rx="6" fill="#fcfbf7" stroke="#c2410c" stroke-width="1.2"/>
+          <rect x="16" y="16" width="180" height="22" rx="3" fill="rgba(194, 65, 12, 0.08)"/>
+          <text x="24" y="31" fill="#c2410c" font-family="'Geist Mono', monospace" font-size="9" font-weight="600">LOCAL ON-PREM · 地端離線模式</text>
+          
+          <!-- Node 1: Client App -->
+          <rect x="25" y="55" width="380" height="60" rx="4" fill="#f5f3ec" stroke="#dedad2" stroke-width="1"/>
+          <text x="40" y="80" fill="#1a1917" font-family="'Geist', sans-serif" font-size="12" font-weight="600">用戶端（內部業務系統 / 腳本）</text>
+          <text x="40" y="98" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9">呼叫本機 http://localhost:11434 端口</text>
+
+          <!-- Arrow 1 -> 2 -->
+          <line x1="215" y1="115" x2="215" y2="148" stroke="#c2410c" stroke-width="1.2" marker-end="url(#arr-local)"/>
+          <rect x="135" y="124" width="160" height="16" fill="#fcfbf7"/>
+          <text x="215" y="136" fill="#c2410c" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">內部迴路 (100% 物理離線)</text>
+
+          <!-- Node 2: Ollama Local Runtime -->
+          <rect x="25" y="155" width="380" height="70" rx="4" fill="#f5f3ec" stroke="#c2410c" stroke-width="1.2"/>
+          <text x="40" y="180" fill="#c2410c" font-family="'Geist', sans-serif" font-size="12" font-weight="600">Ollama / vLLM 本機執行引擎</text>
+          <text x="40" y="198" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9">llama.cpp 底層推理 · GGUF 4-bit 量化載入</text>
+          <text x="40" y="214" fill="#15803d" font-family="'Geist Mono', monospace" font-size="8">Token 費用 $0.00 · 無限量本地調用</text>
+
+          <!-- Arrow 2 -> 3 -->
+          <line x1="215" y1="225" x2="215" y2="258" stroke="#c2410c" stroke-width="1.2" marker-end="url(#arr-local)"/>
+
+          <!-- Node 3: Local Hardware Hardware (GPU/VRAM) -->
+          <rect x="25" y="265" width="380" height="85" rx="4" fill="#ffffff" stroke="#c2410c" stroke-width="1.6"/>
+          <text x="40" y="292" fill="#c2410c" font-family="'Geist', sans-serif" font-size="12" font-weight="600">本機晶片與顯存（Apple Silicon / RTX）</text>
+          <text x="40" y="310" fill="#1a1917" font-family="'Geist Mono', monospace" font-size="9">Llama 3.3 (8B/70B) · Qwen 2.5 · DeepSeek-R1-Distill</text>
+          <text x="40" y="328" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">資料 100% 留存在內部磁碟 · 零外洩風險</text>
+          <text x="40" y="342" fill="#c2410c" font-family="'Geist Mono', monospace" font-size="8">依賴本地顯存 (8GB 跑 7B, 24GB+ 跑 32B/70B)</text>
+
+          <!-- Local Highlights -->
+          <rect x="25" y="365" width="380" height="60" rx="4" fill="rgba(194, 65, 12, 0.05)" stroke="rgba(194, 65, 12, 0.2)" stroke-width="0.8"/>
+          <text x="38" y="386" fill="#15803d" font-family="'Geist Mono', monospace" font-size="9" font-weight="600">優勢：</text>
+          <text x="75" y="386" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">數據絕對合規隱私、零邊際成本、可離線工作。</text>
+          <text x="38" y="408" fill="#c2410c" font-family="'Geist Mono', monospace" font-size="9" font-weight="600">劣勢：</text>
+          <text x="75" y="408" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">受限本機硬體顯存，超大模型（70B+）運行緩慢。</text>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="compare-container">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="width: 18%;">決策維度</th>
+            <th class="cloud-col" style="width: 41%;">☁️ 雲端 API 模式 (OpenAI, Gemini, Claude)</th>
+            <th class="local-col" style="width: 41%;">🏠 地端自建模式 (Ollama, vLLM, 私有伺服器)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>🔒 數據隱私與合規</strong></td>
+            <td>
+              <strong>資料需傳送至外部伺服器</strong><br>
+              雖然商業 API 承諾不使用客戶資料訓練，但在高度管制的金融、醫療、國防領域，外部傳輸本身即可能違反法規。
+            </td>
+            <td>
+              <strong>100% 物理留存本地，零資料出境</strong><br>
+              網路線拔掉依然能流暢運行！完全符合最高等級 GDPR、醫療 HIPAA 或內部機密隔離規定。
+            </td>
+          </tr>
+          <tr>
+            <td><strong>💰 成本結構與收費</strong></td>
+            <td>
+              <strong>按量計費（Pay-as-you-go）</strong><br>
+              前期投入為 0；但如果業務流量極大（如每秒數百次呼叫），累積的 Token 帳單將非常可觀。
+            </td>
+            <td>
+              <strong>前期硬體固定資產投入</strong><br>
+              日常呼叫 Token 邊際成本為 0！但需要投資高階 GPU（如 RTX 4090、A100 或 Mac M3/M4 Max 高統一記憶體）。
+            </td>
+          </tr>
+          <tr>
+            <td><strong>🧠 智能天花板與推理力</strong></td>
+            <td>
+              <strong>極致頂級（Frontier Intelligence）</strong><br>
+              背後是數千億甚至上兆參數的龐大叢集（如 GPT-4o, Claude 3.5 Sonnet），在複雜邏輯、跨領域推理遙遙領先。
+            </td>
+            <td>
+              <strong>受限於本機顯存（VRAM）</strong><br>
+              個人筆電通常只能跑 7B~14B 模型，70B 需高階顯卡。在嚴密邏輯或細膩文筆上與雲端旗艦有明顯落差。
+            </td>
+          </tr>
+          <tr>
+            <td><strong>⚡ 部署與維運難度</strong></td>
+            <td>
+              <strong>零維運（Serverless）</strong><br>
+              申請 API Key，一行 <code>requests.post</code> 或官方 SDK 即可呼叫，全世界高可用性由巨頭維護。
+            </td>
+            <td>
+              <strong>需要掌握基礎運維知識</strong><br>
+              需安裝 Ollama、配置 CUDA 驅動、處理量化格式（GGUF）、記憶體溢出（OOM）與高並發排隊問題。
+            </td>
+          </tr>
+          <tr>
+            <td><strong>🎯 最佳推薦實戰場景</strong></td>
+            <td>
+              • 企業核心業務決策分析<br>
+              • 複雜 Python 資料分析代碼自動編寫<br>
+              • 多語言翻譯與數十萬字長文本綜合研讀
+            </td>
+            <td>
+              • 敏感財務報表初篩與個人隱私資料清洗<br>
+              • 內部私有文檔搜索（離線 RAG）<br>
+              • 飛機、高鐵等無網路狀態下的個人生產力
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="container site-footer">
+    <div>大語言模型本質與資料分析課程 · Module 01 專題圖鑑</div>
+    <div>Designed with Editorial Cream System & Diagram-Design Principles</div>
+  </footer>
+
+  <!-- Interactive Script -->
+  <script>
+    // -------------------------------------------------------------
+    // 1. Tokenizer 模擬與即時計算
+    // -------------------------------------------------------------
+    const PRESETS = {
+      chinese: "大語言模型本質上是一組凍結的浮點數權重矩陣，每一次對話都在根據機率預測下一個 Token！",
+      english: "Language models are next-token probability samplers trained on massive text corpora using Byte-Pair Encoding.",
+      strawberry: "How many letters 'r' are there in the word strawberry?",
+      code: "import pandas as pd\nimport numpy as np\n\ndf = pd.read_csv('sales.csv')\nprint(df.groupby('region')['revenue'].sum())"
+    };
+
+    const PRICING_MODELS = [
+      { name: "DeepSeek-V3", vendor: "DeepSeek", costPerM: 0.14, color: "#15803d" },
+      { name: "Gemini 2.5 Flash", vendor: "Google", costPerM: 0.075, color: "#1d4ed8" },
+      { name: "GPT-4o-mini", vendor: "OpenAI", costPerM: 0.15, color: "#c2410c" },
+      { name: "Claude 3.5 Haiku", vendor: "Anthropic", costPerM: 0.80, color: "#7e22ce" },
+      { name: "GPT-4o", vendor: "OpenAI", costPerM: 2.50, color: "#1a1917" },
+      { name: "Claude 3.5 Sonnet", vendor: "Anthropic", costPerM: 3.00, color: "#7e22ce" }
+    ];
+
+    function setPreset(key) {
+      if (PRESETS[key]) {
+        document.getElementById('tokenInput').value = PRESETS[key];
+        updateTokenizer();
+      }
+    }
+
+    function simulateBpeTokens(text) {
+      if (!text) return [];
+      
+      const regex = /([a-zA-Z]+|[0-9]+|[\u4e00-\u9fa5]|[\u3040-\u30ff]|[\uac00-\ud7af]|[\n\r]+|[ \t]+|[^\s\w\u4e00-\u9fa5])/g;
+      const rawMatches = text.match(regex) || [];
+      const tokens = [];
+
+      rawMatches.forEach(m => {
+        if (/^[a-zA-Z]{6,}$/.test(m)) {
+          if (m.toLowerCase() === "strawberry") {
+            tokens.push("straw");
+            tokens.push("berry");
+          } else if (m.toLowerCase() === "tokenization") {
+            tokens.push("token");
+            tokens.push("ization");
+          } else if (m.toLowerCase() === "unbelievable") {
+            tokens.push("un");
+            tokens.push("believ");
+            tokens.push("able");
+          } else {
+            const mid = Math.floor(m.length / 2);
+            tokens.push(m.slice(0, mid));
+            tokens.push(m.slice(mid));
+          }
+        } else {
+          tokens.push(m);
+        }
+      });
+
+      return tokens;
+    }
+
+    function updateTokenizer() {
+      const text = document.getElementById('tokenInput').value;
+      const tokens = simulateBpeTokens(text);
+      const tokenCount = tokens.length;
+      const charCount = text.length;
+      const ratio = charCount > 0 ? (charCount / (tokenCount || 1)).toFixed(2) : "0.00";
+
+      document.getElementById('statTokens').textContent = tokenCount;
+      document.getElementById('statChars').textContent = charCount;
+      document.getElementById('statRatio').textContent = ratio;
+      document.getElementById('tokenPillCount').textContent = `共 ${tokenCount} 個 Tokens`;
+
+      const cost1M = ((tokenCount * 0.15) / 1000).toFixed(4);
+      document.getElementById('statCost').textContent = `$${cost1M}`;
+
+      const container = document.getElementById('tokenVisualizer');
+      container.innerHTML = '';
+
+      if (tokens.length === 0) {
+        container.innerHTML = '<span style="color: var(--ink-muted); font-size: 13px;">請於上方輸入框輸入文字以觀察分詞...</span>';
+      } else {
+        tokens.forEach((t, i) => {
+          const chip = document.createElement('span');
+          chip.className = `token-chip t-col-${i % 8}`;
+          
+          let displayStr = t;
+          if (t === '\n') displayStr = '↵';
+          else if (t === ' ') displayStr = '␣';
+          else if (/^\s+$/.test(t)) displayStr = '␣'.repeat(t.length);
+
+          chip.innerHTML = `${escapeHtml(displayStr)}<span class="token-idx">#${i + 1}</span>`;
+          chip.title = `Token #${i + 1} | 長度: ${t.length} 字元`;
+          container.appendChild(chip);
+        });
+      }
+
+      renderPricingTable(tokenCount);
+    }
+
+    function renderPricingTable(tokenCount) {
+      const tbody = document.getElementById('pricingRows');
+      tbody.innerHTML = '';
+
+      PRICING_MODELS.forEach(m => {
+        const singleCost = (tokenCount * (m.costPerM / 1000000)).toFixed(6);
+        const batchCost = (tokenCount * (m.costPerM / 1000000) * 100000).toFixed(4);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong style="color: ${m.color};">${m.name}</strong></td>
+          <td>${m.vendor}</td>
+          <td class="mono">$${m.costPerM.toFixed(3)}</td>
+          <td class="mono">$${singleCost}</td>
+          <td class="mono"><strong>$${batchCost}</strong></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    // -------------------------------------------------------------
+    // 2. 模型篩選切換
+    // -------------------------------------------------------------
+    function filterModels(category) {
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const cards = document.querySelectorAll('.model-card');
+      cards.forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // -------------------------------------------------------------
+    // 3. 實時 API 試演調用 (Live API Tester)
+    // -------------------------------------------------------------
+    function syncModelKey() {
+      const sel = document.getElementById('liveModelSelect').value;
+      const keyInput = document.getElementById('liveApiKeyInput');
+      if (sel.startsWith('openrouter:')) {
+        const saved = localStorage.getItem('llm_lab_openrouter_key') || '';
+        keyInput.value = saved;
+        keyInput.placeholder = '填入 OpenRouter API Key (sk-or-...)';
+      } else if (sel.startsWith('gemini:')) {
+        const saved = localStorage.getItem('llm_lab_gemini_key') || '';
+        keyInput.value = saved;
+        keyInput.placeholder = '填入 Google Gemini API Key (AIzaSy...)';
+      } else {
+        keyInput.value = '';
+        keyInput.placeholder = '本地模擬模式，無需填寫 Key';
+      }
+    }
+
+    async function executeLiveApiTest() {
+      const sel = document.getElementById('liveModelSelect').value;
+      const key = document.getElementById('liveApiKeyInput').value.trim();
+      const prompt = document.getElementById('tokenInput').value.trim();
+      const outBox = document.getElementById('liveOutputBox');
+
+      if (!prompt) {
+        alert('請先在上方輸入框輸入測試文字！');
+        return;
+      }
+
+      outBox.textContent = '⏳ [請求發送中] 正在調用模型 API，等待返回首個 Token 與 Usage 數據...';
+
+      if (sel === 'simulation' || !key) {
+        setTimeout(() => {
+          const simulatedTokens = simulateBpeTokens(prompt).length;
+          const completionSim = 28;
+          outBox.textContent = `【本地模擬回應】\n針對您輸入的「${prompt.substring(0, 30)}...」：\n\n大語言模型是透過將這段文字拆分成 ${simulatedTokens} 個 Tokens，再於自注意力矩陣（Self-Attention）中計算下一個文字的機率分佈。\n\n（💡 提示：若填入 OpenRouter 或 Gemini API Key，即可獲取官方伺服器實際返回的精準 Token 消耗與扣款明細！）`;
+
+          document.getElementById('pillPromptTokens').textContent = `Prompt Tokens: ${simulatedTokens} (模擬)`;
+          document.getElementById('pillCompletionTokens').textContent = `Completion Tokens: ${completionSim} (模擬)`;
+          document.getElementById('pillTotalTokens').textContent = `Total Tokens: ${simulatedTokens + completionSim}`;
+          document.getElementById('pillActualCost').textContent = `本次呼叫成本: $0.000000`;
+        }, 500);
+        return;
+      }
+
+      try {
+        if (sel.startsWith('openrouter:')) {
+          localStorage.setItem('llm_lab_openrouter_key', key);
+          const modelName = sel.replace('openrouter:', '');
+          const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${key}`,
+              'Content-Type': 'application/json',
+              'HTTP-Referer': window.location.href,
+              'X-Title': 'LLM Encyclopedia'
+            },
+            body: JSON.stringify({
+              model: modelName,
+              messages: [{ role: 'user', content: prompt }]
+            })
+          });
+
+          const data = await res.json();
+          if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+
+          const content = data.choices[0].message.content;
+          outBox.textContent = `【模型回應：${modelName}】\n${content}\n\n================ [API 原生 Usage 物件] ================\n${JSON.stringify(data.usage, null, 2)}`;
+
+          if (data.usage) {
+            document.getElementById('pillPromptTokens').textContent = `Prompt Tokens: ${data.usage.prompt_tokens}`;
+            document.getElementById('pillCompletionTokens').textContent = `Completion Tokens: ${data.usage.completion_tokens}`;
+            document.getElementById('pillTotalTokens').textContent = `Total Tokens: ${data.usage.total_tokens}`;
+            
+            // 估算成本
+            const cost = (data.usage.prompt_tokens * 0.0000025 + data.usage.completion_tokens * 0.00001).toFixed(6);
+            document.getElementById('pillActualCost').textContent = `本次呼叫成本: ~$${cost}`;
+          }
+        } else if (sel.startsWith('gemini:')) {
+          localStorage.setItem('llm_lab_gemini_key', key);
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }]
+            })
+          });
+
+          const data = await res.json();
+          if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+
+          const content = data.candidates[0].content.parts[0].text;
+          const usage = data.usageMetadata;
+          outBox.textContent = `【模型回應：Gemini 1.5 Flash】\n${content}\n\n================ [Gemini usageMetadata] ================\n${JSON.stringify(usage, null, 2)}`;
+
+          if (usage) {
+            document.getElementById('pillPromptTokens').textContent = `Prompt Tokens: ${usage.promptTokenCount}`;
+            document.getElementById('pillCompletionTokens').textContent = `Completion Tokens: ${usage.candidatesTokenCount}`;
+            document.getElementById('pillTotalTokens').textContent = `Total Tokens: ${usage.totalTokenCount}`;
+            const cost = (usage.promptTokenCount * 0.000000075 + usage.candidatesTokenCount * 0.0000003).toFixed(6);
+            document.getElementById('pillActualCost').textContent = `本次呼叫成本: ~$${cost}`;
+          }
+        }
+      } catch (err) {
+        outBox.textContent = `❌ API 呼叫失敗：${err.message}\n\n請檢查 API Key 是否正確或網路是否通暢。`;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateTokenizer();
+      syncModelKey();
+    });
+  </script>
+
+</body>
+</html>
