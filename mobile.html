@@ -1082,6 +1082,35 @@
       </p>
     </div>
 
+    <!-- MoE Architecture Card -->
+    <div class="m-card">
+      <div class="m-card-header">
+        <div class="m-card-title">專題圖解：什麼是 MoE (混合專家架構)？</div>
+        <span class="m-card-badge badge-orange">架構揭秘</span>
+      </div>
+      <div class="m-subtitle">「全科醫生 vs 綜合醫院分診台」</div>
+      <p class="m-desc">
+        傳統 Dense 模型問什麼都全體神經元一起算，耗電又爆顯存。<strong>MoE 就像綜合醫院</strong>：大門設有「分診台（Router）」，問代碼只叫 2~3 位代碼專家，其餘專家休眠！
+      </p>
+      <div class="m-flow-box">
+        <div class="m-flow-title">DeepSeek 671B (激活 37B) 的秘密</div>
+        <div class="m-flow-steps">
+          <div class="m-step-item">
+            <div class="m-step-num">1</div>
+            <div class="m-step-text"><strong>提問</strong>：用戶輸入數學或代碼難題。</div>
+          </div>
+          <div class="m-step-item">
+            <div class="m-step-num">2</div>
+            <div class="m-step-text"><strong>分診</strong>：Router 1 毫秒內算出對應領域。</div>
+          </div>
+          <div class="m-step-item" style="border: 2px solid var(--accent-coral);">
+            <div class="m-step-num" style="background:var(--accent-coral);">3</div>
+            <div class="m-step-text"><strong>激活</strong>：僅計算特定專家（省 90% 算力，速度翻倍）！</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 10. Ollama Local Engine -->
     <div class="m-card" data-cat="local">
       <div class="m-card-header">
