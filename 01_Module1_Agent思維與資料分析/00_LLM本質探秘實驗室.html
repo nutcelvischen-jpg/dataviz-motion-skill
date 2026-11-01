@@ -407,6 +407,20 @@
       border-color: var(--border-focus);
       box-shadow: var(--shadow-soft);
     }
+    .preset-item.active {
+      background: rgba(194, 65, 12, 0.08);
+      border-color: var(--accent-terra);
+      box-shadow: 0 0 0 1px var(--accent-terra);
+    }
+    .preset-item.active .preset-name {
+      color: var(--accent-terra);
+      font-weight: 700;
+    }
+    .preset-item.active .preset-chip {
+      background: var(--accent-terra);
+      color: #ffffff;
+      border-color: var(--accent-terra);
+    }
     .preset-name {
       font-size: 0.84rem;
       font-weight: 600;
@@ -498,11 +512,14 @@
     }
     .output-card.placeholder {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      text-align: center;
       color: var(--ink-muted);
       font-family: var(--font-sans);
       font-size: 0.88rem;
+      line-height: 1.6;
     }
 
     /* 底層原理解析卡 */
@@ -834,12 +851,44 @@
           },
           {
             label: "2. 🍓 Strawberry 字母計數陷阱（探討為什麼 BPE 看不見字母）",
-            tag: "BPE 特性",
+            tag: "BPE 盲區",
             prompt: "How many letters 'r' are there in the word strawberry?",
-            simulated: `在單字 'strawberry' 中總共有 3 個字母 'r'。
+            simulated: `【🍓 Strawberry 字母計數陷阱：底層視覺盲區深度還原】
+在單字 'strawberry' 中，正確答案總共有 3 個字母 'r'。
 
-💡【為什麼早期 ChatGPT 經常數成 2 個？】
-在 BPE Tokenizer 詞庫中，'strawberry' 直接被切分成兩個獨立語意塊：[straw] (ID: 11245) + [berry] (ID: 32884)！模型從頭到尾根本沒有「單獨看見英文字母 r」的物理視角，它看見的是兩個代表語意的向量。當你要求它數字母時，它只能憑記憶猜測，這正是 Token 物理邊界帶來的結構性現象！`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【為什麼早期 GPT-4 / Claude 3 經常數成「2 個」？】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+👉 核心真相：這不是智商問題，而是「感官盲區（Sensory Blindness）」！
+
+1. 👁️ 人類的眼睛（光學字元掃描 · 100% 確定）：
+   • 肉眼看到 10 個獨立字母實體：s - t - [r] - a - w - b - e - [r] - [r] - y
+   • 大腦指針由左至右點名：第 3 位是 r，第 8 位是 r，第 9 位是 r
+   • 加總計算：1 + 1 + 1 = 3 個 'r'！（毫不費力，零認知負擔）
+
+2. 🤖 大語言模型的視角（BPE Tokenizer 分詞切塊）：
+   • LLM 根本不直接讀單一字母，而是查字典切塊！
+   • 'strawberry' 依詞頻直接被切成兩大塊（2 個 Tokens）：
+     [Token #1: "straw"] (ID: 11245) + [Token #2: "berry"] (ID: 32884)
+
+3. 📦 密閉包裹難題（神經網路盲點）：
+   • 進入 Transformer 神經網路後，Token 被轉化為 4096 維數學浮點數向量
+   • 模型內部「完全沒有字母的實體視角」！
+   • 就像給盲人兩個密封包裹，標籤寫「稻草」與「莓果」，
+     然後問他：「請問第二個包裹肚子裡縫了幾個字母 r？」
+     盲人拆不開包裹，只能憑機率猜！
+
+4. 🎲 為什麼最常猜「2 個」？（機率聯想偏差）：
+   • 在英文語料中，"berry" 常常與「雙寫 double-r」（如 blueberry, raspberry）高度共現
+   • 模型的注意力權重被 "berry" 內的 double-r 強力牽引，脫口而出「2 個」，
+     直接忽略了前面的 "straw" 裡面其實還藏著第 1 個 r！
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【💡 工程實務上的 3 大破解之道】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• 招式一（提示詞強制拆字）：Prompt 改為「請把 strawberry 每個字母用空格分開：s t r a w b e r r y，再數有幾個 r」。強迫 Tokenizer 將每個字母切成單獨 Token，模型重獲視力！
+• 招式二（Python 程式調用）：讓 AI 調用代碼 'strawberry'.count('r')，秒回 3，徹底杜絕機率幻覺！
+• 招式三（次世代 Reasoning 思維模型）：如 DeepSeek-R1、Claude 3.7 Sonnet、OpenAI o3-mini，在背景思考鏈（Thinking Process）中自主進行多步驗算，成功回答 3！`
           },
           {
             label: "3. 🐍 Python 代碼與特殊符號 Token 切分",
@@ -859,6 +908,42 @@
         analysis: `<strong>一、 什麼是 Token？（LLM 的物理計量單位）</strong><br>
 電腦只能運算數字。當你輸入文字時，模型必須先透過 <strong>Byte-Pair Encoding (BPE)</strong> 分詞器將文字切割為一連串數字編號（Token IDs）。Token 是雲端 API 唯一的計費單位，也是 Context Window 的容量衡量標準。<br><br>
 
+<div style="background: rgba(194, 65, 12, 0.05); border: 1px solid rgba(194, 65, 12, 0.25); border-radius: 6px; padding: 14px; margin-bottom: 14px;">
+  <div style="font-weight: 700; color: #c2410c; font-size: 13px; margin-bottom: 6px;">🍓 深度視覺圖解：為什麼早期 LLM 數不出「strawberry」裡面有幾個「r」？</div>
+  <div style="font-size: 12px; color: var(--ink-secondary); line-height: 1.6; margin-bottom: 10px;">
+    這不是 AI 智力退化，而是分詞字典切片造成的<strong>「感官盲區（Sensory Blindness）」</strong>！請觀察人類眼睛與大語言模型的雙軌認知差異：
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+    <div style="background: #ffffff; border: 1px solid #dcfce7; border-left: 3px solid #166534; padding: 10px; border-radius: 4px;">
+      <div style="font-weight: 700; color: #166534; font-size: 11px; margin-bottom: 4px;">👁️ 人類視覺：字元級光學掃描</div>
+      <div style="font-size: 11px; color: #5e5953; line-height: 1.4;">
+        肉眼看見 10 個獨立字符：<br>
+        <code>s - t - <strong style="color:#166534;">[r]</strong> - a - w - b - e - <strong style="color:#166534;">[r]</strong> - <strong style="color:#166534;">[r]</strong> - y</code><br>
+        大腦指針逐字點名：第 3、8、9 位命中。<br>
+        🎯 <strong>精準算出 3 個 'r' (100% 確定)</strong>
+      </div>
+    </div>
+
+    <div style="background: #ffffff; border: 1px solid #fed7aa; border-left: 3px solid #c2410c; padding: 10px; border-radius: 4px;">
+      <div style="font-weight: 700; color: #c2410c; font-size: 11px; margin-bottom: 4px;">🤖 LLM 運算：BPE 分詞黑盒子</div>
+      <div style="font-size: 11px; color: #5e5953; line-height: 1.4;">
+        Tokenizer 查字典切大塊：<br>
+        <code>[straw] (#11245) + [berry] (#32884)</code><br>
+        轉化為 4096 維幾何向量，字母完全消失！berry 誘發 double-r 機率記憶，脫口猜 2。<br>
+        ⚠️ <strong>結構盲區：常誤判為 2 個 'r'</strong>
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size: 11px; color: #1a1917; background: #fff; padding: 8px 10px; border-radius: 4px; border: 1px dashed #d1d5db;">
+    <strong>💡 工程破解三招：</strong><br>
+    1. <strong>提示詞強制拆字</strong>：改問「請把字母用空格分開寫出 (s t r a w b e r r y) 再數」，強制切為單字母 Token！<br>
+    2. <strong>代碼執行</strong>：交給 Python <code>'strawberry'.count('r')</code> 秒出 3，以程式消除幻覺！<br>
+    3. <strong>Reasoning 思維模型</strong>：使用 DeepSeek-R1 或 Claude 3.7 Sonnet，模型在思考鏈 (CoT) 中會自我驗算拆解。
+  </div>
+</div>
+
 <strong>二、 大語言模型必懂 6 大核心專有名詞：</strong><br>
 • <strong>Token & Tokenize</strong>：資訊的最小粒子。1 英文單字 ≈ 1.3 Tokens；1 中文字 ≈ 1.5 Tokens。<br>
 • <strong>API Key</strong>：雲端呼叫的數位身分證與信用卡扣款憑證，嚴禁寫死在前端原始碼中。<br>
@@ -867,20 +952,26 @@
 • <strong>Embeddings（向量嵌入）</strong>：文字在高維幾何空間的位置，是 RAG 檢索增強生成的數學底層。<br>
 • <strong>System Prompt（系統提示詞）</strong>：最高指導方針，但並非不可逾越的物理防火牆。<br><br>
 
-<strong>三、 全球 8 大主流大模型全景生態：</strong><br>
-• <strong>OpenAI (GPT-4o / GPT-4o-mini)</strong>：全球通用多模態旗艦，生態最完整、工具調用最成熟。<br>
-• <strong>Anthropic (Claude 3.5 Sonnet)</strong>：軟體工程與長篇代碼天花板，文筆典雅自然。<br>
-• <strong>Google (Gemini 1.5 / 2.5 Pro & Flash)</strong>：百萬超長上下文之王（可一次載入 1 小時影片與整本財報）。<br>
-• <strong>DeepSeek (DeepSeek-V3 / R1)</strong>：極致性價比（價格僅美國 1/20）、MoE 開源巨震、頂級數學推理。<br>
-• <strong>Alibaba (Qwen 2.5 通義千問)</strong>：開源社群全尺寸霸主（0.5B 至 72B），數學與代碼極強。<br>
-• <strong>Moonshot AI (Kimi)</strong>：中文長文本開拓者，合約審查與長篇投行研報梳理首選。<br>
-• <strong>MiniMax (abab 6.5 / 海螺)</strong>：中文多模態與高擬真語音生成（TTS）、視頻創作代表。<br>
-• <strong>Ollama</strong>：地端離線引擎霸主，讓個人電腦一行指令跑開源大模型，零費用且 100% 隱私離線。<br><br>
+<strong>三、 全球 8 大主流大模型最新生態矩陣 (2025/2026 前線)：</strong><br>
+• <strong>OpenAI (o3 / o3-mini / GPT-4.5 Orion / GPT-4o)</strong>：STEM 推理天花板 (o3 Diamond 87.7%) 與萬億級無監督知識密度 (4.5 Orion)。<br>
+• <strong>Anthropic (Claude 3.7 Sonnet / 3.5 Sonnet & Haiku)</strong>：全球首款<strong>混合推理 (Hybrid Reasoning)</strong> 旗艦，可自由開關 Extended Thinking，編程神獸。<br>
+• <strong>Google (Gemini 2.0 Flash / Flash Thinking / 2.0 Pro)</strong>：200 萬超長上下文、端到端極速影音多模態理解，技術儲備直指 Gemini 3.x。<br>
+• <strong>DeepSeek (DeepSeek-V3 / R1 滿血 671B MoE)</strong>：純大規模強化學習 (RL) 推理比肩 o1/o3，成本僅西方 1/20，全球開源巨震。<br>
+• <strong>Alibaba (Qwen 2.5-Max / Qwen 2.5-Coder 32B)</strong>：萬億 MoE 旗艦直追西方閉源，全尺寸開源霸主。<br>
+• <strong>Moonshot AI (Kimi k1.5 / Kimi Chat)</strong>：長上下文強化學習 (Long-Context RL) 與 200 萬字中文長文本開創者。<br>
+• <strong>MiniMax (MiniMax-Text-01 / 海螺 AI)</strong>：混合注意力架構支援 400 萬 Token 天文長窗，擬真語音與 Video-01 視訊。<br>
+• <strong>Ollama (地端離線引擎)</strong>：在個人 Mac/PC 本機 100% 離線運行 DeepSeek-R1-Distill、Qwen 2.5，零 Token 帳單與零隱私外洩。<br><br>
+
+<strong>四、 地端 (Ollama) vs. 雲端 (Cloud API) 架構圖解與決策權衡：</strong><br>
+<div style="background: #ffffff; border: 1px solid var(--border-default); border-radius: 6px; padding: 12px; margin-top: 6px; font-size: 11px; line-height: 1.5;">
+  • <strong>雲端模式 (Cloud API)</strong>：Client ➔ 公網 TLS ➔ 雲端 API Gateway ➔ 萬張 H100 叢集 ➔ <strong>依 Token 計費扣款</strong>。優勢是智能極限高、百萬長窗；劣勢是隱私需經外網、高頻調用持續產生成本。<br>
+  • <strong>地端模式 (Local On-Prem)</strong>：Client ➔ 本機 127.0.0.1:11434 ➔ Ollama/vLLM 引擎 ➔ 本機顯存/記憶體 ➔ <strong>$0 免費</strong>。優勢是 100% 斷網物理隔離、醫療金融絕對合規；劣勢是受限本機硬體顯存規格。
+</div>
 
 <div class="callout-card" style="margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(194, 65, 12, 0.05); border: 1px solid rgba(194, 65, 12, 0.25);">
   <div>
     <div style="font-weight: 600; color: #c2410c; margin-bottom: 2px;">📖 全功能專題：大語言模型通識圖鑑獨立全景頁</div>
-    <div style="font-size: 12px; color: var(--ink-secondary);">前往獨立專題頁，查看完整的地端 (Ollama) vs 雲端 (Cloud API) 向量架構圖與五維決策矩陣</div>
+    <div style="font-size: 12px; color: var(--ink-secondary);">前往獨立專題頁，體驗完整的雙軌 Strawberry 字母流程動畫、8 大模型卡片與互動實時 API Usage 檢驗</div>
   </div>
   <a href="00_LLM_Token與模型全景圖譜.html" target="_blank" style="padding: 6px 12px; background: #c2410c; color: #fff; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap;">開啟獨立全景圖鑑 ↗</a>
 </div>`,
@@ -1574,7 +1665,7 @@ print("Reconciliation: PASS")
       // 重設輸入與輸出
       clearInput();
       document.getElementById('responseOutput').className = 'output-card placeholder';
-      document.getElementById('responseOutput').textContent = '點擊上方預設測試按鈕，或手動輸入後點擊「執行測試」查看模型行為';
+      document.getElementById('responseOutput').innerHTML = '<div style="color: var(--ink-muted);">點選上方預設測試話術，或自行輸入 Prompt 後點擊下方<strong>「⚡ 執行測試」</strong>查看模型行為</div>';
     }
 
     function loadPreset(pIdx) {
@@ -1583,18 +1674,24 @@ print("Reconciliation: PASS")
       document.getElementById('promptInput').value = preset.prompt;
       if (exp.id === 'tokens') updateLabTokenizer();
 
-      const hasKey = (currentProvider === 'openrouter' && openrouterApiKey) || (currentProvider === 'gemini' && geminiApiKey);
-      if (currentProvider === 'simulation' || !hasKey) {
-        // 模擬直接呈現教學回覆
-        const out = document.getElementById('responseOutput');
-        out.className = 'output-card';
-        out.textContent = '⏳ [模擬演算中...] 正在生成回應...';
-        setTimeout(() => {
-          out.textContent = preset.simulated;
-        }, 300);
-      } else {
-        runExperiment();
-      }
+      // 高亮當前選取的預設項目
+      const items = document.querySelectorAll('#presetList .preset-item');
+      items.forEach((item, idx) => {
+        if (idx === pIdx) item.classList.add('active');
+        else item.classList.remove('active');
+      });
+
+      // 依使用者指示：只載入 Prompt 到輸入框，絕不自動執行！提示使用者手動按送出
+      const out = document.getElementById('responseOutput');
+      out.className = 'output-card placeholder';
+      out.innerHTML = `<div style="max-width: 460px; text-align: left;">
+        <div style="font-weight: 700; color: var(--accent-terra); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+          <span>👉 已載入預設話術：</span><span style="color: var(--ink-primary); font-weight: 600;">${escapeHtml(preset.label)}</span>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--ink-secondary); line-height: 1.6; background: var(--bg-surface); padding: 10px 12px; border-radius: 6px; border: 1px dashed var(--border-default);">
+          提示詞已填入上方輸入框。您可以直接檢視或微調文字內容，確認後請點擊下方<strong>「⚡ 執行測試」</strong>按鈕開始運算。
+        </div>
+      </div>`;
     }
 
     function clearInput() {
