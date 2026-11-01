@@ -2193,6 +2193,7 @@
           ⚠️ <strong>關鍵避坑：</strong> 1 個英文字 ≈ 1~1.3 Token，但繁體中文因多字節編碼，<strong>1 個中文字 ≈ 1.5~2.0 Token</strong>（中文天然比英文貴 40%）！在構建 Agent 或長對話時，請善用英文提示詞或專門針對中文微調的 Tokenizer。
         </div>
       </div>
+    </div>
 <!-- Card 3: API Key -->
       <div class="concept-card">
         <div>
@@ -2475,6 +2476,98 @@ You are an interactive CLI tool that helps users with software engineering tasks
 
         </div>
 
+      </div>
+
+      <!-- Card 8: Fine-tuning & LoRA + Unsloth AI -->
+      <div class="concept-card" style="grid-column: 1 / -1; border-left: 5px solid #16a34a;">
+        <div>
+          <div class="concept-card-header">
+            <span class="concept-tag" style="color: #16a34a;">08 / MODEL ADAPTATION &amp; UNSLOTH</span>
+            <span class="code-pill">PEFT · Low-Rank Adaptation</span>
+          </div>
+          <div class="concept-term">Fine-tuning（微調 / 洗模型）與 LoRA（低秩適應）</div>
+          <div class="concept-subtitle">「凍結通用大腦，只插極小專屬外掛矩陣；Unsloth 手寫算子提速 5 倍」</div>
+          <p class="concept-desc">
+            預訓練（Pre-training）花費數千萬美元讓模型讀通全世界；而<strong>微調（Fine-tuning，業界俗稱洗模型）</strong>則是企業崗前培訓，讓模型死守特定業務規則與輸出格式。
+            <strong>LoRA（Low-Rank Adaptation）</strong>完全不改動原模型龐大參數，只在旁邊插上小於 1% 的低秩外掛矩陣，幾十 MB 隨插隨換。
+          </p>
+
+          <!-- Conceptual Comparison Grid -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 14px; margin-bottom: 18px;">
+            <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px;">
+              <strong style="font-size: 13px; color: #1e293b;">🎓 預訓練（Pre-training）＝ 讀完大學通識</strong>
+              <p style="font-size: 12px; color: #64748b; line-height: 1.6; margin-top: 6px;">
+                花費幾千萬美元、幾萬張 GPU 讀完全世界維基百科與互聯網。模型什麼都懂一點，是通才，但不懂您公司的專屬名詞、隱私數據與特殊業務格式。
+              </p>
+            </div>
+
+            <div style="background: #fff; border: 1.5px solid #86efac; border-radius: 6px; padding: 14px;">
+              <strong style="font-size: 13px; color: #15803d;">🎯 微調（Fine-tuning / 洗模型）＝ 企業崗前培訓</strong>
+              <p style="font-size: 12px; color: #475569; line-height: 1.6; margin-top: 6px;">
+                拿自家公司的 1,000 條客服對話、法務審查標準或醫療病例，對模型進行<strong>「定向特訓」</strong>。讓它一張口就是道地的行業行話、死守固定 JSON 格式！
+              </p>
+            </div>
+
+            <div style="background: #fff; border: 2px solid #16a34a; border-radius: 6px; padding: 14px; box-shadow: 0 2px 8px rgba(22,163,74,0.08);">
+              <strong style="font-size: 13px; color: #166534;">🧩 LoRA（低秩適應）＝ 輕量熱插拔外掛</strong>
+              <p style="font-size: 12px; color: #14532d; line-height: 1.6; margin-top: 6px;">
+                傳統微調要把 80 億個參數全改一遍（顯存爆炸）。<strong>LoRA 完全凍結原本大腦，只在旁邊插上兩個極小矩陣（參數不到 1%）</strong>！幾十 MB 的外掛包，單張顯卡就能訓完，隨時熱插拔抽換！
+              </p>
+            </div>
+          </div>
+
+          <!-- UNSLOTH AI DEEP DIVE CARD -->
+          <div style="background: #ffffff; border: 1.5px solid #86efac; border-radius: 8px; padding: 18px; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">🦥</span>
+                <div>
+                  <strong style="font-size: 16px; color: #15803d;">Unsloth AI（unsloth.ai）：全球開發者狂熱的微調加速神庫</strong>
+                  <div style="font-size: 11px; color: #64748b;">創辦人：Daniel Han &amp; Michael Han 兄弟 · 開源熱門度 No.1</div>
+                </div>
+              </div>
+              <a href="https://unsloth.ai" target="_blank" style="font-size: 11px; color: #15803d; text-decoration: none; font-weight: 700; background: #f0fdf4; padding: 4px 10px; border-radius: 12px; border: 1px solid #86efac;">
+                🦥 訪問 unsloth.ai 官網 ➔
+              </a>
+            </div>
+
+            <p style="font-size: 13px; color: var(--ink); line-height: 1.6; margin-bottom: 12px;">
+              在過去，就算用 LoRA 微調一個 8B 模型，也需要一張頂級 A100 GPU；而 <strong>Unsloth</strong> 徹底顛覆了這一切！它以<strong>「手寫 OpenAI Triton GPU 算子與純手工推導反向傳播求導」</strong>，徹底消滅了 PyTorch 的記憶體浪費：
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 12px;">
+              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 12px; border-radius: 6px;">
+                <div style="font-size: 11px; color: #166534; font-weight: 700;">🚀 訓練速度飆升</div>
+                <div style="font-size: 20px; font-weight: 800; color: #15803d; font-family: var(--font-mono);">2x ~ 5x 提速</div>
+                <div style="font-size: 11px; color: #166534;">長文本下更高達 30x</div>
+              </div>
+              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 12px; border-radius: 6px;">
+                <div style="font-size: 11px; color: #166534; font-weight: 700;">💾 顯存消耗狂降</div>
+                <div style="font-size: 20px; font-weight: 800; color: #15803d; font-family: var(--font-mono);">-70% ~ 80%</div>
+                <div style="font-size: 11px; color: #166534;">徹底根絕 CUDA OOM 爆顯存</div>
+              </div>
+              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 12px; border-radius: 6px;">
+                <div style="font-size: 11px; color: #166534; font-weight: 700;">🎯 精度損失</div>
+                <div style="font-size: 20px; font-weight: 800; color: #15803d; font-family: var(--font-mono);">0% 零損失</div>
+                <div style="font-size: 11px; color: #166534;">數學精度 100% 吻合</div>
+              </div>
+              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 12px; border-radius: 6px;">
+                <div style="font-size: 11px; color: #166534; font-weight: 700;">💻 平民硬體支援</div>
+                <div style="font-size: 20px; font-weight: 800; color: #15803d; font-family: var(--font-mono);">RTX 3090/4090</div>
+                <div style="font-size: 11px; color: #166534;">免費 Colab T4 亦可微調</div>
+              </div>
+            </div>
+
+            <div style="font-size: 12px; color: #334155; line-height: 1.6;">
+              • <strong>支援全明星陣容</strong>：Llama 3.3/3.2、DeepSeek-R1（支援 GRPO 深度推理微調）、Qwen 2.5、Mistral、Gemma 2。<br>
+              • <strong>1 行代碼導出 GGUF / Ollama</strong>：微調完成後，只要 <code>model.save_pretrained_gguf("my_model", tokenizer)</code>，就能立刻轉成 GGUF 扔進 Ollama 或本機筆電離線運行，打通了「數據 ➔ 微調 ➔ 本機私有化部署」的終極閉環！
+            </div>
+          </div>
+        </div>
+
+        <div class="concept-callout callout-insight">
+          💡 <strong>心智模型：</strong> 預訓練是讀博通曉古今，微調是入職入行培訓，LoRA 是隨身工牌，Unsloth 是讓培訓加速 5 倍的超級高鐵！
+        </div>
       </div>
 
     </div>
@@ -3931,102 +4024,7 @@ You are an interactive CLI tool that helps users with software engineering tasks
 
         </div>
 
-
-        <!-- ============================================================
-             08. FINE-TUNING (洗模型) & LORA (低秩適應) + UNSLOTH AI
-             ============================================================ -->
-        <div style="margin-top: 28px; background: #fdfefe; border: 1.5px solid #bbf7d0; border-radius: 8px; padding: 22px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="background: #16a34a; color: #fff; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; font-family: var(--font-mono);">08 / MODEL ADAPTATION</span>
-              <strong style="font-size: 18px; color: var(--ink);">Fine-tuning（洗模型 / 微調）與 LoRA：如何給 AI 大腦裝專屬外掛？</strong>
-            </div>
-            <a href="https://unsloth.ai" target="_blank" style="font-size: 12px; color: #15803d; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #86efac; padding: 4px 10px; border-radius: 20px; background: #f0fdf4;">
-              🦥 探索 Unsloth AI 官網 ➔
-            </a>
-          </div>
-
-          <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.6; margin-bottom: 14px;">
-            很多人問：大模型已經很聰明，為什麼還需要<strong>「Fine-tune（微調，業界俗稱洗模型）」</strong>？又為什麼現在所有人都在用 <strong>LoRA</strong> 與 <strong>Unsloth</strong>？
-          </div>
-
-          <!-- Conceptual Comparison Grid -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 18px;">
-            
-            <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px;">
-              <strong style="font-size: 13px; color: #1e293b;">🎓 預訓練（Pre-training）＝ 讀完大學通識</strong>
-              <p style="font-size: 12px; color: #64748b; line-height: 1.6; margin-top: 6px;">
-                花費幾千萬美元、幾萬張 GPU 讀完全世界維基百科與互聯網。模型什麼都懂一點，是通才，但不懂您公司的專屬名詞、隱私數據與特殊業務格式。
-              </p>
-            </div>
-
-            <div style="background: #fff; border: 1.5px solid #86efac; border-radius: 6px; padding: 14px;">
-              <strong style="font-size: 13px; color: #15803d;">🎯 微調（Fine-tuning / 洗模型）＝ 企業崗前培訓</strong>
-              <p style="font-size: 12px; color: #475569; line-height: 1.6; margin-top: 6px;">
-                拿自家公司的 1,000 條客服對話、法務審查標準或醫療病例，對模型進行<strong>「定向特訓」</strong>。讓它一張口就是道地的行業行話、死守固定 JSON 格式！
-              </p>
-            </div>
-
-            <div style="background: #fff; border: 2px solid #16a34a; border-radius: 6px; padding: 14px; box-shadow: 0 2px 8px rgba(22,163,74,0.08);">
-              <strong style="font-size: 13px; color: #166534;">🧩 LoRA（低秩適應）＝ 輕量熱插拔外掛</strong>
-              <p style="font-size: 12px; color: #14532d; line-height: 1.6; margin-top: 6px;">
-                傳統微調要把 80 億個參數全改一遍（顯存爆炸）。<strong>LoRA 完全凍結原本大腦，只在旁邊插上兩個極小矩陣（參數不到 1%）</strong>！幾十 MB 的外掛包，單張顯卡就能訓完，隨時熱插拔抽換！
-              </p>
-            </div>
-
-          </div>
-
-          <!-- UNSLOTH AI DEEP DIVE CARD -->
-          <div style="background: #ffffff; border: 1.5px solid #86efac; border-radius: 8px; padding: 18px; margin-bottom: 12px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 20px;">🦥</span>
-                <div>
-                  <strong style="font-size: 16px; color: #15803d;">Unsloth AI（unsloth.ai）：全球開發者狂熱的微調加速神庫</strong>
-                  <div style="font-size: 11px; color: #64748b;">創辦人：Daniel Han &amp; Michael Han 兄弟 · 開源熱門度 No.1</div>
-                </div>
-              </div>
-              <a href="https://github.com/unslothai/unsloth" target="_blank" style="font-size: 11px; color: #0f172a; text-decoration: none; font-weight: 700; background: #f1f5f9; padding: 4px 10px; border-radius: 12px; border: 1px solid #cbd5e1;">
-                GitHub: unslothai/unsloth ★
-              </a>
-            </div>
-
-            <p style="font-size: 13px; color: var(--ink); line-height: 1.6; margin-bottom: 12px;">
-              在過去，就算用 LoRA 微調一個 8B 模型，也需要一張頂級 A100 GPU；而 <strong>Unsloth</strong> 徹底顛覆了這一切！它以<strong>「手寫 OpenAI Triton GPU 算子與純手工推導反向傳播求導」</strong>，徹底消滅了 PyTorch 的記憶體浪費：
-            </p>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 12px;">
-              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 12px; border-radius: 6px;">
-                <div style="font-size: 11px; color: #166534; font-weight: 700;">🚀 訓練速度飆升</div>
-                <div style="font-size: 20px; font-weight: 800; color: #15803d; font-family: var(--font-mono);">2x ~ 5x 提速</div>
-                <div style="font-size: 11px; color: #166534;">長文本下更高達 30x</div>
-              </div>
-              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 12px; border-radius: 6px;">
-                <div style="font-size: 11px; color: #166534; font-weight: 700;">💾 顯存消耗狂降</div>
-                <div style="font-size: 20px; font-weight: 800; color: #15803d; font-family: var(--font-mono);">-70% ~ 80%</div>
-                <div style="font-size: 11px; color: #166534;">徹底根絕 CUDA OOM 爆顯存</div>
-              </div>
-              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 12px; border-radius: 6px;">
-                <div style="font-size: 11px; color: #166534; font-weight: 700;">🎯 精度損失</div>
-                <div style="font-size: 20px; font-weight: 800; color: #15803d; font-family: var(--font-mono);">0% 零損失</div>
-                <div style="font-size: 11px; color: #166534;">數學精度 100% 吻合</div>
-              </div>
-              <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 10px 12px; border-radius: 6px;">
-                <div style="font-size: 11px; color: #166534; font-weight: 700;">💻 平民硬體支援</div>
-                <div style="font-size: 20px; font-weight: 800; color: #15803d; font-family: var(--font-mono);">RTX 3090/4090</div>
-                <div style="font-size: 11px; color: #166534;">免費 Colab T4 亦可微調</div>
-              </div>
-            </div>
-
-            <div style="font-size: 12px; color: #334155; line-height: 1.6;">
-              • <strong>支援全明星陣容</strong>：Llama 3.3/3.2、DeepSeek-R1（支援 GRPO 深度推理微調）、Qwen 2.5、Mistral、Gemma 2。<br>
-              • <strong>1 行代碼導出 GGUF / Ollama</strong>：微調完成後，只要 <code>model.save_pretrained_gguf("my_model", tokenizer)</code>，就能立刻轉成 GGUF 扔進 Ollama 或本機筆電離線運行，打通了「數據 ➔ 微調 ➔ 本機私有化部署」的終極閉環！
-            </div>
-          </div>
-
-        </div>
-
-      </div>
+</div>
 
     </div>
 
