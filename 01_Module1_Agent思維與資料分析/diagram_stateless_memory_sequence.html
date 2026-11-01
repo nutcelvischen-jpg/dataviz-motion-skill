@@ -191,23 +191,23 @@
       <!-- Actor 1: User / Browser -->
       <g transform="translate(140, 24)">
         <rect x="-80" y="0" width="160" height="44" rx="4" fill="#fcfbf7" stroke="#1a1917" stroke-width="1.2"/>
-        <text x="0" y="20" fill="#1a1917" font-family="'Geist', sans-serif" font-size="12" font-weight="600" text-anchor="middle">使用者瀏覽器</text>
-        <text x="0" y="34" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">Client · Web UI</text>
+        <text x="0" y="20" fill="#1a1917" font-family="'Geist', sans-serif" font-size="12" font-weight="600" text-anchor="middle">👤 使用者 (User)</text>
+        <text x="0" y="34" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">每次發送提問 · 以為 AI 有記憶</text>
       </g>
 
       <!-- Actor 2: Session Buffer / Context Packager -->
       <g transform="translate(480, 24)">
         <rect x="-90" y="0" width="180" height="44" rx="4" fill="#fcfbf7" stroke="#1a1917" stroke-width="1.2"/>
-        <text x="0" y="20" fill="#1a1917" font-family="'Geist', sans-serif" font-size="12" font-weight="600" text-anchor="middle">對話緩存打包器</text>
-        <text x="0" y="34" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">Session State · Messages[]</text>
+        <text x="0" y="20" fill="#1a1917" font-family="'Geist', sans-serif" font-size="12" font-weight="600" text-anchor="middle">💾 存摺資料庫 &amp; 小抄打包器</text>
+        <text x="0" y="34" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">把過去所有對話重組成厚小抄</text>
       </g>
 
       <!-- Actor 3: Stateless LLM Server (Focal) -->
       <g transform="translate(820, 24)">
         <rect x="-90" y="0" width="180" height="44" rx="4" fill="#fcfbf7" stroke="#c2410c" stroke-width="1.8"/>
         <rect x="-90" y="0" width="180" height="44" rx="4" fill="rgba(194, 65, 12, 0.05)"/>
-        <text x="0" y="20" fill="#c2410c" font-family="'Geist', sans-serif" font-size="12" font-weight="600" text-anchor="middle">無狀態 LLM 模型核心</text>
-        <text x="0" y="34" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">Stateless Engine · Zero Memory</text>
+        <text x="0" y="20" fill="#c2410c" font-family="'Geist', sans-serif" font-size="12" font-weight="600" text-anchor="middle">🧊🤖 失憶 AI (金魚腦核心)</text>
+        <text x="0" y="34" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">完全零記憶 · 每次重讀小抄</text>
       </g>
 
       <!-- LIFELINES -->
@@ -267,7 +267,7 @@
       <!-- 2.3 Buffer sends BLOATED payload to LLM -->
       <line x1="484" y1="300" x2="816" y2="300" stroke="#1d4ed8" stroke-width="1.2" marker-end="url(#arrow-sync)"/>
       <rect x="535" y="289" width="230" height="16" fill="#f5f3ec"/>
-      <text x="650" y="301" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">POST /v1/chat: [U1+R1+U2] (140 tokens)</text>
+      <text x="650" y="301" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="9" text-anchor="middle">📜 翻出前次存摺紀錄+新問題打包成小抄</text>
 
       <!-- Activation at LLM -->
       <rect x="816" y="300" width="8" height="35" fill="rgba(194,65,12,0.12)" stroke="#c2410c" stroke-width="0.8"/>

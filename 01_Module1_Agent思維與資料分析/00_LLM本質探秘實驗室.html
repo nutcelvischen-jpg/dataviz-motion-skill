@@ -1004,9 +1004,88 @@
             simulated: "我的知識庫僅更新至訓練資料切斷點。在沒有外部連網或系統注入的情況下，若現實中政治人物近期發生交接，我只能回答我權重中記住的最後一位人物。"
           }
         ],
-        analysis: `<strong>大語言模型為什麼不知道時間？</strong><br>
-LLM 的本質是一組<strong>靜態凍結的浮點數矩陣（Frozen Weights）</strong>。當模型預訓練結束後，它的所有世界知識就永久定格在訓練資料截斷日。<br>
-它在伺服器中只是一個純粹的數學運算函式 \\( y = f(x) \\)，沒有心跳脈衝、沒有 cron job 排程器。平常 ChatGPT 之所以能回答今天日期，<strong>是因為前端工程師在發送請求前，偷偷在背後把 <code>Current date: 2026-10-31</code> 當作隱藏字串塞入進去！</strong>`,
+        analysis: `<strong>一、 為什麼大語言模型自己「不知道時間、也看不見天氣」？</strong><br>
+很多人以為大語言模型住在電腦伺服器裡，應該像手機一樣隨時知道幾點幾分、能即時連網。但真相是：<strong>大模型本質上是一組「完全凍結的靜態數學矩陣（Frozen Weights）」</strong>，它就像一個被關在<strong>無窗密閉房間裡的智者 🧊📦</strong>，沒有內建時鐘、沒有窗戶看天氣，知識只停留在他讀完歷史資料的那一刻（知識截斷日）。<br><br>
+
+<div style="background: rgba(29, 78, 216, 0.04); border: 1px solid rgba(29, 78, 216, 0.2); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+  <div style="font-weight: 700; color: #1d4ed8; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+    <span>🧰 小白秒懂流程圖：AI 為什麼現在能回答時間與天氣？</span>
+    <span style="font-size: 10px; background: rgba(29, 78, 216, 0.1); color: #1d4ed8; padding: 2px 6px; border-radius: 3px; font-weight: 600;">核心概念：工具調用 (Function Calling)</span>
+  </div>
+
+  <div style="font-size: 12px; color: var(--ink-secondary); line-height: 1.6; margin-bottom: 12px;">
+    日常生活中你問 ChatGPT「現在幾點？台北下雨了嗎？」它能準確回答，<strong>不是因為它自己知道，而是它偷偷從「工具箱 🧰」拿出工具去查</strong>！請看下方 4 步流程：
+  </div>
+
+  <!-- 4-Step Visual Flowchart with Cute Icons -->
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    
+    <!-- Step 1 -->
+    <div style="display: flex; align-items: center; gap: 10px; background: #ffffff; border: 1px solid var(--border-default); border-radius: 6px; padding: 10px 12px;">
+      <div style="font-size: 22px; line-height: 1;">👤</div>
+      <div style="flex: 1;">
+        <div style="font-size: 11px; font-weight: 700; color: var(--ink-primary);">步驟 1【用戶提問】</div>
+        <div style="font-size: 11px; color: var(--ink-secondary);">用戶在對話框問：「今天星期幾？台北外面下雨了嗎？」</div>
+      </div>
+      <div style="font-size: 10px; font-family: var(--font-mono); color: #8c867e; background: #f5f3ec; padding: 3px 6px; border-radius: 3px;">發起請求</div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="text-align: center; color: #1d4ed8; font-size: 12px; font-weight: 700; margin: -2px 0;">▼</div>
+
+    <!-- Step 2 -->
+    <div style="display: flex; align-items: center; gap: 10px; background: #ffffff; border: 1px solid var(--border-default); border-radius: 6px; padding: 10px 12px;">
+      <div style="font-size: 22px; line-height: 1;">🧊🤖</div>
+      <div style="flex: 1;">
+        <div style="font-size: 11px; font-weight: 700; color: var(--ink-primary);">步驟 2【AI 發現自己不知道，決定開工具箱】</div>
+        <div style="font-size: 11px; color: var(--ink-secondary);">AI 意識到：「我被關在黑盒子裡沒有時鐘、也沒有窗戶！但我身邊有<strong>專屬小工具箱 🧰</strong>！」</div>
+      </div>
+      <div style="font-size: 10px; font-family: var(--font-mono); color: #c2410c; background: rgba(194,65,12,0.08); padding: 3px 6px; border-radius: 3px;">觸發判斷</div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="text-align: center; color: #1d4ed8; font-size: 12px; font-weight: 700; margin: -2px 0;">▼</div>
+
+    <!-- Step 3: Dual Tools -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+      <div style="background: #ffffff; border: 1px solid #bfdbfe; border-left: 3px solid #1d4ed8; border-radius: 6px; padding: 10px;">
+        <div style="font-size: 11px; font-weight: 700; color: #1d4ed8; margin-bottom: 2px;">⌚ 呼叫手錶小工具 (Time API)</div>
+        <div style="font-size: 10px; color: #5e5953; line-height: 1.4;">
+          AI 叫系統看手錶，回傳：<br>
+          <code style="color: #1d4ed8; font-weight: 600;">2026/11/01 14:30 星期日</code>
+        </div>
+      </div>
+
+      <div style="background: #ffffff; border: 1px solid #fed7aa; border-left: 3px solid #ea580c; border-radius: 6px; padding: 10px;">
+        <div style="font-size: 11px; font-weight: 700; color: #ea580c; margin-bottom: 2px;">🌦️ 呼叫氣象聯網工具 (Weather API)</div>
+        <div style="font-size: 10px; color: #5e5953; line-height: 1.4;">
+          AI 連線氣象局查詢「台北」，回傳：<br>
+          <code style="color: #ea580c; font-weight: 600;">氣溫 24°C，晴時多雲，降雨機率 10%</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="text-align: center; color: #1d4ed8; font-size: 12px; font-weight: 700; margin: -2px 0;">▼</div>
+
+    <!-- Step 4 -->
+    <div style="display: flex; align-items: center; gap: 10px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 10px 12px;">
+      <div style="font-size: 22px; line-height: 1;">💬✨</div>
+      <div style="flex: 1;">
+        <div style="font-size: 11px; font-weight: 700; color: #166534;">步驟 4【AI 整理成溫暖人話回答您】</div>
+        <div style="font-size: 11px; color: #166534; line-height: 1.4;">
+          「今天是 2026 年 11 月 1 日星期日！目前台北是涼爽舒適的晴天，氣溫 24°C，不用帶傘喔！」
+        </div>
+      </div>
+      <div style="font-size: 10px; font-family: var(--font-mono); color: #166534; background: #dcfce7; padding: 3px 6px; border-radius: 3px; font-weight: 700;">完美解答</div>
+    </div>
+
+  </div>
+
+  <div style="margin-top: 10px; padding: 8px 10px; background: #ffffff; border-radius: 4px; font-size: 11px; color: var(--ink-secondary); line-height: 1.5; border: 1px dashed var(--border-default);">
+    📌 <strong>非工程師一句話結論</strong>：純 LLM 就像住在深山只讀古書的智者，給它<strong>「手錶（時鐘 API）」</strong>和<strong>「手機聯網（氣象工具）」</strong>，它就瞬間無所不知！這就是 <strong>Agent（智慧代理人）</strong>最核心的威力！
+  </div>
+</div>`,
         takeaway: `🎓 <strong>課程核心啟示：</strong> 純 LLM 是死板的歷史記憶庫；這就是為什麼在 Module 3 我們必須導入 <strong>MCP 工具協議（Model Context Protocol）</strong>，讓模型學會調用外部時鐘 API、Google Search 與即時即用資料庫！`
       },
       {
@@ -1036,19 +1115,90 @@ LLM 的本質是一組<strong>靜態凍結的浮點數矩陣（Frozen Weights）
             simulated: "根據您剛才提供的對話紀錄，您的名字是陳大華，您最喜歡的顏色是電光紫，而您的貓咪名字叫皮皮！"
           }
         ],
-        analysis: `<strong>什麼叫『無狀態（Stateless）』？</strong><br>
-很多人以為 AI 像人類一樣「大腦有長期記憶」，這是極大的誤解！<br><br>
-實際上，<strong>每一次你按下發送鍵，模型都是以完全失憶的白紙狀態啟動</strong>。你在各家聊天介面看到的連貫記憶，完全是工程師在背後<strong>把過去所有的對話紀錄，重新打包成一長串龐大的 Context 重新塞給模型</strong>！<br><br>
-這帶來了三大工程痛點：<br>
-1. <strong>Token 消耗隨對話輪數呈二次方暴增</strong>，成本成倍上漲。<br>
-2. <strong>上下文稀釋（Context Drift）</strong>：早期設定的規則會被後面的長文字淹沒。<br>
-3. <strong>視窗上限溢出</strong>：一旦對話超越 Context Window 便會發生截斷失憶。<br><br>
-<div class="callout-card" style="margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(29, 78, 216, 0.05); border: 1px solid rgba(29, 78, 216, 0.2);">
-  <div>
-    <div style="font-weight: 600; color: var(--metro-blue); margin-bottom: 2px;">🎨 時序流程圖：對話歷史打包重送與 O(N²) 暴增機制</div>
-    <div style="font-size: 12px; color: var(--ink-secondary);">依據 diagram-design 規範繪製之 Sequence Diagram 高解析時序圖</div>
+        analysis: `<strong>一、 震驚真相：大語言模型其實是「金魚腦（完全沒有記憶）」！</strong><br>
+很多非技術背景的朋友以為 AI 像真人一樣「聊過就記在腦袋裡」。<br>
+<strong>這是天大的誤解！大模型每一次收到你的訊息，它的腦袋都是 100% 空白的白紙 🧊🐟！</strong><br>
+那為什麼 ChatGPT 好像記得你剛才說的話？秘密全在於後台有一個<strong>「對話存摺資料庫 💾」</strong>在默默幫它記小抄！<br><br>
+
+<div style="background: rgba(194, 65, 12, 0.04); border: 1px solid rgba(194, 65, 12, 0.2); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+  <div style="font-weight: 700; color: #c2410c; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+    <span>💾 小白秒懂流程圖：AI 記憶的本質 — 每一次都是「從小抄資料庫翻出來重讀」！</span>
   </div>
-  <a href="diagram_stateless_memory_sequence.html" target="_blank" style="padding: 6px 12px; background: var(--metro-blue); color: #fff; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap;">開啟高解析時序圖 ↗</a>
+
+  <div style="font-size: 12px; color: var(--ink-secondary); line-height: 1.6; margin-bottom: 12px;">
+    請看下方兩輪對話的幕後真相：AI 根本沒記住你，全靠系統每一次把過去所有紀錄<strong>「打包成厚小抄重新塞給它」</strong>！
+  </div>
+
+  <!-- Dual Rounds Visual Flowchart -->
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    
+    <!-- Round 1 Card -->
+    <div style="background: #ffffff; border: 1px solid var(--border-default); border-radius: 6px; padding: 12px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+        <span style="font-size: 11px; font-weight: 700; color: var(--ink-primary);">【第 1 輪對話】初次見面</span>
+        <span style="font-size: 10px; font-family: var(--font-mono); color: #166534; background: #dcfce7; padding: 2px 6px; border-radius: 3px;">寫入資料庫</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--ink-secondary); line-height: 1.5;">
+        <span>👤 用戶：「我叫大華，我的貓叫皮皮」</span>
+        <span>➔</span>
+        <span>💾 <strong>存摺資料庫記下第 1 筆</strong></span>
+        <span>➔</span>
+        <span>🤖 AI 回覆：「你好大華！」</span>
+      </div>
+      <div style="margin-top: 6px; font-size: 10px; color: #dc2626; background: #fee2e2; padding: 4px 8px; border-radius: 4px; font-weight: 600;">
+        ⚠️ 對話一結束，連線斷開！AI 腦袋立刻重置為空白，把大華和皮皮忘得一乾二淨！
+      </div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="text-align: center; color: #c2410c; font-size: 12px; font-weight: 700; margin: -4px 0;">▼</div>
+
+    <!-- Round 2 Card (The Magic Truth) -->
+    <div style="background: #ffffff; border: 1px solid #fdba74; border-left: 4px solid #c2410c; border-radius: 6px; padding: 12px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+        <span style="font-size: 11px; font-weight: 700; color: #c2410c;">【第 2 輪對話】見證奇蹟的幕後真相！</span>
+        <span style="font-size: 10px; font-family: var(--font-mono); color: #c2410c; background: #ffedd5; padding: 2px 6px; border-radius: 3px; font-weight: 700;">小抄全部重送</span>
+      </div>
+      
+      <!-- Step A -->
+      <div style="font-size: 11px; color: var(--ink-secondary); line-height: 1.5; margin-bottom: 6px;">
+        1. 👤 用戶問新問題：「請問我的貓叫什麼名字？」<br>
+        2. 💾 <strong>系統後台立刻翻開【存摺資料庫】</strong>，把剛才第 1 輪講過的所有話撈出來！<br>
+        3. 📜 系統把過去歷史紀錄與新問題，<strong>組裝黏成一張「超大小抄」</strong>：
+      </div>
+
+      <!-- Packet Preview -->
+      <div style="background: #fdf6e2; border: 1px dashed #d97706; padding: 8px 10px; border-radius: 4px; font-size: 10px; font-family: var(--font-mono); color: #78350f; line-height: 1.4; margin-bottom: 6px;">
+        📜 傳送給 AI 的完整小抄封包：<br>
+        [歷史記錄 1]: 用戶說我叫大華，我的貓叫皮皮<br>
+        [歷史記錄 2]: AI 回覆你好大華<br>
+        [最新提問]: 請問我的貓叫什麼名字？
+      </div>
+
+      <!-- Step B -->
+      <div style="font-size: 11px; color: var(--ink-secondary); line-height: 1.5;">
+        4. 🤖 系統把整張小抄塞進失憶的 AI！AI 在 0.1 秒內火速讀完小抄：<em>「哦！小抄寫貓叫皮皮！」</em><br>
+        5. 💬 AI 裝作記得你的樣子回答：「你的貓叫皮皮！」（用戶大驚：AI 記性真好！）
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Real-world Impact for Non-programmers -->
+  <div style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+    <div style="background: #ffffff; border: 1px solid var(--border-default); padding: 8px 10px; border-radius: 4px; font-size: 10px; color: var(--ink-secondary); line-height: 1.4;">
+      💸 <strong>為什麼帳單會暴增？</strong><br>
+      聊第 1 句付 10 個字費用；聊到第 50 句，每次發送都要把前 49 句的小抄全部重送，傳輸字數呈<strong>二次方暴增（雪球效應）</strong>！
+    </div>
+    <div style="background: #ffffff; border: 1px solid var(--border-default); padding: 8px 10px; border-radius: 4px; font-size: 10px; color: var(--ink-secondary); line-height: 1.4;">
+      ✂️ <strong>為什麼聊太久會失憶？</strong><br>
+      小抄厚度有上限（Context Window）！一旦聊天超過上限，系統只能拿剪刀把最舊的小抄剪掉，AI 就真的徹底失憶了！
+    </div>
+  </div>
+
+  <div style="margin-top: 10px; padding: 8px 10px; background: #ffffff; border-radius: 4px; font-size: 11px; color: var(--ink-secondary); line-height: 1.5; border: 1px dashed var(--border-default);">
+    📌 <strong>非工程師一句話結論</strong>：AI 就像一個<strong>只有幾秒記憶的速讀天才</strong>。每次要它回答，我們都必須把「過去所有聊天紀錄的小抄」整本翻出來給它重看一遍！
+  </div>
 </div>`,
         takeaway: `🎓 <strong>課程核心啟示：</strong> 這正是為什麼絕對不能把數十頁 SOP 塞在單一對話框！在 Module 2 我們學習的「自製 Skill」正是運用<strong>漸進式載入（Progressive Disclosure）</strong>，平時 0 消耗，特定任務觸發時才精準加載卡匣！`
       },

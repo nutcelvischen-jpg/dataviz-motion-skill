@@ -977,6 +977,93 @@
       color: var(--accent-coral);
     }
 
+  
+    /* ============================================================
+       💡 NON-CODER INTUITIVE FLOWCHARTS (小白直覺真相卡片)
+       ============================================================ */
+    .intuition-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 24px;
+    }
+    @media (max-width: 860px) {
+      .intuition-grid { grid-template-columns: 1fr; }
+    }
+    .intuition-card {
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .intuition-card.card-memory {
+      border-left: 4px solid var(--accent-coral);
+    }
+    .intuition-card.card-tools {
+      border-left: 4px solid var(--accent-blue);
+    }
+    .intuition-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .badge-memory { background: rgba(194, 65, 12, 0.08); color: var(--accent-coral); }
+    .badge-tools { background: rgba(29, 78, 216, 0.08); color: var(--accent-blue); }
+    .intuition-title {
+      font-family: var(--font-title);
+      font-size: 22px;
+      color: var(--ink);
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+    .intuition-desc {
+      font-size: 12px;
+      color: var(--ink-secondary);
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+    .mini-flow-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--paper-tint);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 12px;
+    }
+    .mini-flow-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 4px;
+      padding: 8px 10px;
+    }
+    .mini-flow-icon { font-size: 18px; line-height: 1; min-width: 24px; text-align: center; }
+    .mini-flow-text { flex: 1; font-size: 11px; line-height: 1.4; color: var(--ink); }
+    .mini-flow-text strong { color: var(--ink); }
+    .mini-flow-text span { font-size: 10px; color: var(--ink-secondary); display: block; }
+    .mini-flow-arrow { text-align: center; font-size: 10px; color: var(--ink-muted); margin: -4px 0; font-weight: 700; }
+    .intuition-bottom-pill {
+      margin-top: 12px;
+      background: var(--paper-tint);
+      border: 1px dashed var(--rule-solid);
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 11px;
+      color: var(--ink-secondary);
+      line-height: 1.5;
+    }
+
   </style>
 </head>
 <body>
@@ -1339,6 +1426,111 @@
           在對話最一開始由開發者注入的最高指導方針，規範模型的角色、語氣、輸出格式與邊界。但如同我們在北捷案例所見：<strong>System Prompt 不是物理防火牆</strong>，仍會被惡意 Prompt Injection 繞過！
         </div>
         <div class="concept-formula">role: "system", content: "You are an expert analyst..."</div>
+      </div>
+    </div>
+
+    <!-- NON-CODER VISUAL INTUITION SECTION -->
+    <div style="margin-top: 36px; padding-top: 24px; border-top: 1px dashed var(--rule-solid);">
+      <div class="section-badge" style="color: var(--accent-coral);">NON-CODER ESSENTIALS</div>
+      <h3 style="font-family: var(--font-title); font-size: 26px; color: var(--ink); margin-bottom: 6px;">
+        💡 非工程師必懂的 2 大直覺真相（可愛圖標流程圖）
+      </h3>
+      <p style="font-size: 13px; color: var(--ink-secondary); margin-bottom: 18px;">
+        完全不講死板代碼與複雜架構！用生活化的<strong>「存摺小抄」</strong>與<strong>「秘書工具箱」</strong>，看懂 AI 的真實生理構造：
+      </p>
+
+      <div class="intuition-grid">
+        
+        <!-- Intuition Card 1: Memory & Database -->
+        <div class="intuition-card card-memory">
+          <div>
+            <div class="intuition-badge badge-memory">真相一 · 金魚腦與存摺資料庫</div>
+            <div class="intuition-title">AI 其實完全沒有記憶！全靠後台「存摺資料庫」翻小抄重讀</div>
+            <div class="intuition-desc">
+              大模型每一次收到你的訊息，它的腦袋都是 100% 空白的白紙 🧊🐟！你在聊天視窗看到的連貫記憶，全是因為系統後台在每一次發送前，<strong>把歷史資料庫裡的所有對話撈出來，打包成厚厚的小抄塞給它</strong>：
+            </div>
+
+            <div class="mini-flow-stack">
+              <div class="mini-flow-item">
+                <div class="mini-flow-icon">👤</div>
+                <div class="mini-flow-text">
+                  <strong>第 1 輪聊天：初次見面</strong>
+                  <span>用戶：「我叫大華，貓叫皮皮」➔ 存入資料庫 💾 ➔ AI 回覆：「你好大華！」</span>
+                </div>
+              </div>
+
+              <div class="mini-flow-arrow">▼ 對話結束，AI 瞬間失憶變回白紙！▼</div>
+
+              <div class="mini-flow-item" style="border-color: #fdba74; background: #fffaf0;">
+                <div class="mini-flow-icon">💾📜</div>
+                <div class="mini-flow-text">
+                  <strong>第 2 輪聊天：幕後小抄大作戰！</strong>
+                  <span>用戶問：「我的貓叫什麼？」➔ 系統後台從資料庫撈出前次對話，組裝成超大小抄 📜！</span>
+                </div>
+              </div>
+
+              <div class="mini-flow-arrow">▼ 整張小抄丟進失憶的 AI 大腦 ▼</div>
+
+              <div class="mini-flow-item" style="border-color: #86efac; background: #f0fdf4;">
+                <div class="mini-flow-icon">🤖💬</div>
+                <div class="mini-flow-text">
+                  <strong>AI 在 0.1 秒內讀完小抄回答您</strong>
+                  <span>「小抄寫貓叫皮皮！」➔ 回覆：「你的貓叫皮皮！」（用戶誤以為 AI 記性超好）</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="intuition-bottom-pill">
+            💸 <strong>成本真相</strong>：每次發送都要把整本歷史小抄全部重傳！聊得越長，每句成本呈<strong>二次方暴增（雪球效應）</strong>；小抄厚過極限時會被剪刀剪掉，AI 就真正失憶！
+          </div>
+        </div>
+
+        <!-- Intuition Card 2: Tools & Weather/Time -->
+        <div class="intuition-card card-tools">
+          <div>
+            <div class="intuition-badge badge-tools">真相二 · 工具箱與時間/天氣</div>
+            <div class="intuition-title">AI 自己不知道時間與天氣！全靠「工具箱 (Function Calling)」即時查</div>
+            <div class="intuition-desc">
+              大語言模型是一組凍結的歷史大腦，它被關在一個<strong>沒有窗戶、沒有手錶的密閉房間 🧊📦</strong>！它能回答你今天星期幾、外面有沒有下雨，全靠它身邊的<strong>「專屬小工具箱 🧰」</strong>：
+            </div>
+
+            <div class="mini-flow-stack">
+              <div class="mini-flow-item">
+                <div class="mini-flow-icon">👤</div>
+                <div class="mini-flow-text">
+                  <strong>步驟 1：用戶提問即時資訊</strong>
+                  <span>用戶在對話框問：「今天星期幾？台北外面下雨了嗎？」</span>
+                </div>
+              </div>
+
+              <div class="mini-flow-arrow">▼ AI 知道自己被關在黑盒子，翻開工具箱 ▼</div>
+
+              <div class="mini-flow-item" style="border-color: #bfdbfe; background: #eff6ff;">
+                <div class="mini-flow-icon">🧰⌚</div>
+                <div class="mini-flow-text">
+                  <strong>步驟 2：掏出「手錶工具」與「氣象工具」</strong>
+                  <span>• 手錶 API ⌚ 查時間 ➔ 得到 2026/11/01 14:30<br>• 氣象 API 🌦️ 查台北 ➔ 得到 24°C，晴時多雲</span>
+                </div>
+              </div>
+
+              <div class="mini-flow-arrow">▼ 工具回傳數據給 AI 大腦 ▼</div>
+
+              <div class="mini-flow-item" style="border-color: #86efac; background: #f0fdf4;">
+                <div class="mini-flow-icon">💬✨</div>
+                <div class="mini-flow-text">
+                  <strong>步驟 3：AI 整理成溫暖人話回答您</strong>
+                  <span>「今天是 2026 年 11 月 1 號星期日！目前台北天氣晴朗舒適，氣溫 24°C，不用帶傘喔！」</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="intuition-bottom-pill">
+            🎯 <strong>Agent 核心啟示</strong>：純 LLM 就像深山飽學隱士，給它<strong>「手錶（時鐘 API）」</strong>與<strong>「手機（天氣與搜尋工具）」</strong>，它就進化成無所不知的 <strong>AI 智慧代理人（Agent）</strong>！
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
