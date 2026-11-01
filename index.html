@@ -1739,7 +1739,159 @@
       line-height: 1.3;
     }
 
-  </style>
+  
+    /* =========================================================
+       SECTION 05 PART B: COMMERCIAL AGENT MATRIX REDESIGN
+       ========================================================= */
+    .agent-matrix-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: #f1efe9;
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid var(--rule);
+    }
+    .agent-matrix-tab {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--ink-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .agent-matrix-tab:hover {
+      color: var(--ink);
+      background: rgba(255,255,255,0.7);
+    }
+    .agent-matrix-tab.active {
+      background: #ffffff;
+      color: var(--ink);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .agent-bento-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin: 16px 0;
+    }
+    @media (max-width: 768px) {
+      .agent-bento-grid { grid-template-columns: 1fr; }
+    }
+    .agent-pillar-card {
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .agent-pillar-title {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .agent-pillar-content {
+      font-size: 12.5px;
+      color: var(--ink-secondary);
+      line-height: 1.6;
+    }
+    .agent-war-box {
+      background: #fff8f5;
+      border: 1px solid #fed7aa;
+      border-left: 4px solid #ea580c;
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-top: 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--ink);
+    }
+
+    /* =========================================================
+       SECTION 06 & 07: MACROECONOMICS & DISTILLATION DEFENSE
+       ========================================================= */
+    .macro-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 20px 0;
+    }
+    @media (max-width: 900px) {
+      .macro-metric-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 540px) {
+      .macro-metric-grid { grid-template-columns: 1fr; }
+    }
+    .macro-metric-card {
+      background: #ffffff;
+      border: 1px solid var(--rule-solid);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .macro-metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: var(--accent-coral);
+    }
+    .macro-metric-num {
+      font-family: var(--font-title);
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1.1;
+      margin: 6px 0;
+    }
+    .macro-metric-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--ink-muted);
+    }
+    .macro-metric-sub {
+      font-size: 11px;
+      color: var(--ink-secondary);
+      line-height: 1.4;
+    }
+    .defense-card {
+      background: #ffffff;
+      border: 1px solid var(--rule-solid);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .defense-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .defense-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+      color: #b91c1c;
+      background: #fee2e2;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+</style>
 </head>
 <body>
 
@@ -1750,14 +1902,16 @@
         <span class="brand-badge">MODULE 01</span>
         <span class="brand-title">大語言模型通識圖鑑</span>
       </div>
-      <nav class="nav-actions">
-        <a href="#tokenizer" class="nav-link">Token 視覺化</a>
-        <a href="#api-trial" class="nav-link">實時 API 試演</a>
-        <a href="#glossary" class="nav-link">核心概念</a>
+            <nav class="nav-actions">
+        <a href="#pricing" class="nav-link">推論成本試算</a>
+        <a href="#glossary" class="nav-link">核心概念與分詞</a>
         <a href="#models" class="nav-link">全球模型全景</a>
         <a href="#cloud-vs-local" class="nav-link">雲端 vs 地端</a>
-        <a href="#agent-evolution" class="nav-link">Agent 演進與時長</a>
-        <a href="00_LLM本質探秘實驗室.html" class="nav-link active-pill">🔬 前往本質實驗室 ↗</a>
+        <a href="#agent-evolution" class="nav-link">Agent 商業矩陣</a>
+        <a href="#macro-economy" class="nav-link">總體經濟轉型</a>
+        <a href="#distillation-security" class="nav-link">蒸餾攻防專題</a>
+        <a href="lab.html" class="nav-link active-pill">🔬 探秘實驗室 ↗</a>
+        <a href="mobile.html" class="nav-link" style="color: #059669; font-weight: 700;">📱 手機版 App</a>
       </nav>
     </div>
   </header>
@@ -1771,28 +1925,197 @@
     </p>
 
     <!-- Quick Navigation Pills -->
-    <div class="section-nav">
-      <a href="#tokenizer">⚡ 互動式 Tokenizer 分詞沙盒</a>
-      <a href="#api-trial">📡 實時 API 調用與 Usage 試演</a>
-      <a href="#strawberry">🍓 為什麼 AI 數不出 strawberry 的 r？</a>
-      <a href="#glossary">📖 6 大基礎專有名詞詞典</a>
-      <a href="#models">🌐 全球主流 8 大模型全景評測</a>
+        <div class="section-nav">
+      <a href="#pricing">💰 2026 前沿模型推論成本試算與 API 檢驗器</a>
+      <a href="#glossary">📖 大模型 9 大基石 (含 Token 分詞沙盒與 Strawberry 陷阱)</a>
+      <a href="#models">🌐 全球主流 10 大模型全景評測</a>
       <a href="#cloud-vs-local">⚖️ 雲端 API vs 地端 Ollama 架構決策</a>
-      <a href="#agent-evolution">🤖 從 Prompt 到現代 Agent Loop &amp; 執行時長全景</a>
+      <a href="#agent-evolution">🤖 2026 自主 AI Agent 產業格局與四大商業旗艦</a>
+      <a href="#macro-economy">📈 人工智慧總體經濟轉型：Anthropic 實證指數與 2030 情境</a>
+      <a href="#distillation-security">🛡️ 前沿模型蒸餾攻擊與防禦架構專題</a>
     </div>
   </section>
 
   <!-- SECTION 1: TOKEN & TOKENIZE SANDBOX -->
-  <section id="tokenizer" class="container section-block">
+    <!-- SECTION 1: 2026 FRONTIER MODEL INFERENCE PRICING CALCULATOR & API INSPECTOR -->
+  <section id="pricing" class="container section-block">
     <div class="section-header">
-      <div class="section-badge">INTERACTIVE EXPLORER · 01</div>
-      <h2 class="section-title">Token 是什麼？互動式分詞與成本試算沙盒</h2>
+      <div class="section-badge">REAL-TIME INFERENCE COST · 01</div>
+      <h2 class="section-title">2026 前沿模型推論成本實時試算與 API 檢驗器</h2>
       <p class="section-desc">
-        電腦只認得二進制數字，無法直接理解人類文字。LLM 透過 <strong>Byte-Pair Encoding (BPE)</strong> 演算法將文字切分成「詞元（Token）」。英文字詞通常 1 個單字切成 1~2 個 Token；繁體中文因多字元編碼，每個字約消耗 1.2~2.0 個 Token！
+        在實際開發與企業部署中，Token 不僅是神經網路的計算量子，更是真金白銀的成本核心。以下即時比對全球 11 大代表性模型之原廠官方費率與 OpenRouter 聚合路由器實價，支援動態輸入量調整與實時 API 底層 Usage 檢驗：
       </p>
     </div>
 
-    <div class="card-editor">
+    <!-- Pricing Calculator Card -->
+    <div class="card-editor" style="margin-bottom: 24px;">
+      <!-- Interactive Token Quick-Adjustment Bar -->
+      <div class="card-header-flex" style="flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--ink);">
+          🎛️ 快速選擇試算 Token 量（或點此前往下方 <a href="#token-visualizer-card" style="color: var(--accent-coral); text-decoration: underline; font-weight: 800;">核心概念 02 分詞沙盒</a> 自由輸入文本）：
+        </div>
+        <div class="preset-pills">
+          <button class="pill-btn" onclick="setQuickTokenCount(500)">500 Tokens (短對話)</button>
+          <button class="pill-btn active" id="btnQuick2k" onclick="setQuickTokenCount(2000)">2,000 Tokens (日常文章)</button>
+          <button class="pill-btn" onclick="setQuickTokenCount(8000)">8,000 Tokens (代碼重構)</button>
+          <button class="pill-btn" onclick="setQuickTokenCount(32000)">32,000 Tokens (長篇論文)</button>
+          <button class="pill-btn" onclick="setQuickTokenCount(128000)">128K (全庫檢索)</button>
+        </div>
+      </div>
+
+      <!-- Metrics Row for Pricing -->
+      <div class="metrics-row" style="margin-bottom: 20px;">
+        <div class="metric-box">
+          <div class="metric-label">當前試算 Token 量</div>
+          <div id="statPricingTokens" class="metric-value">2,000</div>
+          <div class="metric-sub">單次請求之 Input Tokens</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">最低單次成本 (DeepSeek-V4.1)</div>
+          <div id="statMinCost" class="metric-value">$0.00028</div>
+          <div class="metric-sub">費率 $0.140 / 1M Tokens</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">最高單次成本 (Claude Opus 5.5)</div>
+          <div id="statMaxCost" class="metric-value">$0.03000</div>
+          <div class="metric-sub">費率 $15.000 / 1M Tokens</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">高低階模型成本懸殊比</div>
+          <div class="metric-value">107 倍</div>
+          <div class="metric-sub">旗艦推理 vs 輕量快速端</div>
+        </div>
+      </div>
+<div class="pricing-toggle-bar">
+        <div style="font-size: 13px; font-weight: 700; color: var(--ink);">
+          📊 2026 前沿旗艦模型推論成本實時試算 (原廠官方 vs OpenRouter 聚合路由器)
+        </div>
+        <div class="pricing-toggle-group">
+          <button id="btnPriceOfficial" class="p-toggle-btn active" onclick="switchPricingMode('official')">🏛️ 原廠官方直連費率</button>
+          <button id="btnPriceOpenRouter" class="p-toggle-btn" onclick="switchPricingMode('openrouter')">🌐 OpenRouter 聚合實價</button>
+        </div>
+      </div>
+
+      <div class="pricing-table-wrapper">
+        <table class="pricing-table">
+          <thead>
+            <tr>
+              <th>模型名稱</th>
+              <th>供應商 / 生態</th>
+              <th id="thInputRate">原廠官方輸入費率 (每 1M TOKENS)</th>
+              <th id="thOpenRouterRate" style="display: none;">OpenRouter 聚合費率 (每 1M TOKENS)</th>
+              <th>本次輸入預估費用 (單次)</th>
+              <th>10 萬次調用累積費用</th>
+              <th>計費特質 / 備註</th>
+            </tr>
+          </thead>
+          <tbody id="pricingRows">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- API LIVE TRIAL SUB-SECTION -->
+    <div id="api-trial" class="api-trial-card">
+      <div class="card-header-flex">
+        <div>
+          <span class="concept-tag" style="color: var(--accent-coral);">LIVE API INSPECTOR</span>
+          <h3 style="font-family: var(--font-title); font-size: 24px; color: var(--ink);">實時 API 試演與底層 Usage 數據檢視</h3>
+        </div>
+        <div style="font-size: 12px; color: var(--ink-secondary);">
+          親眼見證雲端回傳的 <code>prompt_tokens</code> 與 <code>completion_tokens</code>
+        </div>
+      </div>
+
+      <div class="api-controls-grid">
+        <select id="liveModelSelect" class="select-clean" onchange="syncModelKey()">
+          <option value="simulation">🧪 本地教學模擬 (免填 Key · 即時 Token 計算)</option>
+          <option value="openrouter:deepseek/deepseek-r1">deepseek/deepseek-r1 (OpenRouter 滿血推理)</option>
+          <option value="openrouter:deepseek/deepseek-chat">deepseek/deepseek-chat (OpenRouter 萬億 MoE)</option>
+          <option value="openrouter:anthropic/claude-3.7-sonnet">claude-3.7-sonnet (OpenRouter 混合推理)</option>
+          <option value="openrouter:qwen/qwen-2.5-72b-instruct">qwen/qwen-2.5-72b (OpenRouter 開源主力)</option>
+          <option value="openrouter:openai/gpt-4o">openai/gpt-4o (OpenRouter 旗艦全模態)</option>
+          <option value="gemini:gemini-2.0-flash">gemini-2.0-flash (Google Direct 官方直連)</option>
+        </select>
+        <input type="password" id="liveApiKeyInput" class="input-clean" placeholder="填入 API Key（若選擇模擬模式則留空即可）">
+        <button class="btn-action" onclick="executeLiveApiTest()">發送試演 ↗</button>
+      </div>
+
+      <div id="liveOutputBox" class="api-output-box">點擊上方「發送試演」，觀察模型即時生成，並解析底層回傳的 Token 計費物件（usage: prompt_tokens, completion_tokens）。</div>
+
+      <div id="usageBadgeBar" class="usage-badge-bar">
+        <span class="usage-pill" id="pillPromptTokens">Prompt Tokens: -</span>
+        <span class="usage-pill" id="pillCompletionTokens">Completion Tokens: -</span>
+        <span class="usage-pill" id="pillTotalTokens">Total Tokens: -</span>
+        <span class="usage-pill" id="pillActualCost">本次呼叫成本: -</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: CORE CONCEPT GLOSSARY -->
+  <section id="glossary" class="container section-block">
+    <div class="section-header">
+      <div class="section-badge">CORE FOUNDATIONS · 02</div>
+      <h2 class="section-title">大語言模型必懂 7 大核心基石：全流程圖解與心智模型</h2>
+      <p class="section-desc">
+        徹底告別死記硬背的純文字枯燥定義！以下將大語言模型（LLM）的 7 大基礎專有名詞，轉化為直觀的<strong>「物理流程圖（Flowcharts）」</strong>與<strong>「生活化心智模型」</strong>，看懂資料如何從人類文字變為神經網路的機率預測：
+      </p>
+    </div>
+
+    <div class="glossary-grid">
+      
+      <!-- Card 1: LLM -->
+      <div class="concept-card">
+        <div>
+          <div class="concept-card-header">
+            <span class="concept-tag" style="color: #7c3aed;">01 / PROBABILITY MACHINE</span>
+            <span class="code-pill">Next-Token Predictor</span>
+          </div>
+          <div class="concept-term">LLM (大語言模型本質)</div>
+          <div class="concept-subtitle">「純機率接話機，不是有意識的水晶球」</div>
+          <p class="concept-desc">
+            LLM 本質上不是具有自我意識的數位神明，而是<strong>一組被凍結的高維浮點數矩陣（Frozen Weights）</strong>。它所做的一切，就是根據你給予的上文，計算字典裡哪一個字在統計學上「最可能出現在後面」：
+          </p>
+
+          <!-- Flowchart 1 -->
+          <div class="concept-flow-box">
+            <div class="flow-step-label">運作流程圖：4 步自回歸生成循環</div>
+            <div class="flow-steps-flex">
+              <span class="flow-node"><span>👤</span><strong>提示詞輸入</strong></span>
+              <span class="flow-arrow">➔</span>
+              <span class="flow-node"><span>🧊📦</span><strong>凍結權重矩陣</strong></span>
+              <span class="flow-arrow">➔</span>
+              <span class="flow-node"><span>🎲</span><strong>Softmax 機率骰子</strong></span>
+              <span class="flow-arrow">➔</span>
+              <span class="flow-node"><span>🔮</span><strong>吐出最高分詞</strong></span>
+            </div>
+            <div style="font-size: 11px; font-family: var(--font-mono); color: var(--ink-muted); margin-top: 4px; background: #fff; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--rule);">
+              候選字實例：「床前明月」 ➔ <strong>「光」(98.2% 🟩)</strong> ｜ 「地」(0.8% 🟨) ｜ 「餅」(0.001% 🟥 幻覺)
+            </div>
+          </div>
+        </div>
+
+        <div class="concept-callout callout-insight">
+          💡 <strong>心智模型：</strong> AI 不懂悲傷也不懂真理，它只是把全人類文字歷史統計成一張巨型「接龍機率表」。
+        </div>
+      </div>
+
+      <!-- Card 2: Token & Interactive BPE Visualizer -->
+      <div id="token-visualizer-card" class="concept-card" style="grid-column: 1 / -1; border-left: 5px solid var(--accent-coral);">
+        <div>
+          <div class="concept-card-header">
+            <span class="concept-tag" style="color: var(--accent-coral);">02 / QUANTUM OF LLM &amp; INTERACTIVE SANDBOX</span>
+            <span class="code-pill">Byte-Pair Encoding (BPE) · 互動分詞沙盒</span>
+          </div>
+          <div class="concept-term">Token（詞元）與 Tokenize 切片機制</div>
+          <div class="concept-subtitle">「語言的切片樂高積木，計費的量子單位與 Strawberry 字母盲區」</div>
+          <p class="concept-desc">
+            電腦根本認不得中文、英文或標點符號，神經網路只能運算整數數字！<strong>Tokenizer（分詞器）</strong>就像一台高精度查表咬碎機，把長文本碎成一塊塊「詞元樂高積木」，並對應到字典編號。英文字詞通常 1 個單字約 1~2 個 Token；繁體中文因多位元組編碼，每個字約消耗 1.2~2.0 個 Token！
+          </p>
+
+          <!-- Embedded Interactive Tokenizer Sandbox & Strawberry Paradox -->
+          <div class="card-editor">
       <div class="card-header-flex">
         <span class="card-title-sub">輸入任意文字，即時查看 BPE 分詞色塊與計費：</span>
         <div class="preset-pills">
@@ -1979,158 +2302,14 @@
       </div>
 
       <!-- Pricing Comparison Table -->
-      <div class="pricing-toggle-bar">
-        <div style="font-size: 13px; font-weight: 700; color: var(--ink);">
-          📊 2026 前沿旗艦模型推論成本實時試算 (原廠官方 vs OpenRouter 聚合路由器)
+
         </div>
-        <div class="pricing-toggle-group">
-          <button id="btnPriceOfficial" class="p-toggle-btn active" onclick="switchPricingMode('official')">🏛️ 原廠官方直連費率</button>
-          <button id="btnPriceOpenRouter" class="p-toggle-btn" onclick="switchPricingMode('openrouter')">🌐 OpenRouter 聚合實價</button>
+
+        <div class="concept-callout callout-warn" style="margin-top: 16px;">
+          ⚠️ <strong>關鍵避坑：</strong> 1 個英文字 ≈ 1~1.3 Token，但繁體中文因多字節編碼，<strong>1 個中文字 ≈ 1.5~2.0 Token</strong>（中文天然比英文貴 40%）！在構建 Agent 或長對話時，請善用英文提示詞或專門針對中文微調的 Tokenizer。
         </div>
       </div>
-
-      <div class="pricing-table-wrapper">
-        <table class="pricing-table">
-          <thead>
-            <tr>
-              <th>模型名稱</th>
-              <th>供應商 / 生態</th>
-              <th id="thInputRate">原廠官方輸入費率 (每 1M TOKENS)</th>
-              <th id="thOpenRouterRate" style="display: none;">OpenRouter 聚合費率 (每 1M TOKENS)</th>
-              <th>本次輸入預估費用 (單次)</th>
-              <th>10 萬次調用累積費用</th>
-              <th>計費特質 / 備註</th>
-            </tr>
-          </thead>
-          <tbody id="pricingRows">
-            <!-- Dynamically populated -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- API LIVE TRIAL SUB-SECTION -->
-    <div id="api-trial" class="api-trial-card">
-      <div class="card-header-flex">
-        <div>
-          <span class="concept-tag" style="color: var(--accent-coral);">LIVE API INSPECTOR</span>
-          <h3 style="font-family: var(--font-title); font-size: 24px; color: var(--ink);">實時 API 試演與底層 Usage 數據檢視</h3>
-        </div>
-        <div style="font-size: 12px; color: var(--ink-secondary);">
-          親眼見證雲端回傳的 <code>prompt_tokens</code> 與 <code>completion_tokens</code>
-        </div>
-      </div>
-
-      <div class="api-controls-grid">
-        <select id="liveModelSelect" class="select-clean" onchange="syncModelKey()">
-          <option value="simulation">🧪 本地教學模擬 (免填 Key · 即時 Token 計算)</option>
-          <option value="openrouter:deepseek/deepseek-r1">deepseek/deepseek-r1 (OpenRouter 滿血推理)</option>
-          <option value="openrouter:deepseek/deepseek-chat">deepseek/deepseek-chat (OpenRouter 萬億 MoE)</option>
-          <option value="openrouter:anthropic/claude-3.7-sonnet">claude-3.7-sonnet (OpenRouter 混合推理)</option>
-          <option value="openrouter:qwen/qwen-2.5-72b-instruct">qwen/qwen-2.5-72b (OpenRouter 開源主力)</option>
-          <option value="openrouter:openai/gpt-4o">openai/gpt-4o (OpenRouter 旗艦全模態)</option>
-          <option value="gemini:gemini-2.0-flash">gemini-2.0-flash (Google Direct 官方直連)</option>
-        </select>
-        <input type="password" id="liveApiKeyInput" class="input-clean" placeholder="填入 API Key（若選擇模擬模式則留空即可）">
-        <button class="btn-action" onclick="executeLiveApiTest()">發送試演 ↗</button>
-      </div>
-
-      <div id="liveOutputBox" class="api-output-box">點擊上方「發送試演」，觀察模型即時生成，並解析底層回傳的 Token 計費物件（usage: prompt_tokens, completion_tokens）。</div>
-
-      <div id="usageBadgeBar" class="usage-badge-bar">
-        <span class="usage-pill" id="pillPromptTokens">Prompt Tokens: -</span>
-        <span class="usage-pill" id="pillCompletionTokens">Completion Tokens: -</span>
-        <span class="usage-pill" id="pillTotalTokens">Total Tokens: -</span>
-        <span class="usage-pill" id="pillActualCost">本次呼叫成本: -</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 2: CORE CONCEPT GLOSSARY -->
-  <section id="glossary" class="container section-block">
-    <div class="section-header">
-      <div class="section-badge">CORE FOUNDATIONS · 02</div>
-      <h2 class="section-title">大語言模型必懂 7 大核心基石：全流程圖解與心智模型</h2>
-      <p class="section-desc">
-        徹底告別死記硬背的純文字枯燥定義！以下將大語言模型（LLM）的 7 大基礎專有名詞，轉化為直觀的<strong>「物理流程圖（Flowcharts）」</strong>與<strong>「生活化心智模型」</strong>，看懂資料如何從人類文字變為神經網路的機率預測：
-      </p>
-    </div>
-
-    <div class="glossary-grid">
-      
-      <!-- Card 1: LLM -->
-      <div class="concept-card">
-        <div>
-          <div class="concept-card-header">
-            <span class="concept-tag" style="color: #7c3aed;">01 / PROBABILITY MACHINE</span>
-            <span class="code-pill">Next-Token Predictor</span>
-          </div>
-          <div class="concept-term">LLM (大語言模型本質)</div>
-          <div class="concept-subtitle">「純機率接話機，不是有意識的水晶球」</div>
-          <p class="concept-desc">
-            LLM 本質上不是具有自我意識的數位神明，而是<strong>一組被凍結的高維浮點數矩陣（Frozen Weights）</strong>。它所做的一切，就是根據你給予的上文，計算字典裡哪一個字在統計學上「最可能出現在後面」：
-          </p>
-
-          <!-- Flowchart 1 -->
-          <div class="concept-flow-box">
-            <div class="flow-step-label">運作流程圖：4 步自回歸生成循環</div>
-            <div class="flow-steps-flex">
-              <span class="flow-node"><span>👤</span><strong>提示詞輸入</strong></span>
-              <span class="flow-arrow">➔</span>
-              <span class="flow-node"><span>🧊📦</span><strong>凍結權重矩陣</strong></span>
-              <span class="flow-arrow">➔</span>
-              <span class="flow-node"><span>🎲</span><strong>Softmax 機率骰子</strong></span>
-              <span class="flow-arrow">➔</span>
-              <span class="flow-node"><span>🔮</span><strong>吐出最高分詞</strong></span>
-            </div>
-            <div style="font-size: 11px; font-family: var(--font-mono); color: var(--ink-muted); margin-top: 4px; background: #fff; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--rule);">
-              候選字實例：「床前明月」 ➔ <strong>「光」(98.2% 🟩)</strong> ｜ 「地」(0.8% 🟨) ｜ 「餅」(0.001% 🟥 幻覺)
-            </div>
-          </div>
-        </div>
-
-        <div class="concept-callout callout-insight">
-          💡 <strong>心智模型：</strong> AI 不懂悲傷也不懂真理，它只是把全人類文字歷史統計成一張巨型「接龍機率表」。
-        </div>
-      </div>
-
-      <!-- Card 2: Token -->
-      <div class="concept-card">
-        <div>
-          <div class="concept-card-header">
-            <span class="concept-tag" style="color: var(--accent-coral);">02 / QUANTUM OF LLM</span>
-            <span class="code-pill">Byte-Pair Encoding</span>
-          </div>
-          <div class="concept-term">Token（詞元）與 Tokenize</div>
-          <div class="concept-subtitle">「語言的切片樂高積木，計費的量子單位」</div>
-          <p class="concept-desc">
-            電腦根本認不得中文、英文或標點符號，神經網路只能運算整數數字！<strong>Tokenizer（分詞器）</strong>就像一台高精度查表咬碎機，把長文本碎成一塊塊「詞元樂高積木」，並對應到字典編號：
-          </p>
-
-          <!-- Flowchart 2 -->
-          <div class="concept-flow-box">
-            <div class="flow-step-label">切詞流程圖：人類文字到數位編號</div>
-            <div class="flow-steps-flex">
-              <span class="flow-node"><span>🗣️</span><strong>自然語言長句</strong></span>
-              <span class="flow-arrow">➔</span>
-              <span class="flow-node"><span>⚙️</span><strong>BPE 字典切片機</strong></span>
-              <span class="flow-arrow">➔</span>
-              <span class="flow-node"><span>🧱</span><strong>切塊樂高積木</strong></span>
-              <span class="flow-arrow">➔</span>
-              <span class="flow-node"><span>🔢</span><strong>整數 Token ID</strong></span>
-            </div>
-            <div style="font-size: 11px; font-family: var(--font-mono); color: var(--ink-secondary); margin-top: 4px; background: #fff; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--rule);">
-              「人工智慧」 ➔ <code>["人工", "智慧"]</code> ➔ <code>Token IDs: [10294, 88201]</code>
-            </div>
-          </div>
-        </div>
-
-        <div class="concept-callout callout-warn">
-          ⚠️ <strong>關鍵避坑：</strong> 1 個英文字 ≈ 1~1.3 Token，但繁體中文因多字節編碼，<strong>1 個中文字 ≈ 1.5~2.0 Token</strong>（中文天然比英文貴 40%）！
-        </div>
-      </div>
-
-      <!-- Card 3: API Key -->
+<!-- Card 3: API Key -->
       <div class="concept-card">
         <div>
           <div class="concept-card-header">
@@ -3950,155 +4129,285 @@ You are an interactive CLI tool that helps users with software engineering tasks
         </div>
       </div>
 
+      
       <!-- 2. 2026 四大主流商業 AI Agent 深度剖析 -->
       <div style="margin-bottom: 36px;">
         <div class="timeline-badge" style="background:#e0e7ff; color:#3730a3; border-color:#c7d2fe;">COMMERCIAL AGENTS MATRIX · 四大旗艦</div>
         <h3 style="font-family: var(--font-title); font-size: 26px; color: var(--ink); margin: 8px 0 16px 0;">二、 2026 年四大主流商業 AI Agent 深度剖析</h3>
         <p class="timeline-desc" style="font-size: 14px; line-height: 1.7; margin-bottom: 20px;">
-          在 2026 年下半年，全球商業 AI 代理市場形成了由 <strong>Meta、OpenAI、xAI（SpaceXAI）與 Anthropic</strong> 四大科技巨頭正面交鋒的競爭格局。四者在產品定位、沙盒架構與生態護城河上展現出高度分化的戰略路徑：
+          在 2026 年下半年，全球商業 AI 代理市場形成了由 <strong>Meta、OpenAI、xAI（SpaceXAI）與 Anthropic</strong> 四大科技巨頭正面交鋒的競爭格局。四者在產品定位、沙盒架構與生態護城河上展現出高度分化的戰略路徑。請點擊切換查看全景對比或各家專屬 Bento 深度剖析：
         </p>
 
-        <!-- Big Comparison Table -->
-        <div class="table-container" style="margin-bottom: 24px;">
-          <table class="specs-table">
-            <thead>
-              <tr>
-                <th style="width: 14%;">比較維度</th>
-                <th style="width: 21%;">Meta Muse</th>
-                <th style="width: 21%;">OpenAI Dots (單數稱 Dot)</th>
-                <th style="width: 22%;">xAI (SpaceXAI) Grok Bot</th>
-                <th style="width: 22%;">Anthropic Claude (Cowork &amp; Code)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>發布時間</strong></td>
-                <td>2026年9月8日</td>
-                <td>2026年9月29日 (DevDay 2026)</td>
-                <td>2026年8月11日 (Beta 上線)</td>
-                <td>Code: 2024秋季演進；Cowork: 2026年1月預覽，8月內建專屬瀏覽器</td>
-              </tr>
-              <tr>
-                <td><strong>底層驅動模型</strong></td>
-                <td>Muse Spark (1.3)、Muse Wonder / Wonder Full</td>
-                <td>GPT-6 Astra (搭配 Codex 與 ChatGPT Work)</td>
-                <td>後端自動路由模型 (不開放使用者手動指定)</td>
-                <td>Claude Opus 4.5 / Sonnet / Haiku (200K Context)</td>
-              </tr>
-              <tr>
-                <td><strong>核心產品定位</strong></td>
-                <td>個人生活管理、跨平台購物比價與小型企業成長助手</td>
-                <td>全天候數位工作夥伴、企業跨應用專案管理與深度研究代理</td>
-                <td>免寫程式（No-Code）之「AI 隊友」，擅長操作無 API 舊系統與多 Bot 協作</td>
-                <td>知識工作者桌面與跨平台代理（Cowork）及開發者終端機工程代理（Code）</td>
-              </tr>
-              <tr>
-                <td><strong>運算與沙盒架構</strong></td>
-                <td><strong>Muse Secure VM</strong>：每位用戶配發獨立雲端虛擬機與共享瀏覽器；規劃推出全加密 <strong>Confidential VM</strong></td>
-                <td><strong>Cloud Sandbox</strong>：每個 Dot 擁有獨立雲端電腦與瀏覽器，可選配授權連線本機筆電</td>
-                <td><strong>帳號級共享雲端電腦</strong>：運行於 Cursor 雲端，同一帳號下多個具名 Bot 共享單一持久雲端 VM（含瀏覽器、檔案系統、終端機）</td>
-                <td><strong>本機虛擬化與跨端同步</strong>：macOS 端透過 Apple <code>VZVirtualMachine</code> 運行沙盒化 Linux；整合隔離瀏覽器與 Web/行動端背景執行</td>
-              </tr>
-              <tr>
-                <td><strong>安全與權限控制</strong></td>
-                <td>系統級雙重隔離之 <strong>Sentinel Agent</strong> 管控讀寫權限；搭配 Nvidia OpenShell 與 Sentry 監控</td>
-                <td>背景 Proactive Research 強制<strong>唯讀（Read-Only）</strong>；寫入動作受 Custom Rules 與不可關閉之 Auto-review 限制</td>
-                <td>三層式登入：內建 <strong>Vault、1Password</strong> 串接、或交還螢幕由用戶於 <strong>Secure Form</strong> 輸入（模型不見明文密碼），但 Session 持久保留</td>
-                <td>顯式本機資料夾授權、Constitutional AI 安全邊界、企業級 OpenTelemetry 監控、SSO/SCIM 與既有系統權限繼承</td>
-              </tr>
-              <tr>
-                <td><strong>商業模式與定價</strong></td>
-                <td>免費版（需綁卡限額）、Power（$20/月）、Maximum（$100/月）及 Token 加購；<strong>無廣告，靠交易抽成獲利</strong></td>
-                <td>首個 Dot 包含於 ChatGPT Pro（$100/月）與 Business Premium（$100–125/席/月）；另推 $500/月頂級方案</td>
-                <td>不單獨販售；綁定於 The X Subscription、Cursor 方案（Teams約$120/月、Ultra $200/月）或 SuperGrok Heavy（$300/月）</td>
-                <td>包含於 Claude Pro（$20/月）、Max（$100/月）、Ultra 及 Team/Enterprise 方案（最高達 $200/月）</td>
-              </tr>
-              <tr>
-                <td><strong>生態整合與硬體</strong></td>
-                <td>WhatsApp、IG、FB、macOS 控制、智慧眼鏡喚醒詞、掌上硬體 <strong>Muse Charm</strong>；串接 Stripe、Shopify</td>
-                <td>透過外掛生態串接 <strong>4,000+ Apps</strong>；跨 Slack、Teams 維持一致脈絡，並與 <strong>Microsoft Agent 365</strong> 整合</td>
-                <td>原生整合 X (@bot)；支援透過對話載入 Skills（如 openquok-core）與 MCP；涵蓋 macOS、Win、Linux、iOS、Android</td>
-                <td><strong>開放標準 MCP (Model Context Protocol)</strong> 串接 CRM/ERP/雲端硬碟；Chrome 擴充套件、Office 365 增益集與私有市集</td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- Segmented Tab Bar -->
+        <div class="agent-matrix-nav">
+          <button id="btnTabMatrix" class="agent-matrix-tab active" onclick="switchAgentMatrixTab('matrix')">🏢 四大旗艦全景對比矩陣</button>
+          <button id="btnTabMuse" class="agent-matrix-tab" onclick="switchAgentMatrixTab('muse')">🔷 Meta Muse (商務代理)</button>
+          <button id="btnTabDots" class="agent-matrix-tab" onclick="switchAgentMatrixTab('dots')">🟢 OpenAI Dots (企業下屬)</button>
+          <button id="btnTabGrok" class="agent-matrix-tab" onclick="switchAgentMatrixTab('grok')">🔶 xAI Grok Bot (共享雲端電腦)</button>
+          <button id="btnTabClaude" class="agent-matrix-tab" onclick="switchAgentMatrixTab('claude')">🟣 Anthropic Claude (本機虛擬化)</button>
         </div>
 
-        <!-- Four In-depth Cards -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 20px;">
-          
-          <!-- Card 1: Meta Muse -->
-          <div class="timeline-card" style="border-top: 4px solid #2563eb;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span class="timeline-badge" style="background:#dbeafe; color:#1e40af;">META · 代理商務</span>
-              <span style="font-size: 11px; font-weight:700; color:#2563eb;">Alexandr Wang &amp; Nat Friedman 領軍</span>
+        <!-- VIEW 1: Overview Matrix -->
+        <div id="viewAgentMatrix" class="agent-view-panel">
+          <div class="table-container" style="margin-bottom: 20px;">
+            <table class="specs-table">
+              <thead>
+                <tr>
+                  <th style="width: 14%;">比較維度</th>
+                  <th style="width: 21%; color:#1d4ed8;">🔷 Meta Muse</th>
+                  <th style="width: 21%; color:#047857;">🟢 OpenAI Dots</th>
+                  <th style="width: 22%; color:#c2410c;">🔶 xAI Grok Bot</th>
+                  <th style="width: 22%; color:#6b21a8;">🟣 Anthropic Claude</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>發布時間</strong></td>
+                  <td>2026年9月8日</td>
+                  <td>2026年9月29日 (DevDay 2026)</td>
+                  <td>2026年8月11日 (Beta 上線)</td>
+                  <td>Code: 2024秋季演進；Cowork: 2026年1月預覽，8月內建專屬瀏覽器</td>
+                </tr>
+                <tr>
+                  <td><strong>底層驅動模型</strong></td>
+                  <td>Muse Spark (1.3)、Muse Wonder / Wonder Full</td>
+                  <td>GPT-6 Astra (搭配 Codex 與 ChatGPT Work)</td>
+                  <td>後端自動路由模型 (不開放手動指定)</td>
+                  <td>Claude Opus 4.5 / Sonnet / Haiku (200K Context)</td>
+                </tr>
+                <tr>
+                  <td><strong>核心產品定位</strong></td>
+                  <td>個人生活管理、跨平台購物比價與小型企業成長助手</td>
+                  <td>全天候數位工作夥伴、企業跨應用專案管理與深度研究代理</td>
+                  <td>免寫程式（No-Code）之「AI 隊友」，擅長操作無 API 舊系統與多 Bot 協作</td>
+                  <td>知識工作者桌面與跨平台代理（Cowork）及開發者終端機工程代理（Code）</td>
+                </tr>
+                <tr>
+                  <td><strong>運算與沙盒架構</strong></td>
+                  <td><strong>Muse Secure VM</strong>：獨立雲端虛擬機，規劃推出全加密 <strong>Confidential VM</strong></td>
+                  <td><strong>Cloud Sandbox</strong>：獨立雲端電腦與瀏覽器，可選配授權連線本機筆電</td>
+                  <td><strong>帳號級共享雲端電腦</strong>：Cursor 託管，同一帳號多個 Bot 共享單一持久 VM</td>
+                  <td><strong>本機虛擬化與跨端同步</strong>：macOS 透過 Apple <code>VZVirtualMachine</code> 運行沙盒 Linux</td>
+                </tr>
+                <tr>
+                  <td><strong>安全與權限控制</strong></td>
+                  <td>系統級雙重隔離 <strong>Sentinel Agent</strong>；攜手 Nvidia 導入 OpenShell 與 Sentry</td>
+                  <td>離線背景研究強制<strong>唯讀（Read-Only）</strong>；寫入受 Custom Rules 與 Auto-review 限制</td>
+                  <td>三層式登入：<strong>Vault ➔ 1Password ➔ Secure Form</strong>（模型不見明文密碼），但 Session 持久保留</td>
+                  <td>顯式本機資料夾授權、Constitutional AI 安全邊界、企業級 OpenTelemetry 審計</td>
+                </tr>
+                <tr>
+                  <td><strong>商業模式與定價</strong></td>
+                  <td>免費版（需綁卡限額）、Power（$20/月）、Maximum（$100/月）；<strong>零點擊商務抽成</strong></td>
+                  <td>首個 Dot 隨附於 ChatGPT Pro（$100/月）與 Business Premium（$100–125/席/月）</td>
+                  <td>綁定於 The X Subscription、Cursor 方案（$120~$200/月）或 SuperGrok Heavy（$300/月）</td>
+                  <td>隨附於 Claude Pro（$20/月）、Max（$100/月）、Ultra 及 Team/Enterprise 方案</td>
+                </tr>
+                <tr>
+                  <td><strong>生態整合與硬體</strong></td>
+                  <td>WhatsApp、IG、FB、macOS 控制、智慧眼鏡喚醒詞、獨立掌上硬體 <strong>Muse Charm</strong></td>
+                  <td>串接 <strong>4,000+ 企業應用</strong>；與微軟合作推出 <strong>Microsoft Agent 365</strong></td>
+                  <td>原生整合 X (@bot)；支援透過對話載入 Skills（如 openquok-core）與 MCP 協定</td>
+                  <td>主導 <strong>MCP (Model Context Protocol)</strong> 開放標準；整合 GitHub、Slack 與本機工具鏈</td>
+                </tr>
+                <tr>
+                  <td><strong>2026 關鍵戰役</strong></td>
+                  <td><span style="color:#dc2626; font-weight:700;">Amazon 無預警封鎖 Muse</span>（代理商務 vs 零售廣告帝國首戰）</td>
+                  <td>微軟 Agent 365 專家下屬生態；全面封堵無人看守之寫入權限</td>
+                  <td><span style="color:#ea580c; font-weight:700;">影子代理（Shadow IT）</span>引爆企業資安警訊；老舊網頁示範學習</td>
+                  <td><span style="color:#7c3aed; font-weight:700;">架構大收斂</span>：單一強大推理模型 ＋ 模組化技能（碾壓多代理拆分）</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW 2: Meta Muse Deep Dive -->
+        <div id="viewAgentMuse" class="agent-view-panel" style="display: none;">
+          <div class="timeline-card" style="border-top: 5px solid #2563eb;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <span class="timeline-badge" style="background:#dbeafe; color:#1e40af;">META · 代理商務霸主</span>
+                <span style="font-size: 20px; font-weight: 800; color: var(--ink); margin-left: 8px;">Meta Muse：零點擊商務代購與專屬安全虛擬機</span>
+              </div>
+              <span style="font-size: 11px; font-weight:700; color:#2563eb; background:#eff6ff; padding:4px 10px; border-radius:12px;">發布時間：2026年9月8日</span>
             </div>
-            <div class="timeline-title" style="font-size: 20px;">Meta Muse：消費級「個人超級智慧」與代理商務破局者</div>
-            <p class="timeline-desc">
-              Meta 斥資 143 億美元入股 Scale AI（49%）並延攬其前 CEO Alexandr Wang 出任首任首席 AI 官（CAIO）。Muse 搭載專為代理打造的 <strong>Muse Spark 1.3 與 Muse Wonder</strong> 模型家族。
+            <p class="timeline-desc" style="margin-bottom: 16px;">
+              扎克伯格將 Muse 定位為「觸達數十億大眾的首款個人 AI 代理」，深度融合 Meta 旗下 WhatsApp、Instagram 與 Messenger 社群資產，主打跨平台生活排程與無縫電商比價代購。
             </p>
-            <div style="font-size: 12px; color: var(--ink-secondary); line-height: 1.6; margin-bottom: 10px;">
-              • <strong>雙重隔離沙盒（Muse Secure VM）</strong>：每位用戶享有專屬雲端虛擬機，內建獨立的 <strong>Sentinel（哨兵）Agent</strong> 在系統層級專職審核讀寫權限；年底規劃全加密 <strong>Confidential VM</strong>（連 Meta 官方亦無法存取），並攜手 Nvidia（30 億美元投資）導入 OpenShell 與 Sentry 監控。<br>
-              • <strong>零點擊商務（Zero-Click Commerce）</strong>：無廣告置入，透過交易抽成獲利。整合 <strong>Stripe Link</strong> 動態生成一次性虛擬卡號完成跨平台代購；推出掌上型獨立硬體 <strong>Muse Charm</strong> 與智慧眼鏡喚醒。<br>
-              • <strong>廣告帝國衝突</strong>：首季吸納逾 1,000 萬用戶，卻遭 <strong>Amazon 無預警封鎖</strong>（指控繞過商品搜尋廣告與擷取憑證），引發代理商務與零售媒體廣告圍牆花園的首次世紀大戰。
+            <div class="agent-bento-grid">
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #1e40af;">🖥️ 運算沙盒架構</div>
+                <div class="agent-pillar-content">
+                  每位用戶配發獨立的 <strong>Muse Secure VM</strong> 雲端虛擬機，內建獨立專屬瀏覽器；年底規劃推出全加密 <strong>Confidential VM</strong>（連 Meta 官方亦無法存取記憶體與金鑰），並獲 Nvidia 30 億美元投資導入 OpenShell 與 Sentry 監控。
+                </div>
+              </div>
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #047857;">🛡️ 安全與權限控制</div>
+                <div class="agent-pillar-content">
+                  採用系統級雙重隔離之 <strong>Sentinel（哨兵）Agent</strong>，專職在作業系統層級審核主代理的讀寫權限；敏感金融操作（付款、轉帳）強制要求用戶二次確認。
+                </div>
+              </div>
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #b45309;">💰 商業模式與定價</div>
+                <div class="agent-pillar-content">
+                  採免費版（需綁卡限額）、Power（$20/月）、Maximum（$100/月）。<strong>核心堅持無廣告置入，全面依靠代理商務交易抽成（Take-Rate）獲利</strong>。
+                </div>
+              </div>
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #7c3aed;">⚡ 生態整合與硬體</div>
+                <div class="agent-pillar-content">
+                  整合 <strong>Stripe Link</strong> 動態生成一次性虛擬卡號；深度打通智慧眼鏡語音喚醒詞，並推出掌上型獨立硬體 <strong>Muse Charm</strong> 與小型企業專用連接器。
+                </div>
+              </div>
+            </div>
+            <div class="agent-war-box">
+              💥 <strong>2026 世紀大戰：Amazon 無預警封鎖 Muse</strong><br>
+              上線首季吸納逾 1,000 萬用戶，然而因 Muse 繞過亞馬遜搜尋版位直接替用戶比價結帳，遭 Amazon 以「違反爬蟲規範與憑證安全」為由全面封鎖 IP 與 Session，正式引爆「代理商務（Zero-Click Commerce）」與「零售媒體廣告帝國（Retail Media Network）」的首次世紀大對決！
             </div>
           </div>
+        </div>
 
-          <!-- Card 2: OpenAI Dots -->
-          <div class="timeline-card" style="border-top: 4px solid #10b981;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span class="timeline-badge" style="background:#d1fae5; color:#065f46;">OPENAI · 企業下屬</span>
-              <span style="font-size: 11px; font-weight:700; color:#059669;">DevDay 2026 旗艦發布</span>
+        <!-- VIEW 3: OpenAI Dots Deep Dive -->
+        <div id="viewAgentDots" class="agent-view-panel" style="display: none;">
+          <div class="timeline-card" style="border-top: 5px solid #10b981;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <span class="timeline-badge" style="background:#d1fae5; color:#065f46;">OPENAI · 企業常駐下屬</span>
+                <span style="font-size: 20px; font-weight: 800; color: var(--ink); margin-left: 8px;">OpenAI Dots：企業級「常駐數位下屬」與主動式研究</span>
+              </div>
+              <span style="font-size: 11px; font-weight:700; color:#059669; background:#ecfdf5; padding:4px 10px; border-radius:12px;">DevDay 2026 旗艦發布 (9月29日)</span>
             </div>
-            <div class="timeline-title" style="font-size: 20px;">OpenAI Dots：企業級「常駐數位下屬」與主動式研究架構</div>
-            <p class="timeline-desc">
-              OpenAI 將 Dot 定義為「全天候維持工作關係的數位直接下屬（Direct Report）」，徹底打破頻繁開立臨時對話串的碎片化體驗。底層由旗艦模型 <strong>GPT-6 Astra</strong> 驅動。
+            <p class="timeline-desc" style="margin-bottom: 16px;">
+              OpenAI 將 Dot（單數稱 Dot，複數稱 Dots）定義為「全天候維持工作關係的數位直接下屬（Direct Report）」，徹底打破臨時對話串模式。底層由旗艦模型 <strong>GPT-6 Astra</strong> 驅動。
             </p>
-            <div style="font-size: 12px; color: var(--ink-secondary); line-height: 1.6; margin-bottom: 10px;">
-              • <strong>專屬沙盒與多端委派</strong>：每個 Dot 配備獨立 <strong>Cloud Sandbox</strong> 與瀏覽器，可動態委派任務予 <strong>ChatGPT Work</strong> 或 <strong>Codex</strong> 編程引擎執行實質交付。<br>
-              • <strong>主動式研究（Proactive Research）與嚴格讀寫分離</strong>：離線時在背景自動掃描已授權之收件匣、行事曆或代碼庫。<strong>硬性鐵律：無人看守時全系統強制「唯讀（Read-Only）」</strong>，寫入與交易行為必須通過不可關閉的 Auto-review 或人工簽核（Human-in-the-Loop）。<br>
-              • <strong>企業生態與定價</strong>：串接 4,000+ 款企業軟體；與微軟合作推出 <strong>Microsoft Agent 365</strong> 專家代理（Specialist Dots）；首個 Dot 隨附於 ChatGPT Pro（$100/月）與 Business Premium。
+            <div class="agent-bento-grid">
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #047857;">🖥️ 運算沙盒架構</div>
+                <div class="agent-pillar-content">
+                  每個 Dot 配備獨立的 <strong>Cloud Sandbox</strong> 與虛擬瀏覽器，可動態委派任務予 <strong>ChatGPT Work</strong> 辦公引擎或 <strong>Codex</strong> 編程引擎執行端到端交付；可選配授權連線至本機筆電。
+                </div>
+              </div>
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #dc2626;">🛡️ 嚴格讀寫分離原則</div>
+                <div class="agent-pillar-content">
+                  背景主動研究（Proactive Research）在離線時自動掃描收件匣與代碼庫，<strong>硬性規定無人看守時全系統強制「唯讀（Read-Only）」</strong>；寫入行為必須經過不可關閉的 Auto-review 或人工審核（Human-in-the-Loop）。
+                </div>
+              </div>
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #b45309;">💰 商業模式與定價</div>
+                <div class="agent-pillar-content">
+                  首個 Dot 隨附於 ChatGPT Pro（$100/月）與 Business Premium（$100–125/席/月）；另提供 $500/月具備更高並行額度與專屬算力之企業旗艦方案。
+                </div>
+              </div>
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #7c3aed;">⚡ 企業軟體連接與微軟整合</div>
+                <div class="agent-pillar-content">
+                  透過外掛生態原生串接 <strong>4,000+ 款企業 SaaS 軟體</strong>；與微軟深度戰略合作，推出 <strong>Microsoft Agent 365</strong>，將 Dots 轉化為跨 Word、Teams 與 Outlook 的專家下屬。
+                </div>
+              </div>
+            </div>
+            <div class="agent-war-box" style="border-left-color: #10b981; background: #f0fdf4;">
+              💼 <strong>微軟生態反向擴張：Agent 365 專屬下屬矩陣</strong><br>
+              Dots 與微軟的結合使企業能夠為行銷、法務與資安團隊量身客製專屬的「Specialist Dots」。透過集中治理控制平面，IT 管理員可即時追蹤每個 Dot 的操作日誌，建立企業級數位員工編制。
             </div>
           </div>
+        </div>
 
-          <!-- Card 3: xAI Grok Bot -->
-          <div class="timeline-card" style="border-top: 4px solid #c2410c;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span class="timeline-badge" style="background:#ffedd5; color:#9a3412;">XAI · 共享雲端電腦</span>
-              <span style="font-size: 11px; font-weight:700; color:#c2410c;">馬斯克旗下 xAI / SpaceXAI</span>
+        <!-- VIEW 4: xAI Grok Bot Deep Dive -->
+        <div id="viewAgentGrok" class="agent-view-panel" style="display: none;">
+          <div class="timeline-card" style="border-top: 5px solid #c2410c;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <span class="timeline-badge" style="background:#ffedd5; color:#9a3412;">XAI · 共享雲端電腦</span>
+                <span style="font-size: 20px; font-weight: 800; color: var(--ink); margin-left: 8px;">xAI Grok Bot：帳號級共享雲端電腦與無 API 舊系統穿透</span>
+              </div>
+              <span style="font-size: 11px; font-weight:700; color:#c2410c; background:#fff7ed; padding:4px 10px; border-radius:12px;">馬斯克旗下 xAI / SpaceXAI (2026年8月)</span>
             </div>
-            <div class="timeline-title" style="font-size: 20px;">xAI Grok Bot：帳號級共享雲端電腦與無 API 舊系統穿透</div>
-            <p class="timeline-desc">
+            <p class="timeline-desc" style="margin-bottom: 16px;">
               主打「免寫程式、安裝即用的 AI 隊友（AI Teammate）」，切入傳統企業 RPA 與開源代理之間的空白，由 Cursor 雲端託管之持久化雲端電腦驅動。
             </p>
-            <div style="font-size: 12px; color: var(--ink-secondary); line-height: 1.6; margin-bottom: 10px;">
-              • <strong>帳號級共享雲端架構</strong>：同一帳號下多個具名 Bot（幕僚長、排程、前端開發）<strong>共享同一台持久雲端 VM</strong>，分配獨立虛擬螢幕並直接在群組對話互派任務，無須人類當傳話筒。<br>
-              • <strong>示範學習與三層式登入</strong>：帶領 Bot 走過一次老舊網頁操作，即自動儲存為 Routine/Skill。透過 <strong>Vault 保險箱 ➔ 1Password ➔ Secure Form 安全表單</strong> 三層防護，模型永遠不接觸明文密碼。<br>
-              • <strong>影子代理（Shadow IT）資安警訊</strong>：整合於 The X Subscription 與 Cursor 方案；員工常以個人帳號在公務電腦登入，但因瀏覽器 Session 持久留存於雲端 VM、且後端採黑盒子自動模型路由器，引發企業資安審計高度警惕。
+            <div class="agent-bento-grid">
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #c2410c;">🖥️ 帳號級共享雲端 VM</div>
+                <div class="agent-pillar-content">
+                  同一帳號下多個具名 Bot（幕僚長、排程、前端開發）<strong>共享同一台持久雲端 VM</strong>，分配獨立虛擬螢幕並直接在群組對話互派任務，無須人類當傳話筒。
+                </div>
+              </div>
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #047857;">🛡️ 三層式登入安全機制</div>
+                <div class="agent-pillar-content">
+                  透過 <strong>Vault 保險箱 ➔ 1Password ➔ Secure Form 安全表單</strong> 三層防護，模型永遠不接觸明文密碼；帶領 Bot 走過一次老舊網頁操作，即自動儲存為 Routine/Skill。
+                </div>
+              </div>
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #b45309;">💰 商業綁定方案</div>
+                <div class="agent-pillar-content">
+                  不單獨販售；綁定於 The X Subscription、Cursor 方案（Teams 約 $120/月、Ultra $200/月）或 SuperGrok Heavy（$300/月），主攻極客與開發者群體。
+                </div>
+              </div>
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #7c3aed;">⚡ X 社群數據與跨平台支持</div>
+                <div class="agent-pillar-content">
+                  原生整合 X (@bot) 即時數據流；支援透過對話載入 Skills（如 openquok-core）與 MCP 協定；涵蓋 macOS、Windows、Linux、iOS 與 Android。
+                </div>
+              </div>
+            </div>
+            <div class="agent-war-box">
+              ⚠️ <strong>影子代理（Shadow IT）資安風暴</strong><br>
+              員工常以個人帳號在公務電腦登入 Grok Bot，因其瀏覽器 Session 持久留存於雲端 VM、且後端採黑盒子自動模型路由器，引發多家金融機構與國防承包商的資安警訊，促使企業加速導入控制平面審計。
             </div>
           </div>
+        </div>
 
-          <!-- Card 4: Anthropic Claude Cowork & Code -->
-          <div class="timeline-card" style="border-top: 4px solid #7c3aed;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span class="timeline-badge" style="background:#f3e8ff; color:#6b21a8;">ANTHROPIC · 本機虛擬化</span>
-              <span style="font-size: 11px; font-weight:700; color:#7c3aed;">MCP 開放標準霸權</span>
+        <!-- VIEW 5: Anthropic Claude Deep Dive -->
+        <div id="viewAgentClaude" class="agent-view-panel" style="display: none;">
+          <div class="timeline-card" style="border-top: 5px solid #7c3aed;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <span class="timeline-badge" style="background:#f3e8ff; color:#6b21a8;">ANTHROPIC · 本機虛擬化</span>
+                <span style="font-size: 20px; font-weight: 800; color: var(--ink); margin-left: 8px;">Anthropic Claude (Cowork &amp; Code)：由下而上虛擬化與架構大收斂</span>
+              </div>
+              <span style="font-size: 11px; font-weight:700; color:#7c3aed; background:#faf5ff; padding:4px 10px; border-radius:12px;">MCP 開放標準霸權</span>
             </div>
-            <div class="timeline-title" style="font-size: 20px;">Anthropic Claude (Cowork &amp; Code)：由下而上虛擬化與架構收斂</div>
-            <p class="timeline-desc">
+            <p class="timeline-desc" style="margin-bottom: 16px;">
               從終端機編程神作 <strong>Claude Code</strong> 演進至桌面代理 <strong>Claude Cowork</strong>，以「大腦（Brain 200K）、眼睛（Eyes Computer Use）、雙手（Hands）」三位一體為核心哲學。
             </p>
-            <div style="font-size: 12px; color: var(--ink-secondary); line-height: 1.6; margin-bottom: 10px;">
-              • <strong>蘋果原生虛擬化（VZVirtualMachine）</strong>：macOS 桌面端調用 Apple 原生虛擬化框架啟動高度隔離的 Linux 沙盒，僅限存取使用者顯式授權之單一資料夾；整合專屬隔離瀏覽器。<br>
-              • <strong>MCP 開放標準主導權</strong>：開創 Model Context Protocol (MCP) 成為全產業通用工具標準；推出企業私有市集與 OpenTelemetry 審計。<br>
-              • <strong>架構大收斂（Single Agent + Skills）</strong>：2026年10月顛覆性指南指出：盲目拆分過多子代理（Sub-agents）只會帶來嚴重 Token 浪費與上下文失真，<strong>「單一強大推理模型 ＋ 模組化技能（Skills）」</strong>在實務上顯著碾壓複雜多代理網絡！
+            <div class="agent-bento-grid">
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #7c3aed;">🖥️ 蘋果原生虛擬化 (VZVirtualMachine)</div>
+                <div class="agent-pillar-content">
+                  macOS 桌面端調用 Apple 原生虛擬化框架啟動高度隔離的 Linux 沙盒，僅限存取使用者顯式授權之單一資料夾；整合專屬隔離瀏覽器與本機終端機。
+                </div>
+              </div>
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #047857;">🛡️ 憲政 AI 與 OpenTelemetry 審計</div>
+                <div class="agent-pillar-content">
+                  基於 Constitutional AI 確立安全邊界；原生支援企業級 OpenTelemetry 追蹤日誌、SSO/SCIM 驗證與既有組織權限繼承，為合規嚴苛之大型企業首選。
+                </div>
+              </div>
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #b45309;">💰 階梯式席位定價</div>
+                <div class="agent-pillar-content">
+                  隨附於 Claude Pro（$20/月）、Max（$100/月）、Ultra 及 Team/Enterprise 方案（最高達 $200/席/月），具備極高性價比。
+                </div>
+              </div>
+              <div class="agent-pillar-card">
+                <div class="agent-pillar-title" style="color: #2563eb;">⚡ MCP (Model Context Protocol) 霸權</div>
+                <div class="agent-pillar-content">
+                  開創 Model Context Protocol (MCP) 成為全產業通用工具標準；開放外部工具生態無縫掛載，支援企業私有工具市集。
+                </div>
+              </div>
+            </div>
+            <div class="agent-war-box" style="border-left-color: #7c3aed; background: #faf5ff;">
+              ⚖️ <strong>2026 架構大收斂：單一強代理＋技能（Single Agent + Skills）</strong><br>
+              Anthropic 2026年10月指南指出：盲目拆分過多子代理只會帶來嚴重 Token 浪費與上下文失真，<strong>「單一強大推理模型 ＋ 模組化技能（Skills）」</strong>在實務上顯著碾壓複雜多代理網絡！
             </div>
           </div>
-
         </div>
-      </div>
 
-      <!-- 3. 歷史演進脈絡與開源生態基石 (Pi, Hermes, OpenClaw & poteto/noodle) -->
+      </div>
+<!-- 3. 歷史演進脈絡與開源生態基石 (Pi, Hermes, OpenClaw & poteto/noodle) -->
       <div style="margin-bottom: 36px;">
         <div class="timeline-badge" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">OPEN SOURCE &amp; HISTORY · 開源基石</div>
         <h3 style="font-family: var(--font-title); font-size: 26px; color: var(--ink); margin: 8px 0 16px 0;">三、 歷史演進脈絡與開源生態基石：Pi、Hermes、OpenClaw 與 poteto/noodle</h3>
@@ -4350,7 +4659,596 @@ You are an interactive CLI tool that helps users with software engineering tasks
   </section>
 
   <!-- Footer -->
-  <footer class="container site-footer">
+  
+  <!-- ============================================================
+       SECTION 6: MACROECONOMICS & LABOR RECONFIGURATION (ANTHROPIC AEI)
+       ============================================================ -->
+  <section id="macro-economy" class="container section-block">
+    <div class="section-header">
+      <div class="section-badge" style="background:#e0f2fe; color:#0369a1; border-color:#bae6fd;">MACROECONOMIC SHIFT · 06</div>
+      <h2 class="section-title">人工智慧的總體經濟轉型：Anthropic 實證指數、勞動市場重構與政策應對架構</h2>
+      <p class="section-desc">
+        前沿大語言模型（LLM）由輔助性文本生成工具演進為常駐型自主代理系統（Agentic Systems），對實體經濟的滲透路徑已顯著超越傳統自動化技術。前沿研究機構 Anthropic 結合<strong>數百萬筆第一方遙測（AEI）、計量實證、動態總體模擬與公共財政推演</strong>，量化 AI 對就業市場與社會財富分配的深刻變革：
+      </p>
+    </div>
+
+    <!-- 4 Macro Highlights -->
+    <div class="macro-metric-grid">
+      <div class="macro-metric-card">
+        <div class="macro-metric-label">實證 vs 理論鴻溝</div>
+        <div class="macro-metric-num" style="color: #0284c7;">33% vs 94%</div>
+        <div class="macro-metric-sub">電腦類理論暴露 94%，但實證觀測僅 33%；制度摩擦顯著</div>
+      </div>
+      <div class="macro-metric-card">
+        <div class="macro-metric-label">學徒制招聘減緩</div>
+        <div class="macro-metric-num" style="color: #dc2626;">-6% ~ -16%</div>
+        <div class="macro-metric-sub">高度暴露職業之 22~25 歲初階新進勞工就業人數實質萎縮</div>
+      </div>
+      <div class="macro-metric-card">
+        <div class="macro-metric-label">人機工時比 (Anthropic 內部)</div>
+        <div class="macro-metric-num" style="color: #7c3aed;">6 : 1</div>
+        <div class="macro-metric-sub">互動式代理工時全面超越人類員工，SWE/PM 比例升至 17:1</div>
+      </div>
+      <div class="macro-metric-card">
+        <div class="macro-metric-label">Baumol 成本病反轉</div>
+        <div class="macro-metric-num" style="color: #059669;">+34% vs -11%</div>
+        <div class="macro-metric-sub">2030 極端情境：實體藍領薪資暴漲 34%，認知白領萎縮 11.5%</div>
+      </div>
+    </div>
+
+    <!-- Sub-chapter 1: 緒論與微觀機制 -->
+    <div style="background: #ffffff; border: 1px solid var(--rule-solid); border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+      <div class="timeline-badge" style="background:#f0fdf4; color:#166534; border-color:#bbf7d0;">EMPIRICAL EVIDENCE · 微觀實證</div>
+      <h3 style="font-family: var(--font-title); font-size: 22px; color: var(--ink); margin: 8px 0 14px 0;">
+        一、 緒論與勞動市場微觀機制：觀測暴露度、任務重組與組織演進
+      </h3>
+      
+      <p style="font-size: 14px; line-height: 1.8; color: var(--ink-secondary); margin-bottom: 16px;">
+        傳統文獻多依據 Eloundou 等人的理論可行性指標（&beta; 評分）評估衝擊，但 Anthropic 建立的<strong>「Anthropic 經濟指數」（Anthropic Economic Index, AEI）</strong>採樣數百萬筆來自 Claude.ai 終端對話與企業級第一方 API 互動數據，由 Maxim Massenkoff 與 Peter McCrory 主導創立了<strong>「觀測暴露度」（Observed Exposure）</strong>指標，將理論可行性與真實職場採納進行計量分離。
+      </p>
+
+      <div style="background: var(--paper-tint); border-left: 4px solid var(--accent-coral); padding: 12px 16px; border-radius: 4px; font-size: 13px; color: var(--ink); line-height: 1.7; margin-bottom: 20px;">
+        <strong>計量核心發現：</strong> 由實際使用數據構建的「觀測暴露度」能有效預測美國勞工統計局（BLS）2024 至 2034 年的長期就業成長軌跡，<strong>觀測暴露度每上升 10 個百分點，預測就業成長率相應下修 0.6 個百分點</strong>；反之，若僅使用純理論潛能指標，則與官方就業預測完全缺乏統計顯著性。這證實企業自動化決策受「邊際替代成本與組織吸納效率」主導，而非單純的技術理論可能。
+      </div>
+
+      <!-- Job Exposure Comparison Table -->
+      <div style="font-weight: 700; font-size: 14px; color: var(--ink); margin-bottom: 8px;">📊 職業群體之理論暴露度 vs 實證觀測暴露度對比表</div>
+      <div class="table-container" style="margin-bottom: 20px;">
+        <table class="specs-table">
+          <thead>
+            <tr>
+              <th style="width: 25%;">職業群體 / 代表性工種</th>
+              <th style="width: 20%;">理論暴露評分 (&beta;)</th>
+              <th style="width: 20%;">實證觀測暴露度 (Observed)</th>
+              <th style="width: 35%;">核心任務特徵與主要互動架構</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>電腦程式設計師 (Computer Programmers)</strong></td>
+              <td>~98%</td>
+              <td><span style="color: #dc2626; font-weight: 700;">75% (極高)</span></td>
+              <td>系統除錯、單元測試、代碼生成與架構重構（API 與開發工具高度自動化）</td>
+            </tr>
+            <tr>
+              <td><strong>資料輸入員 (Data Entry Keyers)</strong></td>
+              <td>~95%</td>
+              <td><span style="color: #ea580c; font-weight: 700;">67% (高度)</span></td>
+              <td>原始單據辨識、結構化資料提取、跨系統批次建檔</td>
+            </tr>
+            <tr>
+              <td><strong>客戶服務代表 (Customer Service Reps)</strong></td>
+              <td>~90%</td>
+              <td><span style="color: #d97706; font-weight: 700;">高度暴露 (High)</span></td>
+              <td>第一方 API 批次處理、即時客訴分類、標準問題自主對答與摘要</td>
+            </tr>
+            <tr>
+              <td><strong>辦公室與行政支援 (Office &amp; Admin Support)</strong></td>
+              <td>90%</td>
+              <td><span style="color: #2563eb; font-weight: 700;">中高暴露 (Med-High)</span></td>
+              <td>行程調度、商務信函起草、簡報彙編、日常流程協同</td>
+            </tr>
+            <tr>
+              <td><strong>實體操作與藍領群體 (Cooks, Mechanics, etc.)</strong></td>
+              <td>~0%</td>
+              <td><span style="color: #059669; font-weight: 700;">0% (零覆蓋)</span></td>
+              <td>現場體力操作、三維動態環境交互、非結構化實體維修</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 任務維度模式分流與人口特徵 -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 20px;">
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px;">
+          <div style="font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">🔄 替代與增強動態演化（模式分流）</div>
+          <div style="font-size: 12px; color: #475569; line-height: 1.6;">
+            • <strong>個人終端介面</strong>：<strong>增強模式（Augmentation）佔 57%~60%</strong>，個人多將模型作為思考延伸或校對工具。<br>
+            • <strong>企業 API 流量</strong>：<strong>自動化模式（Automation）佔 80%+ 絕對優勢</strong>，企業傾向以無人化軟體管線封閉執行。<br>
+            • <strong>認知從業者溢價悖論</strong>：重度依賴自動化委託者，對職涯前景與實質薪資成長展現出最高樂觀度，因其工作向上躍遷至目標設定與邊界審查的高附加價值環節。
+          </div>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 14px;">
+          <div style="font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">👥 暴露勞動力的社會經濟學特徵</div>
+          <div style="font-size: 12px; color: #475569; line-height: 1.6;">
+            • <strong>學歷與所得偏向</strong>：暴露度前 25% 的勞工平均薪資高出 <strong>47%</strong>，碩博士比例達 <strong>17.4%</strong>（未暴露組僅 4.5%）。<br>
+            • <strong>人口結構特徵</strong>：女性比例高出 16 個百分點，白人高 11 個百分點，亞裔佔比擴大至接近兩倍。<br>
+            • <strong>歷史範式反轉</strong>：歷史自動化（蒸氣機、微電腦）符合偏向技能技術進步（SBTC），衝擊中低技術；本輪 AI 卻直接將替代壓力聚焦於<strong>高所得、高學歷之認知白領</strong>！
+          </div>
+        </div>
+      </div>
+
+      <!-- 學徒制斷階現象與 Anthropic 內部指標 -->
+      <div style="margin-top: 24px;">
+        <div style="font-size: 15px; font-weight: 800; color: #991b1b; margin-bottom: 6px;">
+          ⚠️ 總體就業悖論與「學徒制斷階」（Apprenticeship Pipeline）
+        </div>
+        <p style="font-size: 13px; line-height: 1.7; color: var(--ink-secondary); margin-bottom: 14px;">
+          雖然高暴露職業總體失業率未出現驟升，但勞動市場邊際調整以<strong>「初階招聘凍結」（Hiring Slowdown）</strong>展開，22 至 25 歲年輕從業人員就業人數實質下滑 <strong>6% 至 16%</strong>！當企業全面以 AI 替代初階代碼編寫與文件審核，初階人員無法在實戰中積累隱性知識（Tacit Knowledge），動搖未來資深架構師的養成管線：
+        </p>
+
+        <!-- Anthropic Internal Case Table -->
+        <div style="font-weight: 700; font-size: 13px; color: var(--ink); margin-bottom: 8px;">🔬 前沿研發環境微觀試驗場：Anthropic 內部人機協同營運指標表</div>
+        <div class="table-container" style="margin-bottom: 16px;">
+          <table class="specs-table">
+            <thead>
+              <tr>
+                <th style="width: 22%;">組織維度 / 營運指標</th>
+                <th style="width: 22%;">基準期 (2025 年中)</th>
+                <th style="width: 22%;">演進期 (2026 年下半年)</th>
+                <th style="width: 34%;">微觀機制與經濟意涵</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>代理人工時與人類工時比</strong></td>
+                <td>人類工時佔絕大多數</td>
+                <td><span style="color: #7c3aed; font-weight: 700;">6 : 1 (代理工時遠超人類)</span></td>
+                <td>2026年3月代理人自主工時首度超越人類，8月達到極端擴展</td>
+              </tr>
+              <tr>
+                <td><strong>初階技術職位比例 (Junior Share)</strong></td>
+                <td>技術編制佔比 21%</td>
+                <td><span style="color: #dc2626; font-weight: 700;">收縮至 14% (新聘由 27% 劇降至 9%)</span></td>
+                <td>管理層大幅減緩入門技術招聘，初階入行門檻劇烈拉高</td>
+              </tr>
+              <tr>
+                <td><strong>人均營收產出能力</strong></td>
+                <td>快速成長型軟體公司常態</td>
+                <td><span style="color: #059669; font-weight: 700;">達 Meta/Google 同期之 2~4 倍</span></td>
+                <td>AI 承擔常規除錯與編寫，企業維持極度緊湊精幹之核心團隊</td>
+              </tr>
+              <tr>
+                <td><strong>工程師與產品經理比 (SWE / PM)</strong></td>
+                <td>傳統科技公司常態比例</td>
+                <td><span style="color: #ea580c; font-weight: 700;">大幅攀升至約 17 : 1</span></td>
+                <td>非編程協調角色大幅收縮，資深工程師透過 AI 直接管理端到端流程</td>
+              </tr>
+              <tr>
+                <td><strong>組織內部流動性 (Mobility)</strong></td>
+                <td>傳統專案型調整</td>
+                <td><span style="color: #2563eb; font-weight: 700;">滿一年者輪調率激增 50%</span></td>
+                <td>常規職能被自動化後，原團隊轉型為模型評測、代理提示詞優化與行為監管</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Meta-Work Box -->
+        <div style="background: #fffdf5; border: 1px solid #fef08a; border-radius: 6px; padding: 14px 18px; font-size: 13px; color: #854d0e; line-height: 1.7;">
+          🧠 <strong>認知注意力瓶頸與「元工作」（Meta-Work）轉型：</strong> 在生產力函數中，AI 代理人有高達 <strong>80% 的掛鐘時間處於閒置狀態</strong>，等待人類使用者審查核准！約 20% 的員工表明其工作核心已從「親力親為」轉變為「管理多個 Claude 代理系統」，員工必須設置中斷檢查點與優化通訊架構，<strong>批判性邏輯與非確定性情境下的架構決策權限</strong>成為新的核心溢價要素。
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-chapter 2: 2030 三大總體情境模擬與分配效應 -->
+    <div style="background: #ffffff; border: 1px solid var(--rule-solid); border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+      <div class="timeline-badge" style="background:#ede9fe; color:#5b21b6; border-color:#ddd6fe;">DYNAMIC MACRO MODEL · 2030 情境推演</div>
+      <h3 style="font-family: var(--font-title); font-size: 22px; color: var(--ink); margin: 8px 0 14px 0;">
+        二、 總體經濟與分配效應：2030 三種情境模擬與要素收益轉變
+      </h3>
+      <p style="font-size: 14px; line-height: 1.8; color: var(--ink-secondary); margin-bottom: 16px;">
+        Anthropic 經濟研究團隊聯合 Anton Korinek 與 Charles I. Jones 構建動態任務基礎模型（替代彈性設定為 &sigma; = 0.5），體現現代經濟的<strong>「O 型環特徵」（O-Ring Property）與弱連結瓶頸</strong>：即便 AI 在認知任務釋放數倍生產力，總體經濟擴張仍嚴格受限於難以自動化的實體任務。依據 Hulten 定理，全要素生產力（TFP）的躍升等於 AI 介入任務份額與成本降幅之乘積。
+      </p>
+
+      <!-- 2030 3 Scenarios Table -->
+      <div style="font-weight: 700; font-size: 14px; color: var(--ink); margin-bottom: 8px;">📈 2030 年三大總體情境與關鍵經濟指標比較表</div>
+      <div class="table-container" style="margin-bottom: 20px;">
+        <table class="specs-table">
+          <thead>
+            <tr>
+              <th style="width: 22%;">總體經濟變數與關鍵指標</th>
+              <th style="width: 18%;">無 AI 基準路徑</th>
+              <th style="width: 20%;">溫和變革情境 (Modest)</th>
+              <th style="width: 20%;">實質重塑情境 (Substantial)</th>
+              <th style="width: 20%;">極端顛覆情境 (Extreme)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>美國實質 GDP 規模</strong></td>
+              <td>基準線 ($33.6 兆)</td>
+              <td>$34.1 兆 (+1.6%)</td>
+              <td>$36.3 兆 (+8.3%)</td>
+              <td><span style="color: #dc2626; font-weight: 700;">$44.4 兆 (+32.4%)</span></td>
+            </tr>
+            <tr>
+              <td><strong>年化經濟成長動能</strong></td>
+              <td>~2.0% 歷史趨勢</td>
+              <td>類似早期網路緩步提升</td>
+              <td>達歷史常態之 2 倍</td>
+              <td><span style="color: #dc2626; font-weight: 700;">達年增 15% (每 4.5 年翻倍)</span></td>
+            </tr>
+            <tr>
+              <td><strong>要素分配：勞動所得份額 (s_L)</strong></td>
+              <td>60.0%</td>
+              <td>59.4% (-0.6%)</td>
+              <td>56.1% (-3.9%)</td>
+              <td><span style="color: #dc2626; font-weight: 700;">45.2% (暴跌 14.8 個百分點)</span></td>
+            </tr>
+            <tr>
+              <td><strong>要素分配：資本所得份額 (s_K)</strong></td>
+              <td>40.0%</td>
+              <td>40.6% (+0.6%)</td>
+              <td>43.9% (+3.9%)</td>
+              <td><span style="color: #059669; font-weight: 700;">54.8% (大增 14.8 個百分點)</span></td>
+            </tr>
+            <tr>
+              <td><strong>認知型白領工資相較基準變化</strong></td>
+              <td>基準線</td>
+              <td>微幅下滑 -0.4%</td>
+              <td>大致持平 (~0%)</td>
+              <td><span style="color: #dc2626; font-weight: 700;">實質暴跌 -11.5%</span></td>
+            </tr>
+            <tr>
+              <td><strong>非認知 / 實體型工資相較基準變化</strong></td>
+              <td>基準線</td>
+              <td>小幅上升 +0.7%</td>
+              <td>顯著成長 (Significant)</td>
+              <td><span style="color: #059669; font-weight: 700;">大幅暴漲 +34.0%</span></td>
+            </tr>
+            <tr>
+              <td><strong>全社會平均實質工資變化</strong></td>
+              <td>基準線</td>
+              <td>微增 +0.7%</td>
+              <td>穩步上揚</td>
+              <td>總體上升 +10.0%</td>
+            </tr>
+            <tr>
+              <td><strong>認知部門失業與跨部門轉移</strong></td>
+              <td>~4.0% 自然摩擦</td>
+              <td>維持歷史常態波動</td>
+              <td>認知就業萎縮 4%，總失業 4.6%~5%</td>
+              <td><span style="color: #dc2626; font-weight: 700;">認知失業攀至 20%，積壓沉澱</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Baumol Reversal Box -->
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #16a34a; border-radius: 6px; padding: 14px 18px; font-size: 13px; color: #14532d; line-height: 1.7;">
+        ⚖️ <strong>Baumol 成本病的反轉現象（Baumol's Cost Disease Reversal）：</strong> 傳統經濟學中，難以提升生產力的實體服務業成本會相對上升；而在 AI 時代，認知軟體邊際成本趨近於零，<strong>水電管線、房屋營造、實體維修與高接觸護理</strong>等具備物理邊界的工種獲得巨大的定價權與要素溢價，實質工資在極端情境大幅暴漲 34%！然而，認知型白領在遭遇擠壓時面臨搜尋折價阻尼（&mu; &approx; 0.17），無法順暢轉移至實體技術，產生嚴重技能折損。
+      </div>
+    </div>
+
+    <!-- Sub-chapter 3: 學術批判與爭辯 -->
+    <div style="background: #ffffff; border: 1px solid var(--rule-solid); border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+      <div class="timeline-badge" style="background:#fee2e2; color:#991b1b; border-color:#fca5a5;">ACADEMIC DEBATE · 經濟學界批判與檢驗</div>
+      <h3 style="font-family: var(--font-title); font-size: 22px; color: var(--ink); margin: 8px 0 14px 0;">
+        三、 經濟學界學術論辯與批判性檢視
+      </h3>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+        
+        <div style="background: #fff8f5; border: 1px solid #fed7aa; border-radius: 6px; padding: 16px;">
+          <div style="font-size: 14px; font-weight: 800; color: #9a3412; margin-bottom: 6px;">
+            1. Daron Acemoglu 的 TFP 成長下限與負向外部性
+          </div>
+          <div style="font-size: 12px; color: #475569; line-height: 1.7;">
+            麻省理工學院教授 Acemoglu 指出，LLM 目前能顯著滲透的僅是整體經濟支出中佔比有限的標準化任務，在考量複雜非結構化任務後，<strong>未來十年全要素生產力（TFP）累積提升可能僅約 0.5% 至 1%</strong>。且模型系統性忽略了<strong>合成內容氾濫、商業搜尋成本激增與合約驗證信任維繫損耗</strong>等負向社會外部性。
+          </div>
+        </div>
+
+        <div style="background: #fff8f5; border: 1px solid #fed7aa; border-radius: 6px; padding: 16px;">
+          <div style="font-size: 14px; font-weight: 800; color: #9a3412; margin-bottom: 6px;">
+            2. Ilan Strauss 統計穩健性與匯總偏誤爭議
+          </div>
+          <div style="font-size: 12px; color: #475569; line-height: 1.7;">
+            倫敦大學學院學者 Strauss 等人指出 Anthropic 聲稱「全球 AI 採納可由人均 GDP 解釋（&beta;=0.71）」存在<strong>嚴重的樣本匯總偏誤（Aggregation Bias）</strong>。若對中等所得國家子樣本檢驗，決定係數 R&sup2; 驟降至 7%~17%，統計上完全不顯著；且單一閉源廠商流量存在選擇性偏差，不能代表全球總體採納。
+          </div>
+        </div>
+
+        <div style="background: #fff8f5; border: 1px solid #fed7aa; border-radius: 6px; padding: 16px;">
+          <div style="font-size: 14px; font-weight: 800; color: #9a3412; margin-bottom: 6px;">
+            3. 高登股利折現模型之「金融市場定價檢驗」
+          </div>
+          <div style="font-size: 12px; color: #475569; line-height: 1.7;">
+            Tyler Cowen 依高登折現公式 P/E = 1 / (r - g) 指出：若 2030 年實質 GDP 能年增 15%，資本市場本益比與折現率理應劇烈重組。當前 S&P 500 本益比約 20 倍與 TIPS 實質殖利率（~2.4%）顯示，<strong>金融資本市場隱含的長期實質增長預期仍牢固鎖定在每年 1.9%~2.0% 歷史趨勢線上</strong>，並未採信極端情境。
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sub-chapter 4: 政策應對與稅制架構 -->
+    <div style="background: #ffffff; border: 1px solid var(--rule-solid); border-radius: 8px; padding: 24px;">
+      <div class="timeline-badge" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">POLICY FRAMEWORK · 制度與稅制改革</div>
+      <h3 style="font-family: var(--font-title); font-size: 22px; color: var(--ink); margin: 8px 0 14px 0;">
+        四、 制度與政策響應架構：三級失業防禦機制與 Korinek-Lockwood 稅收架構
+      </h3>
+
+      <!-- 3 Tier Framework Table -->
+      <div style="font-weight: 700; font-size: 14px; color: var(--ink); margin-bottom: 8px;">🛡️ Anthropic 經濟政策架構：三級失業觸發防禦機制（Tiered Labor Market Framework）</div>
+      <div class="table-container" style="margin-bottom: 20px;">
+        <table class="specs-table">
+          <thead>
+            <tr>
+              <th style="width: 20%;">政策響應階層 / 啟動標準</th>
+              <th style="width: 25%;">總體經濟與就業情境判定</th>
+              <th style="width: 27%;">核心制度干預方針</th>
+              <th style="width: 28%;">公共財政與再分配機制重點</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>基礎準備期 (Baseline)</strong></td>
+              <td>任何就業水準均適用之長態機制</td>
+              <td>大幅投資國家統計機構提升採樣頻率；翻新失業救濟發放之數位底座。</td>
+              <td>建立實時產業預警體系，徹底修復突發衝擊下易遭擊潰的社福 IT 系統。</td>
+            </tr>
+            <tr>
+              <td><strong>第一級防禦 (Tier 1)</strong></td>
+              <td>失業率約 5%（自然摩擦，但內部換手加劇）</td>
+              <td>建立普遍預先分配型資本帳戶；鬆綁職業許可限制；在職技能重訓補助。</td>
+              <td>允許公共帳戶直接持有前沿 AI 企業股權以分享資本回報；導入工資損失保險。</td>
+            </tr>
+            <tr>
+              <td><strong>第二級防禦 (Tier 2)</strong></td>
+              <td>失業率約 10%（衰退級衝擊，換手受阻）</td>
+              <td>失業給付自動無條件延長；重點受衝擊行業定向支援補貼；基本生活與醫療保障。</td>
+              <td>若 AI 呈現廣泛勞動替代，支持政府實施統一且具約束力的企業級技術擴散節奏監管，遏止惡性逐底裁員。</td>
+            </tr>
+            <tr>
+              <td><strong>第三級防禦 (Tier 3)</strong></td>
+              <td>失業率超越歷史常態峰值（轉革性顛覆）</td>
+              <td>無條件基本收入 (Universal Basic Income, UBI)；成立 AI 主權財富基金；推行全民股權份額共有制。</td>
+              <td>政策典範由「輔助重返職場」徹底轉型為「持續性所得替代」；重塑國家稅基以支撐大規模再分配。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Korinek-Lockwood Tax Framework -->
+      <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 18px; margin-bottom: 16px;">
+        <div style="font-size: 14px; font-weight: 800; color: #1e293b; margin-bottom: 8px;">
+          🏛️ 公共財政與稅制現代化：Korinek-Lockwood 稅收架構四大原則
+        </div>
+        <div style="font-size: 13px; color: #334155; line-height: 1.8;">
+          1. <strong>支持終端消費課徵「代幣稅」（Token Tax）</strong>：針對個人娛樂生成、個人助理訂閱或零售級產出按量課稅。<br>
+          2. <strong>堅決反對課徵「算力稅（Compute Tax）」與「機器人稅」</strong>：對硬體或伺服器運算直接課稅將直接懲罰生產性資本積累，扭曲資源配置並壓抑 TFP 成長。<br>
+          3. <strong>貫徹中間生產環節免稅原則</strong>：對企業間（B2B）API 呼叫與工業整合免除間接稅，避免產生連鎖稅收級聯效應（Tax Cascading）。<br>
+          4. <strong>重點課徵超額經濟租（Economic Rents）</strong>：鎖定供給完全缺乏彈性之要素（土地價值、頻譜特許、專有稀缺數據集、AI 巨頭平台獨佔利潤）。
+        </div>
+      </div>
+
+      <div style="font-size: 12px; color: #64748b; line-height: 1.6; border-top: 1px solid var(--rule); padding-top: 12px;">
+        🌱 <strong>企業治理承諾：</strong> Anthropic 內部建立職位演變「早期預警系統」，並出資 2 億美元設立「經濟未來研究基金」資助實證政策隨機對照試驗，出資 1.5 億美元成立「國家研究員計畫」協助初階人才跨越轉型門檻。
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ============================================================
+       SECTION 7: MODEL DISTILLATION ATTACKS & DEFENSE FRAMEWORK
+       ============================================================ -->
+  <section id="distillation-security" class="container section-block">
+    <div class="section-header">
+      <div class="section-badge" style="background:#fef2f2; color:#991b1b; border-color:#fecaca;">SECURITY & IP DEFENSE · 07</div>
+      <h2 class="section-title">前沿人工智慧模型蒸餾攻擊與防禦架構專題研究報告</h2>
+      <p class="section-desc">
+        隨著前沿大模型在複雜推理、代碼合成與自主代理任務中取得突破，尖端模型的內部推論能力與權重結構已成為人工智慧產業最核心的戰略資產。2026 年 Anthropic 與業界系統性揭露了針對閉源商用模型之<strong>大規模「模型蒸餾攻擊」與反制體系</strong>，模型安全正式從提示詞越獄防範，升級為智慧財產權與國家安全的系統級攻防：
+      </p>
+    </div>
+
+    <!-- Executive Summary & Distillation Types -->
+    <div style="background: #ffffff; border: 1px solid var(--rule-solid); border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+      <div class="timeline-badge" style="background:#fee2e2; color:#991b1b; border-color:#fca5a5;">ATTACK MODALITIES · 攻擊形態</div>
+      <h3 style="font-family: var(--font-title); font-size: 22px; color: var(--ink); margin: 8px 0 14px 0;">
+        一、 模型蒸餾攻擊之技術原理、運作形態與工業級基礎設施
+      </h3>
+      
+      <p style="font-size: 14px; line-height: 1.8; color: var(--ink-secondary); margin-bottom: 16px;">
+        傳統知識蒸餾原為內部輕量化部署技術；然而當前沿模型透過雲端 API 提供服務時，蒸餾轉化為一種對抗性<strong>「模型擷取攻擊（Model Extraction Attacks）」</strong>。攻擊者在黑盒或灰盒條件下，將目標 API 視為無標籤資料標註工廠，逆向探測內部決策邊界，大量生成高密度微調語料，藉對手前沿模型研發成果實現低成本跨代追趕。
+      </p>
+
+      <!-- 3 Distillation Types Table -->
+      <div style="font-weight: 700; font-size: 14px; color: var(--ink); margin-bottom: 8px;">🎯 三大蒸餾攻擊類型與掠奪目標</div>
+      <div class="table-container" style="margin-bottom: 20px;">
+        <table class="specs-table">
+          <thead>
+            <tr>
+              <th style="width: 25%;">蒸餾類型</th>
+              <th style="width: 25%;">運作機制</th>
+              <th style="width: 25%;">擷取核心目標</th>
+              <th style="width: 25%;">典型用途與效益評估</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>功能複寫 (Functionality Replication)</strong></td>
+              <td>廣泛輸入通用或領域查詢，截取模型最終文本標籤</td>
+              <td>對話風格、格式規範、指令遵循能力</td>
+              <td>複製模型常規對話與基礎功能，節省逾 70% 預訓練與標註成本</td>
+            </tr>
+            <tr>
+              <td><strong>思維軌跡擷取 (Reasoning Trace Extraction)</strong></td>
+              <td>設計特定提示誘發模型逐步思維鏈，擷取解題脈絡</td>
+              <td>邏輯演繹步驟、代碼架構分析、工具呼叫規劃</td>
+              <td>用於監督微調與強化學習，教導學生模型思考邏輯而非單純模仿答案</td>
+            </tr>
+            <tr>
+              <td><strong>強化學習獎勵標註 (Reward Model Synthesis)</strong></td>
+              <td>利用模型對候選回應進行多維度評分與反饋篩選</td>
+              <td>評分準則、偏好排序信號、品質打分</td>
+              <td>取代人類回饋強化學習的高昂人工標註成本，低成本訓練自研獎勵模型</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Industrial Attack Infrastructure -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+        <div style="background: #fff8f5; border: 1px solid #fed7aa; border-radius: 6px; padding: 16px;">
+          <div style="font-size: 14px; font-weight: 800; color: #9a3412; margin-bottom: 6px;">
+            🌐 「九頭蛇叢集」（Hydra Cluster）住宅代理池
+          </div>
+          <div style="font-size: 12px; color: #475569; line-height: 1.7;">
+            攻擊實體批量註冊成千上萬個虛假學術機構、新創公司帳戶，配合虛擬信用卡與外洩憑證，經由遍布全球的住宅代理節點分發高頻查詢請求。即便單一帳號被封禁，備援帳號數秒內無縫遞補，將惡意流量稀釋混入正常用戶請求中，<strong>使傳統單一 IP/Key 速率限制徹底失效</strong>。
+          </div>
+        </div>
+
+        <div style="background: #fff8f5; border: 1px solid #fed7aa; border-radius: 6px; padding: 16px;">
+          <div style="font-size: 14px; font-weight: 800; color: #9a3412; margin-bottom: 6px;">
+            🔀 靜默流量重導向（Silent Redirection）與誘騙
+          </div>
+          <div style="font-size: 12px; color: #475569; line-height: 1.7;">
+            部分下游中繼平台在未告知使用者下，暗中將真實用戶提示詞轉發至 Claude 等前沿模型 API，將生成結果回傳用戶的同時，在後端完整留存提示與回應作為自研微調語料。同時藉由精密對抗性系統提示詞與結構化標籤，強迫模型吐出未經精簡的完整推論記憶區塊。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sub-chapter 2: 2026 案例剖析 -->
+    <div style="background: #ffffff; border: 1px solid var(--rule-solid); border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+      <div class="timeline-badge" style="background:#ede9fe; color:#5b21b6; border-color:#ddd6fe;">THREAT INTEL · 2026 實錄案例</div>
+      <h3 style="font-family: var(--font-title); font-size: 22px; color: var(--ink); margin: 8px 0 14px 0;">
+        二、 案例剖析：Anthropic 披露之大規模蒸餾行動
+      </h3>
+      <p style="font-size: 14px; line-height: 1.8; color: var(--ink-secondary); margin-bottom: 16px;">
+        Anthropic 於 2026 年發布的威脅情報報告與防禦研究中，詳細揭露了多家機構對其旗艦 Claude Opus 與 Sonnet 級別模型發起的未授權蒸餾活動。攻擊目標全面聚焦於面對非確定性問題時的解題路徑與複雜工具整合能力：
+      </p>
+
+      <!-- 4 Entities Case Table -->
+      <div class="table-container" style="margin-bottom: 16px;">
+        <table class="specs-table">
+          <thead>
+            <tr>
+              <th style="width: 22%;">機構代號與實體</th>
+              <th style="width: 18%;">累計請求規模</th>
+              <th style="width: 25%;">核心鎖定能力領域</th>
+              <th style="width: 35%;">特殊攻擊手法與特徵跡證</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Alibaba / 阿里雲 (GTG-16005)</strong></td>
+              <td><span style="color: #dc2626; font-weight: 700;">逾 1 億 5,100 萬次交流</span></td>
+              <td>深度邏輯推理、強化學習環境建構、微架構研發、核心代碼</td>
+              <td>單日峰值逼近 300 萬次；注入固定提示詞強迫輸出思維鏈並以自訂標籤包裹；多帳戶共享之代理池與其他機構設施交疊。</td>
+            </tr>
+            <tr>
+              <td><strong>Moonshot AI / 月之暗面 (GTG-16002)</strong></td>
+              <td><span style="color: #ea580c; font-weight: 700;">逾 2,300 萬次 (初期 340 萬)</span></td>
+              <td>代理推理、工具調用、電腦操作代理、多模態視覺</td>
+              <td>請求元數據直接關聯特定資深研發人員；採用靜默重導向將真實用戶提問轉發至 Claude 竊取雙向軌跡。</td>
+            </tr>
+            <tr>
+              <td><strong>MiniMax</strong></td>
+              <td><span style="color: #d97706; font-weight: 700;">逾 1,300 萬次交流</span></td>
+              <td>代理式程式碼編寫、複雜工具排程、環境調用編排</td>
+              <td>擷取時序高度契合其產品路線圖；Anthropic 上線新型號 24 小時內迅速將近半數流量遷移至新模型。</td>
+            </tr>
+            <tr>
+              <td><strong>DeepSeek</strong></td>
+              <td><span style="color: #059669; font-weight: 700;">逾 1,200 萬次 (初期 15 萬)</span></td>
+              <td>多步驟解題推理、獎勵模型標註準則、政治敏感話術對齊</td>
+              <td>跨帳戶高度同步協同負載均衡；透過元數據追蹤至特定研究員；在 14 天內密集觸發千萬級高頻請求。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sub-chapter 3: 三大防禦技術體系 -->
+    <div style="background: #ffffff; border: 1px solid var(--rule-solid); border-radius: 8px; padding: 24px; margin-bottom: 24px;">
+      <div class="timeline-badge" style="background:#f0fdf4; color:#166534; border-color:#bbf7d0;">DEFENSE ARCHITECTURE · 三大防禦體系</div>
+      <h3 style="font-family: var(--font-title); font-size: 22px; color: var(--ink); margin: 8px 0 14px 0;">
+        三、 三大核心防禦技術體系與博弈機制
+      </h3>
+
+      <div class="defense-card" style="border-left: 5px solid #2563eb;">
+        <div class="defense-header">
+          <div style="font-size: 15px; font-weight: 800; color: #1e40af;">
+            🛡️ 防禦一：語境綁定與「保留思維」（Preserved Thinking）
+          </div>
+          <span class="defense-num">密碼學簽名前綴綁定</span>
+        </div>
+        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.7;">
+          傳統 API 會將推理過程作為可見明文回傳，極易被蒸餾截取。Anthropic 導入<strong>「保留思維」機制</strong>：在模型思維鏈輸出區塊注入<strong>具備密碼學簽名的特殊前綴（Cryptographic Prefix Binding）</strong>。客戶端在進行多輪對話時，必須原封不動回傳該加密簽名區塊以證明上下文合法性；任何企圖以自訂標籤篡改、截斷或替換思維軌跡的請求將直接引發簽名校驗失敗而被中斷，從根本上切斷了自動化思維軌跡擷取管線。
+        </div>
+      </div>
+
+      <div class="defense-card" style="border-left: 5px solid #7c3aed;">
+        <div class="defense-header">
+          <div style="font-size: 15px; font-weight: 800; color: #6b21a8;">
+            🧠 防禦二：兩階段憲法分類器與 MMD 語義分佈偏移檢驗
+          </div>
+          <span class="defense-num">異常流量動態識別</span>
+        </div>
+        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.7;">
+          傳統基於關鍵字之過濾器極易遭改寫規避。新體系在請求入口部署輕量級<strong>憲法分類器（Constitutional Classifier）</strong>進行粗篩，並結合<strong>最大平均差異（Maximum Mean Discrepancy, MMD）演算法</strong>，在滑動時間視窗內監控跨 IP 請求的語義嵌入分佈。當偵測到大批獨立帳號的查詢在語義空間呈現非自然的高度聚集或網格化探測分佈時，分類器會在毫秒內對異常流量打標並動態升級至深度審查。
+        </div>
+      </div>
+
+      <div class="defense-card" style="border-left: 5px solid #059669;">
+        <div class="defense-header">
+          <div style="font-size: 15px; font-weight: 800; color: #065f46;">
+            🧬 防禦三：輸出統計浮水印與放射性溯源技術（Radioactive Genetics）
+          </div>
+          <span class="defense-num">法庭級侵權溯源</span>
+        </div>
+        <div style="font-size: 13px; color: var(--ink-secondary); line-height: 1.7;">
+          前沿實驗室在推論取樣階段，依據隨機數種子將詞表動態劃分為「綠色清單（Greenlist）」與「紅色清單（Redlist）」，對綠名單 Token 的 Logits 施加微不可察的偏置扰動。當未經授權機構使用大量被擾動之合成資料微調自身學生模型時，<strong>該統計偏置會被不可逆地「遺傳」至下游模型的權重分佈中</strong>。即便經過多輪二次微調，防禦方仍可透過假設檢定在極高置信度（p &lt; 10⁻⁶）下證明該模型源自被竊取之資料庫，提供法庭級侵權鐵證。
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sub-chapter 4: 地緣科技與法規邊界 -->
+    <div style="background: #ffffff; border: 1px solid var(--rule-solid); border-radius: 8px; padding: 24px;">
+      <div class="timeline-badge" style="background:#ffedd5; color:#9a3412; border-color:#fed7aa;">GEOPOLITICS &amp; IP · 戰略與治理意涵</div>
+      <h3 style="font-family: var(--font-title); font-size: 22px; color: var(--ink); margin: 8px 0 14px 0;">
+        四、 智慧財產權邊界、防禦代價與出口管制連動
+      </h3>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 16px;">
+          <div style="font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">
+            ⚠️ 防禦機制對正規生態之附帶衝擊
+          </div>
+          <div style="font-size: 12px; color: #475569; line-height: 1.7;">
+            為防堵推論區塊被探測而導入的「保留思維」強制前綴校驗，使合規開發者失去了在工作流程中<strong>動態修改上下文、壓縮長對話歷史與快取提示詞（Prompt Caching）</strong>的靈活性，間接推高了整個應用生態的開發門檻與推論延遲。
+          </div>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 16px;">
+          <div style="font-size: 13px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">
+            🌐 晶片出口管制與地緣戰略因果
+          </div>
+          <div style="font-size: 12px; color: #475569; line-height: 1.7;">
+            透過未授權蒸餾取得能力的外部機構，往往會在自研模型中<strong>剝離安全護欄</strong>，帶來嚴重外溢風險。另一方面，消化並訓練承接自前沿模型的蒸餾數據集仍需高效能算力叢集，此一技術連動進一步強化了<strong>先進晶片出口管制政策在硬體層面實體阻斷的戰略必要性</strong>。
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+<footer class="container site-footer">
     <div>大語言模型本質與資料分析課程 · Module 01 專題圖鑑</div>
     <div>Designed with Editorial Cream System & Diagram-Design Principles</div>
   </footer>
@@ -4717,7 +5615,49 @@ You are an interactive CLI tool that helps users with software engineering tasks
       updateTokenizer();
       syncModelKey();
     });
-  </script>
+  
+    // -------------------------------------------------------------
+    // Agent Matrix Tab Switching
+    // -------------------------------------------------------------
+    function switchAgentMatrixTab(tabKey) {
+      const tabs = ['matrix', 'muse', 'dots', 'grok', 'claude'];
+      tabs.forEach(t => {
+        const btnId = 'btnTab' + t.charAt(0).toUpperCase() + t.slice(1);
+        const viewId = 'viewAgent' + t.charAt(0).toUpperCase() + t.slice(1);
+        const btn = document.getElementById(btnId);
+        const view = document.getElementById(viewId);
+        if (btn) btn.classList.toggle('active', t === tabKey);
+        if (view) view.style.display = (t === tabKey) ? 'block' : 'none';
+      });
+    }
+
+    // -------------------------------------------------------------
+    // Quick Token Count for Pricing Calculator
+    // -------------------------------------------------------------
+    function setQuickTokenCount(tokens) {
+      const statElem = document.getElementById('statPricingTokens');
+      if (statElem) statElem.innerText = tokens.toLocaleString();
+      
+      const minElem = document.getElementById('statMinCost');
+      if (minElem) minElem.innerText = '$' + ((tokens / 1000000) * 0.14).toFixed(5);
+      
+      const maxElem = document.getElementById('statMaxCost');
+      if (maxElem) maxElem.innerText = '$' + ((tokens / 1000000) * 15.0).toFixed(5);
+
+      renderPricingTable(tokens);
+
+      const quickBtns = document.querySelectorAll('#pricing .preset-pills .pill-btn');
+      quickBtns.forEach(btn => {
+        const txt = btn.innerText;
+        const matches = (tokens === 500 && txt.includes('500')) ||
+                        (tokens === 2000 && txt.includes('2,000')) ||
+                        (tokens === 8000 && txt.includes('8,000')) ||
+                        (tokens === 32000 && txt.includes('32,000')) ||
+                        (tokens === 128000 && txt.includes('128K'));
+        btn.classList.toggle('active', matches);
+      });
+    }
+</script>
 
 
   <!-- Floating Mobile Portal Bar -->
