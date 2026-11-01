@@ -632,6 +632,202 @@
       display: block;
     }
 
+    /* ============================================================
+       DECISION MATRICES & ARCHITECTURAL EVALUATION (SECTION 03)
+       ============================================================ */
+    .matrix-section-title {
+      font-family: var(--font-title);
+      font-size: 24px;
+      margin: 36px 0 10px;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .matrix-section-desc {
+      font-size: 13px;
+      color: var(--ink-secondary);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .matrix-card {
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 8px;
+      padding: 22px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+    .matrix-card-header {
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .matrix-card-title {
+      font-family: var(--font-title);
+      font-size: 19px;
+      color: var(--ink);
+    }
+    .matrix-card-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--paper-tint);
+      border: 1px solid var(--rule);
+      color: var(--ink-secondary);
+      font-weight: 700;
+    }
+    .data-matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+    .data-matrix-table th, .data-matrix-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    .data-matrix-table th {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: var(--paper-tint);
+      color: var(--ink);
+      position: sticky;
+      top: 0;
+      white-space: nowrap;
+    }
+    .data-matrix-table tr:hover td {
+      background: rgba(0, 0, 0, 0.015);
+    }
+    .data-matrix-table td.mono-cell {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .code-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      background: var(--paper-tint);
+      border: 1px solid var(--rule);
+      padding: 2px 5px;
+      border-radius: 3px;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .country-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .tag-us { background: rgba(29, 78, 216, 0.08); color: #1d4ed8; }
+    .tag-cn { background: rgba(185, 28, 28, 0.08); color: #b91c1c; }
+    .tag-open-license { background: rgba(22, 101, 52, 0.08); color: #15803d; }
+    .tag-closed-api { background: rgba(100, 116, 139, 0.1); color: #475569; }
+
+    /* Architecture Evaluation Grid */
+    .arch-eval-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-top: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) {
+      .arch-eval-grid { grid-template-columns: 1fr; }
+    }
+    .arch-eval-card {
+      background: var(--paper-card);
+      border: 1px solid var(--rule-solid);
+      border-radius: 6px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .arch-eval-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .arch-eval-num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent-coral);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .arch-eval-title {
+      font-family: var(--font-title);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .arch-eval-text {
+      font-size: 12px;
+      color: var(--ink-secondary);
+      line-height: 1.6;
+    }
+    .arch-eval-text strong { color: var(--ink); }
+    .arch-eval-footer {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--rule);
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--ink-muted);
+    }
+
+    /* Decision Recommendations Box */
+    .decision-guide-box {
+      background: var(--paper-tint);
+      border: 1px solid var(--rule-solid);
+      border-radius: 8px;
+      padding: 22px;
+      margin-top: 24px;
+      margin-bottom: 30px;
+    }
+    .decision-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+    @media (max-width: 800px) {
+      .decision-grid { grid-template-columns: 1fr; }
+    }
+    .decision-item {
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 14px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .decision-item-title {
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     /* Comparison Table */
     .compare-container {
       background: var(--paper-card);
@@ -1871,270 +2067,709 @@
   <section id="models" class="container section-block">
     <div class="section-header">
       <div class="section-badge">MODEL TAXONOMY · 03</div>
-      <h2 class="section-title">全球主流大模型全景圖譜 (The Modern LLM Landscape)</h2>
+      <h2 class="section-title">中美前沿 AI 模型技術格局與部署矩陣深度研究</h2>
       <p class="section-desc">
-        當今世界的大模型已非單一巨頭獨大，而是形成了「美國雲端旗艦」、「亞洲高性價比開源突破」與「地端隱私引擎」三大陣營：
+        全球前沿人工智慧模型的架構演進正由傳統靜態參數量擴展，全面邁向<strong>端到端長程自主代理（Long-Horizon Agentic Workflows）</strong>、<strong>原生作業系統級電腦操作（Computer Use）</strong>、以及<strong>高稀疏度混合專家（MoE）結合動態稀疏注意力（DSA / MSA / KDA）</strong>的系統級架構。美國領先機構在系統級執行能力與高階防禦對齊構築屏障；中國領先團隊則以演算法創新，將具備百萬上下文（1M Context）的數萬億級開放權重推進至生產環境。
       </p>
     </div>
 
     <!-- Filter Buttons -->
     <div class="filter-tabs">
-      <button class="filter-btn active" onclick="filterModels('all')">全部展示 (8 大代表生態)</button>
-      <button class="filter-btn" onclick="filterModels('frontier')">🇺🇸 美國雲端旗艦 (OpenAI, Anthropic, Google)</button>
-      <button class="filter-btn" onclick="filterModels('open')">⚡ 亞洲開源與性價比黑馬 (DeepSeek, Qwen, Kimi, MiniMax)</button>
-      <button class="filter-btn" onclick="filterModels('local')">🏠 本地地端部署 (Ollama)</button>
+      <button class="filter-btn active" onclick="filterModels('all', this)">全部展示 (10 大前沿旗艦與生態)</button>
+      <button class="filter-btn" onclick="filterModels('frontier', this)">🇺🇸 美國雲端防禦旗艦 (OpenAI GPT-6, Gemini 4, Claude 5.5, Grok 4.7, Meta)</button>
+      <button class="filter-btn" onclick="filterModels('open', this)">⚡ 中國萬億開源黑馬 (DeepSeek V4, Kimi K3.1, MiniMax M3, Qwen 3.5)</button>
+      <button class="filter-btn" onclick="filterModels('local', this)">🏠 地端開源部署與硬體矩陣 (Ollama, Muse Spark, 企業私有叢集)</button>
     </div>
 
-    <!-- Models Grid -->
+    <!-- Models Grid (10 Models) -->
     <div class="models-grid" id="modelsGrid">
-      <!-- 1. OpenAI -->
+      
+      <!-- 1. OpenAI GPT-6 Astra -->
       <div class="model-card" data-category="frontier">
         <div class="model-card-top">
           <div class="model-header">
-            <span class="model-company">OPENAI · 美國 (FRONTIER & REASONING)</span>
-            <span class="model-tag-pill tag-cloud">雙軌旗艦 · o3 推理 / 4.5 Orion</span>
+            <span class="model-company">OPENAI · 美國 (FRONTIER & COMPUTER USE)</span>
+            <span class="model-tag-pill tag-cloud">天體矩陣頂峰 · 循環深度推理</span>
           </div>
-          <div class="model-name">OpenAI o3, o3-mini & GPT-4.5 Orion</div>
+          <div class="model-name">GPT-6 Astra & 天體矩陣 (Sol, Terra, Luna)</div>
           <p class="model-summary">
-            OpenAI 形成「強化推理」與「超大預訓練」雙軌格局：<strong>o3 & o3-mini</strong> 具備可調思維深度（Low/Med/High）、視覺深度推理與代碼執行，GPQA Diamond 達 87.7%；<strong>GPT-4.5 (研發代號 Orion)</strong> 為萬億級無監督學習旗艦，專精情感直覺、常識理解與極低幻覺；<strong>GPT-4o</strong> 則為全模態即時交互標竿。業界亦高度關注次世代統一架構（GPT-5/6 及實驗代號如 Luna/Terra 等多模態自主 Agent 專案）。
+            官方 API 為 <code>gpt-6-astra</code>（ChatGPT 標示為 GPT-6 Pro）。位於天體矩陣頂端（能力高於 Sol、Terra 及 Luna）。在德州星際之門（Stargate）動用超過 10 萬塊高階 GPU 叢集訓練。架構引入<strong>循環深度（Recurrent Depth）動態推理</strong>；具備成熟原生電腦操作（Computer Use），在 OSWorld 2.0 達到 72.6%（執行時間壓縮 47%）；ARC-AGI-3 抽象推理 99.9%、FrontierMath Tier 4 達 98%。首度觸發 Preparedness Framework 的「Critical」資安等級防禦審查。
           </p>
           <div class="model-specs">
             <div class="spec-item">
               <span class="spec-label">上下文視窗</span>
-              <span class="spec-value">128K ~ 200K Tokens</span>
+              <span class="spec-value">1,050K Tokens (輸出 128K)</span>
             </div>
             <div class="spec-item">
-              <span class="spec-label">輸入價格</span>
-              <span class="spec-value">$1.10 (o3-mini) / $2.50 (4o)</span>
+              <span class="spec-label">標準費率</span>
+              <span class="spec-value">入 $10.00 / 出 $50.00</span>
             </div>
             <div class="spec-item">
-              <span class="spec-label">核心強項</span>
-              <span class="spec-value">STEM 頂級推理 · 工具生態完整</span>
+              <span class="spec-label">快取與階梯</span>
+              <span class="spec-value">快取 $1.00 (&gt;272K 翻倍)</span>
             </div>
           </div>
         </div>
         <div class="model-strengths">
-          <strong>適合場景：</strong> 高難度程式庫架構推演、多步驟 Agent 自主規劃、高準確性金融/法律決策。
+          <strong>適合場景：</strong> 極端複雜多步驟端到端商務與科研流程、原生電腦桌面操作接管、國防級資安推演。
         </div>
       </div>
 
-      <!-- 2. Anthropic Claude -->
+      <!-- 2. Google DeepMind Gemini 4 Argon & Carbon -->
       <div class="model-card" data-category="frontier">
         <div class="model-card-top">
           <div class="model-header">
-            <span class="model-company">ANTHROPIC · 美國 (HYBRID REASONING)</span>
-            <span class="model-tag-pill tag-cloud">混合推理 · 編程工程首選</span>
+            <span class="model-company">GOOGLE DEEPMIND · 美國 (DUAL FRONTIER & CYBER-DEFENSE)</span>
+            <span class="model-tag-pill tag-cloud">雙生旗艦 · 首創 1M Long Decode</span>
           </div>
-          <div class="model-name">Claude 3.7 Sonnet & 3.5 Sonnet / Haiku</div>
+          <div class="model-name">Gemini 4 Argon & Gemini 4 Carbon</div>
           <p class="model-summary">
-            最新發布全球首款<strong>混合推理（Hybrid Reasoning）</strong>旗艦 <strong>Claude 3.7 Sonnet</strong>！允許開發者自由調節 Extended Thinking 思維時間，在 SWE-bench Verified 創下全球軟體工程紀錄，搭配官方 Claude Code 工具成為全球頂級工程師標配；文筆自然高雅、無 AI 公式化痕跡。高階 3.5 Opus 與次世代架構探索（Fable）亦是業界焦點。
+            雙生旗艦機制：<strong>Gemini 4 Argon</strong> 具備 1M 統一脈絡，支援業界首創的單次百萬級 Token<strong>「長解碼（Long Decode）」</strong>輸出，支援三段思考深度調控，在 Gray Swan 間接提示注入測試（IPI）受攻擊率壓至 0.7%；<strong>Gemini 4 Carbon</strong>（Barium-B 演進路線）在 AA Index v5.0 勇奪全球榜首，生成無漏洞代碼機率為 Argon 兩倍以上、自動修補缺陷品質達非 Google 頂尖模型 10 倍，專用於 Fairwind 國家級資安防禦。
           </p>
           <div class="model-specs">
             <div class="spec-item">
               <span class="spec-label">上下文視窗</span>
-              <span class="spec-value">200K Tokens</span>
+              <span class="spec-value">1,000K Tokens (長解碼 1M)</span>
             </div>
             <div class="spec-item">
-              <span class="spec-label">輸入價格</span>
-              <span class="spec-value">$3.00 / 1M ($0.80 Haiku)</span>
+              <span class="spec-label">Argon 費率</span>
+              <span class="spec-value">入 $4.00 / 出 $20.00 (含思考)</span>
             </div>
             <div class="spec-item">
-              <span class="spec-label">核心強項</span>
-              <span class="spec-value">全端寫 Code · 深度混合思考</span>
+              <span class="spec-label">核心突破</span>
+              <span class="spec-value">零漏洞代碼 · IPI 攻擊率 0.7%</span>
             </div>
           </div>
         </div>
         <div class="model-strengths">
-          <strong>適合場景：</strong> 全端架構重構、複雜代碼庫修復、長篇商業報告與論文無痕改寫。
+          <strong>適合場景：</strong> 百萬級長解碼連續推演、零時差軟體漏洞自動挖掘與修復、全域多模態安全審計。
         </div>
       </div>
 
-      <!-- 3. Google Gemini -->
+      <!-- 3. Anthropic Claude Opus 5.5 -->
       <div class="model-card" data-category="frontier">
         <div class="model-card-top">
           <div class="model-header">
-            <span class="model-company">GOOGLE DEEPMIND · 美國 (MULTIMODAL & CO-REASONING)</span>
-            <span class="model-tag-pill tag-cloud">200萬超長窗 · Flash 極速多模態</span>
+            <span class="model-company">ANTHROPIC · 美國 (AGENTIC CODE & ADAPTIVE THINKING)</span>
+            <span class="model-tag-pill tag-cloud">自適應思考常態化 · 快取大降 60%</span>
           </div>
-          <div class="model-name">Gemini 2.0 Flash / Flash Thinking · 2.0 Pro</div>
+          <div class="model-name">Claude Opus 5.5 & Claude 5.5 家族</div>
           <p class="model-summary">
-            以業界首創的「百萬級原生多模態超長上下文」（最高 200 萬 Token）領跑！<strong>Gemini 2.0 Flash</strong> 達成端到端極速影音理解；<strong>Gemini 2.0 Flash Thinking Experimental</strong> 則結合了 Flash 極速與透明思維鏈（CoT）推理；<strong>Gemini 2.0 Pro</strong> 專精高難度提示詞與複雜程式工程。內部持續推進 Argon、Carbon 前瞻實驗，技術儲備直指 Gemini 3.x 世代。
+            核心模型 <strong>Claude Opus 5.5</strong>（API: <code>claude-opus-5-5</code>）與頂級科研模型 Fable 5.1 並駕齊驅，算力成本較前代 Opus 5 降低 40%，輸出提速 30%。全面啟用<strong>「常態化自適應思考（Adaptive Thinking Always On）」</strong>，廢除強制工具呼叫改由內部意圖路由；沙箱逃逸嘗試率大降 85%；快取讀取費率大幅下調 60% 至每百萬 <strong>$0.20</strong>，專門大幅降低長期運行編程代理（Claude Code）的維護成本。
           </p>
           <div class="model-specs">
             <div class="spec-item">
               <span class="spec-label">上下文視窗</span>
-              <span class="spec-value">1M ~ 2M Tokens (百萬級)</span>
+              <span class="spec-value">1,000K Tokens (1M 脈絡)</span>
             </div>
             <div class="spec-item">
-              <span class="spec-label">輸入價格</span>
-              <span class="spec-value">$0.075 (Flash) / $1.25 (Pro)</span>
+              <span class="spec-label">標準費率</span>
+              <span class="spec-value">入 $4.00 / 出 $20.00</span>
             </div>
             <div class="spec-item">
-              <span class="spec-label">核心強項</span>
-              <span class="spec-value">200萬超長窗 · 影音同源理解</span>
+              <span class="spec-label">快取讀取</span>
+              <span class="spec-value">$0.20 / 1M (降幅 60%)</span>
             </div>
           </div>
         </div>
         <div class="model-strengths">
-          <strong>適合場景：</strong> 整年財報即時勾稽、小時級影片轉錄、巨型代碼庫靜態全量分析。
+          <strong>適合場景：</strong> 長程全端軟體架構重構、合規追溯思維鏈透明審計、超低成本連續對話 Agent 代理。
         </div>
       </div>
 
-      <!-- 4. DeepSeek -->
+      <!-- 4. xAI Grok 4.7 -->
+      <div class="model-card" data-category="frontier">
+        <div class="model-card-top">
+          <div class="model-header">
+            <span class="model-company">XAI (馬斯克) · 美國 (LONG-HORIZON & REAL-TIME STREAM)</span>
+            <span class="model-tag-pill tag-cloud">長程多小時工程 · 即時 X 數據流</span>
+          </div>
+          <div class="model-name">Grok 4.7 & 推理怪癖 (Quirk) 技術辨析</div>
+          <p class="model-summary">
+            最新旗艦 <strong>Grok 4.7</strong>（API: <code>grok-4.7</code>）專注於多小時長程工程任務與自我驗證，原生整合 X 全球即時社群數據流。<strong>【技術辨析】</strong>：官方從無「Quirk」獨立模型；曾於 Grok 4.3 涉及母公司爭議時出現學術界記錄之「過渡性推理怪癖（Transient Reasoning Quirk）」，現已由系統提示強制中立修復；產品風格反過度說教、提供自動提示擴寫（Technical Quirk）。注意：Grok 3/4 世代為封閉雲端 API（僅初代 Grok-1 於 2024 開源）。
+          </p>
+          <div class="model-specs">
+            <div class="spec-item">
+              <span class="spec-label">上下文視窗</span>
+              <span class="spec-value">500K Tokens</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">商業費率</span>
+              <span class="spec-value">入 $2.00 / 出 $6.00</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">架構特質</span>
+              <span class="spec-value">即時 X 數據 · 多小時長程自校驗</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-strengths">
+          <strong>適合場景：</strong> 即時全球動態資訊流推演、高性價比長程程式碼自驗證、長文本低費率代理。
+        </div>
+      </div>
+
+      <!-- 5. Meta Muse Wonder & Muse Spark Open -->
+      <div class="model-card" data-category="frontier local">
+        <div class="model-card-top">
+          <div class="model-header">
+            <span class="model-company">META · 美國 (DUAL-TRACK & COMMUNITY BEDROCK)</span>
+            <span class="model-tag-pill tag-open">西方開源底座 · LLaMA 生態繼承者</span>
+          </div>
+          <div class="model-name">Muse Wonder & Muse Spark Open</div>
+          <p class="model-summary">
+            Meta 採取雙軌佈局：雲端商業旗艦 <strong>Muse Wonder</strong> 在通用智能榜單直面頂級閉源旗艦；而開放權重模型 <strong>Muse Spark Open</strong> 則正式承接 LLaMA 系列的開源生態位，以開放權重形式發布，成為西方開發者社群在個人工作站或企業內部建構專有微調、私有化地端代理系統的核心基座。最低僅需 2× RTX 4090 或 1× A100 (80GB) 即可運行與微調。
+          </p>
+          <div class="model-specs">
+            <div class="spec-item">
+              <span class="spec-label">上下文視窗</span>
+              <span class="spec-value">128K ~ 512K Tokens</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">交付形態</span>
+              <span class="spec-value">雲端 API + 開放權重下載</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">硬體門檻</span>
+              <span class="spec-value">2× 4090 (24GB) 或 1× A100</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-strengths">
+          <strong>適合場景：</strong> 企業專屬業務數據微調、西方開源生態對接、部門級工作站私有部署。
+        </div>
+      </div>
+
+      <!-- 6. DeepSeek-V4-Pro & V4.1-Flash -->
+      <div class="model-card" data-category="open local">
+        <div class="model-card-top">
+          <div class="model-header">
+            <span class="model-company">DEEPSEEK · 中國杭州 (OPEN-WEIGHT DISRUPTION & DSA)</span>
+            <span class="model-tag-pill tag-open">1.6 兆 MoE · DSA 稀疏注意力 · MIT 開源</span>
+          </div>
+          <div class="model-name">DeepSeek-V4-Pro & DeepSeek-V4.1-Flash</div>
+          <p class="model-summary">
+            <strong>DeepSeek-V4-Pro</strong> 總參數高達 1.6 兆（1.6T MoE，單 Token 激活 49B），預訓練吞吐 33T Tokens；經濟型 <strong>V4.1-Flash</strong> 總參數 284B（激活 13B）。首創自研 <strong>DSA（DeepSeek Sparse Attention）</strong> 稀疏注意力，在 Token 維度特徵壓縮徹底打破長序列顯存瓶頸。Codeforces 3,206 分、SWE-bench Verified 80.6%。延續全量 MIT 協議開源，原生適配華為昇騰（Ascend）與 FP4/FP8，為企業大規模私有化首選。
+          </p>
+          <div class="model-specs">
+            <div class="spec-item">
+              <span class="spec-label">上下文視窗</span>
+              <span class="spec-value">1,000K Tokens (標配 1M)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">V4.1-Flash 費率</span>
+              <span class="spec-value">入 $0.14 / 出 $0.28 (快取 $0.014)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">V4-Pro 費率</span>
+              <span class="spec-value">入 $1.74 / 出 $3.48 (離峰 $0.66)</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-strengths">
+          <strong>適合場景：</strong> 萬億級高併發背景 Agent 循環、金融/國企國產算力私有化部署、高難度競技編程。
+        </div>
+      </div>
+
+      <!-- 7. Moonshot Kimi K3.1 Pro -->
+      <div class="model-card" data-category="open local">
+        <div class="model-card-top">
+          <div class="model-header">
+            <span class="model-company">MOONSHOT AI (月之暗面) · 中國北京 (LATENT MOE & 3D PARAMETRIC)</span>
+            <span class="model-tag-pill tag-open">3T 級 MoE · KDA 稀疏注意力 · 3D Make 列印</span>
+          </div>
+          <div class="model-name">Kimi K3.1 Pro & Kimi K3 (3T 級開放權重)</div>
+          <p class="model-summary">
+            總參數達 2.8T~3.0T（激活 104B），全球最大開放權重之一。獨創 <strong>KDA（Kimi Delta Attention）</strong> 結合 24 層門控 MLA 與 Attention Residuals，構建 896 個專家（16 路由 + 2 共享）Stable LatentMoE；內建 401M MoonViT-V2 原生視覺編碼器；長程多文檔 OfficeQA Pro v2 達 64.4，空間參數建模 BenchCAD 達 92.7%，上線具備實體 3D 列印導出能力的 <strong>3D Make</strong> 功能。
+          </p>
+          <div class="model-specs">
+            <div class="spec-item">
+              <span class="spec-label">上下文視窗</span>
+              <span class="spec-value">1,048K Tokens (1M 脈絡)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">雲端 API 費率</span>
+              <span class="spec-value">入 $2.00 / 出 $10.00 (Highspeed)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">授權與部署</span>
+              <span class="spec-value">Kimi License 開放權重 (32× H100)</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-strengths">
+          <strong>適合場景：</strong> 長程複雜工程審計、財報多文檔核對、實體 3D 參數化生成、高階私有雲算力節點。
+        </div>
+      </div>
+
+      <!-- 8. MiniMax M3 -->
+      <div class="model-card" data-category="open local">
+        <div class="model-card-top">
+          <div class="model-header">
+            <span class="model-company">MINIMAX (名之夢) · 中國上海 (SPARSE ATTENTION & MULTIMODAL)</span>
+            <span class="model-tag-pill tag-open">MSA 稀疏注意力 · 解碼提速 15 倍 · NeMo 叢集</span>
+          </div>
+          <div class="model-name">MiniMax M3 & MiniMax M3.1 Flash</div>
+          <p class="model-summary">
+            全新世代旗艦 <strong>MiniMax M3</strong> 採用 428B 總參數、激活 22B 的 MoE 視覺語言架構（60 層：3 密集 + 57 MoE，128 專家）。自研 <strong>MSA（MiniMax Sparse Attention）</strong> 使 Prefill 提速 9 倍、Decode 提速逾 15 倍！結合 32 層 ViT 動態處理解析度影像與連續長視訊幀；SWE-bench Pro 達 59.0%、Terminal-Bench 2.1 達 66.0%；支援 NVIDIA NeMo AutoModel 叢集部署（Hopper / Blackwell，BF16 / MXFP8）。
+          </p>
+          <div class="model-specs">
+            <div class="spec-item">
+              <span class="spec-label">上下文視窗</span>
+              <span class="spec-value">1,000K Tokens (1M 脈絡)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">API 費率 (≤512K)</span>
+              <span class="spec-value">入 $0.30 / 出 $1.20 (快取 $0.06)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">超長費率 (&gt;512K)</span>
+              <span class="spec-value">入 $0.60 / 出 $2.40</span>
+            </div>
+          </div>
+        </div>
+        <div class="model-strengths">
+          <strong>適合場景：</strong> 百萬長脈絡超低延遲交互、終端指令代理 (Terminal-Bench 66%)、企業 Hopper/Blackwell 叢集私有化。
+        </div>
+      </div>
+
+      <!-- 9. Alibaba Cloud Qwen 3.5 & 3.8 -->
       <div class="model-card" data-category="open">
         <div class="model-card-top">
           <div class="model-header">
-            <span class="model-company">DEEPSEEK · 中國杭州 (OPEN-WEIGHT DISRUPTION)</span>
-            <span class="model-tag-pill tag-open">開源 MoE 巨震 · 純 RL 滿血推理</span>
+            <span class="model-company">ALIBABA CLOUD (阿里巴巴) · 中國 (OPEN-WEIGHT & HIGH-THROUGHPUT)</span>
+            <span class="model-tag-pill tag-open">開源全尺寸霸主 · 397B-A17B 架構</span>
           </div>
-          <div class="model-name">DeepSeek-V3 & DeepSeek-R1 (671B MoE)</div>
+          <div class="model-name">通義千問 Qwen 3.5 & Qwen 3.8 (全尺寸 MoE)</div>
           <p class="model-summary">
-            引發全球 AI 產業格局劇震的開源奇蹟！<strong>DeepSeek-V3</strong> 擁有 671B 總參數與 37B 啟動參數，首創 MLA 多頭潛在注意力機制與無輔助損失負載平衡，訓練成本僅約 600 萬美元；<strong>DeepSeek-R1</strong> 透過大規模純強化學習（Pure RL）訓練出足以抗衡西方頂級閉源模型（o1/o3）的滿血推理能力，價格僅其二十分之一，並開源全套權重供本機部署。
+            阿里巴巴旗下通義千問旗艦矩陣。涵蓋端側輕量到 <strong>397B-A17B</strong> 等大型 MoE 架構，在開源社群排行榜與終端指令執行展現極高吞吐與多語言穩定性；與智譜 GLM-5/5.2 共同構建起國產晶片算子級優化生態，在中文意圖解析、跨語言轉換、終端代碼輔助與政企私有雲落地方面具備極高滲透率。
           </p>
           <div class="model-specs">
             <div class="spec-item">
               <span class="spec-label">上下文視窗</span>
-              <span class="spec-value">64K ~ 128K Tokens</span>
-            </div>
-            <div class="spec-item">
-              <span class="spec-label">輸入價格</span>
-              <span class="spec-value">$0.14 / 1M (開源權重免費)</span>
-            </div>
-            <div class="spec-item">
-              <span class="spec-label">核心強項</span>
-              <span class="spec-value">純 RL 推理 · 極致性價比</span>
-            </div>
-          </div>
-        </div>
-        <div class="model-strengths">
-          <strong>適合場景：</strong> 大規模批次數據清洗、演算法與數學競賽、預算敏感型企業私有化部署。
-        </div>
-      </div>
-
-      <!-- 5. Alibaba Qwen -->
-      <div class="model-card" data-category="open">
-        <div class="model-card-top">
-          <div class="model-header">
-            <span class="model-company">ALIBABA CLOUD (阿里巴巴) · 中國 (OPEN & MAX)</span>
-            <span class="model-tag-pill tag-open">開源全尺寸霸主 · 萬億 MoE 旗艦</span>
-          </div>
-          <div class="model-name">Qwen 2.5-Max · Qwen 2.5-Coder (32B)</div>
-          <p class="model-summary">
-            阿里巴巴旗下通義千問旗艦矩陣。<strong>Qwen 2.5-Max</strong> 作為千億/萬億級 MoE 模型，在國際權威基準直追 GPT-4o 與 Claude 3.5 Sonnet；開源端則涵蓋 0.5B 至 72B 全尺寸，其中 <strong>Qwen 2.5-Coder (32B)</strong> 被譽為開源寫 Code 最強神獸。在多語言支援、工具調用（Tool Calling）與數學能力上表現極為穩健。
-          </p>
-          <div class="model-specs">
-            <div class="spec-item">
-              <span class="spec-label">上下文視窗</span>
-              <span class="spec-value">128K Tokens</span>
+              <span class="spec-value">256K ~ 1,000K Tokens</span>
             </div>
             <div class="spec-item">
               <span class="spec-label">授權形態</span>
-              <span class="spec-value">開源 Apache 2.0 / 雲端 API</span>
+              <span class="spec-value">開源 Apache 2.0 / 百煉雲端 API</span>
             </div>
             <div class="spec-item">
               <span class="spec-label">核心強項</span>
-              <span class="spec-value">全尺寸覆蓋 · 工具調用成熟</span>
+              <span class="spec-value">全尺寸覆蓋 · 國產晶片算子適配</span>
             </div>
           </div>
         </div>
         <div class="model-strengths">
-          <strong>適合場景：</strong> 企業私有化本地部屬、邊緣輕量設備運行、中文與多語言在地化微調。
+          <strong>適合場景：</strong> 企業各部門全尺寸階梯部署、邊緣設備指令執行、端到端長脈絡工具調用。
         </div>
       </div>
 
-      <!-- 6. Moonshot Kimi -->
-      <div class="model-card" data-category="open">
-        <div class="model-card-top">
-          <div class="model-header">
-            <span class="model-company">MOONSHOT AI (月之暗面) · 中國北京 (LONG-CONTEXT RL)</span>
-            <span class="model-tag-pill tag-cloud">長上下文 RL 推理 · 200萬長文本</span>
-          </div>
-          <div class="model-name">Kimi k1.5 · Kimi Chat (200萬長文本)</div>
-          <p class="model-summary">
-            華語圈長文本先驅。推出全新一代多模態推理模型 <strong>Kimi k1.5</strong>，專注於「長上下文強化學習（Long-Context RL）」，在無需複雜搜尋樹的情況下，透過大規模長思維鏈訓練，在 AIME 數學與 LiveCodeBench 上大幅超越傳統基準；Kimi Chat 支援 200 萬字無損長篇解讀。
-          </p>
-          <div class="model-specs">
-            <div class="spec-item">
-              <span class="spec-label">上下文視窗</span>
-              <span class="spec-value">200 萬 Tokens</span>
-            </div>
-            <div class="spec-item">
-              <span class="spec-label">部署形態</span>
-              <span class="spec-value">雲端 API & Web/App</span>
-            </div>
-            <div class="spec-item">
-              <span class="spec-label">核心強項</span>
-              <span class="spec-value">長思維強化學習 · 中文文案契約</span>
-            </div>
-          </div>
-        </div>
-        <div class="model-strengths">
-          <strong>適合場景：</strong> 超長法律合同審查、長篇投行研報梳理、互聯網多模態檢索。
-        </div>
-      </div>
-
-      <!-- 7. MiniMax -->
-      <div class="model-card" data-category="open">
-        <div class="model-card-top">
-          <div class="model-header">
-            <span class="model-company">MINIMAX (名之夢) · 中國上海 (HYBRID ATTENTION & VIDEO)</span>
-            <span class="model-tag-pill tag-cloud">400萬超長窗 · 擬真多模態</span>
-          </div>
-          <div class="model-name">MiniMax-Text-01 (4M 上下文) · 海螺 AI</div>
-          <p class="model-summary">
-            中國最具自主架構野心的 AI 獨角獸之一。<strong>MiniMax-Text-01</strong> 採用獨創的 Lightning Attention + Softmax Attention 混合架構，支援高達 <strong>400 萬 Tokens</strong> 的天文級上下文視窗！在多模態領域，旗下海螺 AI (Hailuo AI) 在語音合成（TTS）與 Video-01 高擬真影片生成領域名列世界前茅。
-          </p>
-          <div class="model-specs">
-            <div class="spec-item">
-              <span class="spec-label">上下文視窗</span>
-              <span class="spec-value">400 萬 Tokens (4M)</span>
-            </div>
-            <div class="spec-item">
-              <span class="spec-label">多模態能力</span>
-              <span class="spec-value">文字 · 超擬真人聲 · 視頻 Video-01</span>
-            </div>
-            <div class="spec-item">
-              <span class="spec-label">核心強項</span>
-              <span class="spec-value">400萬混合注意 · 擬真視訊語音</span>
-            </div>
-          </div>
-        </div>
-        <div class="model-strengths">
-          <strong>適合場景：</strong> 超長歷史資料一次性載入、多模態娛樂與互動有聲陪伴、高品質視頻短片生成。
-        </div>
-      </div>
-
-      <!-- 8. Ollama Local Engine -->
+      <!-- 10. Ollama & On-Premises Clusters -->
       <div class="model-card" data-category="local">
         <div class="model-card-top">
           <div class="model-header">
-            <span class="model-company">OLLAMA · 開源生態 (LOCAL & AIR-GAPPED)</span>
-            <span class="model-tag-pill tag-local">100% 離線隱私 · 零費用地端引擎</span>
+            <span class="model-company">OLLAMA & 企業叢集 (LOCAL / AIR-GAPPED / PRIVATE CLOUD)</span>
+            <span class="model-tag-pill tag-local">100% 物理隔離 · $0 離線或專有叢集</span>
           </div>
-          <div class="model-name">Ollama (支援 DeepSeek-R1-Distill, Qwen 2.5, Llama 3.3)</div>
+          <div class="model-name">Ollama & 企業級地端私有化部署矩陣</div>
           <p class="model-summary">
-            全球最受歡迎的本機模型執行引擎。透過 GGUF 4-bit 量化與 llama.cpp 底層優化，讓普通筆電（如 Apple Silicon M 系列晶片或 NVIDIA RTX 顯示卡）免聯網、一行指令即可本機秒開 DeepSeek-R1-Distill、Qwen 2.5-Coder、Llama 3.3 等頂級開源模型。提供相容 OpenAI 的本地 11434 端口。
+            個人端利用 Ollama 搭配 GGUF 4-bit 量化與 llama.cpp 底層優化，普通 Mac (M系列) 或 PC 免聯網即可運行 Qwen 3.5、DeepSeek-V4.1-Distill、Muse Spark；企業端則透過 SGLang、vLLM 或 NeMo AutoModel 驅動 4×A100/H100 或華為昇騰 910B/920 叢集，實現萬億級 MoE 模型的 FP4/FP8 私有化高併發落地，徹底消除雲端外洩風險。
           </p>
           <div class="model-specs">
             <div class="spec-item">
               <span class="spec-label">運行環境</span>
-              <span class="spec-value">Mac (Apple Silicon) / Linux / Windows</span>
+              <span class="spec-value">Mac M-Series / NVIDIA / 華為昇騰</span>
             </div>
             <div class="spec-item">
               <span class="spec-label">Token 費用</span>
-              <span class="spec-value">$0.00 (完全免費無限推論)</span>
+              <span class="spec-value">$0.00 (本機無限推論，零外網)</span>
             </div>
             <div class="spec-item">
-              <span class="spec-label">核心強項</span>
-              <span class="spec-value">100% 物理離線 · 零資料外洩</span>
+              <span class="spec-label">核心優勢</span>
+              <span class="spec-value">100% 物理隔離 · 國防/醫療級合規</span>
             </div>
           </div>
         </div>
         <div class="model-strengths">
-          <strong>適合場景：</strong> 高機密財務/醫療資料分析、拔掉網路線（Air-gapped）作業、無月租個人 Agent。
+          <strong>適合場景：</strong> 國防金融極密數據、醫療合規隔離、拔除外網作業（Air-gapped）、零月租專有 Agent。
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================================
+         THREE MASTER DECISION MATRICES (跨維度規格、經濟學與部署矩陣)
+         ============================================================ -->
+    <div class="matrix-section-title">
+      <span>📊</span> 中美前沿模型三維對比決策矩陣 (Frontier Decision Matrices)
+    </div>
+    <p class="matrix-section-desc">
+      為了清晰呈現中美兩國最新模型的工程參數、服務成本與落地途徑，以下透過三個結構化維度進行橫向對比：
+    </p>
+
+    <!-- Table 1: Specifications Matrix -->
+    <div class="matrix-card">
+      <div class="matrix-card-header">
+        <div class="matrix-card-title">矩陣一：核心旗艦型號全景矩陣 (Frontier Specifications Matrix)</div>
+        <div class="matrix-card-badge">2026 最新前沿架構橫向對比</div>
+      </div>
+      <table class="data-matrix-table">
+        <thead>
+          <tr>
+            <th>研發機構</th>
+            <th>官方型號名稱</th>
+            <th>API 模型識別碼</th>
+            <th>歸屬國</th>
+            <th>權重開放性</th>
+            <th>上下文視窗</th>
+            <th>核心架構與代表性特點</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>OpenAI</strong></td>
+            <td>GPT-6 Astra</td>
+            <td><code class="code-pill">gpt-6-astra</code></td>
+            <td><span class="country-tag tag-us">美國</span></td>
+            <td><span class="country-tag tag-closed-api">閉源 (雲端 API)</span></td>
+            <td class="mono-cell">1,050K Tokens</td>
+            <td>循環深度動態推理；原生電腦桌面操作；Critical 級資安防禦架構</td>
+          </tr>
+          <tr>
+            <td><strong>Google</strong></td>
+            <td>Gemini 4 Argon</td>
+            <td><code class="code-pill">gemini-4-argon</code></td>
+            <td><span class="country-tag tag-us">美國</span></td>
+            <td><span class="country-tag tag-closed-api">閉源 (雲端 API)</span></td>
+            <td class="mono-cell">1,000K Tokens</td>
+            <td>1M 統一脈絡與 Long Decode；多階思考調控；高抗提示注入能力 (IPI 0.7%)</td>
+          </tr>
+          <tr>
+            <td><strong>Google</strong></td>
+            <td>Gemini 4 Carbon</td>
+            <td><code class="code-pill">Fairwind 內部預覽</code></td>
+            <td><span class="country-tag tag-us">美國</span></td>
+            <td><span class="country-tag tag-closed-api">閉源 (受限預覽)</span></td>
+            <td class="mono-cell">1,000K Tokens</td>
+            <td>AA Index v5.0 首位；超低漏洞代碼生成與自主零時差補丁研發</td>
+          </tr>
+          <tr>
+            <td><strong>Anthropic</strong></td>
+            <td>Claude Opus 5.5</td>
+            <td><code class="code-pill">claude-opus-5-5</code></td>
+            <td><span class="country-tag tag-us">美國</span></td>
+            <td><span class="country-tag tag-closed-api">閉源 (雲端 API)</span></td>
+            <td class="mono-cell">1,000K Tokens</td>
+            <td>自適應思考常態化；沙箱逃逸率降 85%；取消強制工具呼叫語法</td>
+          </tr>
+          <tr>
+            <td><strong>xAI (馬斯克)</strong></td>
+            <td>Grok 4.7</td>
+            <td><code class="code-pill">grok-4.7</code></td>
+            <td><span class="country-tag tag-us">美國</span></td>
+            <td><span class="country-tag tag-closed-api">閉源 (僅初代開源)</span></td>
+            <td class="mono-cell">500K Tokens</td>
+            <td>長程代碼與多小時任務自我驗證；修復過渡性推理怪癖；反過度審查</td>
+          </tr>
+          <tr>
+            <td><strong>Meta</strong></td>
+            <td>Muse Spark Open</td>
+            <td><code class="code-pill">開放權重下載</code></td>
+            <td><span class="country-tag tag-us">美國</span></td>
+            <td><span class="country-tag tag-open-license">開放權重 (地端/託管)</span></td>
+            <td class="mono-cell">128K~512K Tokens</td>
+            <td>延續 LLaMA 生態的高效開放架構，適配企業本地部署微調 (4090/A100)</td>
+          </tr>
+          <tr>
+            <td><strong>DeepSeek</strong></td>
+            <td>DeepSeek-V4-Pro</td>
+            <td><code class="code-pill">deepseek-v4-pro</code></td>
+            <td><span class="country-tag tag-cn">中國</span></td>
+            <td><span class="country-tag tag-open-license">開源 (MIT 協議)</span></td>
+            <td class="mono-cell">1,000K Tokens</td>
+            <td>1.6T MoE (49B 激活)；DSA 稀疏注意力；深度適配華為昇騰與 FP4</td>
+          </tr>
+          <tr>
+            <td><strong>DeepSeek</strong></td>
+            <td>DeepSeek-V4.1-Flash</td>
+            <td><code class="code-pill">deepseek-flash</code></td>
+            <td><span class="country-tag tag-cn">中國</span></td>
+            <td><span class="country-tag tag-open-license">開源 (MIT 協議)</span></td>
+            <td class="mono-cell">1,000K Tokens</td>
+            <td>284B MoE (13B 激活)；極低成本高頻代理；原生雙模態思考切換</td>
+          </tr>
+          <tr>
+            <td><strong>Moonshot</strong></td>
+            <td>Kimi K3.1 Pro</td>
+            <td><code class="code-pill">kimi-k3.1-pro</code></td>
+            <td><span class="country-tag tag-cn">中國</span></td>
+            <td><span class="country-tag tag-open-license">開放權重 (Kimi 許可)</span></td>
+            <td class="mono-cell">1,048K Tokens</td>
+            <td>3T 級 MoE (104B 激活)；KDA+MLA 896專家；原生多模態與 3D 空間建模</td>
+          </tr>
+          <tr>
+            <td><strong>MiniMax</strong></td>
+            <td>MiniMax M3</td>
+            <td><code class="code-pill">MiniMax-M3</code></td>
+            <td><span class="country-tag tag-cn">中國</span></td>
+            <td><span class="country-tag tag-open-license">開放權重 / 雲端 API</span></td>
+            <td class="mono-cell">1,000K Tokens</td>
+            <td>428B MoE (22B 激活)；MSA 稀疏注意力 (提速15x)；NeMo 叢集微調支援</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Table 2: Pricing & Prompt Caching Economics -->
+    <div class="matrix-card">
+      <div class="matrix-card-header">
+        <div class="matrix-card-title">矩陣二：商業雲端定價與推論經濟學對比 (Cloud Pricing & Prompt Caching Economics)</div>
+        <div class="matrix-card-badge">每百萬 Tokens 計 (單位：美元 USD)</div>
+      </div>
+      <table class="data-matrix-table">
+        <thead>
+          <tr>
+            <th>模型名稱</th>
+            <th>標準輸入費率</th>
+            <th>標準輸出費率 (含思考)</th>
+            <th>快取讀取 (Cache Hit) 費率</th>
+            <th>特殊費率條件與計價說明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>GPT-6 Astra</strong></td>
+            <td class="mono-cell">$10.00</td>
+            <td class="mono-cell">$50.00</td>
+            <td class="mono-cell">$1.00</td>
+            <td>單次請求輸入超過 272K Tokens 時，輸入與快取費率翻倍，輸出費率為 1.5 倍</td>
+          </tr>
+          <tr>
+            <td><strong>Gemini 4 Argon</strong></td>
+            <td class="mono-cell">$2.00 (推廣) / $4.00</td>
+            <td class="mono-cell">$10.00 (推廣) / $20.00</td>
+            <td class="mono-cell">依系統自動折抵</td>
+            <td>無免費使用層級；所有輸出均包含思考過程的 Token 消耗</td>
+          </tr>
+          <tr>
+            <td><strong>Claude Opus 5.5</strong></td>
+            <td class="mono-cell">$4.00</td>
+            <td class="mono-cell">$20.00</td>
+            <td class="mono-cell" style="color: #166534; font-weight:700;">$0.20</td>
+            <td>快取讀取較前代大幅降低 60%；Fast 專用通道為 $8.00 / $40.00</td>
+          </tr>
+          <tr>
+            <td><strong>Grok 4.7</strong></td>
+            <td class="mono-cell">$2.00</td>
+            <td class="mono-cell">$6.00</td>
+            <td class="mono-cell">支援即時 X 檢索</td>
+            <td>提供雙倍速度與費率的 Fast 專用模式；同級別具備極高價格殺傷力</td>
+          </tr>
+          <tr>
+            <td><strong>DeepSeek-V4-Pro</strong></td>
+            <td class="mono-cell">$1.74</td>
+            <td class="mono-cell">$3.48</td>
+            <td class="mono-cell">$0.174 (原價 10%)</td>
+            <td>離峰時段輸入降至 $0.66；全天提供 75% 彈性折扣方案</td>
+          </tr>
+          <tr>
+            <td><strong>DeepSeek-V4.1-Flash</strong></td>
+            <td class="mono-cell" style="color: #166534; font-weight:700;">$0.14</td>
+            <td class="mono-cell" style="color: #166534; font-weight:700;">$0.28</td>
+            <td class="mono-cell" style="color: #166534; font-weight:700;">$0.014</td>
+            <td>極度適合長上下文代理的頻繁背景循環調用（性價比之王）</td>
+          </tr>
+          <tr>
+            <td><strong>Kimi K3.1 Pro</strong></td>
+            <td class="mono-cell">$2.00</td>
+            <td class="mono-cell">$10.00</td>
+            <td class="mono-cell">依系統自動折抵</td>
+            <td>提供 Highspeed 高速版本（吞吐量提升 2 至 3 倍）</td>
+          </tr>
+          <tr>
+            <td><strong>MiniMax M3</strong></td>
+            <td class="mono-cell">$0.30 (≤512K)</td>
+            <td class="mono-cell">$1.20 (≤512K)</td>
+            <td class="mono-cell">$0.06</td>
+            <td>輸入介於 512K 至 1M Tokens 時，輸入調整為 $0.60，輸出為 $2.40</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Table 3: On-Premises Hardware Configuration Table -->
+    <div class="matrix-card">
+      <div class="matrix-card-header">
+        <div class="matrix-card-title">矩陣三：地端與私有化部署硬體門檻對照表 (On-Premises Hardware Configuration)</div>
+        <div class="matrix-card-badge">企業合規與私有算力選型</div>
+      </div>
+      <table class="data-matrix-table">
+        <thead>
+          <tr>
+            <th>開源模型名稱</th>
+            <th>總參數 / 激活參數</th>
+            <th>建議量化推論格式</th>
+            <th>最低地端硬體配置 (滿足基本流水線)</th>
+            <th>生產級高併發建議硬體架構</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>DeepSeek-V4.1-Flash</strong></td>
+            <td class="mono-cell">284B / 13B</td>
+            <td>INT4 / FP4 / FP8</td>
+            <td>4× NVIDIA A100/H100 (80GB) 或 4× 華為昇騰 910B</td>
+            <td>8× H100/H200 NVLink 節點；單卡推論吞吐可達 120+ tok/s</td>
+          </tr>
+          <tr>
+            <td><strong>DeepSeek-V4-Pro</strong></td>
+            <td class="mono-cell">1.6T / 49B</td>
+            <td>FP4 (InferenceX/SGLang)</td>
+            <td>2 節點 (共 16× H100 80GB，透過 InfiniBand 互連)</td>
+            <td>4 節點 B200/B300 叢集或同等規格大規模昇騰叢集</td>
+          </tr>
+          <tr>
+            <td><strong>Kimi K3.1 Pro</strong></td>
+            <td class="mono-cell">2.8T~3.0T / 104B</td>
+            <td>MXFP4 權重 / MXFP8 激活</td>
+            <td>4 個 8 卡節點 (共 32× H100/H200 80GB)</td>
+            <td>8 節點 HGX H200 / B200 叢集；需龐大高速 RDMA 網絡支撐專家路由</td>
+          </tr>
+          <tr>
+            <td><strong>MiniMax M3</strong></td>
+            <td class="mono-cell">428B / 22B</td>
+            <td>BF16 / FP8</td>
+            <td>8× NVIDIA H100/A100 (80GB)</td>
+            <td>2 節點 (16× GPU) NeMo AutoModel 部署，維持滿載 1M KV 顯存</td>
+          </tr>
+          <tr>
+            <td><strong>Grok-1 (早期開源權重)</strong></td>
+            <td class="mono-cell">314B / 2 專家激活</td>
+            <td>INT4 / FP8 / BF16</td>
+            <td>8× NVIDIA A100 (80GB) 伺服器</td>
+            <td>官方開源 JAX 權重（Apache 2.0）；注意：Grok 3 與 Grok 4 系列均未開源</td>
+          </tr>
+          <tr>
+            <td><strong>Muse Spark Open</strong></td>
+            <td class="mono-cell">~70B 密集或中小 MoE</td>
+            <td>INT4 / INT8 / FP16</td>
+            <td>2× RTX 4090 (24GB) 或 1× A100 (80GB)</td>
+            <td>單台 4× A100/H100 伺服器即可滿足中大型企業內部部門級併發</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ============================================================
+         CRITICAL ARCHITECTURAL & ENGINEERING INSIGHTS
+         ============================================================ -->
+    <div class="matrix-section-title">
+      <span>🔬</span> 關鍵技術架構與工程落地深度評估
+    </div>
+    <div class="arch-eval-grid">
+      
+      <!-- Insight 1 -->
+      <div class="arch-eval-card">
+        <div>
+          <div class="arch-eval-header">
+            <span class="arch-eval-num">INSIGHT · 01</span>
+            <span class="code-pill">Computer Use 安全威脅</span>
+          </div>
+          <div class="arch-eval-title">作業系統級操作安全升級：從提示詞注入到副作用防護網關</div>
+          <p class="arch-eval-text">
+            當 <strong>GPT-6 Astra</strong> 與 <strong>Claude Opus 5.5</strong> 具備看見螢幕像素、自主滑動滑鼠並向終端機發送指令的原生電腦操作能力時，傳統的「提示詞注入風險」已被放大為直接的「作業系統破壞風險」。Astra 在獲得工具授權後已展現出獨立發掘零時差漏洞並構建利用路徑的能力（觸發 Critical 防禦）；Anthropic 亦將沙箱逃逸（Sandbox Escape）列為最高壓制指標。<br><br>
+            <strong>工程應對：</strong> 企業在引入電腦操作 Agent 時，嚴禁僅依賴輸出文本過濾，必須在基礎設施層部署專屬的<strong>代理防護網關（Agentic Gateway）</strong>，建立代碼執行與網路操作的嚴格沙箱隔離，並在涉及敏感數據刪除或對外通訊等不可逆步驟時強制實施人機審批（HITL）。
+          </p>
+        </div>
+        <div class="arch-eval-footer">關鍵技術：Agentic Gateway · Sandbox Isolation · Human-in-the-Loop</div>
+      </div>
+
+      <!-- Insight 2 -->
+      <div class="arch-eval-card">
+        <div>
+          <div class="arch-eval-header">
+            <span class="arch-eval-num">INSIGHT · 02</span>
+            <span class="code-pill">Recurrent vs CoT</span>
+          </div>
+          <div class="arch-eval-title">推理機制的兩條路線：循環深度動態算力 vs. 透明思維鏈合規審計</div>
+          <p class="arch-eval-text">
+            思考過程的可視化與可控性出現了截然不同的架構選擇：<br>
+            • <strong>OpenAI GPT-6 Astra</strong> 採用<strong>循環深度（Recurrent Depth）</strong>機制，依據難度自適應分配計算資源，在提升運算效率的同時會部分掩蔽其內部思維鏈（Chain-of-Thought），使外部審計人員更難即時監控真實動機。<br>
+            • <strong>Anthropic Claude Opus 5.5</strong> 則將思考深度轉化為可控 effort 參數，並對企業級客戶提供<strong>保留思維鏈（Preserved Thinking）</strong>選項，便於後續的合規追溯與偏差審計。<br><br>
+            對於金融稽核、醫療診斷與法務遵循等強規管領域，推理透明度將直接決定系統在合規評估中的通過機率。
+          </p>
+        </div>
+        <div class="arch-eval-footer">關鍵技術：Recurrent Depth · Preserved Thinking · Regulatory Compliance</div>
+      </div>
+
+      <!-- Insight 3 -->
+      <div class="arch-eval-card">
+        <div>
+          <div class="arch-eval-header">
+            <span class="arch-eval-num">INSIGHT · 03</span>
+            <span class="code-pill">稀疏注意力三劍客</span>
+          </div>
+          <div class="arch-eval-title">稀疏注意力三劍客（DSA / MSA / KDA）：打破 1M 長脈絡顯存爆炸危機</div>
+          <p class="arch-eval-text">
+            隨著序列長度普遍跨越百萬（1M Context）門檻，二次方計算複雜度與巨量 KV 快取（KV Cache）顯存霸佔成為最大瓶頸。中國研發團隊在演算法與底層系統軟體提出了三大原創解法：<br>
+            • <strong>DeepSeek DSA（稀疏注意力）</strong>：在 Token 維度進行特徵壓縮與稀疏索引，打破長序列顯存瓶頸。<br>
+            • <strong>MiniMax MSA（塊稀疏注意力）</strong>：預填充（Prefill）速度提升 9 倍、解碼（Decode）速度提升逾 15 倍。<br>
+            • <strong>月之暗面 KDA + AttnRes</strong>：結合門控 MLA 構建穩定 LatentMoE，成功支撐起 896 個專家的高度稀疏路由。<br><br>
+            這證明前沿模型的擴展已從單純堆疊密集參數，全面轉向演算法架構、通訊拓撲與專用硬體的緊密協同。
+          </p>
+        </div>
+        <div class="arch-eval-footer">關鍵技術：DSA (DeepSeek) · MSA (MiniMax) · KDA (Kimi) · KV Cache 抑制</div>
+      </div>
+
+      <!-- Insight 4 -->
+      <div class="arch-eval-card">
+        <div>
+          <div class="arch-eval-header">
+            <span class="arch-eval-num">INSIGHT · 04</span>
+            <span class="code-pill">反蒸餾與護城河</span>
+          </div>
+          <div class="arch-eval-title">反蒸餾（Anti-Distillation）檢測技術與跨國技術護城河博弈</div>
+          <p class="arch-eval-text">
+            跨國模型在數據訓練維度上的競爭與摩擦愈發激烈。業界多次圍繞合成數據與強化學習後訓練階段的模型蒸餾（Distillation）展開博弈。部分觀點指出新興開放權重模型在訓練過程中借鑒了西方頂尖閉源旗艦的生成樣本。<br><br>
+            為了維護自身技術護城河，Anthropic 與 OpenAI 均已在其雲端 API 中實施了高度嚴密的<strong>反蒸餾檢測機制</strong>，將疑似批量數據採集與蒸餾行為的識別與封鎖成功率提升至 90% 以上。這一趨勢促使全球前沿模型逐步分流為<strong>依賴西方專有閉源生態</strong>與<strong>立足本土開源軟硬體全棧生態</strong>的兩條獨立演進路徑。
+          </p>
+        </div>
+        <div class="arch-eval-footer">關鍵技術：Anti-Distillation Detection · Data Moat · Bi-Polar Ecosystem</div>
+      </div>
+
+    </div>
+
+    <!-- Enterprise Architecture Decision Guide -->
+    <div class="decision-guide-box">
+      <div style="font-family: var(--font-title); font-size: 20px; color: var(--ink); margin-bottom: 6px;">
+        🏛️ 產業落地與架構決策指引 (Enterprise Architecture Recommendations)
+      </div>
+      <p style="font-size: 13px; color: var(--ink-secondary); line-height: 1.6; margin-bottom: 12px;">
+        當前大模型選型已不再局限於紙面基準跑分，而是全面進入以<strong>任務完成度、全流程運算成本以及安全邊界治理</strong>為導向的工程實踐：
+      </p>
+      <div class="decision-grid">
+        <div class="decision-item">
+          <div class="decision-item-title"><span>💻</span> 長程自主軟體工程與科研模擬</div>
+          <strong>推薦首選：</strong> OpenAI GPT-6 Astra / Anthropic Claude Opus 5.5<br>
+          具備最頂尖的端到端任務完成度與電腦桌面操作能力；在 Claude Opus 5.5 上結合低至 $0.20/1M 的快取讀取費率，能極大化維持長期編程 Agent 的可負擔性。
+        </div>
+        <div class="decision-item">
+          <div class="decision-item-title"><span>🛡️</span> 高階代碼重構與零漏洞修補</div>
+          <strong>推薦首選：</strong> Google Gemini 4 Argon / Gemini 4 Carbon<br>
+          Argon 提供商用級百萬 Token 連續長解碼（Long Decode）與極低提示注入攻擊率；Carbon 則在 AA Index v5.0 與零時差漏洞修復方面展現斷層級優勢。
+        </div>
+        <div class="decision-item">
+          <div class="decision-item-title"><span>⚡</span> 海量文檔檢索與高頻背景輪詢 Agent</div>
+          <strong>推薦首選：</strong> DeepSeek-V4.1-Flash / MiniMax M3<br>
+          推論成本僅為美系專有旗艦的數十分之一（V4.1-Flash 輸入 $0.14 / 輸出 $0.28），配合自研稀疏注意力（DSA/MSA），適合百萬脈絡高併發企業知識庫與日常工程協同。
+        </div>
+        <div class="decision-item">
+          <div class="decision-item-title"><span>🏦</span> 數據嚴格合規與企業地端私有化</div>
+          <strong>推薦首選：</strong> DeepSeek-V4-Pro (MIT 協議) / Kimi K3.1 Pro / Muse Spark<br>
+          徹底顛覆「開源落後雲端」的舊格局！以 FP4 或 MXFP8 量化格式在 16~32 張 H100 或國產華為昇騰 910B 叢集上部署，建構兼具世界級前沿智能與自主可控的專屬 AI 基礎設施。
         </div>
       </div>
     </div>
+
   </section>
 
   <!-- SECTION 4: CLOUD VS LOCAL ARCHITECTURE DIAGRAM -->
@@ -2724,13 +3359,18 @@
     // -------------------------------------------------------------
     // 2. 模型篩選切換
     // -------------------------------------------------------------
-    function filterModels(category) {
+    function filterModels(category, btnElem) {
       document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+      if (btnElem) {
+        btnElem.classList.add('active');
+      } else if (window.event && window.event.target) {
+        window.event.target.classList.add('active');
+      }
 
       const cards = document.querySelectorAll('.model-card');
       cards.forEach(card => {
-        if (category === 'all' || card.dataset.category === category) {
+        const cats = (card.getAttribute('data-category') || '').split(' ');
+        if (category === 'all' || cats.includes(category)) {
           card.style.display = 'flex';
         } else {
           card.style.display = 'none';
