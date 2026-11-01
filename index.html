@@ -3680,6 +3680,83 @@
       }
     ];
 
+    function setPreset(key) {
+      if (PRESETS[key]) {
+        document.getElementById('tokenInput').value = PRESETS[key];
+        updateTokenizer();
+      }
+    }
+
+    function simulateBpeTokens(text) {
+      if (!text) return [];
+      const regex = new RegExp("([a-zA-Z]+|[0-9]+|[\\u4e00-\\u9fa5]|[\\u3040-\\u30ff]|[\\uac00-\\ud7af]|[\\r\\n]+|[ \\t]+|[^\\s\\w\\u4e00-\\u9fa5])", "g");
+      const rawMatches = text.match(regex) || [];
+      const tokens = [];
+
+      rawMatches.forEach(m => {
+        if (/^[a-zA-Z]{6,}$/.test(m)) {
+          if (m.toLowerCase() === "strawberry") {
+            tokens.push("straw");
+            tokens.push("berry");
+          } else if (m.toLowerCase() === "tokenization") {
+            tokens.push("token");
+            tokens.push("ization");
+          } else if (m.toLowerCase() === "unbelievable") {
+            tokens.push("un");
+            tokens.push("believ");
+            tokens.push("able");
+          } else {
+            const mid = Math.floor(m.length / 2);
+            tokens.push(m.slice(0, mid));
+            tokens.push(m.slice(mid));
+          }
+        } else {
+          tokens.push(m);
+        }
+      });
+
+      return tokens;
+    }
+
+    function updateTokenizer() {
+      const text = document.getElementById('tokenInput').value;
+      const tokens = simulateBpeTokens(text);
+      const tokenCount = tokens.length;
+      const charCount = text.length;
+      const ratio = charCount > 0 ? (charCount / (tokenCount || 1)).toFixed(2) : "0.00";
+
+      document.getElementById('statTokens').textContent = tokenCount;
+      document.getElementById('statChars').textContent = charCount;
+      document.getElementById('statRatio').textContent = ratio;
+      document.getElementById('tokenPillCount').textContent = `共 ${tokenCount} 個 Tokens`;
+
+      const cost1M = ((tokenCount * 0.15) / 1000).toFixed(4);
+      document.getElementById('statCost').textContent = `${cost1M}`;
+
+      const container = document.getElementById('tokenVisualizer');
+      container.innerHTML = '';
+
+      if (tokens.length === 0) {
+        container.innerHTML = '<span style="color: var(--ink-muted); font-size: 13px;">請於上方輸入框輸入文字以觀察分詞...</span>';
+      } else {
+        tokens.forEach((t, i) => {
+          const chip = document.createElement('span');
+          chip.className = `token-chip t-col-${i % 8}`;
+          
+          let displayStr = t;
+          if (t === '\n') displayStr = '↵';
+          else if (t === ' ') displayStr = '␣';
+          else if (/^\s+$/.test(t)) displayStr = '␣'.repeat(t.length);
+
+          chip.innerHTML = `${escapeHtml(displayStr)}<span class="token-idx">#${i + 1}</span>`;
+          chip.title = `Token #${i + 1} | 長度: ${t.length} 字元`;
+          container.appendChild(chip);
+        });
+      }
+
+      renderPricingTable(tokenCount);
+    }
+
     function switchPricingMode(mode) {
       currentPricingMode = mode;
       document.getElementById('btnPriceOfficial').classList.toggle('active', mode === 'official');
