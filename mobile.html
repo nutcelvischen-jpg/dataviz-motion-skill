@@ -1131,7 +1131,7 @@
   <main id="view-pricing" class="view-container">
     <div class="view-hero">
       <span class="hero-tag">PRICING CALCULATOR · 即時試算</span>
-      <h1 class="hero-title">10 大模型推論費用計算機</h1>
+      <h1 class="hero-title">2026 前沿旗艦模型推論費用計算機</h1>
       <p class="hero-desc">輸入文字或點選預設範例，即時比對官方直連與 OpenRouter 聚合價格：</p>
     </div>
 
@@ -1543,17 +1543,18 @@
 
     let mPriceMode = 'official';
 
-    const M_MODELS = [
-      { name: "Gemini 2.0 Flash", vendor: "Google", official: 0.075, openrouter: 0.100, note: "性價比之王" },
-      { name: "DeepSeek-V3 / R1", vendor: "DeepSeek", official: 0.140, openrouter: 0.257, note: "純 RL 滿血推理" },
-      { name: "GPT-4o-mini", vendor: "OpenAI", official: 0.150, openrouter: 0.150, note: "輕量全模態" },
-      { name: "Claude 3.5 Haiku", vendor: "Anthropic", official: 0.800, openrouter: 0.100, note: "Haiku 5.5 降價" },
-      { name: "OpenAI o3-mini", vendor: "OpenAI", official: 1.100, openrouter: 0.550, note: "STEM 推理" },
-      { name: "Qwen 2.5-Max", vendor: "Alibaba", official: 1.600, openrouter: 0.360, note: "開源全尺寸" },
-      { name: "GPT-4o", vendor: "OpenAI", official: 2.500, openrouter: 2.500, note: "全模態標竿" },
-      { name: "Claude 3.7 Sonnet", vendor: "Anthropic", official: 3.000, openrouter: 2.000, note: "寫 Code 旗艦" },
-      { name: "GPT-4.5 (Orion)", vendor: "OpenAI", official: 75.000, openrouter: 15.000, note: "旗艦無監督" },
-      { name: "Ollama (Local)", vendor: "地端離線", official: 0.000, openrouter: 0.000, note: "100% 離線 $0" }
+            const M_MODELS = [
+      { name: "DeepSeek-V4.1-Flash", vendor: "DeepSeek", official: 0.140, openrouter: 0.140, note: "DSA 稀疏注意力 · 性價比之王" },
+      { name: "DeepSeek-V4-Pro", vendor: "DeepSeek", official: 0.270, openrouter: 0.270, note: "1.6T MoE 滿血推理 · MIT 開源" },
+      { name: "Qwen 3.5 (MoE)", vendor: "Alibaba", official: 0.800, openrouter: 0.720, note: "開源全尺寸霸主 · 國產晶片適配" },
+      { name: "Moonshot Kimi K3.1", vendor: "月之暗面", official: 2.000, openrouter: 1.850, note: "百萬長文研讀之王 · 財報精讀" },
+      { name: "xAI Grok 4.7", vendor: "xAI 馬斯克", official: 2.000, openrouter: 2.000, note: "打通 X 即時社群 · 曼菲斯超算" },
+      { name: "Meta Muse Wonder", vendor: "Meta", official: 2.500, openrouter: 2.200, note: "常駐長程代理 · Muse Secure VM" },
+      { name: "Claude Sonnet 5.5", vendor: "Anthropic", official: 3.000, openrouter: 2.800, note: "全端重構主力 · 混合推理首選" },
+      { name: "Gemini 4 Argon", vendor: "Google", official: 4.000, openrouter: 3.500, note: "1M 長解碼 · 雙生旗艦安全防禦" },
+      { name: "GPT-6 Astra", vendor: "OpenAI", official: 10.000, openrouter: 7.500, note: "德州星際之門 10 萬卡 · 循環推理" },
+      { name: "Claude Opus 5.5", vendor: "Anthropic", official: 15.000, openrouter: 14.500, note: "自適應思考 · 快取讀取僅 $0.20" },
+      { name: "Ollama (地端私有化)", vendor: "本機離線", official: 0.000, openrouter: 0.000, note: "100% 物理隔離 · 零 Token 帳單" }
     ];
 
     function setMobilePreset(key) {
