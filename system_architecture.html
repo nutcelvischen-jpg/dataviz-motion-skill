@@ -144,48 +144,169 @@
       border: 1px solid #cbd5e1;
     }
 
-    /* Diagram Section Wrapper */
+    /* Diagram Section Wrapper - Dark Terminal Aesthetic (inspired by subagent tip reference) */
     .diagram-frame {
-      background: var(--dd-paper-card);
-      border: 1px solid var(--dd-rule-solid);
-      border-radius: 12px;
-      padding: 1.5rem;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 14px;
+      padding: 1.25rem 1.25rem 1.5rem;
       margin-bottom: 2.5rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      color: #c9d1d9;
     }
     .diagram-frame-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1rem;
-      border-bottom: 1px solid var(--dd-rule);
+      border-bottom: 1px solid #21262d;
       padding-bottom: 0.75rem;
     }
     .diagram-frame-title {
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      color: var(--dd-ink);
+      color: #f0f6fc;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--font-mono);
+    }
+    .diagram-frame-hint {
+      font-size: 0.8125rem;
+      color: #8b949e;
+      font-family: var(--font-mono);
+    }
+
+    .diagram-controls-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.825rem;
+      font-family: var(--font-mono);
+    }
+    .diagram-ctrl-group {
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
-    .diagram-frame-hint {
-      font-size: 0.8125rem;
-      color: var(--dd-soft);
+    .diagram-ctrl-btn {
+      background: #21262d;
+      color: #c9d1d9;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
       font-family: var(--font-mono);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .diagram-ctrl-btn:hover {
+      background: #30363d;
+      color: #f0f6fc;
+      border-color: #8b949e;
+    }
+    .diagram-ctrl-btn.active {
+      background: #238636;
+      border-color: #2ea043;
+      color: #ffffff;
     }
 
     .diagram-scroll-box {
       width: 100%;
       overflow-x: auto;
       border-radius: 8px;
-      background: #fafaf9;
+      background: #090d13;
+      border: 1px solid #21262d;
       padding: 0.5rem 0;
     }
     .diagram-scroll-box svg {
       display: block;
-      min-width: 1080px;
+      width: 100%;
+      max-width: 1180px;
+      min-width: 980px;
+      height: auto;
       margin: 0 auto;
+    }
+
+    /* Terminal Session Log Console at Diagram Bottom */
+    .terminal-session-log {
+      margin-top: 1rem;
+      background: #090d13;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 0.85rem 1.15rem;
+      font-family: var(--font-mono);
+      font-size: 0.775rem;
+      line-height: 1.6;
+    }
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      color: #8b949e;
+      border-bottom: 1px dashed #21262d;
+      padding-bottom: 0.4rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.725rem;
+      letter-spacing: 0.05em;
+    }
+    .log-status {
+      color: #3fb950;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+    }
+    .log-line {
+      display: flex;
+      gap: 0.75rem;
+      color: #c9d1d9;
+      align-items: baseline;
+    }
+    .log-time {
+      color: #6e7681;
+      flex-shrink: 0;
+    }
+    .log-tag {
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+    .log-tag.client { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .log-tag.dispatch { background: rgba(88, 166, 255, 0.15); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); }
+    .log-tag.gas { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .log-tag.openrouter { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .log-tag.sheets { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+    .log-tag.return { background: rgba(56, 189, 248, 0.2); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.4); }
+
+    /* Animated Progress Bars Inside SVG */
+    @keyframes animStreamBar {
+      0% { width: 30px; opacity: 0.7; }
+      50% { width: 195px; opacity: 1; }
+      100% { width: 30px; opacity: 0.7; }
+    }
+    .anim-stream-bar {
+      animation: animStreamBar 2.5s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 2px #38bdf8); }
+      50% { filter: drop-shadow(0 0 8px #38bdf8); }
+    }
+    .pulse-glow-blue {
+      animation: pulseGlow 2s infinite ease-in-out;
     }
 
     /* Content Grid */
@@ -398,208 +519,408 @@
       </div>
     </header>
 
-    <!-- Architecture Diagram Box (diagram-design compliant) -->
+    <!-- Architecture Diagram Box (Dark Terminal Edition with Dynamic Motion) -->
     <section class="diagram-frame">
       <div class="diagram-frame-header">
         <div class="diagram-frame-title">
-          <span>📐</span>
-          <span>系統端到端架構與數據流向圖 (System Topology & Data Flow)</span>
+          <span>🖥️</span>
+          <span>系統端到端架構與實時數據傳輸動態圖 (Active Pipeline Architecture)</span>
         </div>
-        <div class="diagram-frame-hint">規範依循 diagram-design · 3 階區域劃分與直角正交走線</div>
+        <div class="diagram-frame-hint">參考黑底終端機風格 · 數據小球動態傳輸 · 動態進度條 · 零管線重疊</div>
+      </div>
+
+      <!-- Interactive Controls Bar -->
+      <div class="diagram-controls-bar">
+        <div class="diagram-ctrl-group">
+          <span style="color:#58a6ff; font-weight:700;">傳輸模擬控制器：</span>
+          <button type="button" class="diagram-ctrl-btn active" id="btnToggleAnim" onclick="toggleAnimation()">
+            <span id="animIcon">⏸</span> <span id="animLabel">暫停動態小球</span>
+          </button>
+          <button type="button" class="diagram-ctrl-btn" onclick="triggerPingBurst()">
+            <span>⚡</span> <span>模擬即時提問封包</span>
+          </button>
+        </div>
+        <div class="diagram-ctrl-group">
+          <span style="color:#8b949e;">管線狀態：</span>
+          <span style="color:#3fb950; font-weight:600;">● 全鏈路正常 (302 Follow + SSL Keep-Alive)</span>
+        </div>
       </div>
 
       <div class="diagram-scroll-box">
-        <!-- SVG Architecture Diagram compliant with diagram-design specifications -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 520" width="1100" height="520" style="background:#ffffff; font-family:'Inter', 'Noto Sans TC', sans-serif;">
+        <!-- SVG Architecture Diagram - Dark Terminal Mode with Moving Packets & Dynamic Loading Bars -->
+        <svg id="archSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 580" style="background:#090d13; font-family:'Inter', 'Noto Sans TC', sans-serif;">
           <defs>
-            <!-- Arrow markers -->
-            <marker id="dd-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#475569" />
+            <!-- Glow Filters for Moving Packet Balls -->
+            <filter id="glow-cyan" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="glow-green" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="glow-orange" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="glow-purple" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+
+            <!-- Arrow markers (dark mode) -->
+            <marker id="dd-arrow-blue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#38bdf8" />
             </marker>
-            <marker id="dd-arrow-accent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#bf4520" />
+            <marker id="dd-arrow-orange" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#f59e0b" />
             </marker>
-            <marker id="dd-arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
+            <marker id="dd-arrow-green" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#10b981" />
             </marker>
-            <marker id="dd-arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#1b8354" />
+            <marker id="dd-arrow-purple" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#c084fc" />
+            </marker>
+            <marker id="dd-arrow-slate" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#58a6ff" />
             </marker>
           </defs>
 
+          <!-- Terminal Window Chrome Frame -->
+          <rect x="2" y="2" width="1176" height="576" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="1.4" />
+          
+          <!-- Terminal Titlebar -->
+          <rect x="2" y="2" width="1176" height="36" rx="10 10 0 0" fill="#161b22" />
+          <circle cx="20" cy="19" r="5" fill="#ff5f56" />
+          <circle cx="36" cy="19" r="5" fill="#ffbd2e" />
+          <circle cx="52" cy="19" r="5" fill="#27c93f" />
+          <text x="74" y="23" fill="#8b949e" font-size="11.5" font-family="'DM Mono', monospace">~/architecture - digital-jitong-bff - zsh (90x36)</text>
+          
+          <!-- Quick Status Pills on Titlebar -->
+          <text x="1150" y="23" text-anchor="end" font-size="10" font-family="'DM Mono', monospace">
+            <tspan fill="#38bdf8">■ CLIENT</tspan>   <tspan fill="#f59e0b">■ GAS BFF</tspan>   <tspan fill="#10b981">■ OPENROUTER</tspan>   <tspan fill="#c084fc">■ SHEETS</tspan>
+          </text>
+
           <!-- ==================== TIER 1 ZONE: FRONTEND / CLIENT TIER ==================== -->
-          <rect x="25" y="40" width="310" height="450" rx="8" fill="rgba(15,23,42,0.02)" stroke="rgba(15,23,42,0.12)" stroke-width="1" />
-          <rect x="37" y="34" width="240" height="14" rx="2" fill="#ffffff" />
-          <text x="42" y="45" fill="#64748b" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.14em" font-weight="600">ZONE 1 · 前端與用戶瀏覽端 (GITHUB PAGES)</text>
+          <rect x="20" y="52" width="315" height="505" rx="8" fill="#131b2e" stroke="#1e293b" stroke-width="1.2" />
+          <rect x="32" y="44" width="245" height="16" rx="3" fill="#0d1117" stroke="#38bdf8" stroke-width="0.8" />
+          <text x="38" y="56" fill="#38bdf8" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.14em" font-weight="700">ZONE 1 · 前端與用戶瀏覽端 (GITHUB PAGES)</text>
 
           <!-- Node 1: User Browser -->
-          <g id="node-browser" transform="translate(45, 65)">
-            <rect x="0" y="0" width="270" height="85" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
-            <text x="14" y="22" fill="#64748b" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.12em">CLIENT BROWSER</text>
-            <text x="14" y="42" fill="#0f172a" font-size="13" font-weight="700">學員瀏覽器 (Desktop / Mobile)</text>
-            <text x="14" y="60" fill="#475569" font-size="11">DOM 視圖 · 圖表渲染 · 提問輸入框</text>
-            <text x="14" y="74" fill="#94a3b8" font-size="10" font-family="'DM Mono', monospace">無需安裝環境 · 跨手機 / 平板 / 筆電</text>
+          <g id="node-browser" transform="translate(36, 75)">
+            <rect x="0" y="0" width="283" height="84" rx="6" fill="#0b0f19" stroke="#30363d" stroke-width="1.2" />
+            <text x="14" y="20" fill="#60a5fa" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">CLIENT BROWSER</text>
+            <text x="14" y="39" fill="#f0f6fc" font-size="13" font-weight="700">學員瀏覽器 (Desktop / Mobile)</text>
+            <text x="14" y="56" fill="#8b949e" font-size="11">DOM 視圖 · 圖表渲染 · 提問輸入框</text>
+            <text x="14" y="72" fill="#3fb950" font-size="10" font-family="'DM Mono', monospace">● 零安裝環境 · 全響應式自適應</text>
           </g>
 
           <!-- Node 2: GitHub Pages Static CDN -->
-          <g id="node-github" transform="translate(45, 175)">
-            <rect x="0" y="0" width="270" height="95" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
-            <text x="14" y="22" fill="#64748b" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.12em">STATIC CDN HOSTING</text>
-            <text x="14" y="42" fill="#0f172a" font-size="13" font-weight="700">GitHub Pages 靜態託管</text>
-            <text x="14" y="60" fill="#475569" font-size="11">託管 HTML5 / CSS / Apache ECharts</text>
-            <text x="14" y="74" fill="#475569" font-size="11">免費全球 CDN 邊緣加速 · 零維護</text>
-            <text x="14" y="88" fill="#1b8354" font-size="10" font-weight="600" font-family="'DM Mono', monospace">🔒 公開 Repo 內絕無任何 API Key</text>
+          <g id="node-github" transform="translate(36, 175)">
+            <rect x="0" y="0" width="283" height="92" rx="6" fill="#0b0f19" stroke="#30363d" stroke-width="1.2" />
+            <text x="14" y="20" fill="#60a5fa" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">STATIC CDN HOSTING</text>
+            <text x="14" y="39" fill="#f0f6fc" font-size="13" font-weight="700">GitHub Pages 靜態託管</text>
+            <text x="14" y="56" fill="#8b949e" font-size="11">託管 HTML5 / CSS / Apache ECharts</text>
+            <text x="14" y="70" fill="#8b949e" font-size="11">全球 CDN 邊緣加速 · 永久 0 元維運</text>
+            <text x="14" y="85" fill="#3fb950" font-size="10" font-weight="600" font-family="'DM Mono', monospace">🔒 公開 Repo 內絕無任何 API Key</text>
           </g>
 
           <!-- Node 3: Digital Jitong Frontend Module -->
-          <g id="node-jitong" transform="translate(45, 295)">
-            <rect x="0" y="0" width="270" height="175" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2" />
-            <rect x="0" y="0" width="270" height="24" rx="6 6 0 0" fill="#f1f5f9" />
-            <text x="12" y="16" fill="#334155" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">AGENT UI · digital_jitong.js</text>
+          <g id="node-jitong" transform="translate(36, 282)">
+            <rect x="0" y="0" width="283" height="260" rx="6" fill="#0b0f19" stroke="#38bdf8" stroke-width="1.4" />
+            <rect x="0" y="0" width="283" height="24" rx="6 6 0 0" fill="#1e293b" />
+            <text x="12" y="16" fill="#38bdf8" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">AGENT UI · digital_jitong.js</text>
             
-            <text x="14" y="44" fill="#0f172a" font-size="13" font-weight="700">「數位乩童」客服前端模組</text>
-            <text x="14" y="64" fill="#475569" font-size="11">1. 對話狀態管理 (Session History)</text>
-            <text x="14" y="82" fill="#475569" font-size="11">2. 畫面上下文萃取 (getPageContext)</text>
-            <text x="14" y="100" fill="#475569" font-size="11">3. 多模態截圖 (Canvas to Base64)</text>
-            <text x="14" y="118" fill="#475569" font-size="11">4. fetch() 請求送出 (mode: 'cors')</text>
+            <text x="14" y="44" fill="#f0f6fc" font-size="13" font-weight="700">「數位乩童」客服前端模組</text>
+            <text x="14" y="64" fill="#8b949e" font-size="11">1. 對話狀態管理 (Session History)</text>
+            <text x="14" y="82" fill="#8b949e" font-size="11">2. 畫面上下文萃取 (getPageContext)</text>
+            <text x="14" y="100" fill="#8b949e" font-size="11">3. 框選螢幕截圖 (html2canvas to Base64)</text>
+            <text x="14" y="118" fill="#8b949e" font-size="11">4. fetch() 請求送出 (mode: 'cors')</text>
             
-            <rect x="12" y="132" width="246" height="30" rx="4" fill="#f8fafc" stroke="#cbd5e1" />
-            <text x="135" y="151" fill="#2563eb" font-size="10" font-family="'DM Mono', monospace" text-anchor="middle" font-weight="600">redirect: "follow" (處理 302 重導向)</text>
+            <rect x="12" y="130" width="259" height="26" rx="4" fill="#111827" stroke="#1f2937" />
+            <text x="141" y="147" fill="#60a5fa" font-size="10" font-family="'DM Mono', monospace" text-anchor="middle" font-weight="600">redirect: "follow" (處理 302 重導向)</text>
+
+            <!-- Dynamic Loading / Progress Bar inside Client Node -->
+            <rect x="12" y="168" width="259" height="54" rx="5" fill="#111827" stroke="#1f2937" />
+            <text x="22" y="184" fill="#8b949e" font-size="9" font-family="'DM Mono', monospace">CLIENT PAYLOAD PACKER</text>
+            <text x="22" y="200" fill="#38bdf8" font-size="10.5" font-weight="700" font-family="'DM Mono', monospace">status: READY (截圖 + Prompt)</text>
+            
+            <!-- Progress bar track & animated fill -->
+            <rect x="22" y="206" width="239" height="6" rx="3" fill="#1f2937" />
+            <rect x="22" y="206" width="239" height="6" rx="3" fill="#38bdf8" />
+            <text x="22" y="228" fill="#3fb950" font-size="9.5" font-family="'DM Mono', monospace">● 雙向多模態通道待命</text>
           </g>
 
 
           <!-- ==================== TIER 2 ZONE: SERVERLESS BACKEND (GAS) ==================== -->
-          <rect x="375" y="40" width="350" height="450" rx="8" fill="rgba(191,69,32,0.02)" stroke="rgba(191,69,32,0.22)" stroke-width="1.2" />
-          <rect x="387" y="34" width="270" height="14" rx="2" fill="#ffffff" />
-          <text x="392" y="45" fill="#bf4520" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.14em" font-weight="700">ZONE 2 · 無伺服器中繼後端 (GOOGLE APPS SCRIPT)</text>
+          <rect x="440" y="52" width="345" height="505" rx="8" fill="#1c1917" stroke="#451a03" stroke-width="1.2" />
+          <rect x="452" y="44" width="280" height="16" rx="3" fill="#0d1117" stroke="#f59e0b" stroke-width="0.8" />
+          <text x="458" y="56" fill="#f59e0b" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.14em" font-weight="700">ZONE 2 · 無伺服器中繼後端 (GOOGLE APPS SCRIPT)</text>
 
           <!-- Node 4 (Focal Node ★): Google Apps Script Web App -->
-          <g id="node-gas-webapp" transform="translate(395, 65)">
-            <rect x="0" y="0" width="310" height="135" rx="6" fill="#fff7ed" stroke="#ea580c" stroke-width="1.8" />
-            <rect x="0" y="0" width="310" height="26" rx="6 6 0 0" fill="#ffedd5" />
-            <text x="12" y="18" fill="#9a3412" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">★ FOCAL GATEWAY · doPost(e) &amp; doGet(e)</text>
+          <g id="node-gas-webapp" transform="translate(455, 75)">
+            <rect x="0" y="0" width="315" height="145" rx="6" fill="#291407" stroke="#f97316" stroke-width="1.8" />
+            <rect x="0" y="0" width="315" height="26" rx="6 6 0 0" fill="#431407" />
+            <text x="12" y="18" fill="#fdba74" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">★ FOCAL GATEWAY · doPost(e) &amp; doGet(e)</text>
             
-            <text x="14" y="48" fill="#7c2d12" font-size="13.5" font-weight="700">Google Apps Script Web App</text>
-            <text x="14" y="68" fill="#431407" font-size="11">接收前端 POST 請求，充當安全中繼代理 (BFF)</text>
-            <text x="14" y="86" fill="#431407" font-size="11">處理 302 跨域跳轉與 CORS 預檢安全機制</text>
-            <text x="14" y="104" fill="#431407" font-size="11">以 ContentService 回傳標準 JSON</text>
-            
-            <rect x="12" y="112" width="286" height="18" rx="3" fill="#ffffff" stroke="#fdba74" />
-            <text x="155" y="125" fill="#ea580c" font-size="9.5" font-family="'DM Mono', monospace" text-anchor="middle" font-weight="600">永久免費 · 每日高達 20,000 次 API 轉發額度</text>
+            <text x="14" y="47" fill="#ffedd5" font-size="13.5" font-weight="700">Google Apps Script Web App</text>
+            <text x="14" y="66" fill="#fed7aa" font-size="11">接收前端 POST 請求，充當安全中繼代理 (BFF)</text>
+            <text x="14" y="83" fill="#fed7aa" font-size="11">處理 302 跨域跳轉與 CORS 預檢安全機制</text>
+            <text x="14" y="100" fill="#fed7aa" font-size="11">以 ContentService 回傳標準 JSON</text>
+
+            <!-- Dynamic Loading Bar inside GAS Gateway -->
+            <rect x="12" y="108" width="291" height="28" rx="4" fill="#1c1917" stroke="#7c2d12" />
+            <rect x="16" y="125" width="283" height="5" rx="2.5" fill="#451a03" />
+            <rect x="16" y="125" width="283" height="5" rx="2.5" fill="#f97316" />
+            <text x="16" y="120" fill="#fdba74" font-size="9.5" font-family="'DM Mono', monospace" font-weight="600">302 重導向正常通過 · 每日額度 20,000 次</text>
           </g>
 
           <!-- Node 5: Script Properties (Key Vault) -->
-          <g id="node-gas-vault" transform="translate(395, 225)">
-            <rect x="0" y="0" width="310" height="85" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
-            <text x="14" y="20" fill="#64748b" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.12em">INTERNAL KEY VAULT</text>
-            <text x="14" y="38" fill="#0f172a" font-size="13" font-weight="700">Script Properties 金鑰保險箱</text>
-            <text x="14" y="56" fill="#475569" font-size="11">PropertiesService.getScriptProperties()</text>
-            <text x="14" y="72" fill="#bf4520" font-size="10.5" font-weight="600">私密變數儲存 OPENROUTER_API_KEY，學生絕不外洩</text>
+          <g id="node-gas-vault" transform="translate(455, 235)">
+            <rect x="0" y="0" width="315" height="82" rx="6" fill="#0b0f19" stroke="#30363d" stroke-width="1.2" />
+            <text x="14" y="20" fill="#f59e0b" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">INTERNAL KEY VAULT</text>
+            <text x="14" y="38" fill="#f0f6fc" font-size="13" font-weight="700">Script Properties 金鑰保險箱</text>
+            <text x="14" y="55" fill="#8b949e" font-size="11">PropertiesService.getScriptProperties()</text>
+            <text x="14" y="70" fill="#f97316" font-size="10" font-weight="600">🔒 私密變數儲存 OPENROUTER_API_KEY，學生絕不外洩</text>
           </g>
 
           <!-- Node 6: UrlFetchApp Forwarding Engine -->
-          <g id="node-gas-engine" transform="translate(395, 335)">
-            <rect x="0" y="0" width="310" height="135" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
-            <text x="14" y="20" fill="#64748b" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.12em">HTTP DISPATCH ENGINE</text>
-            <text x="14" y="38" fill="#0f172a" font-size="13" font-weight="700">UrlFetchApp 外部請求引擎</text>
-            <text x="14" y="58" fill="#475569" font-size="11">1. 自動附加 Authorization: Bearer Header</text>
-            <text x="14" y="76" fill="#475569" font-size="11">2. 將圖表 Base64 轉換為 OpenRouter 多模態格式</text>
-            <text x="14" y="94" fill="#475569" font-size="11">3. 呼叫 OpenRouter 進行 Claude Haiku 推論</text>
-            <text x="14" y="112" fill="#475569" font-size="11">4. 呼叫 SpreadsheetApp 進行非同步日誌入庫</text>
+          <g id="node-gas-engine" transform="translate(455, 332)">
+            <rect x="0" y="0" width="315" height="210" rx="6" fill="#0b0f19" stroke="#30363d" stroke-width="1.2" />
+            <text x="14" y="20" fill="#f59e0b" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">HTTP DISPATCH ENGINE</text>
+            <text x="14" y="38" fill="#f0f6fc" font-size="13" font-weight="700">UrlFetchApp 外部請求引擎</text>
+            <text x="14" y="58" fill="#8b949e" font-size="11">1. 自動附加 Authorization: Bearer Header</text>
+            <text x="14" y="75" fill="#8b949e" font-size="11">2. 將圖表 Base64 轉換為 OpenRouter 多模態格式</text>
+            <text x="14" y="92" fill="#8b949e" font-size="11">3. 呼叫 OpenRouter 進行 Claude Haiku 推論</text>
+            <text x="14" y="109" fill="#8b949e" font-size="11">4. 呼叫 SpreadsheetApp 進行非同步日誌入庫</text>
+
+            <!-- Dynamic Loading Bar inside Engine -->
+            <rect x="12" y="125" width="291" height="72" rx="4" fill="#161b22" stroke="#21262d" />
+            <text x="22" y="142" fill="#8b949e" font-size="9" font-family="'DM Mono', monospace">PROXY THROUGHPUT ENGINE</text>
+            <text x="22" y="158" fill="#3fb950" font-size="10.5" font-family="'DM Mono', monospace" font-weight="700">active: HTTPS Keep-Alive Pool</text>
+            <rect x="22" y="165" width="271" height="6" rx="3" fill="#21262d" />
+            <rect x="22" y="165" width="245" height="6" rx="3" fill="#3fb950" class="anim-stream-bar" />
+            <text x="22" y="186" fill="#8b949e" font-size="9.5" font-family="'DM Mono', monospace">SSL 握手完成 · 雙向管線零丟包</text>
           </g>
 
 
           <!-- ==================== TIER 3 ZONE: CLOUD AI & PERSISTENCE ==================== -->
-          <rect x="765" y="40" width="310" height="450" rx="8" fill="rgba(15,23,42,0.02)" stroke="rgba(15,23,42,0.12)" stroke-width="1" />
-          <rect x="777" y="34" width="220" height="14" rx="2" fill="#ffffff" />
-          <text x="782" y="45" fill="#64748b" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.14em" font-weight="600">ZONE 3 · 雲端 AI 推論與試算表資料庫</text>
+          <rect x="885" y="52" width="275" height="505" rx="8" fill="#0b1912" stroke="#064e3b" stroke-width="1.2" />
+          <rect x="897" y="44" width="235" height="16" rx="3" fill="#0d1117" stroke="#10b981" stroke-width="0.8" />
+          <text x="903" y="56" fill="#10b981" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.14em" font-weight="700">ZONE 3 · 雲端 AI 推論與試算表資料庫</text>
 
           <!-- Node 7: OpenRouter AI Gateway -->
-          <g id="node-openrouter" transform="translate(785, 65)">
-            <rect x="0" y="0" width="270" height="150" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
-            <rect x="0" y="0" width="270" height="24" rx="6 6 0 0" fill="#f8fafc" />
-            <text x="12" y="16" fill="#334155" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">LLM INFERENCE · CLOUD GATEWAY</text>
+          <g id="node-openrouter" transform="translate(898, 75)">
+            <rect x="0" y="0" width="250" height="175" rx="6" fill="#091e14" stroke="#059669" stroke-width="1.4" />
+            <rect x="0" y="0" width="250" height="24" rx="6 6 0 0" fill="#064e3b" />
+            <text x="12" y="16" fill="#6ee7b7" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">LLM INFERENCE · CLOUD GATEWAY</text>
             
-            <text x="14" y="44" fill="#0f172a" font-size="13" font-weight="700">OpenRouter API 閘道</text>
-            <text x="14" y="64" fill="#1b8354" font-size="11.5" font-weight="600">Claude Haiku 3.5 / 5.5</text>
-            <text x="14" y="82" fill="#475569" font-size="11">支援高智商推理、上下文追問與視覺圖表辨識</text>
-            <text x="14" y="100" fill="#475569" font-size="11">極低 Token 費率 · 秒級串流/完整解答</text>
+            <text x="14" y="44" fill="#f0f6fc" font-size="13" font-weight="700">OpenRouter API 閘道</text>
+            <text x="14" y="63" fill="#34d399" font-size="11.5" font-weight="700">Claude Haiku 3.5 / 5.5</text>
+            <text x="14" y="80" fill="#8b949e" font-size="10.5">高智商推理 · 多輪追問 · 視覺圖表辨識</text>
+            <text x="14" y="96" fill="#8b949e" font-size="10.5">極低 Token 費率 · 秒級串流/完整解答</text>
             
-            <rect x="12" y="112" width="246" height="26" rx="4" fill="#f0fdf4" stroke="#86efac" />
-            <text x="135" y="129" fill="#15803d" font-size="10.5" font-weight="600" text-anchor="middle">多模態圖表辨識 + 數位乩童人設</text>
+            <!-- Dynamic Progress Bar inside OpenRouter -->
+            <rect x="12" y="108" width="226" height="54" rx="4" fill="#062e1e" stroke="#047857" />
+            <text x="20" y="124" fill="#6ee7b7" font-size="9" font-family="'DM Mono', monospace">STREAMING INFERENCE ENGINE</text>
+            <text x="20" y="140" fill="#34d399" font-size="10.5" font-family="'DM Mono', monospace" font-weight="700">running: 88% (148 tokens/s)</text>
+            <rect x="20" y="146" width="210" height="6" rx="3" fill="#064e3b" />
+            <rect x="20" y="146" width="180" height="6" rx="3" fill="#10b981" class="anim-stream-bar" />
           </g>
 
           <!-- Node 8: Google Sheets Persistent Log -->
-          <g id="node-sheets" transform="translate(785, 265)">
-            <rect x="0" y="0" width="270" height="205" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
-            <rect x="0" y="0" width="270" height="24" rx="6 6 0 0" fill="#f0fdf4" />
-            <text x="12" y="16" fill="#15803d" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">FREE DATABASE · GOOGLE SHEETS</text>
+          <g id="node-sheets" transform="translate(898, 265)">
+            <rect x="0" y="0" width="250" height="277" rx="6" fill="#140f28" stroke="#7c3aed" stroke-width="1.3" />
+            <rect x="0" y="0" width="250" height="24" rx="6 6 0 0" fill="#2e1065" />
+            <text x="12" y="16" fill="#c084fc" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">FREE DATABASE · GOOGLE SHEETS</text>
             
-            <text x="14" y="46" fill="#0f172a" font-size="13" font-weight="700">Google Sheets 對話歷史庫</text>
-            <text x="14" y="66" fill="#475569" font-size="11">免安裝 MySQL / PostgreSQL</text>
-            <text x="14" y="84" fill="#475569" font-size="11">SpreadsheetApp.openById().appendRow()</text>
+            <text x="14" y="44" fill="#f0f6fc" font-size="13" font-weight="700">Google Sheets 對話歷史庫</text>
+            <text x="14" y="62" fill="#a78bfa" font-size="11">免安裝 MySQL · 永久免費保存</text>
+            <text x="14" y="79" fill="#8b949e" font-size="10.5" font-family="'DM Mono', monospace">SpreadsheetApp.appendRow()</text>
             
-            <text x="14" y="108" fill="#1e293b" font-size="11" font-weight="600">日誌寫入欄位：</text>
-            <text x="14" y="126" fill="#64748b" font-size="10" font-family="'DM Mono', monospace">1. Timestamp (時間戳記)</text>
-            <text x="14" y="142" fill="#64748b" font-size="10" font-family="'DM Mono', monospace">2. Question (學生提問內容)</text>
-            <text x="14" y="158" fill="#64748b" font-size="10" font-family="'DM Mono', monospace">3. Answer (AI 回覆開示摘要)</text>
-            <text x="14" y="174" fill="#64748b" font-size="10" font-family="'DM Mono', monospace">4. Model &amp; HasImage (多模態標記)</text>
+            <text x="14" y="102" fill="#e2e8f0" font-size="11" font-weight="700">日誌寫入欄位：</text>
+            <text x="14" y="120" fill="#a78bfa" font-size="10" font-family="'DM Mono', monospace">1. Timestamp (時間戳記)</text>
+            <text x="14" y="136" fill="#a78bfa" font-size="10" font-family="'DM Mono', monospace">2. Question (學生提問內容)</text>
+            <text x="14" y="152" fill="#a78bfa" font-size="10" font-family="'DM Mono', monospace">3. Answer (AI 回覆開示摘要)</text>
+            <text x="14" y="168" fill="#a78bfa" font-size="10" font-family="'DM Mono', monospace">4. Model &amp; HasImage (多模態標記)</text>
             
-            <rect x="12" y="180" width="246" height="18" rx="3" fill="#f1f5f9" />
-            <text x="135" y="193" fill="#475569" font-size="9" text-anchor="middle">老師可隨時以試算表篩選分析學員卡點</text>
+            <!-- Dynamic Log Append Progress -->
+            <rect x="12" y="180" width="226" height="84" rx="4" fill="#1e1035" stroke="#4c1d95" />
+            <text x="20" y="196" fill="#c084fc" font-size="9" font-family="'DM Mono', monospace">PERSISTENCE STORAGE TELEMETRY</text>
+            <text x="20" y="212" fill="#e9d5ff" font-size="10" font-family="'DM Mono', monospace" font-weight="700">✓ LOGGED: Row #382 Appended</text>
+            <rect x="20" y="218" width="210" height="6" rx="3" fill="#2e1065" />
+            <rect x="20" y="218" width="210" height="6" rx="3" fill="#a855f7" />
+            <text x="20" y="238" fill="#8b949e" font-size="9.5">老師可隨時以試算表篩選分析學員卡點</text>
+            <text x="20" y="252" fill="#3fb950" font-size="9.5" font-family="'DM Mono', monospace">● 數據結構化就緒</text>
           </g>
 
 
-          <!-- ==================== CONNECTORS & DATA FLOWS ==================== -->
-          <!-- 1. Browser -> GitHub Pages: Load Static Assets (Straight Line) -->
-          <line x1="180" y1="150" x2="180" y2="175" stroke="#475569" stroke-width="1.2" marker-end="url(#dd-arrow)" />
-          <rect x="140" y="154" width="80" height="14" rx="2" fill="#ffffff" />
-          <text x="180" y="164" fill="#64748b" font-size="7.5" font-family="'DM Mono', monospace" text-anchor="middle">1. 載入網頁資源</text>
+          <!-- ==================== CONNECTORS & DATA FLOWS (ISOLATED LANES · ZERO COLLISION) ==================== -->
+          
+          <!-- 1. Browser -> GitHub Pages: Load Static Assets (Vertical Straight Line) -->
+          <line x1="177" y1="159" x2="177" y2="175" stroke="#58a6ff" stroke-width="1.2" marker-end="url(#dd-arrow-slate)" />
+          <rect x="137" y="160" width="80" height="14" rx="2" fill="#0d1117" stroke="#30363d" stroke-width="0.8" />
+          <text x="177" y="170" fill="#8b949e" font-size="7.5" font-family="'DM Mono', monospace" text-anchor="middle">1. 載入網頁資源</text>
 
-          <!-- 2. Jitong UI -> GAS Web App: POST Payload (Orthogonal elbow path with r=8) -->
-          <!-- From (315, 340) to (395, 115). Mid = (315+395)/2 = 355 -->
-          <path d="M 315,340 H 347 Q 355,340 355,332 V 123 Q 355,115 363,115 H 395" 
-                fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#dd-arrow-blue)" />
-          <!-- Label mask and text -->
-          <rect x="325" y="220" width="60" height="26" rx="3" fill="#ffffff" stroke="#bfdbfe" />
-          <text x="355" y="232" fill="#1d4ed8" font-size="8" font-family="'DM Mono', monospace" font-weight="600" text-anchor="middle">2. POST</text>
-          <text x="355" y="242" fill="#2563eb" font-size="7" font-family="'DM Mono', monospace" text-anchor="middle">JSON+截圖</text>
 
-          <!-- 3. GAS Web App -> Script Properties: Read Secret Key (Vertical Line) -->
-          <line x1="550" y1="200" x2="550" y2="225" stroke="#bf4520" stroke-width="1.4" marker-end="url(#dd-arrow-accent)" />
-          <rect x="510" y="206" width="80" height="14" rx="2" fill="#ffffff" />
-          <text x="550" y="216" fill="#bf4520" font-size="7.5" font-family="'DM Mono', monospace" font-weight="600" text-anchor="middle">3. 讀取 API Key</text>
+          <!-- ==================== LEFT CORRIDOR: x = 335 to 445 ==================== -->
+          <!-- 2. Jitong UI -> GAS Web App: POST Payload -->
+          <!-- Lane 2 runs exclusively along x = 360 -->
+          <path id="path-flow-2"
+                d="M 319,345 H 352 Q 360,345 360,337 V 123 Q 360,115 368,115 H 455" 
+                fill="none" stroke="#38bdf8" stroke-width="2" marker-end="url(#dd-arrow-blue)" />
+          <!-- Label 2 sitting on x = 360 with wide dark mask -->
+          <rect x="325" y="196" width="70" height="28" rx="4" fill="#0d1117" stroke="#38bdf8" stroke-width="1.2" />
+          <text x="360" y="208" fill="#38bdf8" font-size="8.5" font-family="'DM Mono', monospace" font-weight="700" text-anchor="middle">2. POST</text>
+          <text x="360" y="219" fill="#7dd3fc" font-size="7.5" font-family="'DM Mono', monospace" text-anchor="middle">JSON+截圖</text>
 
-          <!-- 4. GAS Engine -> OpenRouter: HTTPS Request (Orthogonal elbow path) -->
-          <!-- From (705, 380) to (785, 125). Mid = (705+785)/2 = 745 -->
-          <path d="M 705,380 H 737 Q 745,380 745,372 V 133 Q 745,125 753,125 H 785" 
-                fill="none" stroke="#1b8354" stroke-width="1.6" marker-end="url(#dd-arrow-green)" />
-          <rect x="715" y="240" width="60" height="26" rx="3" fill="#ffffff" stroke="#bbf7d0" />
-          <text x="745" y="252" fill="#15803d" font-size="8" font-family="'DM Mono', monospace" font-weight="600" text-anchor="middle">4. HTTPS</text>
-          <text x="745" y="262" fill="#1b8354" font-size="7" font-family="'DM Mono', monospace" text-anchor="middle">Bearer Key</text>
+          <!-- 7. GAS Web App -> Jitong Frontend: Return JSON Response -->
+          <!-- Lane 7 runs exclusively along x = 405 (45px apart from Lane 2!) -->
+          <path id="path-flow-7"
+                d="M 455,150 H 413 Q 405,150 405,158 V 432 Q 405,440 397,440 H 319" 
+                fill="none" stroke="#60a5fa" stroke-width="1.6" stroke-dasharray="5,3" marker-end="url(#dd-arrow-slate)" />
+          <!-- Label 7 sitting on x = 405 with wide dark mask (90px vertical offset from Label 2!) -->
+          <rect x="370" y="286" width="70" height="28" rx="4" fill="#0d1117" stroke="#60a5fa" stroke-width="1.2" />
+          <text x="405" y="298" fill="#60a5fa" font-size="8.5" font-family="'DM Mono', monospace" font-weight="700" text-anchor="middle">7. 響應</text>
+          <text x="405" y="309" fill="#93c5fd" font-size="7.5" font-family="'DM Mono', monospace" text-anchor="middle">JSON 回傳</text>
 
-          <!-- 5. OpenRouter -> GAS Engine: Response Return (Dashed Orthogonal path) -->
-          <!-- From (785, 175) to (705, 410). Mid = 745. Hop/Bridge over crossing if needed -->
-          <path d="M 785,175 H 753 Q 745,175 745,183 V 402 Q 745,410 737,410 H 705" 
-                fill="none" stroke="#64748b" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#dd-arrow)" />
-          <rect x="715" y="300" width="60" height="14" rx="2" fill="#ffffff" />
-          <text x="745" y="310" fill="#475569" font-size="7.5" font-family="'DM Mono', monospace" text-anchor="middle">5. 回傳推論</text>
 
-          <!-- 6. GAS Engine -> Google Sheets: appendRow (Orthogonal elbow path) -->
-          <!-- From (705, 450) to (785, 370). Mid = 745 -->
-          <path d="M 705,450 H 737 Q 745,450 745,442 V 378 Q 745,370 753,370 H 785" 
-                fill="none" stroke="#475569" stroke-width="1.2" marker-end="url(#dd-arrow)" />
-          <rect x="715" y="415" width="60" height="14" rx="2" fill="#ffffff" />
-          <text x="745" y="425" fill="#475569" font-size="7.5" font-family="'DM Mono', monospace" text-anchor="middle">6. 寫入日誌</text>
+          <!-- 3. GAS Web App -> Script Properties: Read Secret Key (Vertical Line inside Zone 2) -->
+          <line id="path-flow-3" x1="612" y1="220" x2="612" y2="235" stroke="#f59e0b" stroke-width="1.6" marker-end="url(#dd-arrow-orange)" />
+          <rect x="567" y="222" width="90" height="14" rx="2" fill="#0d1117" stroke="#f59e0b" stroke-width="0.8" />
+          <text x="612" y="232" fill="#fbbf24" font-size="7.5" font-family="'DM Mono', monospace" font-weight="700" text-anchor="middle">3. 讀取 API Key</text>
 
-          <!-- 7. GAS Web App -> Jitong Frontend: Return JSON Response (Dashed Orthogonal path) -->
-          <!-- From (395, 150) to (315, 390). Mid = 355 -->
-          <path d="M 395,150 H 363 Q 355,150 355,158 V 382 Q 355,390 347,390 H 315" 
-                fill="none" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#dd-arrow-blue)" />
-          <rect x="325" y="270" width="60" height="14" rx="2" fill="#ffffff" />
-          <text x="355" y="280" fill="#2563eb" font-size="7.5" font-family="'DM Mono', monospace" text-anchor="middle">7. JSON 響應</text>
+
+          <!-- ==================== RIGHT CORRIDOR: x = 770 to 898 ==================== -->
+          <!-- 4. GAS Engine -> OpenRouter: HTTPS Request -->
+          <!-- Lane 4 runs exclusively along x = 810 -->
+          <path id="path-flow-4"
+                d="M 770,385 H 802 Q 810,385 810,377 V 123 Q 810,115 818,115 H 898" 
+                fill="none" stroke="#10b981" stroke-width="2" marker-end="url(#dd-arrow-green)" />
+          <!-- Label 4 sitting on x = 810 with wide dark mask -->
+          <rect x="775" y="196" width="70" height="28" rx="4" fill="#0d1117" stroke="#10b981" stroke-width="1.2" />
+          <text x="810" y="208" fill="#10b981" font-size="8.5" font-family="'DM Mono', monospace" font-weight="700" text-anchor="middle">4. HTTPS</text>
+          <text x="810" y="219" fill="#6ee7b7" font-size="7.5" font-family="'DM Mono', monospace" text-anchor="middle">Bearer Key</text>
+
+          <!-- 5. OpenRouter -> GAS Engine: Response Return -->
+          <!-- Lane 5 runs exclusively along x = 855 (45px apart from Lane 4!) -->
+          <path id="path-flow-5"
+                d="M 898,155 H 863 Q 855,155 855,163 V 422 Q 855,430 847,430 H 770" 
+                fill="none" stroke="#34d399" stroke-width="1.6" stroke-dasharray="5,3" marker-end="url(#dd-arrow-green)" />
+          <!-- Label 5 sitting on x = 855 with wide dark mask (90px vertical offset from Label 4!) -->
+          <rect x="820" y="286" width="70" height="28" rx="4" fill="#0d1117" stroke="#34d399" stroke-width="1.2" />
+          <text x="855" y="298" fill="#34d399" font-size="8.5" font-family="'DM Mono', monospace" font-weight="700" text-anchor="middle">5. 推論</text>
+          <text x="855" y="309" fill="#a7f3d0" font-size="7.5" font-family="'DM Mono', monospace" text-anchor="middle">Claude 回覆</text>
+
+          <!-- 6. GAS Engine -> Google Sheets: appendRow -->
+          <!-- Lane 6 runs along x = 835 at lower altitude (y=475) with zero overlap -->
+          <path id="path-flow-6"
+                d="M 770,475 H 827 Q 835,475 835,467 V 378 Q 835,370 843,370 H 898" 
+                fill="none" stroke="#c084fc" stroke-width="1.8" marker-end="url(#dd-arrow-purple)" />
+          <!-- Label 6 sitting on x = 835 at y = 435 -->
+          <rect x="800" y="435" width="70" height="28" rx="4" fill="#0d1117" stroke="#c084fc" stroke-width="1.2" />
+          <text x="835" y="447" fill="#c084fc" font-size="8.5" font-family="'DM Mono', monospace" font-weight="700" text-anchor="middle">6. 記錄</text>
+          <text x="835" y="458" fill="#e9d5ff" font-size="7.5" font-family="'DM Mono', monospace" text-anchor="middle">appendRow</text>
+
+
+          <!-- ==================== ANIMATED PACKET BALLS (MOVING PARTICLES ALONG PATHS) ==================== -->
+          <g id="animated-packets" class="packet-layer">
+            <!-- Packet Ball 2: Client -> GAS (Cyan Glow) -->
+            <circle r="4.5" fill="#38bdf8" filter="url(#glow-cyan)">
+              <animateMotion dur="2.2s" repeatCount="indefinite">
+                <mpath href="#path-flow-2" />
+              </animateMotion>
+            </circle>
+
+            <!-- Packet Ball 3: GAS -> Vault (Amber Glow) -->
+            <circle r="3.5" fill="#f59e0b" filter="url(#glow-orange)">
+              <animateMotion dur="1.2s" repeatCount="indefinite">
+                <mpath href="#path-flow-3" />
+              </animateMotion>
+            </circle>
+
+            <!-- Packet Ball 4: GAS -> OpenRouter (Green Glow) -->
+            <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
+              <animateMotion dur="2.2s" begin="0.7s" repeatCount="indefinite">
+                <mpath href="#path-flow-4" />
+              </animateMotion>
+            </circle>
+
+            <!-- Packet Ball 5: OpenRouter -> GAS (Emerald Glow Return) -->
+            <circle r="4" fill="#34d399" filter="url(#glow-green)">
+              <animateMotion dur="2.2s" begin="1.4s" repeatCount="indefinite">
+                <mpath href="#path-flow-5" />
+              </animateMotion>
+            </circle>
+
+            <!-- Packet Ball 6: GAS -> Sheets (Purple Glow) -->
+            <circle r="4" fill="#c084fc" filter="url(#glow-purple)">
+              <animateMotion dur="2.2s" begin="1.7s" repeatCount="indefinite">
+                <mpath href="#path-flow-6" />
+              </animateMotion>
+            </circle>
+
+            <!-- Packet Ball 7: GAS -> Client (Blue Glow Return) -->
+            <circle r="4.5" fill="#60a5fa" filter="url(#glow-cyan)">
+              <animateMotion dur="2.2s" begin="1.9s" repeatCount="indefinite">
+                <mpath href="#path-flow-7" />
+              </animateMotion>
+            </circle>
+          </g>
 
         </svg>
+      </div>
+
+      <!-- Real-Time Animated Pipeline Session Log (inspired by dark terminal reference) -->
+      <div class="terminal-session-log">
+        <div class="log-header">
+          <span class="log-title">── session log · data transmission telemetry ────────────────────────────────────────────────────────</span>
+          <span class="log-status" id="logStatusPill">● STREAMING ACTIVE (LOOP)</span>
+        </div>
+        <div class="log-lines">
+          <div class="log-line">
+            <span class="log-time" id="logTime1">07:05:12</span>
+            <span class="log-tag client">browser</span>
+            <span>User prompt + ECharts canvas screenshot attached to digital_jitong.js</span>
+          </div>
+          <div class="log-line">
+            <span class="log-time" id="logTime2">07:05:13</span>
+            <span class="log-tag dispatch">fetch-api</span>
+            <span>POST https://script.google.com/.../exec (mode: 'cors', redirect: 'follow')</span>
+          </div>
+          <div class="log-line">
+            <span class="log-time" id="logTime3">07:05:14</span>
+            <span class="log-tag gas">gas-bff</span>
+            <span>HTTP 302 follow-redirect handled -> ScriptProperties loaded OPENROUTER_API_KEY</span>
+          </div>
+          <div class="log-line">
+            <span class="log-time" id="logTime4">07:05:15</span>
+            <span class="log-tag openrouter">openrouter</span>
+            <span>POST /chat/completions (Claude Haiku 5.5 multi-modal vision inferring, 148 tok/s)</span>
+          </div>
+          <div class="log-line">
+            <span class="log-time" id="logTime5">07:05:16</span>
+            <span class="log-tag sheets">sheets-db</span>
+            <span>SpreadsheetApp.appendRow([Timestamp, UserQuery, ReplySummary, HasImage]) saved</span>
+          </div>
+          <div class="log-line">
+            <span class="log-time" id="logTime6">07:05:17</span>
+            <span class="log-tag return">response</span>
+            <span>ContentService returned JSON payload -> client rendered AI insight bubble</span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -901,7 +1222,7 @@ function doGet(e) {
 
   </div>
 
-  <!-- Tab Switch Script -->
+  <!-- Tab Switch Script & Diagram Simulation Scripts -->
   <script>
     function switchTab(index) {
       const tabs = document.querySelectorAll('.tab-btn');
@@ -915,6 +1236,92 @@ function doGet(e) {
           panes[i].classList.remove('active');
         }
       });
+    }
+
+    // Architecture Diagram Interactive Simulation Controls
+    let animRunning = true;
+    function toggleAnimation() {
+      const svg = document.getElementById('archSvg');
+      const btn = document.getElementById('btnToggleAnim');
+      const icon = document.getElementById('animIcon');
+      const label = document.getElementById('animLabel');
+      const pill = document.getElementById('logStatusPill');
+
+      if (!svg) return;
+
+      if (animRunning) {
+        if (svg.pauseAnimations) svg.pauseAnimations();
+        animRunning = false;
+        btn.classList.remove('active');
+        icon.textContent = '▶';
+        label.textContent = '繼續動態小球';
+        if (pill) {
+          pill.textContent = '⏸ PACKET TRANSMISSION PAUSED';
+          pill.style.color = '#e3b341';
+        }
+      } else {
+        if (svg.unpauseAnimations) svg.unpauseAnimations();
+        animRunning = true;
+        btn.classList.add('active');
+        icon.textContent = '⏸';
+        label.textContent = '暫停動態小球';
+        if (pill) {
+          pill.textContent = '● STREAMING ACTIVE (LOOP)';
+          pill.style.color = '#3fb950';
+        }
+      }
+    }
+
+    function triggerPingBurst() {
+      const logLines = document.querySelector('.terminal-session-log .log-lines');
+      const pill = document.getElementById('logStatusPill');
+      const now = new Date();
+      const timeStr = [now.getHours(), now.getMinutes(), now.getSeconds()]
+        .map(n => String(n).padStart(2, '0')).join(':');
+
+      if (pill) {
+        pill.textContent = '⚡ LIVE PING BURST DISPATCHED';
+        pill.style.color = '#58a6ff';
+        setTimeout(() => {
+          if (animRunning) {
+            pill.textContent = '● STREAMING ACTIVE (LOOP)';
+            pill.style.color = '#3fb950';
+          }
+        }, 3000);
+      }
+
+      if (logLines) {
+        const newLine = document.createElement('div');
+        newLine.className = 'log-line';
+        newLine.style.animation = 'pulse-progress 0.6s ease';
+        newLine.innerHTML = `
+          <span class="log-time" style="color:#f59e0b; font-weight:bold;">${timeStr}</span>
+          <span class="log-tag" style="background:#1f3b2b; color:#34d399; border:1px solid #238636;">ping-burst</span>
+          <span style="color:#f0f6fc; font-weight:600;">⚡ 學員手動觸發模擬封包 ───&gt; [Client 截圖] ──(302 Follow)──&gt; [GAS BFF 金鑰注入] ──&gt; [Claude Haiku 5.5] ──&gt; [Sheets 日誌寫入] ──(180ms 完成)</span>
+        `;
+        logLines.appendChild(newLine);
+        while (logLines.children.length > 9) {
+          logLines.removeChild(logLines.children[0]);
+        }
+      }
+    }
+
+    // Initialize Telemetry Timestamps with Real Time
+    function initLogTimestamps() {
+      const now = new Date();
+      for (let i = 1; i <= 6; i++) {
+        const el = document.getElementById('logTime' + i);
+        if (el) {
+          const t = new Date(now.getTime() - (6 - i) * 1200);
+          el.textContent = [t.getHours(), t.getMinutes(), t.getSeconds()]
+            .map(n => String(n).padStart(2, '0')).join(':');
+        }
+      }
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initLogTimestamps);
+    } else {
+      initLogTimestamps();
     }
   </script>
 
