@@ -157,12 +157,14 @@
     trigger.addEventListener('click', () => {
       state.isOpen = !state.isOpen;
       windowEl.classList.toggle('open', state.isOpen);
+      trigger.classList.toggle('hidden-by-chat', state.isOpen);
       if (state.isOpen) textarea.focus();
     });
 
     btnClose.addEventListener('click', () => {
       state.isOpen = false;
       windowEl.classList.remove('open');
+      trigger.classList.remove('hidden-by-chat');
     });
 
     // 展開設定面板

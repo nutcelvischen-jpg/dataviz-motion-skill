@@ -406,7 +406,7 @@
       <!-- Right: Dataset Quick Selector, Engine Toggle, Briefing, Export -->
       <div class="topbar-right">
         <!-- Dataset Selector -->
-        <select id="datasetQuickSelect" class="app-select-sm sample-select" style="min-width: 360px; max-width: 480px; font-weight: 600;">
+        <select id="datasetQuickSelect" class="app-select-sm sample-select" style="font-weight: 600;">
           <optgroup label="日本官方統計 e-Stat 數據庫 (房價 / 人口 / 經濟基盤)">
             <option value="open_17_domains">自選 17 大領域指標變數與歷年區間...</option>
             <option value="jp_housing">日本 47 都道府縣「房價地價・租金・空屋率・所得」綜合表 (2024)</option>
@@ -425,61 +425,64 @@
           </optgroup>
         </select>
 
-        <!-- 17 Domains & Year Range Button -->
-        <button type="button" class="btn-domain-top" id="btnOpen17DomainsModalTop" title="自訂選取 e-Stat 17大領域指標變數與年份區間">
-          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="7"></rect>
-            <rect x="14" y="3" width="7" height="7"></rect>
-            <rect x="14" y="14" width="7" height="7"></rect>
-            <rect x="3" y="14" width="7" height="7"></rect>
-          </svg>
-          <span>17領域變數與年份設定</span>
-        </button>
+        <!-- Action Buttons Row -->
+        <div class="topbar-actions-row">
+          <!-- 17 Domains & Year Range Button -->
+          <button type="button" class="btn-domain-top" id="btnOpen17DomainsModalTop" title="自訂選取 e-Stat 17大領域指標變數與年份區間">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>17領域變數與年份設定</span>
+          </button>
 
-        <!-- Tableau Data Prep & Schema Button -->
-        <button type="button" class="btn btn-sm btn-outline" id="btnOpenSchemaModalTop" title="開啟 Tableau 欄位分類與資料前處理精靈">
-          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-          </svg>
-          <span>欄位微調與分類 (Tableau Prep)</span>
-        </button>
+          <!-- Tableau Data Prep & Schema Button -->
+          <button type="button" class="btn btn-sm btn-outline" id="btnOpenSchemaModalTop" title="開啟 Tableau 欄位分類與資料前處理精靈">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>欄位微調與分類 (Tableau Prep)</span>
+          </button>
 
-        <!-- Toggle Engine -->
-        <button type="button" class="btn btn-sm btn-outline" id="btnToggleEngine" title="切換 ECharts 互動引擎 或 原生 1080p Bauhaus Canvas">
-          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="20" x2="18" y2="10"></line>
-            <line x1="12" y1="20" x2="12" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="14"></line>
-          </svg>
-          <span>ECharts 互動引擎</span>
-        </button>
+          <!-- Toggle Engine -->
+          <button type="button" class="btn btn-sm btn-outline" id="btnToggleEngine" title="切換 ECharts 互動引擎 或 原生 1080p Bauhaus Canvas">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>ECharts 互動引擎</span>
+          </button>
 
-        <!-- Data-to-Video Briefing Button -->
-        <button type="button" class="btn-briefing" id="btnOpenBriefingModal" title="查看 34秒 包豪斯動態影音簡報">
-          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-          </svg>
-          <span>數據動態簡報</span>
-        </button>
+          <!-- Data-to-Video Briefing Button -->
+          <button type="button" class="btn-briefing" id="btnOpenBriefingModal" title="查看 34秒 包豪斯動態影音簡報">
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span>數據動態簡報</span>
+          </button>
 
-        <!-- Export Image -->
-        <button type="button" class="btn btn-primary" id="btnExportImage" title="匯出 1080p 高清圖表">
-          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          <span>匯出圖表</span>
-        </button>
+          <!-- Export Image -->
+          <button type="button" class="btn btn-primary" id="btnExportImage" title="匯出 1080p 高清圖表">
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>匯出圖表</span>
+          </button>
+        </div>
       </div>
     </header>
 
     <!-- 2. Workspace Body -->
     <div class="workspace-body">
       
-      <!-- Left Dock: PyGWalker Field List & Chart Types (334px fixed) -->
-      <aside class="sidebar-dock" style="width: 334px; min-width: 334px;">
+      <!-- Left Dock: PyGWalker Field List & Chart Types -->
+      <aside class="sidebar-dock" id="sidebarDock">
         <div class="sidebar-scroll-container">
           
           <!-- Section 1: Upload Dropzone -->
