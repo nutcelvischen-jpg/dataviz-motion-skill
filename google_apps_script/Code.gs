@@ -56,9 +56,12 @@ function doPost(e) {
       });
     }
 
-    // 2. 組裝傳送給 OpenRouter 的 Messages 陣列 (保留 reasoning_details 多輪上下文)
+    // 2. 組裝傳送給 OpenRouter 的 Messages 陣列 (支援環境變數覆寫 SYSTEM_PROMPT 與保留 reasoning_details)
+    const customSysPrompt = scriptProperties.getProperty('SYSTEM_PROMPT');
+    const activeSystemPrompt = (customSysPrompt && customSysPrompt.trim()) ? customSysPrompt : DEFAULT_SYSTEM_PROMPT;
+
     const messages = [];
-    messages.push({ role: 'system', content: DEFAULT_SYSTEM_PROMPT });
+    messages.push({ role: 'system', content: activeSystemPrompt });
 
     // 注入歷史對話
     if (Array.isArray(incomingHistory) && incomingHistory.length > 0) {
