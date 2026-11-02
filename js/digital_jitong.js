@@ -93,21 +93,7 @@
           </div>
         </div>
         <div class="jitong-header-actions">
-          <button type="button" class="jitong-icon-btn" id="btnJitongSettings" title="設定 Google Apps Script 後端連線網址">⚙️</button>
           <button type="button" class="jitong-icon-btn" id="btnJitongClose" title="收起對話框">✕</button>
-        </div>
-      </div>
-
-      <!-- Settings Panel -->
-      <div class="jitong-settings-panel" id="jitongSettingsPanel">
-        <div style="font-weight: 700; color: #1e293b; margin-bottom: 2px;">🔗 Google Apps Script 連線設定</div>
-        <div style="color: #64748b; font-size: 11px; line-height: 1.4;">
-          請將已部署為 Web App 的 Apps Script 網址填入，連線 OpenRouter 並同步存檔 Google Sheet：
-        </div>
-        <input type="text" class="jitong-input-field" id="inputGasUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec" value="${escapeAttr(state.gasUrl)}">
-        <div class="jitong-settings-actions">
-          <a href="https://docs.google.com/spreadsheets/d/14hpJCb47z2rJejY2L8CxQzgKrhO5jI3hHmVwt8_ZQP0/edit" target="_blank" style="color: #7c3aed; text-decoration: underline; font-size: 11px;">開啟 Google Sheet 日誌庫 ↗</a>
-          <button type="button" class="jitong-btn-save" id="btnSaveGasUrl">儲存設定</button>
         </div>
       </div>
 
@@ -151,10 +137,6 @@
     const trigger = document.getElementById('jitongFloatingTrigger');
     const windowEl = document.getElementById('jitongChatWindow');
     const btnClose = document.getElementById('btnJitongClose');
-    const btnSettings = document.getElementById('btnJitongSettings');
-    const settingsPanel = document.getElementById('jitongSettingsPanel');
-    const btnSaveGas = document.getElementById('btnSaveGasUrl');
-    const inputGas = document.getElementById('inputGasUrl');
     const btnSend = document.getElementById('btnJitongSend');
     const textarea = document.getElementById('jitongInput');
 
@@ -170,20 +152,6 @@
       state.isOpen = false;
       windowEl.classList.remove('open');
       trigger.classList.remove('hidden-by-chat');
-    });
-
-    // 展開設定面板
-    btnSettings.addEventListener('click', () => {
-      settingsPanel.classList.toggle('open');
-    });
-
-    // 儲存 Google Apps Script 網址
-    btnSaveGas.addEventListener('click', () => {
-      const url = inputGas.value.trim();
-      state.gasUrl = url;
-      localStorage.setItem(STORAGE_KEY_GAS_URL, url);
-      settingsPanel.classList.remove('open');
-      appendBotMessage(`✅ 已儲存 Google Apps Script 連線！後續對話將透過 OpenRouter 模型回答並存檔於 Google Sheet。`);
     });
 
     // 發送訊息與輸入法 (IME) 選字保護
@@ -358,7 +326,7 @@
         }
 
         if (!matched) {
-          reply = `🔮 **數位乩童已感應問題**：「${message}」\n\n您可點擊右上角 ⚙️ 齒輪填入 **Google Apps Script 網址**，即可連線至您的 OpenRouter 金鑰（使用 Claude Haiku 5.5 深度回答並保存日誌至 Google Sheet）！\n\n您也可以點擊下方快捷膠囊，我能為您開示今日課程、e-Stat API 避坑或 Data Atoms 多指標對比！`;
+          reply = `🔮 **數位乩童已感應問題**：「${message}」\n\n您可點擊下方快捷膠囊，我能為您開示今日課程、e-Stat API 避坑、Data Atoms 多指標對比，或探索陳俊智博士（Elvis Chen）的自研系統與產學成果！`;
         }
 
         appendBotMessage(reply);
