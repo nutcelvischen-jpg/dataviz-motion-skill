@@ -1,0 +1,2112 @@
+import re
+
+html_template = r"""<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>e-Stat 日本政府官方統計 · 17大領域、時序長度與 10 大資料視覺化分析法</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg-page: #fbfaf6;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f5f2ea;
+      --bg-inset: #ede8dc;
+      --border-light: rgba(45, 40, 36, 0.08);
+      --border-default: #e5dfd3;
+      --ink-primary: #23201d;
+      --ink-secondary: #5d564e;
+      --ink-muted: #8a8277;
+      
+      --metro-blue: #2c548a;
+      --metro-tint: rgba(44, 84, 138, 0.08);
+      --clay-danger: #b84a2d;
+      --clay-tint: rgba(184, 74, 45, 0.08);
+      --forest-green: #2c6e49;
+      --forest-tint: rgba(44, 110, 73, 0.08);
+      --amber-accent: #c07d2b;
+      --amber-tint: rgba(192, 125, 43, 0.08);
+      --purple-accent: #6b46c1;
+      --purple-tint: rgba(107, 70, 193, 0.08);
+      --teal-accent: #0f766e;
+      --teal-tint: rgba(15, 118, 110, 0.08);
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 14px rgba(0,0,0,0.06);
+    }
+
+    body {
+      font-family: 'Geist', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--ink-primary);
+      line-height: 1.6;
+      padding: 0 0 100px 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 頂部官方指示條 */
+    .official-top-banner {
+      background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 100%);
+      color: #ffffff;
+      padding: 10px 48px;
+      font-size: 13.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      z-index: 101;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
+    .official-portal-link {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .official-portal-link:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-default);
+      padding: 30px 48px 22px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.94);
+    }
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      background: var(--metro-tint);
+      color: var(--metro-blue);
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-family: 'Noto Serif TC', 'Instrument Serif', Georgia, serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .header-desc {
+      font-size: 14px;
+      color: var(--ink-secondary);
+      margin-top: 4px;
+    }
+    .nav-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-default);
+      color: var(--ink-primary);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover {
+      background: var(--metro-blue);
+      color: #fff;
+      border-color: var(--metro-blue);
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 32px auto 0;
+      padding: 0 48px;
+    }
+    @media (max-width: 1024px) {
+      .official-top-banner, header, main { padding-left: 20px; padding-right: 20px; }
+    }
+
+    /* 頂部數據看板 */
+    .hero-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .hero-stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .hero-stat-num {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--metro-blue);
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .hero-stat-unit {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink-secondary);
+    }
+    .hero-stat-label {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--ink-primary);
+      margin-top: 2px;
+    }
+    .hero-stat-sub {
+      font-size: 12px;
+      color: var(--ink-muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* 視角切換器 (View Switcher) */
+    .view-switcher-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .view-tab-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .view-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--ink-secondary);
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+    .view-tab-btn:hover {
+      background: var(--bg-subtle);
+      color: var(--ink-primary);
+    }
+    .view-tab-btn.active {
+      background: var(--metro-blue);
+      color: #ffffff;
+      border-color: var(--metro-blue);
+      box-shadow: 0 2px 6px rgba(44, 84, 138, 0.25);
+    }
+    .view-tab-count {
+      display: inline-block;
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.08);
+    }
+    .view-tab-btn.active .view-tab-count {
+      background: rgba(255,255,255,0.25);
+      color: #fff;
+    }
+
+    /* 搜尋與篩選列 */
+    .filter-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      margin-bottom: 32px;
+      box-shadow: var(--shadow-sm);
+    }
+    .search-row {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .search-input {
+      flex: 1;
+      min-width: 280px;
+      background: var(--bg-page);
+      border: 1px solid var(--border-default);
+      color: var(--ink-primary);
+      padding: 12px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--metro-blue);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(44, 84, 138, 0.1);
+    }
+
+    .tags-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-tag {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-default);
+      color: var(--ink-secondary);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .filter-tag:hover {
+      background: var(--bg-inset);
+      color: var(--ink-primary);
+    }
+    .filter-tag.active {
+      background: var(--metro-blue);
+      color: #fff;
+      border-color: var(--metro-blue);
+      font-weight: 600;
+    }
+
+    /* 區塊標題 */
+    .section-title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin: 36px 0 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border-default);
+    }
+    .section-title-bar.first-section {
+      margin-top: 10px;
+    }
+    .section-title-main {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title {
+      font-family: 'Noto Serif TC', Georgia, serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink-primary);
+    }
+    .section-tag-pill {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background: var(--metro-tint);
+      color: var(--metro-blue);
+      border: 1px solid rgba(44, 84, 138, 0.15);
+    }
+    .section-count {
+      font-size: 13px;
+      color: var(--ink-muted);
+    }
+    .section-desc-sub {
+      font-size: 13.5px;
+      color: var(--ink-secondary);
+      margin-top: 6px;
+    }
+
+    /* ==========================================================
+       區塊 0: 10 大資料視覺化實戰分析法 (DataViz Atoms Section)
+       ========================================================== */
+    .dataviz-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+      gap: 24px;
+    }
+    @media (max-width: 768px) {
+      .dataviz-grid { grid-template-columns: 1fr; }
+    }
+    .dataviz-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .dataviz-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--metro-blue);
+    }
+    .dataviz-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+    .dataviz-title-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .dataviz-icon {
+      font-size: 22px;
+      line-height: 1;
+    }
+    .dataviz-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink-primary);
+      line-height: 1.35;
+    }
+    .dataviz-atom-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      white-space: nowrap;
+    }
+
+    /* 問題情境框 */
+    .dataviz-question-box {
+      background: #fefce8;
+      border: 1px solid #fef08a;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: #713f12;
+      line-height: 1.5;
+    }
+    .dataviz-question-box strong {
+      color: #854d0e;
+    }
+
+    /* 欄位拖曳設定 */
+    .dataviz-shelf-box {
+      background: var(--bg-page);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 12.5px;
+      color: var(--ink-secondary);
+      margin-bottom: 12px;
+      font-family: monospace;
+    }
+    .dataviz-shelf-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+      font-family: 'Geist', sans-serif;
+    }
+
+    /* 洞察技巧 */
+    .dataviz-insight-box {
+      font-size: 12.5px;
+      color: var(--ink-secondary);
+      line-height: 1.5;
+      margin-bottom: 14px;
+      padding-left: 14px;
+      border-left: 3px solid var(--metro-blue);
+    }
+    .dataviz-insight-box strong {
+      color: var(--ink-primary);
+    }
+
+    /* 底部開啟按鈕 */
+    .dataviz-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-light);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .dataset-hint-tag {
+      font-size: 11.5px;
+      color: var(--ink-muted);
+    }
+    .launch-atom-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--metro-blue);
+      color: #ffffff;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .launch-atom-btn:hover {
+      background: #1e3a8a;
+    }
+
+    /* ==========================================================
+       區塊 1: 官方數據時間跨度與歷史長度縱深 (Horizons)
+       ========================================================== */
+    .horizon-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      margin-bottom: 36px;
+      box-shadow: var(--shadow-sm);
+    }
+    .horizon-summary-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 26px;
+    }
+    .horizon-summary-box {
+      border: 1px solid var(--border-default);
+      background: var(--bg-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      border-left: 4px solid var(--metro-blue);
+    }
+    .horizon-summary-box.amber { border-left-color: var(--amber-accent); }
+    .horizon-summary-box.green { border-left-color: var(--forest-green); }
+    .horizon-summary-box.purple { border-left-color: var(--purple-accent); }
+    
+    .horizon-summary-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      justify-content: space-between;
+    }
+    .horizon-summary-val {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink-primary);
+      margin: 6px 0 2px;
+      letter-spacing: -0.02em;
+    }
+    .horizon-summary-desc {
+      font-size: 12px;
+      color: var(--ink-muted);
+      line-height: 1.45;
+    }
+
+    /* 視覺化時間軸長條比較 */
+    .timeline-chart-wrap {
+      background: var(--bg-page);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 22px 20px;
+      margin-bottom: 24px;
+    }
+    .timeline-chart-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-muted);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-default);
+      margin-bottom: 14px;
+    }
+    .timeline-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 14px;
+      font-size: 13px;
+    }
+    .timeline-label {
+      width: 220px;
+      flex-shrink: 0;
+      font-weight: 600;
+      color: var(--ink-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .timeline-bar-bg {
+      flex: 1;
+      height: 22px;
+      background: #e9e4d8;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    .timeline-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      position: absolute;
+      top: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      transition: width 0.3s ease;
+      white-space: nowrap;
+    }
+    .timeline-span-badge {
+      width: 90px;
+      flex-shrink: 0;
+      text-align: right;
+      font-weight: 700;
+      font-family: monospace;
+      color: var(--metro-blue);
+      font-size: 12.5px;
+    }
+
+    /* 時間跨度詳細規格表 */
+    .horizon-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+    }
+    .horizon-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+    .horizon-table th {
+      background: var(--bg-subtle);
+      padding: 12px 16px;
+      font-weight: 600;
+      color: var(--ink-secondary);
+      border-bottom: 1px solid var(--border-default);
+      white-space: nowrap;
+    }
+    .horizon-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+    }
+    .horizon-table tr:hover td {
+      background: rgba(44, 84, 138, 0.02);
+    }
+    .time-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: monospace;
+      background: var(--metro-tint);
+      color: var(--metro-blue);
+    }
+    .duration-chip {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      background: var(--forest-tint);
+      color: var(--forest-green);
+      border: 1px solid rgba(44, 110, 73, 0.2);
+    }
+
+    /* ==========================================================
+       區塊 2: 17 大領域分類卡片 (Category Grid)
+       ========================================================== */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+      gap: 24px;
+    }
+    @media (max-width: 768px) {
+      .category-grid { grid-template-columns: 1fr; }
+    }
+    .cat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    .cat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--metro-blue);
+    }
+    .cat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .cat-code-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--bg-subtle);
+      color: var(--ink-secondary);
+      border: 1px solid var(--border-default);
+    }
+    .cat-name {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--ink-primary);
+      margin-top: 4px;
+    }
+    .cat-ministry {
+      font-size: 12px;
+      color: var(--metro-blue);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .cat-time-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--forest-green);
+      background: var(--forest-tint);
+      border: 1px solid rgba(44, 110, 73, 0.2);
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-top: 6px;
+    }
+    .cat-data-scope {
+      background: var(--bg-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--ink-secondary);
+      margin: 14px 0;
+      line-height: 1.5;
+    }
+    .cat-data-scope strong {
+      color: var(--ink-primary);
+    }
+
+    .research-block {
+      border-top: 1px dashed var(--border-default);
+      padding-top: 14px;
+      margin-top: 10px;
+    }
+    .research-title-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--clay-danger);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .research-idea-list {
+      list-style: none;
+    }
+    .research-idea-item {
+      font-size: 13px;
+      color: var(--ink-primary);
+      margin-bottom: 8px;
+      padding-left: 18px;
+      position: relative;
+      line-height: 1.45;
+    }
+    .research-idea-item::before {
+      content: "✦";
+      position: absolute;
+      left: 0;
+      color: var(--amber-accent);
+      font-size: 11px;
+      top: 1px;
+    }
+    .research-method-tag {
+      display: inline-block;
+      font-size: 11px;
+      background: var(--bg-subtle);
+      color: var(--ink-muted);
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-left: 4px;
+      font-family: monospace;
+    }
+
+    .cat-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-light);
+    }
+    .api-hint {
+      font-size: 12px;
+      font-family: monospace;
+      color: var(--ink-muted);
+    }
+    .quick-api-btn {
+      background: transparent;
+      border: 1px solid var(--border-default);
+      color: var(--metro-blue);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .quick-api-btn:hover {
+      background: var(--metro-tint);
+      border-color: var(--metro-blue);
+    }
+
+    /* ==========================================================
+       區塊 3: 進階學術計量研究卡片 (Econometric Grid)
+       ========================================================== */
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+      gap: 24px;
+    }
+    .method-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .method-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--purple-accent);
+    }
+    .method-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .method-family-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .method-cat-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--purple-tint);
+      color: var(--purple-accent);
+      border: 1px solid rgba(107, 70, 193, 0.2);
+    }
+    .method-time-horizon-banner {
+      background: linear-gradient(90deg, #f0f7ff 0%, #faf5ff 100%);
+      border: 1px solid #dbeafe;
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 12.5px;
+      color: #1e40af;
+      margin: 12px 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .method-time-badge-bold {
+      font-weight: 700;
+      background: #2563eb;
+      color: #ffffff;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    .core-algo-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .core-algo-pill {
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg-subtle);
+      color: var(--ink-secondary);
+      border: 1px solid var(--border-default);
+    }
+    .method-topic-item {
+      background: var(--bg-page);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+    .topic-item-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--ink-primary);
+      margin-bottom: 4px;
+    }
+    .topic-item-meta {
+      font-size: 12px;
+      color: var(--ink-secondary);
+      line-height: 1.5;
+    }
+    .topic-tag-model {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--purple-tint);
+      color: var(--purple-accent);
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin-top: 4px;
+    }
+    .pipeline-steps-box {
+      background: var(--bg-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      margin-top: 12px;
+      font-size: 12px;
+    }
+
+    footer {
+      max-width: 1400px;
+      margin: 60px auto 0;
+      padding: 30px 48px;
+      border-top: 1px solid var(--border-default);
+      display: flex;
+      justify-content: space-between;
+      color: var(--ink-muted);
+      font-size: 13px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 頂部官方入口指示橫條 -->
+<div class="official-top-banner">
+  <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+    <span style="font-weight: 700;">🏛️ 日本政府官方統計入口網站：</span>
+    <a href="https://www.e-stat.go.jp" target="_blank" class="official-portal-link">
+      <span style="font-family: monospace;">https://www.e-stat.go.jp</span>
+      <span>(前往官網) ↗</span>
+    </a>
+  </div>
+  <div style="display: flex; gap: 14px; align-items: center; font-size: 12px;">
+    <span style="opacity: 0.9;">API 端點：<code style="background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 3px; font-family: monospace;">api.e-stat.go.jp/rest/3.0/app</code></span>
+    <button onclick="navigator.clipboard.writeText('https://www.e-stat.go.jp'); alert('已複製 e-Stat 官網網址！');" style="background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">複製官網網址</button>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="badge">📚 e-Stat 官方資料庫全集 · 10 大資料視覺化實戰法 · 17 大領域與百年時序</div>
+      <h1>日本官方統計視覺化實戰導航與數據矩陣</h1>
+      <p class="header-desc">一般人與學員友善：從生活與商業問題 ➔ 10 大圖表選型 ➔ 一鍵在 Data Atoms 儀表板開啟繪出洞察</p>
+    </div>
+    <div class="nav-actions">
+      <a href="data_atoms.html" class="nav-btn" style="background: var(--metro-blue); color: #fff; border-color: var(--metro-blue);">📊 數據原子儀表板 (Data Atoms)</a>
+      <a href="student_data_analyst_workflow.html" class="nav-btn">🎓 學員實戰手冊</a>
+      <a href="index.html#learning-map" class="nav-btn">🧭 回六站學習路線</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- 宏觀數字看板 -->
+  <section class="hero-stat-grid">
+    <div class="hero-stat-card">
+      <div class="hero-stat-num">10 <span class="hero-stat-unit">大招式</span></div>
+      <div class="hero-stat-label">資料視覺化實戰分析法</div>
+      <div class="hero-stat-sub">直觀對應 10 大 Data Atoms 圖表</div>
+    </div>
+    <div class="hero-stat-card">
+      <div class="hero-stat-num">17 <span class="hero-stat-unit">大領域</span></div>
+      <div class="hero-stat-label">官方統計領域分野</div>
+      <div class="hero-stat-sub">涵蓋人口、經濟、司法至文化</div>
+    </div>
+    <div class="hero-stat-card">
+      <div class="hero-stat-num">100+ <span class="hero-stat-unit">年</span></div>
+      <div class="hero-stat-label">歷史數據時間跨度</div>
+      <div class="hero-stat-sub">國勢調查 (1920–2020) 百年長河</div>
+    </div>
+    <div class="hero-stat-card">
+      <div class="hero-stat-num">50 <span class="hero-stat-unit">年連續</span></div>
+      <div class="hero-stat-label">SSDSE 都道府縣面板</div>
+      <div class="hero-stat-sub">1975–2024 半世紀跨縣追蹤體系</div>
+    </div>
+  </section>
+
+  <!-- 視角切換器 -->
+  <div class="view-switcher-bar">
+    <div style="font-size: 13.5px; font-weight: 700; color: var(--ink-secondary); display: flex; align-items: center; gap: 6px;">
+      <span>🧭 檢視視角導航：</span>
+    </div>
+    <div class="view-tab-group">
+      <button class="view-tab-btn active" id="tabDataviz" onclick="switchView('dataviz')">
+        <span>📊 10 大資料視覺化分析法</span>
+        <span class="view-tab-count" style="background: var(--amber-accent); color: #fff;">一般人推薦</span>
+      </button>
+      <button class="view-tab-btn" id="tabDomain" onclick="switchView('domain')">
+        <span>🏛️ 依 17 大統計領域分類</span>
+        <span class="view-tab-count">17 領域</span>
+      </button>
+      <button class="view-tab-btn" id="tabHorizon" onclick="switchView('horizon')">
+        <span>⏳ 官方數據歷史長度地圖</span>
+        <span class="view-tab-count">10 大調查</span>
+      </button>
+      <button class="view-tab-btn" id="tabEconometric" onclick="switchView('econometric')">
+        <span>🎓 進階學術計量研究</span>
+        <span class="view-tab-count">DID / VAR</span>
+      </button>
+      <button class="view-tab-btn" id="tabAll" onclick="switchView('all')">
+        <span>📑 展開全部區塊</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 篩選器與搜尋列 -->
+  <section class="filter-panel">
+    <div class="search-row">
+      <input type="text" id="searchInput" class="search-input" placeholder="🔍 搜尋生活/商業問題、圖表型態或關鍵字（例如：折線、地圖、空屋、薪資、排名、散佈、雙軸、高齡化、1975...）" oninput="onSearchInput()">
+    </div>
+    <div class="tags-group" id="tagsContainer">
+      <span style="font-size: 13px; font-weight: 600; color: var(--ink-secondary); margin-right: 6px;">快速分類標籤：</span>
+      <span class="filter-tag active" onclick="setFilter(event, 'all')">全部檢視</span>
+      <span class="filter-tag" onclick="setFilter(event, 'demographics')">👥 人口與勞動</span>
+      <span class="filter-tag" onclick="setFilter(event, 'economy')">💹 經濟、商業與物價</span>
+      <span class="filter-tag" onclick="setFilter(event, 'housing')">🏠 土地、居住與觀光</span>
+      <span class="filter-tag" onclick="setFilter(event, 'welfare')">🏥 醫療、福祉與生活</span>
+      <span class="filter-tag" onclick="setFilter(event, 'tech')">⚡ 科技、能源與環境</span>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       區塊 0: 10 大資料視覺化實戰分析法 (搭上 Data Atoms 儀表板)
+       ========================================================= -->
+  <section id="datavizSectionBlock">
+    <div class="section-title-bar first-section">
+      <div class="section-title-main">
+        <div class="section-title">📊 10 大資料視覺化實戰分析法（直接對應 Data Atoms 工具）</div>
+        <span class="section-tag-pill" style="background: var(--amber-tint); color: var(--amber-accent); border-color: rgba(192, 125, 43, 0.2);">一般人與學員首選 · 免艱澀數學</span>
+      </div>
+      <div class="section-count" id="datavizResultsCount">共 10 個實戰圖表招式</div>
+    </div>
+    <div class="section-desc-sub">從大家最常關心的生活與商業問題出發 ➔ 一秒選對視覺化圖表 ➔ 點擊按鈕直接在我們的 Data Atoms 儀表板開啟繪出！</div>
+
+    <div class="dataviz-grid" id="datavizContainer" style="margin-top: 18px;">
+      <!-- JS 會自動注入 10 大資料視覺化卡片 -->
+    </div>
+  </section>
+
+  <!-- =========================================================
+       區塊 1: 官方 17 大統計領域分類矩陣 (Domains Section)
+       ========================================================= -->
+  <section id="domainSectionBlock">
+    <div class="section-title-bar">
+      <div class="section-title-main">
+        <div class="section-title">🏛️ 官方 17 大統計領域與可執行的深度研究矩陣</div>
+        <span class="section-tag-pill">Domain-Oriented</span>
+      </div>
+      <div class="section-count" id="domainResultsCount">顯示全部 17 個領域</div>
+    </div>
+    <div class="section-desc-sub">以日本政府法定規格分野 (statsField 01–17) 檢索，包含 13 組 SSDSE 指標、包含範疇與代表性研究主題。</div>
+
+    <div class="category-grid" id="categoryContainer" style="margin-top: 18px;">
+      <!-- JS 會自動注入 17 大領域與研究卡片 -->
+    </div>
+  </section>
+
+  <!-- =========================================================
+       區塊 2: 官方數據時間跨度與歷史縱深一覽 (Horizons Section)
+       ========================================================= -->
+  <section id="horizonSectionBlock">
+    <div class="section-title-bar">
+      <div class="section-title-main">
+        <div class="section-title">⏳ 官方統計資料時間跨度與歷史縱深地圖</div>
+        <span class="section-tag-pill">時序長度與頻率全覽</span>
+      </div>
+      <div class="section-count">涵蓋日本中央省廳 10 大權威統計</div>
+    </div>
+    <div class="section-desc-sub">明確標註各主要國家級調查的起訖年份、時間跨度長度、調查頻率與最適計量研究方法。</div>
+
+    <div class="horizon-panel" style="margin-top: 16px;">
+      <div class="horizon-summary-row">
+        <div class="horizon-summary-box">
+          <div class="horizon-summary-title"><span>最長普查時間跨度</span><span>1920–2020</span></div>
+          <div class="horizon-summary-val">100 年歷史長河</div>
+          <div class="horizon-summary-desc">國勢調查百年歷史，每 5 年一次，適合分析大正至令和跨世紀之家庭結構、少子高齡化大趨勢。</div>
+        </div>
+        <div class="horizon-summary-box amber">
+          <div class="horizon-summary-title"><span>最長月/年連續時序</span><span>1950–2024</span></div>
+          <div class="horizon-summary-val">74 年連續時間序列</div>
+          <div class="horizon-summary-desc">人口推計與住民基本台帳人口移動 (1954~)，連續 70+ 年無間斷，為長期趨勢預測的黃金基準。</div>
+        </div>
+        <div class="horizon-summary-box green">
+          <div class="horizon-summary-title"><span>宏觀跨縣面板數據</span><span>1975–2024</span></div>
+          <div class="horizon-summary-val">連續 50 年面板 (N=47, T=50)</div>
+          <div class="horizon-summary-desc">SSDSE 社會人口統計體系提供 47 都道府縣半世紀面板 (NT=2,350)，為跨區域長年追蹤必備。</div>
+        </div>
+        <div class="horizon-summary-box purple">
+          <div class="horizon-summary-title"><span>宏觀經濟物價與土地</span><span>1970–2024 / 1974–2024</span></div>
+          <div class="horizon-summary-val">54 年物價 / 50 年地價</div>
+          <div class="horizon-summary-desc">消費者物價指數細項 (CPI) 54 年，地價公示 50 年，完整覆蓋泡沫景氣、失落三十年與近期通膨重估。</div>
+        </div>
+      </div>
+
+      <!-- 視覺化長條時間軸 -->
+      <div class="timeline-chart-wrap">
+        <div class="timeline-chart-header">
+          <span>調查項目名稱</span>
+          <span style="flex: 1; text-align: center;">時間覆蓋區間 (1920 年 ~ 2024 年)</span>
+          <span style="width: 90px; text-align: right;">時間跨度</span>
+        </div>
+        <div id="timelineBarsContainer"></div>
+      </div>
+
+      <!-- 詳細規格表 -->
+      <div class="horizon-table-wrap">
+        <table class="horizon-table">
+          <thead>
+            <tr>
+              <th>調查名稱與主責機關</th>
+              <th>起訖年份 (時間區間)</th>
+              <th>連續長度</th>
+              <th>統計頻率</th>
+              <th>地理顆粒度</th>
+              <th>推薦計量與實證研究方法</th>
+              <th>e-Stat 表單代碼</th>
+            </tr>
+          </thead>
+          <tbody id="horizonTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       區塊 3: 進階學術計量研究 (Econometric Section - Advanced)
+       ========================================================= -->
+  <section id="econometricSectionBlock">
+    <div class="section-title-bar">
+      <div class="section-title-main">
+        <div class="section-title">🎓 進階學術計量研究矩陣 (DID / VAR / 空間模型)</div>
+        <span class="section-tag-pill" style="background: var(--purple-tint); color: var(--purple-accent); border-color: rgba(107, 70, 193, 0.2);">進階選修 · 論文與政策實證</span>
+      </div>
+      <div class="section-count" id="methodResultsCount">6 大計量實證體系</div>
+    </div>
+    <div class="section-desc-sub">針對研究生、政策研究員或數據科學家設計：因果推論、SVAR 脈衝響應、空間溢出與雙重機器學習模型設定。</div>
+
+    <div class="method-grid" id="methodContainer" style="margin-top: 18px;">
+      <!-- JS 會自動注入 6 大實證計量卡片 -->
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div>
+    <strong>資料庫來源:</strong> 日本總務省統計局 e-Stat API v3.0 (官方規格標準分類代碼 statsField 01–17)
+  </div>
+  <div>
+    <strong>推薦視覺化工具:</strong> <a href="data_atoms.html" style="color: var(--metro-blue); font-weight: 700;">Data Atoms 互動儀表板</a>、Apache ECharts、PyGWalker、Python Statsmodels
+  </div>
+</footer>
+
+<script>
+// =========================================================================
+// 1. 10 大資料視覺化實戰分析法 (DataViz Atoms Methods Data)
+// =========================================================================
+const datavizMethodsData = [
+  {
+    id: "trend_line",
+    chartAtom: "line",
+    icon: "📈",
+    name: "時序趨勢預警法 (Trend Analysis)",
+    atomName: "時序趨勢折線圖 (Line Chart)",
+    category: "動態走勢",
+    question: "日本總人口哪一年開始反轉崩跌？高齡化衝得多快？未來還會繼續惡化嗎？",
+    shelfSetup: "X 軸：年份 (1975~2024) ｜ Y 軸：總人口 / 65歲以上老年比例",
+    insightTips: "觀察折線的「拐點 (Inflection Point)」與斜率加速度；當老年比例線與幼年人口線黃金交叉，即為超高齡社會分水嶺。",
+    datasetHint: "推薦數據：02 人口推計 (1950–2024, 74年序列)",
+    tag: "時序預警"
+  },
+  {
+    id: "geo_map",
+    chartAtom: "geo",
+    icon: "🗾",
+    name: "地理空間熱度與城鄉差距法 (Choropleth Geo Map)",
+    atomName: "通用地理分級地圖 (Geo Map)",
+    category: "空間分佈",
+    question: "全日本哪裡空屋最嚴重？年輕人都湧向哪些縣市？偏鄉真的在消失嗎？",
+    shelfSetup: "地理維度：都道府縣 (Prefecture) ｜ 色彩深淺：空屋率 / 淨移入人口數",
+    insightTips: "透過色階深淺（Choropleth），一眼看出東京、愛知、大阪三大都會區的磁吸紅區，與四國、東北人口空洞化深谷。",
+    datasetHint: "推薦數據：08 住宅土地調查 (空屋率) + 02 住民移動報告",
+    tag: "區域落差"
+  },
+  {
+    id: "ranking_bar",
+    chartAtom: "bar",
+    icon: "📊",
+    name: "規模體量與競爭排名法 (Ranking & Volume Comparison)",
+    atomName: "離散體量柱狀圖 (Bar Chart)",
+    category: "體量對比",
+    question: "各都道府縣的製造業產值排行？東京的商業規模真的是第二名的幾倍？",
+    shelfSetup: "X 軸：都道府縣 / 產業類別 (離散類別) ｜ Y 軸：出貨額 / 營收總和 (度量數值)",
+    insightTips: "將數值由大到小降序排列，可以看出斷層式落差（二八法則與長尾分佈），快速辨識誰是領頭羊、誰是後段班。",
+    datasetHint: "推薦數據：05 工業統計 + 06 商業統計指標 (1951–2021)",
+    tag: "排行對比"
+  },
+  {
+    id: "correlation_scatter",
+    chartAtom: "scatter",
+    icon: "🔵",
+    name: "雙指標關聯與假說檢驗法 (Correlation & Scatter Insight)",
+    atomName: "相關散佈分佈圖 (Scatter Plot)",
+    category: "關聯驗證",
+    question: "地價越貴的地方，空屋率真的越低嗎？平均薪資越高的縣市，大家生得更多還是更少？",
+    shelfSetup: "X 軸：住宅公示地價 (或平均薪資) ｜ Y 軸：空屋率 (或粗出生率)",
+    insightTips: "觀察散佈點雲的聚集走向：朝右上代表正相關、朝右下代表負相關、散落無章代表兩者無直接關係，快速打破直覺迷思。",
+    datasetHint: "推薦數據：13 地價公示 (1974–2024) + 08 空屋率",
+    tag: "關聯假說"
+  },
+  {
+    id: "scale_rate_dual",
+    chartAtom: "dual",
+    icon: "⚖️",
+    name: "規模量體 vs 比例比率複合對比法 (Dual-Axis Scale vs Rate)",
+    atomName: "雙軸指標複合圖 (Dual-Axis Combo)",
+    category: "矛盾解構",
+    question: "東京的老人總人數全日本最多，但它的『高齡化比例』到底高不高？總量大跟程度嚴重是一回事嗎？",
+    shelfSetup: "X 軸：都道府縣 ｜ 左 Y 軸 (柱狀)：老人總量 (萬人) ｜ 右 Y 軸 (折線)：高齡化率 (%)",
+    insightTips: "打破「大城市一定老化最嚴重」的常見盲點：東京老人總數第一但佔比僅 23%（青年稀釋）；偏鄉老人少但佔比突破 40%！",
+    datasetHint: "推薦數據：02 社會人口體系 SSDSE-A (47都道府縣)",
+    tag: "雙重視角"
+  },
+  {
+    id: "donut_part",
+    chartAtom: "donut",
+    icon: "🍩",
+    name: "整體結構與預算佔比切片法 (Part-to-Whole Composition)",
+    atomName: "結構佔比甜甜圈圖 (Donut Chart)",
+    category: "結構比例",
+    question: "一般日本家庭每個月的薪水都花去哪了？食衣住行育樂誰吃掉了最大的份額？",
+    shelfSetup: "類別分組：消費大類 (食品/住居/光熱水費/交通等) ｜ 數值大小：月均支出金額",
+    insightTips: "環形切片大小一眼看出核心支出痛點；配合年份篩選，可分析能源通膨對家庭民生造成的擠壓效應。",
+    datasetHint: "推薦數據：07 家計調查 (收支與儲蓄, 1963–2024, 61年時序)",
+    tag: "開銷結構"
+  },
+  {
+    id: "boxplot_outliers",
+    chartAtom: "boxplot",
+    icon: "📦",
+    name: "分組離散度與貧富極端值檢驗法 (Group Distribution & Outliers)",
+    atomName: "盒鬚指標分佈圖 (Boxplot)",
+    category: "分佈檢驗",
+    question: "各區域的薪資是普遍差不多，還是少數人賺超多、多數人很苦？有沒有誇張的極端值？",
+    shelfSetup: "分組維度：八大地理區域 (關東/近畿/中部/九州...) ｜ 分析指標：每人實質工資",
+    insightTips: "看箱體高度判斷貧富差距離散度（IQR）；看中位數而非容易被拉偏的平均數；箱外浮點即為「超級離群暴富/偏鄉縣市」。",
+    datasetHint: "推薦數據：03 賃金構造基本統計 (1953–2024, 71年時序)",
+    tag: "貧富離散"
+  },
+  {
+    id: "radar_profile",
+    chartAtom: "radar",
+    icon: "🕸️",
+    name: "多維綜合體質畫像評估法 (Multidimensional Radar Profile)",
+    atomName: "多維畫像雷達圖 (Radar Chart)",
+    category: "綜合評價",
+    question: "這座城市適不適合我移居？醫療、教育、交通、育兒、環境各得幾分？",
+    shelfSetup: "多維度量軸：百人病床數、保育所入所率、道路鋪設率、人均公園面積、財政健全指數",
+    insightTips: "多角形覆蓋面積越大代表城市綜合體質越強健；形狀偏向哪一側，一眼識別是「文教型」、「醫療型」還是「環境宜居型」。",
+    datasetHint: "推薦數據：SSDSE-A~M 全領域 1500+ 指標體系 (1975–2024)",
+    tag: "城市畫像"
+  },
+  {
+    id: "treemap_hierarchy",
+    chartAtom: "treemap",
+    icon: "🧱",
+    name: "多層級結構與面積權重法 (Hierarchical Treemap Weighting)",
+    atomName: "矩形樹狀層級圖 (Treemap)",
+    category: "層級權重",
+    question: "全國近千萬間空屋中，木造 vs 鋼筋、公寓 vs 獨棟、可租售 vs 荒廢無人的分佈權重如何？",
+    shelfSetup: "主層級：住宅構造 (木造/非木造) ｜ 次層級：利用現況 (租賃用/拋棄廢棄) ｜ 面積：空屋戶數",
+    insightTips: "巢狀矩形以面積直觀呈現整體與局部的權重關係，快速抓出「哪一類危老木造空屋正在釀成治安與倒塌隱患」。",
+    datasetHint: "推薦數據：08 住宅土地統計調查 (1948–2023, 75年歷史)",
+    tag: "層級佔比"
+  },
+  {
+    id: "funnel_flow",
+    chartAtom: "funnel",
+    icon: "🔻",
+    name: "轉化流失與階段漏斗法 (Conversion Funnel Analysis)",
+    atomName: "轉化路徑漏斗圖 (Funnel Chart)",
+    category: "流程流失",
+    question: "地方青年從高中畢業、升讀大學、外流到東京就業，到最後願意回流鄉村的留存率有多少？",
+    shelfSetup: "流程階段：高中畢業數 ➔ 大學在學數 ➔ 在地就業數 ➔ 青年留鄉數 ｜ 數值：人數規模",
+    insightTips: "觀察漏斗哪一個階梯落差最劇烈（最大瓶頸點），直接指出政府地方創生補貼應該在哪個階段精準發力。",
+    datasetHint: "推薦數據：16 學校基本調查 + 02 住民移動報告 (1975–2024)",
+    tag: "漏斗流失"
+  }
+];
+
+// =========================================================================
+// 2. 官方 10 大調查之時間跨度與規格資料庫 (Horizons Data)
+// =========================================================================
+const horizonsData = [
+  {
+    name: "國勢調查 (Population Census)",
+    ministry: "總務省統計局",
+    startYear: 1920,
+    endYear: 2020,
+    years: 100,
+    frequency: "每 5 年一次 (全數普查)",
+    granularity: "都道府縣 / 市町村 / 500m 統計網格",
+    models: "世代人口轉型、人口重心移動 (Centroid Shift)、長期世帶構成萎縮",
+    color: "#2563eb",
+    tableId: "0003412000"
+  },
+  {
+    name: "人口推計 (Population Estimates)",
+    ministry: "總務省統計局",
+    startYear: 1950,
+    endYear: 2024,
+    years: 74,
+    frequency: "月度 (全國各年齡) / 年度 (47 都道府縣)",
+    granularity: "都道府縣、男女各歲階層",
+    models: "世代存活法 (Cohort-Component)、超長期 VAR / SVAR、年齡金字塔模擬",
+    color: "#0284c7",
+    tableId: "0003448228"
+  },
+  {
+    name: "住民基本台帳人口移動報告",
+    ministry: "總務省統計局",
+    startYear: 1954,
+    endYear: 2024,
+    years: 70,
+    frequency: "月度 / 年度",
+    granularity: "47 都道府縣間、市町村遷徙流向",
+    models: "空間引力模型 (Gravity Model)、東京單極集中動態、青年人口遷徙網絡",
+    color: "#0d9488",
+    tableId: "0003411440"
+  },
+  {
+    name: "家計調查 (Family Income & Expenditure)",
+    ministry: "總務省統計局",
+    startYear: 1963,
+    endYear: 2024,
+    years: 61,
+    frequency: "月度 / 年度",
+    granularity: "全國、都道府縣廳所在地、各所得分位",
+    models: "生命週期假說 (Life-Cycle)、微觀需求體系 (AIDS)、通膨生活成本差異",
+    color: "#ca8a04",
+    tableId: "0003427000"
+  },
+  {
+    name: "消費者物價指數 (CPI)",
+    ministry: "總務省統計局",
+    startYear: 1970,
+    endYear: 2024,
+    years: 54,
+    frequency: "月度 / 年度",
+    granularity: "全國、都道府縣廳所在地 (近600品項)",
+    models: "SVAR 結構向量自我迴歸、菲利浦曲線、輸入型通膨脈衝響應分析 (IRF)",
+    color: "#ea580c",
+    tableId: "0003427113"
+  },
+  {
+    name: "地價公示・都道府縣地價調查",
+    ministry: "國土交通省",
+    startYear: 1974,
+    endYear: 2024,
+    years: 50,
+    frequency: "年度 (地價公示1月 / 地價調查7月)",
+    granularity: "標準評定地點、各市町村 (住宅/商業/工業)",
+    models: "空間計量 (Spatial Lag / SAR)、特徵價格模型 (Hedonic)、資產泡沫重估",
+    color: "#b91c1c",
+    tableId: "0000010108"
+  },
+  {
+    name: "社會・人口統計體系 (SSDSE 跨縣面板)",
+    ministry: "總務省統計局 / 統計情報中心",
+    startYear: 1975,
+    endYear: 2024,
+    years: 50,
+    frequency: "年度連續跨縣面板",
+    granularity: "47 都道府縣 (N=47, T=50, NT=2,350)",
+    models: "雙重差分法 (DID)、雙向固定效應 (Two-Way FE)、合成控制法 (SCM)、PCA",
+    color: "#7c3aed",
+    tableId: "0000010101~13"
+  },
+  {
+    name: "住宅・土地統計調查",
+    ministry: "總務省統計局",
+    startYear: 1948,
+    endYear: 2023,
+    years: 75,
+    frequency: "每 5 年一次",
+    granularity: "都道府縣 / 市町村",
+    models: "空屋空間自相關 (Moran's I)、折價溢出效應、斷點回歸 (RDD)",
+    color: "#4f46e5",
+    tableId: "0000010108"
+  },
+  {
+    name: "事業所・企業統計 / 經濟普查",
+    ministry: "總務省 / 經濟產業省",
+    startYear: 1951,
+    endYear: 2021,
+    years: 70,
+    frequency: "每 3~5 年一次",
+    granularity: "都道府縣 / 市町村",
+    models: "產業集聚度 (Agglomeration)、電商創造性破壞、勞力資本替代 S 曲線",
+    color: "#059669",
+    tableId: "0000010103"
+  },
+  {
+    name: "勞動力調查 (失業率與就業結構)",
+    ministry: "厚生勞動省 / 總務省",
+    startYear: 1953,
+    endYear: 2024,
+    years: 71,
+    frequency: "月度 / 年度",
+    granularity: "全國、主要經濟地區",
+    models: "貝佛里奇曲線 (Beveridge Curve)、奧肯定律 (Okun's Law)、非正規雇用分解",
+    color: "#db2777",
+    tableId: "0003428800"
+  }
+];
+
+// =========================================================================
+// 3. 進階學術計量研究資料庫 (Econometric Methods Data)
+// =========================================================================
+const econometricMethodsData = [
+  {
+    id: "causal",
+    icon: "⚖️",
+    name: "因果推論與政策評估 (Causal Inference & Policy Evaluation)",
+    category: "準實驗計量",
+    timeSpan: "1975–2024 (50年跨縣面板)",
+    timeBadge: "50 年連續面板 · 政策前後 10~20 年",
+    coreMethods: ["雙重差分法 (DID)", "多期事件研究法 (Event Study)", "合成控制法 (SCM)", "斷點回歸 (RDD)"],
+    summary: "排除遺漏變數與宏觀時間混淆因素，精準估計日本國家級重大政策或外生衝擊的「平均處置效果 (ATE/ATT)」。",
+    topics: [
+      {
+        title: "「平成大合併」行政簡併政策對地方財政自給率與公共建設支出的長期因果衝擊",
+        hypothesis: "市町村合併初期雖減緩公債負擔，但偏鄉公共服務可及性因行政中心外移而加速衰退。",
+        model: "多期雙重差分法 (Multi-period DID / Two-Way Fixed Effects)",
+        vars: "Y: 實質赤字比率、公債費負擔比率；X: 政策處置虛擬變數、人口規模、老齡化比率",
+        dataset: "SSDSE-D 財政指標 (1975–2024) + SSDSE-A 人口指標"
+      },
+      {
+        title: "75 歲「後期高齡者」自願繳回駕照獎勵政策對偏鄉高齡交通事故之斷點回歸評估",
+        hypothesis: "達到 75 歲法定特定換照認知機能檢查與自主繳回乘車津貼門檻，顯著降低高齡駕駛肇事致死率。",
+        model: "清晰斷點回歸 (Sharp RDD) 與局部多項式估計",
+        vars: "Y: 每萬名高齡者交通事故死傷數；Running Var: 駕駛人年齡 (以 75 歲為斷點切線)",
+        dataset: "SSDSE-K 司法安全指標 (1975–2024) + 警察廳交通統計"
+      }
+    ],
+    pipeline: ["1. 平行趨勢檢驗", "2. 雙向固定效應估計", "3. 動態事件研究圖", "4. 安慰劑檢驗"],
+    packages: "Python: linearmodels.panel | R: fixest::feols | Stata: reghdfe"
+  },
+  {
+    id: "timeseries",
+    icon: "📈",
+    name: "時序計量與人口世代預測 (Time-Series Econometrics & Demography)",
+    category: "動態時序與人口學",
+    timeSpan: "1950–2024 (74年連續時序) / 1920–2020 (百年普查)",
+    timeBadge: "74 年連續時間序列 · 長期預測",
+    coreMethods: ["世代存活法 (Cohort-Component)", "向量自我迴歸 (VAR/SVAR)", "共整合與誤差修正 (VECM)", "Prophet / ARIMA"],
+    summary: "利用日本半世紀以上連續未中斷的時間序列，模擬長期人口金字塔推估、物價通膨傳導動態與脈衝響應分析。",
+    topics: [
+      {
+        title: "2025–2050 日本 47 都道府縣人口年齡結構崩縮與「地方消滅」臨界點模擬預測",
+        hypothesis: "地方 20-39 歲育齡女性在未來 20 年減半，導致人口自然萎縮形成不可逆的自我強化螺旋。",
+        model: "世代存活法 (Cohort-Component Projection)",
+        vars: "Y: 5歲階級年齡別人口推估；參數: 都道府縣別生命表生殘率、特殊出生率、跨縣純移動率",
+        dataset: "人口推計 (0003448228, 1950–2024) + 國勢調查"
+      },
+      {
+        title: "「春鬥」名目工資調升、進口能源物價衝擊與核心通膨之動態傳導時滯與脈衝響應分析",
+        hypothesis: "名目薪資調升對核心 CPI 的傳導時滯約 6~9 個月，短期波動主要由進口原物料價格推動。",
+        model: "結構向量自我迴歸 (SVAR & Impulse Response Functions)",
+        vars: "變數群: 每月勤勞統計現金給與總額、進口物價指數、核心通膨率 (CPI)、有效求人倍率",
+        dataset: "消費者物價指數 CPI (0003427113, 1970–2024) + 勞動統計"
+      }
+    ],
+    pipeline: ["1. ADF 單根檢驗", "2. AIC/BIC 滯後階數", "3. 脈衝響應分析 (IRF)", "4. 蒙地卡羅情境模擬"],
+    packages: "Python: statsmodels.tsa.api.VAR | prophet | R: demography"
+  },
+  {
+    id: "spatial",
+    icon: "🗺️",
+    name: "空間計量與區域經濟學 (Spatial Econometrics & Regional Economics)",
+    category: "地理空間統計",
+    timeSpan: "1954–2024 (70年人口移動) / 1974–2024 (50年地價)",
+    timeBadge: "70 年跨縣移動 · 空間自相關與溢出",
+    coreMethods: ["莫蘭指數 (Moran's I)", "空間落後模型 (Spatial Lag / SAR)", "空間誤差模型 (SEM)", "地理加權迴歸 (GWR)"],
+    summary: "突破傳統計量「個體獨立同分佈」假設，量化地理鄰近性、跨區域空間溢出效應 (Spatial Spillover) 與城鄉磁吸力。",
+    topics: [
+      {
+        title: "日本 900 萬戶空屋危機 (Akiya Crisis) 的跨鄰里空間溢出與周邊房價折價效應",
+        hypothesis: "高空屋率具有顯著的正向空間自相關，並對相鄰市町村住宅地價產生負向空間溢出傳染。",
+        model: "空間落後模型 (Spatial Autoregressive Model, SAR)",
+        vars: "Y: 都道府縣住宅公示地價；X: 本地空屋率、空間落後項 W·Y (Spatial Lag)、建築著工戶數",
+        dataset: "地價公示 (1974–2024) + 住宅・土地統計調查 (SSDSE-H)"
+      }
+    ],
+    pipeline: ["1. 空間權重矩陣 W", "2. 全域莫蘭指數檢驗", "3. LM Lag/Error 檢驗", "4. 溢出效應分解"],
+    packages: "Python: pysal, esda, mgwr, geopandas | R: spatialreg"
+  }
+];
+
+// =========================================================================
+// 4. 官方 17 大統計領域分類資料庫 (Categories Data)
+// =========================================================================
+const categoriesData = [
+  {
+    code: "02",
+    tagGroup: "demographics",
+    name: "人口・世帶 (Population & Households)",
+    ministry: "總務省統計局",
+    statsField: "02",
+    tableId: "0000010101 (社會・人口體系 A)",
+    timeSpan: "1920–2020 (百年普查) / 1950–2024 (74年推計)",
+    scope: "國勢調查（全日本普查）、人口推計（月度/年度）、住民基本台帳人口移動報告、單身與核心家庭世帶構成、在留外國人人口。",
+    researchTopics: [
+      { title: "「地方消滅」危機指數模型：各都道府縣 2040 年人口自然萎縮率預測", method: "世代存活法 (Cohort-Component)" },
+      { title: "東京單極集中（Tokyo Centralization）的磁吸力與青年移住淨流入分析", method: "引力模型 (Gravity Model)" },
+      { title: "高齡單身世帶急增對地方公共服務與社區安照的衝擊量化", method: "多元線性迴歸 (MLR)" },
+      { title: "外籍勞工與留學生地域分佈對製造業與農業缺工的補償效應", method: "差分法 (DID)" }
+    ]
+  },
+  {
+    code: "03",
+    tagGroup: "demographics",
+    name: "勞動・賃金 (Labor & Wages)",
+    ministry: "厚生勞動省 / 總務省",
+    statsField: "03",
+    tableId: "0000010106 (社會・人口體系 F)",
+    timeSpan: "1953–2024 (71年連續時序)",
+    scope: "每月勤勞統計調查、賃金構造基本統計調查、勞動力調查（失業率）、職業安定業務統計（有效求人倍率）、每週工時、非正規雇用比例。",
+    researchTopics: [
+      { title: "「春鬥」加薪潮下，中小企業實質薪資與通膨率之滯後效應分析", method: "向量自我迴歸 (VAR)" },
+      { title: "性別薪資差距（Gender Wage Gap）的行業別與年資別解構研究", method: "Oaxaca-Blinder 分解" },
+      { title: "有效求人倍率與失業率的 Beveridge 曲線移位：日本勞動市場結構性缺工", method: "貝佛里奇曲線分析" }
+    ]
+  },
+  {
+    code: "13",
+    tagGroup: "economy",
+    name: "物價・地價 (Prices & Land Value)",
+    ministry: "總務省統計局 / 國土交通省",
+    statsField: "13",
+    tableId: "0003427113 (消費者物價指數 CPI)",
+    timeSpan: "1970–2024 (54年 CPI) / 1974–2024 (50年地價)",
+    scope: "消費者物價指數 (CPI 各品項細項)、地價公示、都道府縣地價調查、企業物價指數、市街地價格指數。",
+    researchTopics: [
+      { title: "進口能源與食品通膨對不同收入分位數家庭之「生活成本差異」研究", method: "微觀計量經濟模型" },
+      { title: "日圓歷史性貶值對日本國內各都市住宅與商業地價的資本重估效應", method: "空間計量經濟學 (Spatial Lag)" },
+      { title: "東京 23 區新成屋每坪破億日幣背後的資金結構與海外投資客驅動分析", method: "特徵價格法 (Hedonic Pricing)" }
+    ]
+  },
+  {
+    code: "07",
+    tagGroup: "economy",
+    name: "企業・家計・經濟 (Business & Economy)",
+    ministry: "內閣府 / 總務省 / 財務省",
+    statsField: "07",
+    tableId: "0000010103 (社會・人口體系 C)",
+    timeSpan: "1963–2024 (61年家計調查) / 1975–2024 (50年SSDSE)",
+    scope: "國民經濟計算 (SNA/GDP)、家計調查（每戶月均收支與儲蓄）、法人企業統計調查、景氣動向指數、民營企業設備投資調查。",
+    researchTopics: [
+      { title: "日本企業內部現金保留金（留保金）累積與薪資分紅脫節的成因研究", method: "面板數據分析 (Panel Data)" },
+      { title: "高儲蓄率神話破滅？日本老齡化如何推動家計儲蓄率下探臨界點", method: "生命週期假說實證" }
+    ]
+  },
+  {
+    code: "08",
+    tagGroup: "housing",
+    name: "住宅・土地・建設 (Housing & Construction)",
+    ministry: "總務省 / 國土交通省",
+    statsField: "08",
+    tableId: "0000010108 (社會・人口體系 H)",
+    timeSpan: "1948–2023 (75年住宅調查)",
+    scope: "住宅・土地統計調查（5年一次）、全日本空屋率（空き家）、建築著工統計（新屋開工戶數）、住宅每坪租金與持有率。",
+    researchTopics: [
+      { title: "日本 900 萬戶「空屋危機 (Akiya Crisis)」的地理擴散路徑與房價折價率", method: "空間自相關 (Moran's I)" },
+      { title: "繼承稅法規改制對日本高齡者生前贈與住宅與拆除老舊木造屋之誘因評估", method: "斷點回歸設計 (RDD)" }
+    ]
+  },
+  {
+    code: "10",
+    tagGroup: "housing",
+    name: "運輸・觀光 (Transport & Tourism)",
+    ministry: "國土交通省觀光廳 / 鐵道局",
+    statsField: "10",
+    tableId: "0002160001 (訪日外國人旅行消費動向)",
+    timeSpan: "2010–2024 (訪日觀光數據)",
+    scope: "訪日外國人消費動向調查、宿泊旅行統計調查（各縣客房稼動率）、幹線鐵道客運量、高速公路交通量、航空班機載客率。",
+    researchTopics: [
+      { title: "後疫情時代各國旅客（台灣、歐美、陸客）在日消費偏好與免稅貢獻對比", method: "聚類分析 (K-Means)" },
+      { title: "地方私鐵與 JR 地方路線廢線對沿線小鎮人口流失的加速效應", method: "綜合控制法 (Synthetic Control)" }
+    ]
+  },
+  {
+    code: "15",
+    tagGroup: "welfare",
+    name: "社會保障・衛生 (Social Security & Health)",
+    ministry: "厚生勞動省",
+    statsField: "15",
+    tableId: "0000010110 (社會・人口體系 J / I)",
+    timeSpan: "1975–2024 (50年社會保障體系)",
+    scope: "國民醫療費、介護保險（長照）給付狀況、生活保護受給世帶、平均壽命與健康壽命、死因分析（癌症、心血管、衰老）。",
+    researchTopics: [
+      { title: "各都道府縣「健康壽命 vs 平均壽命」差距分析：長照失能時間之區域不平等", method: "存活分析 (Survival Analysis)" },
+      { title: "醫師與病床地理分佈不均度（Gini係數）對偏鄉急性病致死率之影響", method: "吉尼係數與空間分析" }
+    ]
+  },
+  {
+    code: "16",
+    tagGroup: "welfare",
+    name: "教育・文化・體育 (Education & Culture)",
+    ministry: "文部科學省",
+    statsField: "16",
+    tableId: "0000010105 (社會・人口體系 E)",
+    timeSpan: "1975–2024 (50年學校基本調查)",
+    scope: "學校基本調查（幼兒園至大學各級學生數與升學率）、公私立教育費用支出、圖書館藏書數、文化遺產保存數。",
+    researchTopics: [
+      { title: "少子化下「地方私立大學招募不足（定員割れ）」與倒閉退場風險預測", method: "Logistic 預測模型" },
+      { title: "家庭年所得對兒童課外補習（塾）支出與名校錄取率的代際傳遞研究", method: "結構方程模型 (SEM)" }
+    ]
+  },
+  {
+    code: "01",
+    tagGroup: "tech",
+    name: "國土・氣象 (Land & Climate)",
+    ministry: "國土交通省氣象廳 / 國土地理院",
+    statsField: "01",
+    tableId: "0000010102 (社會・人口體系 B)",
+    timeSpan: "1975–2024 (50年連續氣象與國土)",
+    scope: "都道府縣土地面積、可住地面積比率、氣溫（最高/最低/年均）、降水量、日照時數、積雪深度、自然公園面積。",
+    researchTopics: [
+      { title: "日本半世紀暖化軌跡：各地區夏日「猛暑日（35℃以上）」日數增長與中暑急救關聯", method: "時間序列趨勢檢驗" }
+    ]
+  },
+  {
+    code: "09",
+    tagGroup: "tech",
+    name: "能源・水 (Energy & Water)",
+    ministry: "資源能源廳 / 經產省",
+    statsField: "09",
+    tableId: "0003428901 (能源消費統計)",
+    timeSpan: "1975–2024 (50年能源消費數據)",
+    scope: "電力銷售量（家庭用/工業用）、太陽光及風力發電併網裝機容量、原油與液化天然氣消耗、水庫蓄水量與水道普及率。",
+    researchTopics: [
+      { title: "311 福島核電停運後，日本各電力公司電價飆升對高耗能製造業外移之衝擊", method: "斷點迴歸分析" }
+    ]
+  },
+  {
+    code: "11",
+    tagGroup: "tech",
+    name: "資訊通信・科技 (IT & Science)",
+    ministry: "總務省情報通信局",
+    statsField: "11",
+    tableId: "0003428800 (情報通信白書數據)",
+    timeSpan: "1990–2024 (資通訊發展時序)",
+    scope: "企業與民間研究開發費 (R&D)、專利件數、光纖與 5G 基地台覆蓋率、家庭網路利用率、企業遠距辦公 (Telework) 比例。",
+    researchTopics: [
+      { title: "後疫情時代企業維持「遠距混合辦公」的決定因子：產業別與數位基礎建設的門檻", method: "Probit 回歸模型" }
+    ]
+  },
+  {
+    code: "12",
+    tagGroup: "economy",
+    name: "財政・金融 (Public Finance & Banking)",
+    ministry: "財務省 / 總務省自治財政局",
+    statsField: "12",
+    tableId: "0000010104 (社會・人口體系 D)",
+    timeSpan: "1975–2024 (50年地方財政面板)",
+    scope: "地方財政健全化判斷比率（實質赤字比率、公債費負擔率）、地方稅收、地方交付稅依存度、銀行存款與放款餘額。",
+    researchTopics: [
+      { title: "地方自治體「財政破產預警模型」：夕張市之後，哪些市町村正逼近赤字紅線？", method: "Altman Z-Score 變形" }
+    ]
+  },
+  {
+    code: "14",
+    tagGroup: "welfare",
+    name: "司法・安全・環境 (Justice & Safety)",
+    ministry: "警察廳 / 消防廳 / 環境省",
+    statsField: "14",
+    tableId: "0000010111 (社會・人口體系 K)",
+    timeSpan: "1975–2024 (50年治安與安全面板)",
+    scope: "刑法犯認知件數與破案率、交通事故發生件數與傷亡數、火災件數、工業廢棄物排出量、溫室氣體排放量。",
+    researchTopics: [
+      { title: "75歲以上「後期高齡者」自主繳回駕照（運転免許返納）政策對交通事故降低之成效評估", method: "雙重差分法 (DID)" }
+    ]
+  },
+  {
+    code: "04",
+    tagGroup: "economy",
+    name: "農林水產業 (Agriculture & Forestry)",
+    ministry: "農林水產省",
+    statsField: "04",
+    tableId: "0000010103 (農林業 Census)",
+    timeSpan: "1950–2020 (農林業普查)",
+    scope: "農家戶數與農業就業人口、耕地面積與廢耕地面積、各農產品收穫量、漁業水產捕獲量、糧食自給率。",
+    researchTopics: [
+      { title: "日本農業就業人口平均年齡突破 68 歲：耕地放棄率（休耕廢耕）擴散與糧食安全韌性", method: "空間滯後模型" }
+    ]
+  },
+  {
+    code: "05",
+    tagGroup: "economy",
+    name: "礦工業 (Mining & Manufacturing)",
+    ministry: "經濟產業省",
+    statsField: "05",
+    tableId: "0000010103 (工業統計調查)",
+    timeSpan: "1951–2021 (70年工業普查)",
+    scope: "工業統計調查、製造業事業者數與從業者數、製造品出貨額、附加價值額、庫存率指數。",
+    researchTopics: [
+      { title: "九州熊本台積電 (JASM) 效應：半導體上下游供應鏈在九州的設備投資與出貨倍增", method: "投入產出分析 (I-O Model)" }
+    ]
+  },
+  {
+    code: "06",
+    tagGroup: "economy",
+    name: "商業・服務業 (Commerce & Services)",
+    ministry: "經濟產業省",
+    statsField: "06",
+    tableId: "0000010103 (商業統計指標)",
+    timeSpan: "1951–2021 (70年商業普查)",
+    scope: "商業統計調查（批發與零售業）、第3次產業活動指數、超商/百貨/連鎖超市月度銷售額、電子商務規模 (EC)。",
+    researchTopics: [
+      { title: "便利商店每平方公尺營收密度與都會區人口夜間/日間流動率關係", method: "地理加權迴歸 (GWR)" }
+    ]
+  },
+  {
+    code: "17",
+    tagGroup: "demographics",
+    name: "行政・其他 (Administration & Governance)",
+    ministry: "總務省行政管理局",
+    statsField: "17",
+    tableId: "0000010104 (行政基盤指標)",
+    timeSpan: "1975–2024 (50年行政公務體系)",
+    scope: "地方公務員員額、行政數位化（DX）線上申請普及率、國政與地方公職選舉投票率、議會費支出。",
+    researchTopics: [
+      { title: "「銀髮民主 (Silver Democracy)」成因：高齡選民投票率遠高於青年對地方預算編列之扭曲度", method: "公共選擇政治經濟模型" }
+    ]
+  }
+];
+
+// =========================================================================
+// 5. 視角切換器與互動渲染邏輯 (UI Logic)
+// =========================================================================
+let currentView = 'dataviz'; // 'dataviz' (預設大眾友善), 'domain', 'horizon', 'econometric', 'all'
+let activeTag = 'all';
+
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll('.view-tab-btn').forEach(btn => btn.classList.remove('active'));
+  
+  if (view === 'dataviz') document.getElementById('tabDataviz').classList.add('active');
+  if (view === 'domain') document.getElementById('tabDomain').classList.add('active');
+  if (view === 'horizon') document.getElementById('tabHorizon').classList.add('active');
+  if (view === 'econometric') document.getElementById('tabEconometric').classList.add('active');
+  if (view === 'all') document.getElementById('tabAll').classList.add('active');
+
+  const datavizBlock = document.getElementById('datavizSectionBlock');
+  const domainBlock = document.getElementById('domainSectionBlock');
+  const horizonBlock = document.getElementById('horizonSectionBlock');
+  const econometricBlock = document.getElementById('econometricSectionBlock');
+
+  if (view === 'dataviz') {
+    datavizBlock.style.display = 'block';
+    domainBlock.style.display = 'none';
+    horizonBlock.style.display = 'none';
+    econometricBlock.style.display = 'none';
+  } else if (view === 'domain') {
+    datavizBlock.style.display = 'none';
+    domainBlock.style.display = 'block';
+    horizonBlock.style.display = 'none';
+    econometricBlock.style.display = 'none';
+  } else if (view === 'horizon') {
+    datavizBlock.style.display = 'none';
+    domainBlock.style.display = 'none';
+    horizonBlock.style.display = 'block';
+    econometricBlock.style.display = 'none';
+  } else if (view === 'econometric') {
+    datavizBlock.style.display = 'none';
+    domainBlock.style.display = 'none';
+    horizonBlock.style.display = 'none';
+    econometricBlock.style.display = 'block';
+  } else {
+    // all
+    datavizBlock.style.display = 'block';
+    domainBlock.style.display = 'block';
+    horizonBlock.style.display = 'block';
+    econometricBlock.style.display = 'block';
+  }
+
+  onSearchInput();
+}
+
+function setFilter(evt, tag) {
+  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+  evt.currentTarget.classList.add('active');
+  activeTag = tag;
+  onSearchInput();
+}
+
+function onSearchInput() {
+  const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+
+  // 1. 篩選 DataViz 實戰卡片
+  const filteredDataviz = datavizMethodsData.filter(d => {
+    if (!keyword) return true;
+    const inName = d.name.toLowerCase().includes(keyword);
+    const inAtom = d.atomName.toLowerCase().includes(keyword);
+    const inQuestion = d.question.toLowerCase().includes(keyword);
+    const inShelf = d.shelfSetup.toLowerCase().includes(keyword);
+    const inTips = d.insightTips.toLowerCase().includes(keyword);
+    const inTag = d.tag.toLowerCase().includes(keyword);
+    return inName || inAtom || inQuestion || inShelf || inTips || inTag;
+  });
+  renderDatavizCards(filteredDataviz);
+
+  // 2. 篩選 Domain 卡片
+  const filteredDomains = categoriesData.filter(item => {
+    const matchTag = (activeTag === 'all') || (item.tagGroup === activeTag);
+    if (!matchTag) return false;
+    if (!keyword) return true;
+
+    const inName = item.name.toLowerCase().includes(keyword);
+    const inMinistry = item.ministry.toLowerCase().includes(keyword);
+    const inScope = item.scope.toLowerCase().includes(keyword);
+    const inTime = item.timeSpan.toLowerCase().includes(keyword);
+    const inTopics = item.researchTopics.some(t => t.title.toLowerCase().includes(keyword) || t.method.toLowerCase().includes(keyword));
+    return inName || inMinistry || inScope || inTime || inTopics;
+  });
+  renderDomainCards(filteredDomains);
+
+  // 3. 篩選 Horizons 表格
+  const filteredHorizons = horizonsData.filter(h => {
+    if (!keyword) return true;
+    const inName = h.name.toLowerCase().includes(keyword);
+    const inMinistry = h.ministry.toLowerCase().includes(keyword);
+    const inModels = h.models.toLowerCase().includes(keyword);
+    const inFreq = h.frequency.toLowerCase().includes(keyword);
+    const inYears = String(h.years).includes(keyword) || String(h.startYear).includes(keyword) || String(h.endYear).includes(keyword);
+    return inName || inMinistry || inModels || inFreq || inYears;
+  });
+  renderHorizonTableAndTimeline(filteredHorizons);
+
+  // 4. 篩選進階計量卡片
+  const filteredEconometric = econometricMethodsData.filter(m => {
+    if (!keyword) return true;
+    const inName = m.name.toLowerCase().includes(keyword);
+    const inSummary = m.summary.toLowerCase().includes(keyword);
+    const inCore = m.coreMethods.some(c => c.toLowerCase().includes(keyword));
+    return inName || inSummary || inCore;
+  });
+  renderEconometricCards(filteredEconometric);
+}
+
+// 渲染 10 大資料視覺化實戰卡片
+function renderDatavizCards(data) {
+  const container = document.getElementById('datavizContainer');
+  container.innerHTML = '';
+  document.getElementById('datavizResultsCount').innerText = `共篩選出 ${data.length} 個實戰圖表招式`;
+
+  data.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'dataviz-card';
+
+    card.innerHTML = `
+      <div>
+        <div class="dataviz-card-header">
+          <div class="dataviz-title-row">
+            <span class="dataviz-icon">${item.icon}</span>
+            <div class="dataviz-name">${item.name}</div>
+          </div>
+          <span class="dataviz-atom-badge">${item.atomName}</span>
+        </div>
+
+        <div class="dataviz-question-box">
+          <strong>❓ 大家常問的問題：</strong><br/>
+          ${item.question}
+        </div>
+
+        <div class="dataviz-shelf-box">
+          <div class="dataviz-shelf-label">🛠️ 在 Data Atoms 儀表板中拖曳設定：</div>
+          <div>${item.shelfSetup}</div>
+        </div>
+
+        <div class="dataviz-insight-box">
+          <strong>💡 視覺化洞察訣竅：</strong><br/>
+          ${item.insightTips}
+        </div>
+      </div>
+
+      <div class="dataviz-card-footer">
+        <span class="dataset-hint-tag">${item.datasetHint}</span>
+        <a href="data_atoms.html?chart=${item.chartAtom}" target="_blank" class="launch-atom-btn">
+          <span>🚀 在 Data Atoms 儀表板開啟範例 ↗</span>
+        </a>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// 渲染時間軸與規格表
+function renderHorizonTableAndTimeline(data) {
+  const barsContainer = document.getElementById('timelineBarsContainer');
+  const tableBody = document.getElementById('horizonTableBody');
+  barsContainer.innerHTML = '';
+  tableBody.innerHTML = '';
+
+  const minYear = 1920;
+  const maxYear = 2024;
+  const totalRange = maxYear - minYear;
+
+  data.forEach(item => {
+    const leftPct = ((item.startYear - minYear) / totalRange) * 100;
+    const widthPct = Math.max(((item.endYear - item.startYear) / totalRange) * 100, 3);
+
+    const barRow = document.createElement('div');
+    barRow.className = 'timeline-row';
+    barRow.innerHTML = `
+      <div class="timeline-label" title="${item.name}">${item.name}</div>
+      <div class="timeline-bar-bg">
+        <div class="timeline-bar-fill" style="left: ${leftPct.toFixed(1)}%; width: ${widthPct.toFixed(1)}%; background: ${item.color};">
+          <span>${item.startYear} ~ ${item.endYear} (${item.years}年)</span>
+        </div>
+      </div>
+      <div class="timeline-span-badge">${item.years} 年跨度</div>
+    `;
+    barsContainer.appendChild(barRow);
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <strong>${item.name}</strong><br/>
+        <span style="font-size: 11px; color: var(--ink-muted);">${item.ministry}</span>
+      </td>
+      <td><span class="time-chip">${item.startYear} ～ ${item.endYear}</span></td>
+      <td><span class="duration-chip">${item.years} 年連續</span></td>
+      <td style="color: var(--ink-secondary); font-size: 12.5px;">${item.frequency}</td>
+      <td style="color: var(--ink-secondary); font-size: 12.5px;">${item.granularity}</td>
+      <td style="max-width: 320px; line-height: 1.45; font-size: 12.5px;">
+        <span style="color: var(--purple-accent); font-weight: 600;">✦ ${item.models}</span>
+      </td>
+      <td>
+        <code style="background: var(--bg-subtle); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 11.5px;">${item.tableId}</code>
+      </td>
+    `;
+    tableBody.appendChild(tr);
+  });
+}
+
+// 渲染進階計量卡片
+function renderEconometricCards(data) {
+  const container = document.getElementById('methodContainer');
+  container.innerHTML = '';
+  document.getElementById('methodResultsCount').innerText = `共 ${data.length} 大計量實證體系`;
+
+  data.forEach(m => {
+    const card = document.createElement('div');
+    card.className = 'method-card';
+
+    const corePills = m.coreMethods.map(c => `<span class="core-algo-pill">${c}</span>`).join('');
+    const topicsHtml = m.topics.map((t, idx) => `
+      <div class="method-topic-item">
+        <div class="topic-item-title">${idx + 1}. ${t.title}</div>
+        <div class="topic-item-meta">
+          <div>🎯 <strong>理論假說：</strong>${t.hypothesis}</div>
+          <div>📊 <strong>模型與變數：</strong>${t.vars}</div>
+          <span class="topic-tag-model">推薦模型: ${t.model}</span>
+        </div>
+      </div>
+    `).join('');
+
+    card.innerHTML = `
+      <div>
+        <div class="method-card-header">
+          <div class="method-family-title">
+            <span>${m.icon}</span>
+            <span>${m.name}</span>
+          </div>
+          <span class="method-cat-badge">${m.category}</span>
+        </div>
+
+        <div class="method-time-horizon-banner">
+          <span class="method-time-badge-bold">⏳ 推薦時間跨度</span>
+          <span><strong>${m.timeSpan}</strong>（${m.timeBadge}）</span>
+        </div>
+
+        <div style="font-size: 13px; color: var(--ink-secondary); margin-bottom: 12px; line-height: 1.5;">
+          ${m.summary}
+        </div>
+
+        <div class="core-algo-group">${corePills}</div>
+
+        <div>${topicsHtml}</div>
+      </div>
+
+      <div style="margin-top: 14px; font-size: 12px; color: var(--ink-muted); font-family: monospace;">
+        📦 ${m.packages}
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// 渲染領域卡片
+function renderDomainCards(data) {
+  const container = document.getElementById('categoryContainer');
+  container.innerHTML = '';
+  document.getElementById('domainResultsCount').innerText = `共篩選出 ${data.length} 個領域分類`;
+
+  data.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+    
+    let topicsHtml = item.researchTopics.map(t => `
+      <li class="research-idea-item">
+        <strong>${t.title}</strong>
+        <span class="research-method-tag">${t.method}</span>
+      </li>
+    `).join('');
+
+    card.innerHTML = `
+      <div>
+        <div class="cat-header">
+          <div>
+            <div class="cat-name">${item.name}</div>
+            <div class="cat-ministry">主管機關：${item.ministry}</div>
+            <div class="cat-time-badge">⏳ 時間跨度：${item.timeSpan}</div>
+          </div>
+          <span class="cat-code-badge">分野代碼 ${item.code}</span>
+        </div>
+
+        <div class="cat-data-scope">
+          <strong>📊 包含數據範疇：</strong><br/>
+          ${item.scope}
+        </div>
+
+        <div class="research-block">
+          <div class="research-title-label">💡 可執行的代表性研究與商業分析切角：</div>
+          <ul class="research-idea-list">
+            ${topicsHtml}
+          </ul>
+        </div>
+      </div>
+
+      <div class="cat-footer">
+        <span class="api-hint">推薦表單: <code>${item.tableId.split(' ')[0]}</code></span>
+        <button class="quick-api-btn" onclick="copyApiQuery('${item.code}', '${item.tableId.split(' ')[0]}')">複製 API 呼叫參數</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function copyApiQuery(code, tableId) {
+  const query = `https://api.e-stat.go.jp/rest/3.0/app/json/getStatsList?appId=d96194b7b3219075b1041948fddc842cfead7477&statsField=${code}&limit=10`;
+  navigator.clipboard.writeText(query).then(() => {
+    alert(`已複製該領域的 e-Stat API 查詢網址：\n${query}`);
+  });
+}
+
+// 頁面初始化
+window.addEventListener('DOMContentLoaded', () => {
+  renderDatavizCards(datavizMethodsData);
+  renderHorizonTableAndTimeline(horizonsData);
+  renderDomainCards(categoriesData);
+  renderEconometricCards(econometricMethodsData);
+  switchView('dataviz'); // 預設以最平易近人的「10大資料視覺化分析法」為主
+});
+</script>
+</body>
+</html>"""
+
+with open('estat_catalog_and_research_guide.html', 'w', encoding='utf-8') as f:
+    f.write(html_template)
+
+print("Successfully wrote upgraded estat_catalog_and_research_guide.html with 10 DataViz Methods!")

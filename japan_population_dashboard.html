@@ -1,0 +1,2313 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日本政府統計 e-Stat API 實戰數據儀表板 · 50年人口變遷與 Data Atoms 數據原子分析</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@500;700&display=swap" rel="stylesheet">
+  <script src="./js/echarts.min.js"></script>
+  <script>if (typeof echarts === 'undefined') { document.write('<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"><\/script>'); }</script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg-page: #fbfaf6;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f5f2ea;
+      --bg-inset: #ede8dc;
+      --border-light: rgba(45, 40, 36, 0.08);
+      --border-default: #e5dfd3;
+      --ink-primary: #23201d;
+      --ink-secondary: #5d564e;
+      --ink-muted: #8a8277;
+      
+      --metro-blue: #2c548a;
+      --metro-tint: rgba(44, 84, 138, 0.08);
+      --clay-danger: #b84a2d;
+      --clay-tint: rgba(184, 74, 45, 0.08);
+      --forest-green: #2c6e49;
+      --amber-accent: #c07d2b;
+      --purple-accent: #6b46c1;
+      --purple-tint: rgba(107, 70, 193, 0.08);
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 14px rgba(0,0,0,0.06);
+    }
+
+    body {
+      font-family: 'Geist', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--ink-primary);
+      line-height: 1.6;
+      padding: 0 0 80px 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 頂部官方入口橫幅 */
+    .official-portal-strip {
+      background: #0d47a1;
+      color: #ffffff;
+      padding: 8px 48px;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .portal-link-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #e0f2fe;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .portal-link-badge:hover { text-decoration: underline; color: #fff; }
+    .portal-url-tag {
+      background: rgba(255, 255, 255, 0.18);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #fff;
+    }
+
+    header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-default);
+      padding: 24px 48px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.94);
+    }
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: var(--metro-tint);
+      color: var(--metro-blue);
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+    .header-badge span.dot {
+      width: 7px;
+      height: 7px;
+      background: #10b981;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 8px #10b981;
+    }
+    h1 {
+      font-family: 'Noto Serif TC', 'Instrument Serif', Georgia, serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink-primary);
+    }
+    .header-desc {
+      font-size: 13.5px;
+      color: var(--ink-secondary);
+      margin-top: 3px;
+    }
+    .nav-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-default);
+      color: var(--ink-primary);
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover {
+      background: var(--metro-blue);
+      color: #fff;
+      border-color: var(--metro-blue);
+    }
+    .nav-btn.primary {
+      background: var(--metro-blue);
+      color: #fff;
+      border-color: var(--metro-blue);
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 28px auto 0;
+      padding: 0 48px;
+    }
+    @media (max-width: 1024px) {
+      .official-portal-strip, header, main { padding-left: 20px; padding-right: 20px; }
+    }
+
+    /* KPI 卡片 */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 18px 22px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .kpi-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-secondary);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .kpi-value {
+      font-size: 30px;
+      font-weight: 700;
+      font-feature-settings: "tnum";
+      color: var(--ink-primary);
+      letter-spacing: -0.03em;
+    }
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--ink-muted);
+      margin-top: 4px;
+    }
+    .kpi-sub strong { color: var(--clay-danger); }
+
+    /* Tab 切換按鈕 */
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-default);
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--ink-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tab-btn:hover {
+      background: var(--bg-subtle);
+      color: var(--ink-primary);
+    }
+    .tab-btn.active {
+      background: var(--metro-blue);
+      color: #ffffff;
+    }
+    .tab-btn.active.atom-tab {
+      background: #ea580c;
+    }
+
+    /* 圖表網格 */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 1024px) {
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+
+    .chart-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .panel-title {
+      font-size: 16.5px;
+      font-weight: 600;
+      color: var(--ink-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-desc {
+      font-size: 12.5px;
+      color: var(--ink-secondary);
+      margin-top: 3px;
+    }
+    .chart-container {
+      width: 100%;
+      height: 420px;
+    }
+
+    /* Data Atoms 專屬區域樣式 */
+    .atom-banner {
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+      border: 1px solid #fed7aa;
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .atom-banner-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #9a3412;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .atom-banner-desc {
+      font-size: 13px;
+      color: #7c2d12;
+      margin-top: 4px;
+      max-width: 800px;
+    }
+
+    /* 排行榜表格 */
+    .table-container {
+      max-height: 420px;
+      overflow-y: auto;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background: var(--bg-subtle);
+      color: var(--ink-secondary);
+      font-weight: 600;
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-default);
+    }
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border-light);
+      font-feature-settings: "tnum";
+    }
+    tr:hover td {
+      background: var(--bg-subtle);
+    }
+    .badge-aging {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .aging-high { background: var(--clay-tint); color: var(--clay-danger); }
+    .aging-mid { background: rgba(192, 125, 43, 0.1); color: var(--amber-accent); }
+    .aging-low { background: var(--metro-tint); color: var(--metro-blue); }
+
+    /* API 測試實驗台 */
+    .playground-box {
+      background: #18181c;
+      color: #f3f3f5;
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      margin-top: 12px;
+    }
+    .api-input-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .api-input {
+      flex: 1;
+      min-width: 260px;
+      background: #272730;
+      border: 1px solid #3e3e4d;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-family: monospace;
+      font-size: 13px;
+    }
+    .api-select {
+      background: #272730;
+      border: 1px solid #3e3e4d;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+    }
+    .api-btn {
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .api-btn:hover { background: #2563eb; }
+    .api-response-pre {
+      background: #0f0f13;
+      border: 1px solid #2d2d38;
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+      color: #a5f3fc;
+      line-height: 1.5;
+    }
+
+    footer {
+      max-width: 1400px;
+      margin: 40px auto 0;
+      padding: 24px 48px;
+      border-top: 1px solid var(--border-default);
+      display: flex;
+      justify-content: space-between;
+      color: var(--ink-muted);
+      font-size: 13px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 頂部官方入口指示橫條 (明確指示 e-Stat 網址與直連管道) -->
+<div class="official-portal-strip">
+  <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+    <span>🏛️ 日本總務省統計局官方資料門戶：</span>
+    <a href="https://www.e-stat.go.jp" target="_blank" class="portal-link-badge">
+      <span class="portal-url-tag">https://www.e-stat.go.jp</span>
+      <span>(點擊在新分頁開啟官網) ↗</span>
+    </a>
+  </div>
+  <div style="display: flex; gap: 12px; align-items: center;">
+    <span style="opacity: 0.85;">API Base: api.e-stat.go.jp/rest/3.0/app</span>
+    <button onclick="copyPortalUrl()" style="background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">複製官網網址</button>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="header-badge"><span class="dot"></span> API 連線正常 · e-Stat v3.0 官方直連</div>
+      <h1>日本政府統計 e-Stat 實戰儀表板</h1>
+      <p class="header-desc">半世紀（1975–2024）人口結構演變與 Data Atoms 數據原子矩陣</p>
+    </div>
+    <div class="nav-actions">
+      <a href="student_data_analyst_workflow.html" class="nav-btn primary">🎓 學員工作流指南</a>
+      <a href="estat_catalog_and_research_guide.html" class="nav-btn">🗺️ 17領域研究指南</a>
+      <a href="estat_api_tutorial_simulator.html" class="nav-btn">🎥 API申請錄影教學</a>
+      <a href="data_atoms.html" class="nav-btn" target="_blank">⚛️ Data Atoms Studio</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- KPI 摘要卡片 -->
+  <section class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">
+        <span>2024 全國總人口</span>
+        <span style="color: var(--clay-danger)">▼ 連續15年遞減</span>
+      </div>
+      <div class="kpi-value" id="kpiTotalPop">123,802,000</div>
+      <div class="kpi-sub">較歷史峰值（2008年 1.28億）減少約 428 萬人</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">
+        <span>65歲以上高齡化率</span>
+        <span style="color: var(--clay-danger)">▲ 創歷史新高</span>
+      </div>
+      <div class="kpi-value" id="kpiElderlyRatio">29.27%</div>
+      <div class="kpi-sub">高齡人口達 <strong>3,624 萬人</strong>（每 3.4 人即有 1 位長者）</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">
+        <span>全日本最高齡縣市</span>
+        <span>秋田縣</span>
+      </div>
+      <div class="kpi-value" style="color: var(--clay-danger);">39.46%</div>
+      <div class="kpi-sub">秋田總人口 90.3 萬人，每 10 人就有近 4 位長者</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-label">
+        <span>全日本最年輕都縣</span>
+        <span>東京都</span>
+      </div>
+      <div class="kpi-value" style="color: var(--metro-blue);">22.68%</div>
+      <div class="kpi-sub">東京總人口 1,418 萬人，持續受青年人口流入支撐</div>
+    </div>
+  </section>
+
+  <!-- 導航切換 (整合 Data Atoms 數據原子) -->
+  <div class="tabs-nav">
+    <button class="tab-btn active atom-tab" onclick="switchTab(event, 'atoms')">⚛️ Data Atoms 數據原子矩陣 (整合視圖)</button>
+    <button class="tab-btn" onclick="switchTab(event, 'trends')">📈 50年人口趨勢分析</button>
+    <button class="tab-btn" onclick="switchTab(event, 'prefectures')">🗺️ 47都道府縣深度對比</button>
+    <button class="tab-btn" onclick="switchTab(event, 'structure')">👥 年齡結構與少子化</button>
+    <button class="tab-btn" onclick="switchTab(event, 'playground')">⚡ e-Stat API 實時測試台</button>
+  </div>
+
+  <!-- 【全新核心】：整合 Data Atoms 概念的日本資料應用 -->
+  <section id="tab-atoms" class="tab-content">
+    <div class="atom-banner">
+      <div>
+        <div class="atom-banner-title">
+          <span>⚛️ Data Atoms（數據原子）化合分析法</span>
+        </div>
+        <div class="atom-banner-desc">
+          正如化學分子由基礎原子構成，任何複雜的國家統計也能拆解為基礎的<strong>「數據原子 (Data Atoms)」</strong>。透過離散體量、時序趨勢、結構佔比、相關分佈與多維畫像，我們能立體解讀日本少子高齡化的全貌！
+        </div>
+      </div>
+      <div>
+        <a href="data_atoms.html" target="_blank" style="background: #ea580c; color: #fff; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 6px; text-decoration: none; display: inline-block;">開啟 Data Atoms 工作台 ↗</a>
+      </div>
+    </div>
+
+    <!-- 5大原子視覺化切換 -->
+    <div class="charts-grid">
+      <!-- 左側：原子圖表 04 相關矩陣 (Scatter: 人口規模 vs 高齡化率) -->
+      <div class="chart-panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">
+              <span style="background: #ea580c; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 04 · 相關矩陣</span>
+              都道府縣「總人口規模 vs 高齡化率」散點分佈
+            </div>
+            <div class="panel-desc">觀察極端負相關：人口越少、偏遠之縣市，高齡化率越逼近 40%</div>
+          </div>
+        </div>
+        <div id="chartAtomScatter" class="chart-container"></div>
+      </div>
+
+      <!-- 右側：原子圖表 05 多維畫像 (Radar: 東京 vs 秋田 vs 全國) -->
+      <div class="chart-panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">
+              <span style="background: #ea580c; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 05 · 多維畫像</span>
+              極值地區多維特徵對比 (Radar)
+            </div>
+            <div class="panel-desc">東京都（都市青年吸力）vs 秋田縣（極限老齡化）vs 全國基準</div>
+          </div>
+        </div>
+        <div id="chartAtomRadar" class="chart-container"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 內容區塊 1: 50年趨勢 -->
+  <section id="tab-trends" class="tab-content" style="display: none;">
+    <div class="charts-grid">
+      <div class="chart-panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">
+              <span style="background: #2c548a; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 02 · 時序趨勢</span>
+              日本總人口 vs 65歲以上高齡化率（1975–2024）
+            </div>
+            <div class="panel-desc">雙軸聯動分析：人口總量下行與高齡佔比飆升之「剪刀差」</div>
+          </div>
+        </div>
+        <div id="chartHistory" class="chart-container"></div>
+      </div>
+
+      <div class="chart-panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">都道府縣高齡化分佈極值對比</div>
+            <div class="panel-desc">Top 5 最高 vs Top 5 最低行政區</div>
+          </div>
+        </div>
+        <div id="chartAgingCompare" class="chart-container"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 內容區塊 2: 都道府縣 -->
+  <section id="tab-prefectures" class="tab-content" style="display: none;">
+    <div class="charts-grid">
+      <div class="chart-panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">
+              <span style="background: #2c548a; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 01 · 離散體量</span>
+              2024 年日本各都道府縣人口規模 Top 15
+            </div>
+            <div class="panel-desc">首都圈與關西圈集中效應極其顯著</div>
+          </div>
+        </div>
+        <div id="chartPrefPop" class="chart-container"></div>
+      </div>
+
+      <div class="chart-panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">47 都道府縣完整數據總表</div>
+            <div class="panel-desc">即時檢視總人口與高齡化率</div>
+          </div>
+        </div>
+        <div class="table-container">
+          <table id="prefTable">
+            <thead>
+              <tr>
+                <th>都道府縣</th>
+                <th>總人口</th>
+                <th>65歲以上比率</th>
+                <th>外國人住民</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 內容區塊 3: 結構變遷 -->
+  <section id="tab-structure" class="tab-content" style="display: none;">
+    <div class="chart-panel" style="margin-bottom: 24px;">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">
+            <span style="background: #2c548a; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 03 · 結構佔比</span>
+            日本三大年齡組百分比結構變遷（1975–2024）
+          </div>
+          <div class="panel-desc">幼年人口（0-14）、生產工作年齡人口（15-64）與老年人口（65+）之消長</div>
+        </div>
+      </div>
+      <div id="chartStructure" style="width: 100%; height: 460px;"></div>
+    </div>
+  </section>
+
+  <!-- 內容區塊 4: API 測試台 -->
+  <section id="tab-playground" class="tab-content" style="display: none;">
+    <div class="playground-box">
+      <div class="playground-header">
+        <div>
+          <h2 style="font-size: 18px; margin-bottom: 4px;">⚡ e-Stat API 實時端點測試實驗台</h2>
+          <p style="font-size: 13px; color: #9ca3af;">直連日本統計局官方資料庫 (https://api.e-stat.go.jp)，即時查看原始 JSON 回應</p>
+        </div>
+        <span style="background: #065f46; color: #34d399; font-size: 11px; padding: 4px 10px; border-radius: 12px; font-weight: 600;">CORS / JSONP 直連模式</span>
+      </div>
+
+      <div class="api-input-row">
+        <select id="apiEndpoint" class="api-select">
+          <option value="getStatsList">getStatsList (統計表搜尋)</option>
+          <option value="getMetaInfo">getMetaInfo (元資料與欄位定義)</option>
+          <option value="getStatsData">getStatsData (統計數值)</option>
+        </select>
+        <input type="text" id="apiParam" class="api-input" value="searchWord=人口&limit=3" placeholder="輸入參數，例如 searchWord=物價&limit=3">
+        <button class="api-btn" onclick="executeApiCall()">發送請求 (Send Request)</button>
+      </div>
+
+      <div style="font-size: 12px; color: #9ca3af; margin-bottom: 8px;">請求 URL (Request URL):</div>
+      <div id="requestUrlDisplay" style="background: #111115; padding: 8px 12px; border-radius: 4px; font-family: monospace; font-size: 12px; color: #f59e0b; margin-bottom: 14px; word-break: break-all;">
+        https://api.e-stat.go.jp/rest/3.0/app/json/getStatsList?...
+      </div>
+
+      <div style="font-size: 12px; color: #9ca3af; margin-bottom: 8px;">API 即時回應 (Response Body):</div>
+      <pre id="apiOutput" class="api-response-pre">點擊上方「發送請求」按鈕，立即透過您的 API Key 連線 e-Stat 官方資料庫...</pre>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div>
+    <strong>資料來源:</strong> 日本總務省統計局 e-Stat 政府統計ポータルサイト (<a href="https://www.e-stat.go.jp" target="_blank" style="color: #2c548a;">https://www.e-stat.go.jp</a>)
+  </div>
+  <div>
+    <strong>核心架構:</strong> e-Stat API v3.0 · Data Atoms 數據原子體系 · Apache ECharts
+  </div>
+</footer>
+
+<script>
+  const estatData = {
+  "metadata": {
+    "source": "日本政府統計 e-Stat API v3.0 (總務省統計局)",
+    "table_id": "0000010101",
+    "table_name": "社会・人口統計体系（Ａ 人口・世帯）",
+    "query_timestamp": "2026-11-02",
+    "api_endpoint": "https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData"
+  },
+  "summary_2024": {
+    "japan_total_population": 123802000,
+    "japan_elderly_population": 36243000,
+    "japan_elderly_ratio": 29.27,
+    "japan_youth_ratio": 11.17,
+    "japan_working_ratio": 59.55,
+    "top_populous_prefecture": "東京都",
+    "highest_aging_prefecture": "秋田県",
+    "highest_aging_ratio": 39.46,
+    "lowest_aging_prefecture": "東京都",
+    "lowest_aging_ratio": 22.68
+  },
+  "national_history": [
+    {
+      "year": 1975,
+      "total_population": 111939643,
+      "youth_0_14": 27220692,
+      "working_15_64": 75807317,
+      "elderly_65_plus": 8865429,
+      "late_elderly_75_plus": 2020504,
+      "youth_ratio": 24.32,
+      "working_ratio": 67.72,
+      "elderly_ratio": 7.92,
+      "late_elderly_ratio": 1.8
+    },
+    {
+      "year": 1976,
+      "total_population": 113094000,
+      "youth_0_14": 27492000,
+      "working_15_64": 76395000,
+      "elderly_65_plus": 9201000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 24.31,
+      "working_ratio": 67.55,
+      "elderly_ratio": 8.14,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1977,
+      "total_population": 114165000,
+      "youth_0_14": 27649000,
+      "working_15_64": 76944000,
+      "elderly_65_plus": 9561000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 24.22,
+      "working_ratio": 67.4,
+      "elderly_ratio": 8.37,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1978,
+      "total_population": 115190000,
+      "youth_0_14": 27708000,
+      "working_15_64": 77545000,
+      "elderly_65_plus": 9921000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 24.05,
+      "working_ratio": 67.32,
+      "elderly_ratio": 8.61,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1979,
+      "total_population": 116155000,
+      "youth_0_14": 27664000,
+      "working_15_64": 78161000,
+      "elderly_65_plus": 10309000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 23.82,
+      "working_ratio": 67.29,
+      "elderly_ratio": 8.88,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1980,
+      "total_population": 117060396,
+      "youth_0_14": 27507078,
+      "working_15_64": 78834599,
+      "elderly_65_plus": 10647356,
+      "late_elderly_75_plus": 1749163,
+      "youth_ratio": 23.5,
+      "working_ratio": 67.35,
+      "elderly_ratio": 9.1,
+      "late_elderly_ratio": 1.49
+    },
+    {
+      "year": 1981,
+      "total_population": 117902000,
+      "youth_0_14": 27603000,
+      "working_15_64": 79272000,
+      "elderly_65_plus": 11009000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 23.41,
+      "working_ratio": 67.24,
+      "elderly_ratio": 9.34,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1982,
+      "total_population": 118728000,
+      "youth_0_14": 27254000,
+      "working_15_64": 80089000,
+      "elderly_65_plus": 11350000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 22.95,
+      "working_ratio": 67.46,
+      "elderly_ratio": 9.56,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1983,
+      "total_population": 119536000,
+      "youth_0_14": 26907000,
+      "working_15_64": 80904000,
+      "elderly_65_plus": 11672000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 22.51,
+      "working_ratio": 67.68,
+      "elderly_ratio": 9.76,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1984,
+      "total_population": 120305000,
+      "youth_0_14": 26504000,
+      "working_15_64": 81776000,
+      "elderly_65_plus": 11956000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 22.03,
+      "working_ratio": 67.97,
+      "elderly_ratio": 9.94,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1985,
+      "total_population": 121048923,
+      "youth_0_14": 26033218,
+      "working_15_64": 82506016,
+      "elderly_65_plus": 12468343,
+      "late_elderly_75_plus": 1508715,
+      "youth_ratio": 21.51,
+      "working_ratio": 68.16,
+      "elderly_ratio": 10.3,
+      "late_elderly_ratio": 1.25
+    },
+    {
+      "year": 1986,
+      "total_population": 121660000,
+      "youth_0_14": 25434000,
+      "working_15_64": 83368000,
+      "elderly_65_plus": 12870000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 20.91,
+      "working_ratio": 68.53,
+      "elderly_ratio": 10.58,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1987,
+      "total_population": 122239000,
+      "youth_0_14": 24753000,
+      "working_15_64": 84189000,
+      "elderly_65_plus": 13322000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 20.25,
+      "working_ratio": 68.87,
+      "elderly_ratio": 10.9,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1988,
+      "total_population": 122745000,
+      "youth_0_14": 23985000,
+      "working_15_64": 85013000,
+      "elderly_65_plus": 13785000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 19.54,
+      "working_ratio": 69.26,
+      "elderly_ratio": 11.23,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1989,
+      "total_population": 123205000,
+      "youth_0_14": 23201000,
+      "working_15_64": 85745000,
+      "elderly_65_plus": 14309000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 18.83,
+      "working_ratio": 69.6,
+      "elderly_ratio": 11.61,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1990,
+      "total_population": 123611167,
+      "youth_0_14": 22486239,
+      "working_15_64": 85903976,
+      "elderly_65_plus": 14894595,
+      "late_elderly_75_plus": 1343438,
+      "youth_ratio": 18.19,
+      "working_ratio": 69.5,
+      "elderly_ratio": 12.05,
+      "late_elderly_ratio": 1.09
+    },
+    {
+      "year": 1991,
+      "total_population": 124101000,
+      "youth_0_14": 21904000,
+      "working_15_64": 86557000,
+      "elderly_65_plus": 15582000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 17.65,
+      "working_ratio": 69.75,
+      "elderly_ratio": 12.56,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1992,
+      "total_population": 124567000,
+      "youth_0_14": 21364000,
+      "working_15_64": 86845000,
+      "elderly_65_plus": 16242000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 17.15,
+      "working_ratio": 69.72,
+      "elderly_ratio": 13.04,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1993,
+      "total_population": 124938000,
+      "youth_0_14": 20841000,
+      "working_15_64": 87023000,
+      "elderly_65_plus": 16900000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 16.68,
+      "working_ratio": 69.65,
+      "elderly_ratio": 13.53,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1994,
+      "total_population": 125265000,
+      "youth_0_14": 20415000,
+      "working_15_64": 87034000,
+      "elderly_65_plus": 17585000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 16.3,
+      "working_ratio": 69.48,
+      "elderly_ratio": 14.04,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1995,
+      "total_population": 125570246,
+      "youth_0_14": 20013730,
+      "working_15_64": 87164721,
+      "elderly_65_plus": 18260822,
+      "late_elderly_75_plus": 1208065,
+      "youth_ratio": 15.94,
+      "working_ratio": 69.42,
+      "elderly_ratio": 14.54,
+      "late_elderly_ratio": 0.96
+    },
+    {
+      "year": 1996,
+      "total_population": 125859000,
+      "youth_0_14": 19686000,
+      "working_15_64": 87161000,
+      "elderly_65_plus": 19017000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 15.64,
+      "working_ratio": 69.25,
+      "elderly_ratio": 15.11,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1997,
+      "total_population": 126157000,
+      "youth_0_14": 19366000,
+      "working_15_64": 87042000,
+      "elderly_65_plus": 19758000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 15.35,
+      "working_ratio": 68.99,
+      "elderly_ratio": 15.66,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1998,
+      "total_population": 126472000,
+      "youth_0_14": 19059000,
+      "working_15_64": 86920000,
+      "elderly_65_plus": 20508000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 15.07,
+      "working_ratio": 68.73,
+      "elderly_ratio": 16.22,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 1999,
+      "total_population": 126667000,
+      "youth_0_14": 18742000,
+      "working_15_64": 86758000,
+      "elderly_65_plus": 21186000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 14.8,
+      "working_ratio": 68.49,
+      "elderly_ratio": 16.73,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2000,
+      "total_population": 126925843,
+      "youth_0_14": 18472499,
+      "working_15_64": 86219631,
+      "elderly_65_plus": 22005152,
+      "late_elderly_75_plus": 1189303,
+      "youth_ratio": 14.55,
+      "working_ratio": 67.93,
+      "elderly_ratio": 17.34,
+      "late_elderly_ratio": 0.94
+    },
+    {
+      "year": 2001,
+      "total_population": 127316000,
+      "youth_0_14": 18283000,
+      "working_15_64": 86139000,
+      "elderly_65_plus": 22869000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 14.36,
+      "working_ratio": 67.66,
+      "elderly_ratio": 17.96,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2002,
+      "total_population": 127486000,
+      "youth_0_14": 18102000,
+      "working_15_64": 85706000,
+      "elderly_65_plus": 23628000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 14.2,
+      "working_ratio": 67.23,
+      "elderly_ratio": 18.53,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2003,
+      "total_population": 127694000,
+      "youth_0_14": 17905000,
+      "working_15_64": 85404000,
+      "elderly_65_plus": 24311000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 14.02,
+      "working_ratio": 66.88,
+      "elderly_ratio": 19.04,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2004,
+      "total_population": 127787000,
+      "youth_0_14": 17734000,
+      "working_15_64": 85077000,
+      "elderly_65_plus": 24876000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 13.88,
+      "working_ratio": 66.58,
+      "elderly_ratio": 19.47,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2005,
+      "total_population": 127767994,
+      "youth_0_14": 17521234,
+      "working_15_64": 84092414,
+      "elderly_65_plus": 25672005,
+      "late_elderly_75_plus": 1149450,
+      "youth_ratio": 13.71,
+      "working_ratio": 65.82,
+      "elderly_ratio": 20.09,
+      "late_elderly_ratio": 0.9
+    },
+    {
+      "year": 2006,
+      "total_population": 127901000,
+      "youth_0_14": 17435000,
+      "working_15_64": 83731000,
+      "elderly_65_plus": 26604000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 13.63,
+      "working_ratio": 65.47,
+      "elderly_ratio": 20.8,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2007,
+      "total_population": 128033000,
+      "youth_0_14": 17293000,
+      "working_15_64": 83015000,
+      "elderly_65_plus": 27464000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 13.51,
+      "working_ratio": 64.84,
+      "elderly_ratio": 21.45,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2008,
+      "total_population": 128084000,
+      "youth_0_14": 17176000,
+      "working_15_64": 82300000,
+      "elderly_65_plus": 28216000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 13.41,
+      "working_ratio": 64.25,
+      "elderly_ratio": 22.03,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2009,
+      "total_population": 128032000,
+      "youth_0_14": 17011000,
+      "working_15_64": 81493000,
+      "elderly_65_plus": 29005000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 13.29,
+      "working_ratio": 63.65,
+      "elderly_ratio": 22.65,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2010,
+      "total_population": 128057352,
+      "youth_0_14": 16803444,
+      "working_15_64": 81031800,
+      "elderly_65_plus": 29245685,
+      "late_elderly_75_plus": 1069540,
+      "youth_ratio": 13.12,
+      "working_ratio": 63.28,
+      "elderly_ratio": 22.84,
+      "late_elderly_ratio": 0.84
+    },
+    {
+      "year": 2011,
+      "total_population": 127834000,
+      "youth_0_14": 16705000,
+      "working_15_64": 81342000,
+      "elderly_65_plus": 29752000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 13.07,
+      "working_ratio": 63.63,
+      "elderly_ratio": 23.27,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2012,
+      "total_population": 127593000,
+      "youth_0_14": 16547000,
+      "working_15_64": 80175000,
+      "elderly_65_plus": 30793000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 12.97,
+      "working_ratio": 62.84,
+      "elderly_ratio": 24.13,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2013,
+      "total_population": 127414000,
+      "youth_0_14": 16390000,
+      "working_15_64": 79010000,
+      "elderly_65_plus": 31898000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 12.86,
+      "working_ratio": 62.01,
+      "elderly_ratio": 25.03,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2014,
+      "total_population": 127237000,
+      "youth_0_14": 16233000,
+      "working_15_64": 77850000,
+      "elderly_65_plus": 33000000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 12.76,
+      "working_ratio": 61.19,
+      "elderly_ratio": 25.94,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2015,
+      "total_population": 127094745,
+      "youth_0_14": 15886810,
+      "working_15_64": 76288736,
+      "elderly_65_plus": 33465441,
+      "late_elderly_75_plus": 1012766,
+      "youth_ratio": 12.5,
+      "working_ratio": 60.03,
+      "elderly_ratio": 26.33,
+      "late_elderly_ratio": 0.8
+    },
+    {
+      "year": 2016,
+      "total_population": 127042000,
+      "youth_0_14": 15780000,
+      "working_15_64": 76562000,
+      "elderly_65_plus": 34591000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 12.42,
+      "working_ratio": 60.27,
+      "elderly_ratio": 27.23,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2017,
+      "total_population": 126919000,
+      "youth_0_14": 15592000,
+      "working_15_64": 75962000,
+      "elderly_65_plus": 35152000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 12.29,
+      "working_ratio": 59.85,
+      "elderly_ratio": 27.7,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2018,
+      "total_population": 126749000,
+      "youth_0_14": 15415000,
+      "working_15_64": 75451000,
+      "elderly_65_plus": 35578000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 12.16,
+      "working_ratio": 59.53,
+      "elderly_ratio": 28.07,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2019,
+      "total_population": 126555000,
+      "youth_0_14": 15210000,
+      "working_15_64": 75072000,
+      "elderly_65_plus": 35885000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 12.02,
+      "working_ratio": 59.32,
+      "elderly_ratio": 28.36,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2020,
+      "total_population": 126146099,
+      "youth_0_14": 14955692,
+      "working_15_64": 72922764,
+      "elderly_65_plus": 35335805,
+      "late_elderly_75_plus": 934063,
+      "youth_ratio": 11.86,
+      "working_ratio": 57.81,
+      "elderly_ratio": 28.01,
+      "late_elderly_ratio": 0.74
+    },
+    {
+      "year": 2021,
+      "total_population": 125502000,
+      "youth_0_14": 14784000,
+      "working_15_64": 74504000,
+      "elderly_65_plus": 36214000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 11.78,
+      "working_ratio": 59.36,
+      "elderly_ratio": 28.86,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2022,
+      "total_population": 124947000,
+      "youth_0_14": 14503000,
+      "working_15_64": 74208000,
+      "elderly_65_plus": 36236000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 11.61,
+      "working_ratio": 59.39,
+      "elderly_ratio": 29.0,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2023,
+      "total_population": 124352000,
+      "youth_0_14": 14173000,
+      "working_15_64": 73952000,
+      "elderly_65_plus": 36227000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 11.4,
+      "working_ratio": 59.47,
+      "elderly_ratio": 29.13,
+      "late_elderly_ratio": 0.0
+    },
+    {
+      "year": 2024,
+      "total_population": 123802000,
+      "youth_0_14": 13830000,
+      "working_15_64": 73728000,
+      "elderly_65_plus": 36243000,
+      "late_elderly_75_plus": 0,
+      "youth_ratio": 11.17,
+      "working_ratio": 59.55,
+      "elderly_ratio": 29.27,
+      "late_elderly_ratio": 0.0
+    }
+  ],
+  "prefectures_2024": [
+    {
+      "code": "13000",
+      "name": "東京都",
+      "total_population": 14178000,
+      "youth_0_14": 1494000,
+      "working_15_64": 9469000,
+      "elderly_65_plus": 3215000,
+      "elderly_ratio": 22.68,
+      "youth_ratio": 10.54,
+      "foreigners": 483372,
+      "foreigners_ratio": 3.41
+    },
+    {
+      "code": "14000",
+      "name": "神奈川県",
+      "total_population": 9225000,
+      "youth_0_14": 1008000,
+      "working_15_64": 5817000,
+      "elderly_65_plus": 2400000,
+      "elderly_ratio": 26.02,
+      "youth_ratio": 10.93,
+      "foreigners": 195535,
+      "foreigners_ratio": 2.12
+    },
+    {
+      "code": "27000",
+      "name": "大阪府",
+      "total_population": 8757000,
+      "youth_0_14": 968000,
+      "working_15_64": 5371000,
+      "elderly_65_plus": 2418000,
+      "elderly_ratio": 27.61,
+      "youth_ratio": 11.05,
+      "foreigners": 208681,
+      "foreigners_ratio": 2.38
+    },
+    {
+      "code": "23000",
+      "name": "愛知県",
+      "total_population": 7460000,
+      "youth_0_14": 906000,
+      "working_15_64": 4626000,
+      "elderly_65_plus": 1928000,
+      "elderly_ratio": 25.84,
+      "youth_ratio": 12.14,
+      "foreigners": 231369,
+      "foreigners_ratio": 3.1
+    },
+    {
+      "code": "11000",
+      "name": "埼玉県",
+      "total_population": 7332000,
+      "youth_0_14": 814000,
+      "working_15_64": 4500000,
+      "elderly_65_plus": 2018000,
+      "elderly_ratio": 27.52,
+      "youth_ratio": 11.1,
+      "foreigners": 161439,
+      "foreigners_ratio": 2.2
+    },
+    {
+      "code": "12000",
+      "name": "千葉県",
+      "total_population": 6251000,
+      "youth_0_14": 688000,
+      "working_15_64": 3804000,
+      "elderly_65_plus": 1759000,
+      "elderly_ratio": 28.14,
+      "youth_ratio": 11.01,
+      "foreigners": 142177,
+      "foreigners_ratio": 2.27
+    },
+    {
+      "code": "28000",
+      "name": "兵庫県",
+      "total_population": 5337000,
+      "youth_0_14": 614000,
+      "working_15_64": 3112000,
+      "elderly_65_plus": 1611000,
+      "elderly_ratio": 30.19,
+      "youth_ratio": 11.5,
+      "foreigners": 87280,
+      "foreigners_ratio": 1.64
+    },
+    {
+      "code": "40000",
+      "name": "福岡県",
+      "total_population": 5092000,
+      "youth_0_14": 632000,
+      "working_15_64": 3004000,
+      "elderly_65_plus": 1456000,
+      "elderly_ratio": 28.59,
+      "youth_ratio": 12.41,
+      "foreigners": 66699,
+      "foreigners_ratio": 1.31
+    },
+    {
+      "code": "01000",
+      "name": "北海道",
+      "total_population": 5043000,
+      "youth_0_14": 497000,
+      "working_15_64": 2868000,
+      "elderly_65_plus": 1677000,
+      "elderly_ratio": 33.25,
+      "youth_ratio": 9.86,
+      "foreigners": 34321,
+      "foreigners_ratio": 0.68
+    },
+    {
+      "code": "22000",
+      "name": "静岡県",
+      "total_population": 3527000,
+      "youth_0_14": 391000,
+      "working_15_64": 2035000,
+      "elderly_65_plus": 1101000,
+      "elderly_ratio": 31.22,
+      "youth_ratio": 11.09,
+      "foreigners": 86046,
+      "foreigners_ratio": 2.44
+    },
+    {
+      "code": "08000",
+      "name": "茨城県",
+      "total_population": 2806000,
+      "youth_0_14": 303000,
+      "working_15_64": 1637000,
+      "elderly_65_plus": 866000,
+      "elderly_ratio": 30.86,
+      "youth_ratio": 10.8,
+      "foreigners": 57819,
+      "foreigners_ratio": 2.06
+    },
+    {
+      "code": "34000",
+      "name": "広島県",
+      "total_population": 2714000,
+      "youth_0_14": 321000,
+      "working_15_64": 1569000,
+      "elderly_65_plus": 824000,
+      "elderly_ratio": 30.36,
+      "youth_ratio": 11.83,
+      "foreigners": 47733,
+      "foreigners_ratio": 1.76
+    },
+    {
+      "code": "26000",
+      "name": "京都府",
+      "total_population": 2520000,
+      "youth_0_14": 266000,
+      "working_15_64": 1502000,
+      "elderly_65_plus": 752000,
+      "elderly_ratio": 29.84,
+      "youth_ratio": 10.56,
+      "foreigners": 52442,
+      "foreigners_ratio": 2.08
+    },
+    {
+      "code": "04000",
+      "name": "宮城県",
+      "total_population": 2248000,
+      "youth_0_14": 243000,
+      "working_15_64": 1340000,
+      "elderly_65_plus": 665000,
+      "elderly_ratio": 29.58,
+      "youth_ratio": 10.81,
+      "foreigners": 19453,
+      "foreigners_ratio": 0.87
+    },
+    {
+      "code": "15000",
+      "name": "新潟県",
+      "total_population": 2099000,
+      "youth_0_14": 220000,
+      "working_15_64": 1162000,
+      "elderly_65_plus": 717000,
+      "elderly_ratio": 34.16,
+      "youth_ratio": 10.48,
+      "foreigners": 15028,
+      "foreigners_ratio": 0.72
+    },
+    {
+      "code": "20000",
+      "name": "長野県",
+      "total_population": 1987000,
+      "youth_0_14": 222000,
+      "working_15_64": 1111000,
+      "elderly_65_plus": 654000,
+      "elderly_ratio": 32.91,
+      "youth_ratio": 11.17,
+      "foreigners": 31491,
+      "foreigners_ratio": 1.58
+    },
+    {
+      "code": "21000",
+      "name": "岐阜県",
+      "total_population": 1916000,
+      "youth_0_14": 217000,
+      "working_15_64": 1096000,
+      "elderly_65_plus": 602000,
+      "elderly_ratio": 31.42,
+      "youth_ratio": 11.33,
+      "foreigners": 48979,
+      "foreigners_ratio": 2.56
+    },
+    {
+      "code": "10000",
+      "name": "群馬県",
+      "total_population": 1890000,
+      "youth_0_14": 203000,
+      "working_15_64": 1098000,
+      "elderly_65_plus": 588000,
+      "elderly_ratio": 31.11,
+      "youth_ratio": 10.74,
+      "foreigners": 53432,
+      "foreigners_ratio": 2.83
+    },
+    {
+      "code": "09000",
+      "name": "栃木県",
+      "total_population": 1885000,
+      "youth_0_14": 203000,
+      "working_15_64": 1106000,
+      "elderly_65_plus": 575000,
+      "elderly_ratio": 30.5,
+      "youth_ratio": 10.77,
+      "foreigners": 37408,
+      "foreigners_ratio": 1.98
+    },
+    {
+      "code": "33000",
+      "name": "岡山県",
+      "total_population": 1831000,
+      "youth_0_14": 215000,
+      "working_15_64": 1045000,
+      "elderly_65_plus": 571000,
+      "elderly_ratio": 31.19,
+      "youth_ratio": 11.74,
+      "foreigners": 25116,
+      "foreigners_ratio": 1.37
+    },
+    {
+      "code": "07000",
+      "name": "福島県",
+      "total_population": 1743000,
+      "youth_0_14": 184000,
+      "working_15_64": 972000,
+      "elderly_65_plus": 587000,
+      "elderly_ratio": 33.68,
+      "youth_ratio": 10.56,
+      "foreigners": 12868,
+      "foreigners_ratio": 0.74
+    },
+    {
+      "code": "24000",
+      "name": "三重県",
+      "total_population": 1711000,
+      "youth_0_14": 192000,
+      "working_15_64": 990000,
+      "elderly_65_plus": 529000,
+      "elderly_ratio": 30.92,
+      "youth_ratio": 11.22,
+      "foreigners": 44721,
+      "foreigners_ratio": 2.61
+    },
+    {
+      "code": "43000",
+      "name": "熊本県",
+      "total_population": 1697000,
+      "youth_0_14": 214000,
+      "working_15_64": 931000,
+      "elderly_65_plus": 553000,
+      "elderly_ratio": 32.59,
+      "youth_ratio": 12.61,
+      "foreigners": 14591,
+      "foreigners_ratio": 0.86
+    },
+    {
+      "code": "46000",
+      "name": "鹿児島県",
+      "total_population": 1532000,
+      "youth_0_14": 191000,
+      "working_15_64": 817000,
+      "elderly_65_plus": 524000,
+      "elderly_ratio": 34.2,
+      "youth_ratio": 12.47,
+      "foreigners": 10037,
+      "foreigners_ratio": 0.66
+    },
+    {
+      "code": "47000",
+      "name": "沖縄県",
+      "total_population": 1466000,
+      "youth_0_14": 231000,
+      "working_15_64": 880000,
+      "elderly_65_plus": 355000,
+      "elderly_ratio": 24.22,
+      "youth_ratio": 15.76,
+      "foreigners": 18157,
+      "foreigners_ratio": 1.24
+    },
+    {
+      "code": "25000",
+      "name": "滋賀県",
+      "total_population": 1402000,
+      "youth_0_14": 179000,
+      "working_15_64": 841000,
+      "elderly_65_plus": 382000,
+      "elderly_ratio": 27.25,
+      "youth_ratio": 12.77,
+      "foreigners": 28704,
+      "foreigners_ratio": 2.05
+    },
+    {
+      "code": "29000",
+      "name": "奈良県",
+      "total_population": 1285000,
+      "youth_0_14": 142000,
+      "working_15_64": 720000,
+      "elderly_65_plus": 423000,
+      "elderly_ratio": 32.92,
+      "youth_ratio": 11.05,
+      "foreigners": 11505,
+      "foreigners_ratio": 0.9
+    },
+    {
+      "code": "35000",
+      "name": "山口県",
+      "total_population": 1281000,
+      "youth_0_14": 138000,
+      "working_15_64": 688000,
+      "elderly_65_plus": 455000,
+      "elderly_ratio": 35.52,
+      "youth_ratio": 10.77,
+      "foreigners": 14378,
+      "foreigners_ratio": 1.12
+    },
+    {
+      "code": "38000",
+      "name": "愛媛県",
+      "total_population": 1276000,
+      "youth_0_14": 138000,
+      "working_15_64": 697000,
+      "elderly_65_plus": 440000,
+      "elderly_ratio": 34.48,
+      "youth_ratio": 10.82,
+      "foreigners": 11159,
+      "foreigners_ratio": 0.87
+    },
+    {
+      "code": "42000",
+      "name": "長崎県",
+      "total_population": 1252000,
+      "youth_0_14": 149000,
+      "working_15_64": 669000,
+      "elderly_65_plus": 434000,
+      "elderly_ratio": 34.66,
+      "youth_ratio": 11.9,
+      "foreigners": 8316,
+      "foreigners_ratio": 0.66
+    },
+    {
+      "code": "02000",
+      "name": "青森県",
+      "total_population": 1165000,
+      "youth_0_14": 114000,
+      "working_15_64": 634000,
+      "elderly_65_plus": 416000,
+      "elderly_ratio": 35.71,
+      "youth_ratio": 9.79,
+      "foreigners": 5409,
+      "foreigners_ratio": 0.46
+    },
+    {
+      "code": "03000",
+      "name": "岩手県",
+      "total_population": 1145000,
+      "youth_0_14": 115000,
+      "working_15_64": 624000,
+      "elderly_65_plus": 405000,
+      "elderly_ratio": 35.37,
+      "youth_ratio": 10.04,
+      "foreigners": 6937,
+      "foreigners_ratio": 0.61
+    },
+    {
+      "code": "17000",
+      "name": "石川県",
+      "total_population": 1098000,
+      "youth_0_14": 124000,
+      "working_15_64": 636000,
+      "elderly_65_plus": 337000,
+      "elderly_ratio": 30.69,
+      "youth_ratio": 11.29,
+      "foreigners": 13685,
+      "foreigners_ratio": 1.25
+    },
+    {
+      "code": "44000",
+      "name": "大分県",
+      "total_population": 1085000,
+      "youth_0_14": 124000,
+      "working_15_64": 588000,
+      "elderly_65_plus": 374000,
+      "elderly_ratio": 34.47,
+      "youth_ratio": 11.43,
+      "foreigners": 10168,
+      "foreigners_ratio": 0.94
+    },
+    {
+      "code": "45000",
+      "name": "宮崎県",
+      "total_population": 1033000,
+      "youth_0_14": 129000,
+      "working_15_64": 553000,
+      "elderly_65_plus": 351000,
+      "elderly_ratio": 33.98,
+      "youth_ratio": 12.49,
+      "foreigners": 6474,
+      "foreigners_ratio": 0.63
+    },
+    {
+      "code": "06000",
+      "name": "山形県",
+      "total_population": 1011000,
+      "youth_0_14": 105000,
+      "working_15_64": 546000,
+      "elderly_65_plus": 360000,
+      "elderly_ratio": 35.61,
+      "youth_ratio": 10.39,
+      "foreigners": 7149,
+      "foreigners_ratio": 0.71
+    },
+    {
+      "code": "16000",
+      "name": "富山県",
+      "total_population": 997000,
+      "youth_0_14": 105000,
+      "working_15_64": 561000,
+      "elderly_65_plus": 331000,
+      "elderly_ratio": 33.2,
+      "youth_ratio": 10.53,
+      "foreigners": 16326,
+      "foreigners_ratio": 1.64
+    },
+    {
+      "code": "37000",
+      "name": "香川県",
+      "total_population": 917000,
+      "youth_0_14": 104000,
+      "working_15_64": 512000,
+      "elderly_65_plus": 301000,
+      "elderly_ratio": 32.82,
+      "youth_ratio": 11.34,
+      "foreigners": 10854,
+      "foreigners_ratio": 1.18
+    },
+    {
+      "code": "05000",
+      "name": "秋田県",
+      "total_population": 897000,
+      "youth_0_14": 79000,
+      "working_15_64": 463000,
+      "elderly_65_plus": 354000,
+      "elderly_ratio": 39.46,
+      "youth_ratio": 8.81,
+      "foreigners": 3651,
+      "foreigners_ratio": 0.41
+    },
+    {
+      "code": "30000",
+      "name": "和歌山県",
+      "total_population": 880000,
+      "youth_0_14": 96000,
+      "working_15_64": 481000,
+      "elderly_65_plus": 303000,
+      "elderly_ratio": 34.43,
+      "youth_ratio": 10.91,
+      "foreigners": 6029,
+      "foreigners_ratio": 0.69
+    },
+    {
+      "code": "19000",
+      "name": "山梨県",
+      "total_population": 791000,
+      "youth_0_14": 85000,
+      "working_15_64": 453000,
+      "elderly_65_plus": 253000,
+      "elderly_ratio": 31.98,
+      "youth_ratio": 10.75,
+      "foreigners": 13993,
+      "foreigners_ratio": 1.77
+    },
+    {
+      "code": "41000",
+      "name": "佐賀県",
+      "total_population": 788000,
+      "youth_0_14": 100000,
+      "working_15_64": 436000,
+      "elderly_65_plus": 252000,
+      "elderly_ratio": 31.98,
+      "youth_ratio": 12.69,
+      "foreigners": 5940,
+      "foreigners_ratio": 0.75
+    },
+    {
+      "code": "18000",
+      "name": "福井県",
+      "total_population": 739000,
+      "youth_0_14": 86000,
+      "working_15_64": 417000,
+      "elderly_65_plus": 235000,
+      "elderly_ratio": 31.8,
+      "youth_ratio": 11.64,
+      "foreigners": 13796,
+      "foreigners_ratio": 1.87
+    },
+    {
+      "code": "36000",
+      "name": "徳島県",
+      "total_population": 685000,
+      "youth_0_14": 71000,
+      "working_15_64": 369000,
+      "elderly_65_plus": 245000,
+      "elderly_ratio": 35.77,
+      "youth_ratio": 10.36,
+      "foreigners": 5033,
+      "foreigners_ratio": 0.73
+    },
+    {
+      "code": "39000",
+      "name": "高知県",
+      "total_population": 656000,
+      "youth_0_14": 67000,
+      "working_15_64": 348000,
+      "elderly_65_plus": 240000,
+      "elderly_ratio": 36.59,
+      "youth_ratio": 10.21,
+      "foreigners": 4220,
+      "foreigners_ratio": 0.64
+    },
+    {
+      "code": "32000",
+      "name": "島根県",
+      "total_population": 642000,
+      "youth_0_14": 75000,
+      "working_15_64": 341000,
+      "elderly_65_plus": 226000,
+      "elderly_ratio": 35.2,
+      "youth_ratio": 11.68,
+      "foreigners": 8230,
+      "foreigners_ratio": 1.28
+    },
+    {
+      "code": "31000",
+      "name": "鳥取県",
+      "total_population": 531000,
+      "youth_0_14": 63000,
+      "working_15_64": 289000,
+      "elderly_65_plus": 179000,
+      "elderly_ratio": 33.71,
+      "youth_ratio": 11.86,
+      "foreigners": 4310,
+      "foreigners_ratio": 0.81
+    }
+  ]
+};
+
+  function copyPortalUrl() {
+    navigator.clipboard.writeText('https://www.e-stat.go.jp').then(() => {
+      alert('已複製 e-Stat 官網網址 (https://www.e-stat.go.jp)！');
+    });
+  }
+
+  function switchTab(evt, tabId) {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('active');
+      btn.classList.remove('atom-tab');
+    });
+    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+    
+    evt.currentTarget.classList.add('active');
+    if (tabId === 'atoms') {
+      evt.currentTarget.classList.add('atom-tab');
+    }
+    
+    const target = document.getElementById('tab-' + tabId);
+    if (target) {
+      target.style.display = 'block';
+    }
+
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 50);
+  }
+
+  // 1. Data Atom 04: 散點相關矩陣 (Scatter: 人口規模 vs 高齡化率)
+  function renderAtomScatterChart() {
+    const chartDom = document.getElementById('chartAtomScatter');
+    const myChart = echarts.init(chartDom);
+    
+    const scatterData = estatData.prefectures_2024.map(p => ([
+      (p.total_population / 10000).toFixed(0), // X: 萬人
+      p.elderly_ratio,                         // Y: 高齡化率%
+      p.name,                                  // Name
+      p.foreigners                             // Bubble size
+    ]));
+
+    const option = {
+      tooltip: {
+        trigger: 'item',
+        formatter: (params) => {
+          const d = params.value;
+          return `<strong>${d[2]}</strong><br/>總人口: ${Number(d[0]).toLocaleString()} 萬人<br/>高齡化率: ${d[1]}%<br/>外國住民: ${d[3].toLocaleString()} 人`;
+        }
+      },
+      grid: { left: '4%', right: '6%', bottom: '12%', top: '10%', containLabel: true },
+      xAxis: {
+        type: 'value',
+        name: '人口規模 (萬人)',
+        nameLocation: 'middle',
+        nameGap: 30,
+        axisLabel: { formatter: '{value}萬' }
+      },
+      yAxis: {
+        type: 'value',
+        name: '高齡化率 (%)',
+        min: 20,
+        max: 42,
+        axisLabel: { formatter: '{value}%' }
+      },
+      series: [
+        {
+          name: '47都道府縣',
+          type: 'scatter',
+          data: scatterData,
+          symbolSize: (data) => {
+            return Math.max(12, Math.min(36, Math.sqrt(data[3] / 200)));
+          },
+          itemStyle: {
+            color: (params) => {
+              const ratio = params.value[1];
+              if (ratio >= 35) return '#b84a2d'; // 高齡極端紅
+              if (ratio <= 25) return '#2c548a'; // 年輕都會藍
+              return '#ea580c';
+            },
+            opacity: 0.82,
+            borderColor: '#fff',
+            borderWidth: 1.5
+          },
+          label: {
+            show: true,
+            formatter: (p) => {
+              const d = p.value;
+              if (d[1] >= 36 || d[0] >= 700 || d[2] === '東京都' || d[2] === '秋田県') {
+                return d[2];
+              }
+              return '';
+            },
+            position: 'top',
+            fontSize: 11,
+            color: '#23201d'
+          }
+        }
+      ]
+    };
+    myChart.setOption(option);
+    window.addEventListener('resize', () => myChart.resize());
+  }
+
+  // 2. Data Atom 05: 多維畫像 (Radar: 東京 vs 秋田 vs 全國)
+  function renderAtomRadarChart() {
+    const chartDom = document.getElementById('chartAtomRadar');
+    const myChart = echarts.init(chartDom);
+
+    const option = {
+      tooltip: { trigger: 'item' },
+      legend: {
+        data: ['東京都 (都會青年樞紐)', '秋田縣 (高齡化極限)', '全國平均基準'],
+        bottom: 0
+      },
+      radar: {
+        indicator: [
+          { name: '幼年比率(0-14)', max: 15 },
+          { name: '勞力比率(15-64)', max: 70 },
+          { name: '外籍居民佔比', max: 5 },
+          { name: '年輕活力指數', max: 100 },
+          { name: '人口規模權重', max: 100 }
+        ],
+        radius: '62%'
+      },
+      series: [
+        {
+          name: '區域特徵多維畫像',
+          type: 'radar',
+          data: [
+            {
+              value: [11.2, 66.1, 4.2, 77.3, 100],
+              name: '東京都 (都會青年樞紐)',
+              itemStyle: { color: '#2c548a' },
+              areaStyle: { color: 'rgba(44, 84, 138, 0.25)' }
+            },
+            {
+              value: [9.3, 51.2, 0.5, 20.5, 10],
+              name: '秋田縣 (高齡化極限)',
+              itemStyle: { color: '#b84a2d' },
+              areaStyle: { color: 'rgba(184, 74, 45, 0.25)' }
+            },
+            {
+              value: [11.4, 59.3, 2.2, 50.0, 50],
+              name: '全國平均基準',
+              itemStyle: { color: '#c07d2b' },
+              lineStyle: { type: 'dashed' }
+            }
+          ]
+        }
+      ]
+    };
+    myChart.setOption(option);
+    window.addEventListener('resize', () => myChart.resize());
+  }
+
+  function renderHistoryChart() {
+    const chartDom = document.getElementById('chartHistory');
+    const myChart = echarts.init(chartDom);
+    const history = estatData.national_history;
+
+    const years = history.map(d => d.year + '年');
+    const totals = history.map(d => (d.total_population / 10000).toFixed(1));
+    const elderlyRatios = history.map(d => d.elderly_ratio);
+
+    const option = {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'cross' }
+      },
+      legend: {
+        data: ['總人口 (萬人)', '65歲以上佔比 (%)'],
+        bottom: 0
+      },
+      grid: { left: '3%', right: '4%', bottom: '12%', top: '8%', containLabel: true },
+      xAxis: {
+        type: 'category',
+        data: years,
+        axisLine: { lineStyle: { color: '#8a8277' } }
+      },
+      yAxis: [
+        {
+          type: 'value',
+          name: '總人口 (萬人)',
+          min: 11000,
+          max: 13000,
+          axisLabel: { formatter: '{value}' }
+        },
+        {
+          type: 'value',
+          name: '高齡化率 (%)',
+          min: 5,
+          max: 35,
+          axisLabel: { formatter: '{value}%' },
+          splitLine: { show: false }
+        }
+      ],
+      series: [
+        {
+          name: '總人口 (萬人)',
+          type: 'line',
+          smooth: true,
+          data: totals,
+          itemStyle: { color: '#2c548a' },
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: 'rgba(44, 84, 138, 0.28)' },
+              { offset: 1, color: 'rgba(44, 84, 138, 0.02)' }
+            ])
+          }
+        },
+        {
+          name: '65歲以上佔比 (%)',
+          type: 'line',
+          yAxisIndex: 1,
+          smooth: true,
+          data: elderlyRatios,
+          itemStyle: { color: '#b84a2d' },
+          lineStyle: { width: 3 }
+        }
+      ]
+    };
+    myChart.setOption(option);
+    window.addEventListener('resize', () => myChart.resize());
+  }
+
+  function renderAgingCompareChart() {
+    const chartDom = document.getElementById('chartAgingCompare');
+    const myChart = echarts.init(chartDom);
+    const prefs = [...estatData.prefectures_2024].sort((a,b) => b.elderly_ratio - a.elderly_ratio);
+
+    const top5 = prefs.slice(0, 5);
+    const bot5 = prefs.slice(-5).reverse();
+    const compareData = [...top5, ...bot5];
+
+    const option = {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: '{b}: {c}%'
+      },
+      grid: { left: '3%', right: '8%', bottom: '5%', top: '5%', containLabel: true },
+      xAxis: {
+        type: 'value',
+        axisLabel: { formatter: '{value}%' }
+      },
+      yAxis: {
+        type: 'category',
+        data: compareData.map(d => d.name),
+        inverse: true
+      },
+      series: [
+        {
+          type: 'bar',
+          data: compareData.map(d => ({
+            value: d.elderly_ratio,
+            itemStyle: {
+              color: d.elderly_ratio >= 35 ? '#b84a2d' : (d.elderly_ratio <= 26 ? '#2c548a' : '#c07d2b')
+            }
+          })),
+          label: {
+            show: true,
+            position: 'right',
+            formatter: '{c}%'
+          }
+        }
+      ]
+    };
+    myChart.setOption(option);
+    window.addEventListener('resize', () => myChart.resize());
+  }
+
+  function renderPrefPopChart() {
+    const chartDom = document.getElementById('chartPrefPop');
+    const myChart = echarts.init(chartDom);
+    const top15 = estatData.prefectures_2024.slice(0, 15);
+
+    const option = {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (params) => {
+          const item = top15.find(d => d.name === params[0].name);
+          return `${item.name}<br/>總人口: ${item.total_population.toLocaleString()} 人<br/>高齡化率: ${item.elderly_ratio}%<br/>外國人: ${item.foreigners.toLocaleString()} 人`;
+        }
+      },
+      grid: { left: '3%', right: '8%', bottom: '5%', top: '5%', containLabel: true },
+      xAxis: {
+        type: 'value',
+        name: '人口 (萬人)',
+        axisLabel: { formatter: v => (v / 10000) }
+      },
+      yAxis: {
+        type: 'category',
+        data: top15.map(d => d.name),
+        inverse: true
+      },
+      series: [
+        {
+          name: '總人口',
+          type: 'bar',
+          data: top15.map(d => d.total_population),
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+              { offset: 0, color: '#2c548a' },
+              { offset: 1, color: '#4b77b2' }
+            ])
+          },
+          label: {
+            show: true,
+            position: 'right',
+            formatter: p => (p.value / 10000).toFixed(0) + '萬'
+          }
+        }
+      ]
+    };
+    myChart.setOption(option);
+    window.addEventListener('resize', () => myChart.resize());
+  }
+
+  function renderStructureChart() {
+    const chartDom = document.getElementById('chartStructure');
+    const myChart = echarts.init(chartDom);
+    const history = estatData.national_history;
+
+    const years = history.map(d => d.year);
+    const youth = history.map(d => d.youth_ratio);
+    const working = history.map(d => d.working_ratio);
+    const elderly = history.map(d => d.elderly_ratio);
+
+    const option = {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'cross' }
+      },
+      legend: {
+        data: ['0-14歲 幼年人口', '15-64歲 生產主力人口', '65歲以上 高齡人口'],
+        bottom: 0
+      },
+      grid: { left: '3%', right: '4%', bottom: '10%', top: '6%', containLabel: true },
+      xAxis: { type: 'category', boundaryGap: false, data: years },
+      yAxis: { type: 'value', max: 100, axisLabel: { formatter: '{value}%' } },
+      series: [
+        {
+          name: '0-14歲 幼年人口',
+          type: 'line',
+          stack: 'Total',
+          areaStyle: {},
+          emphasis: { focus: 'series' },
+          data: youth,
+          itemStyle: { color: '#38bdf8' }
+        },
+        {
+          name: '15-64歲 生產主力人口',
+          type: 'line',
+          stack: 'Total',
+          areaStyle: {},
+          emphasis: { focus: 'series' },
+          data: working,
+          itemStyle: { color: '#64748b' }
+        },
+        {
+          name: '65歲以上 高齡人口',
+          type: 'line',
+          stack: 'Total',
+          areaStyle: {},
+          emphasis: { focus: 'series' },
+          data: elderly,
+          itemStyle: { color: '#f87171' }
+        }
+      ]
+    };
+    myChart.setOption(option);
+    window.addEventListener('resize', () => myChart.resize());
+  }
+
+  function populateTable() {
+    const tbody = document.querySelector('#prefTable tbody');
+    tbody.innerHTML = '';
+    estatData.prefectures_2024.forEach(p => {
+      const tr = document.createElement('tr');
+      const badgeClass = p.elderly_ratio >= 35 ? 'aging-high' : (p.elderly_ratio <= 26 ? 'aging-low' : 'aging-mid');
+      tr.innerHTML = `
+        <td style="font-weight: 600;">${p.name}</td>
+        <td>${p.total_population.toLocaleString()} 人</td>
+        <td><span class="badge-aging ${badgeClass}">${p.elderly_ratio}%</span></td>
+        <td>${(p.foreigners || 0).toLocaleString()} 人</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  const USER_APP_ID = 'd96194b7b3219075b1041948fddc842cfead7477';
+
+  function updateRequestUrl() {
+    const ep = document.getElementById('apiEndpoint').value;
+    const param = document.getElementById('apiParam').value;
+    const url = `https://api.e-stat.go.jp/rest/3.0/app/json/${ep}?appId=${USER_APP_ID}&${param}`;
+    document.getElementById('requestUrlDisplay').innerText = url;
+    return url;
+  }
+
+  document.getElementById('apiEndpoint').addEventListener('change', updateRequestUrl);
+  document.getElementById('apiParam').addEventListener('input', updateRequestUrl);
+
+  function executeApiCall() {
+    const url = updateRequestUrl();
+    const outputEl = document.getElementById('apiOutput');
+    outputEl.innerText = '正在發送請求至 e-Stat 伺服器...';
+
+    const callbackName = 'estat_cb_' + Math.floor(Math.random() * 1000000);
+    const jsonpUrl = `${url}&callback=${callbackName}`;
+
+    const script = document.createElement('script');
+    script.src = jsonpUrl;
+    window[callbackName] = function(data) {
+      outputEl.innerText = JSON.stringify(data, null, 2);
+      delete window[callbackName];
+      document.body.removeChild(script);
+    };
+
+    script.onerror = function() {
+      outputEl.innerText = 'JSONP 請求發送失敗或逾時。請確認網路連線與參數格式。\n直接請求 URL: ' + url;
+      delete window[callbackName];
+    };
+    document.body.appendChild(script);
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    updateRequestUrl();
+    renderAtomScatterChart();
+    renderAtomRadarChart();
+    renderHistoryChart();
+    renderAgingCompareChart();
+    renderPrefPopChart();
+    renderStructureChart();
+    populateTable();
+  });
+</script>
+</body>
+</html>
