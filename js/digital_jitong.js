@@ -32,8 +32,162 @@
     gasUrl: localStorage.getItem(STORAGE_KEY_GAS_URL) || DEFAULT_GAS_URL,
     sessionId: 'jitong_' + Math.random().toString(36).substring(2, 9),
     history: [], // [{role: 'user', content: '...'}, {role: 'assistant', content: '...', reasoning_details: '...'}]
+    attachedImage: null, // base64 data URL
     isLoading: false
   };
+
+  /**
+   * 讀取當前頁面操作狀態與情境 (讓乩童眼觀四面)
+   */
+  function getPageContextSummary() {
+    const filename = location.pathname.split('/').pop() || 'index.html';
+    const title = document.title || 'Antigravity 實戰營';
+    let summary = `【當前學生所在網頁】：${title}（檔案: ${filename}）`;
+
+    // 1. 若在 Data Atoms 互動探索工作台 (data_atoms.html)
+    const atomNavActive = document.querySelector('.atom-nav-btn.active, .chart-type-card.active');
+    if (atomNavActive || document.getElementById('echartsViewport')) {
+      const activeAtomName = atomNavActive ? atomNavActive.innerText.trim().replace(/\s+/g, ' ') : '未指定圖表';
+      const datasetSelect = document.getElementById('datasetSelect');
+      const datasetName = datasetSelect ? datasetSelect.options[datasetSelect.selectedIndex]?.text : '日本 47 都道府縣人口與高齡化全量表 (2024 e-Stat)';
+
+      const xChips = Array.from(document.querySelectorAll('#slotColumns .col-chip, #slotColumns span')).map(el => el.innerText.replace('×', '').trim()).filter(Boolean);
+      const yChips = Array.from(document.querySelectorAll('#slotRows .col-chip, #slotRows span')).map(el => el.innerText.replace('×', '').trim()).filter(Boolean);
+      const secChips = Array.from(document.querySelectorAll('#slotSecondary .col-chip, #slotSecondary span')).map(el => el.innerText.replace('×', '').trim()).filter(Boolean);
+      const colorChips = Array.from(document.querySelectorAll('#slotColor .col-chip, #slotColor span')).map(el => el.innerText.replace('×', '').trim()).filter(Boolean);
+      const filterChips = Array.from(document.querySelectorAll('#slotFilter .col-chip, #filterBadges .filter-badge, .filter-chip.active')).map(el => el.innerText.replace('×', '').trim()).filter(Boolean);
+
+      summary += `\n【Data Atoms 工作台即時狀態】：`;
+      summary += `\n- 當前選用圖表原子：${activeAtomName}`;
+      summary += `\n- 載入資料庫：${datasetName}`;
+      summary += `\n- Columns (X 軸)：${xChips.join(', ') || '都道府縣'}`;
+      summary += `\n- Rows (Y 軸)：${yChips.join(', ') || '總人口(人)'}`;
+      if (secChips.length) summary += `\n- 次軸折線 (Secondary)：${secChips.join(', ')}`;
+      if (colorChips.length) summary += `\n- 顏色分組 (Color)：${colorChips.join(', ')}`;
+      summary += `\n- 篩選條件：${filterChips.join('； ') || '全量呈現（未設定特殊篩選）'}`;
+    }
+
+    // 2. 若在 e-Stat API 實機模擬器 (estat_api_tutorial_simulator.html)
+    if (document.getElementById('statsDataIdInput') || location.pathname.includes('estat_api')) {
+      const statsId = document.getElementById('statsDataIdInput')?.value || '未填寫';
+      const appIdFilled = document.getElementById('appIdInput')?.value ? '已填入金鑰' : '未填寫金鑰';
+      const activeTab = document.querySelector('.api-tab-btn.active')?.innerText?.trim() || '';
+      summary += `\n【e-Stat API 模擬器操作狀態】：`;
+      summary += `\n- 當前分頁：${activeTab}`;
+      summary += `\n- 目標 statsDataId：${statsId}`;
+      summary += `\n- API 金鑰配置：${appIdFilled}`;
+    }
+
+    // 3. 若在分析師工作流或課程手冊
+    const activeSection = document.querySelector('.workflow-step.active, .step-badge.active, h2, h1');
+    if (activeSection && !summary.includes('【Data Atoms')) {
+      summary += `\n【主畫面重點內容】：${activeSection.innerText.trim().slice(0, 100)}`;
+    }
+
+    return summary;
+  }
+
+  /**
+   * 截取當前互動圖表為高畫質圖片 Data URL
+   */
+  function captureCurrentChart() {
+    // 1. 優先嘗試 ECharts 實例
+    const echartsViewport = document.getElementById('echartsViewport') || document.getElementById('atomChart');
+    if (echartsViewport && window.echarts) {
+      try {
+        const inst = window.echarts.getInstanceByDom(echartsViewport);
+        if (inst) {
+          return inst.getDataURL({
+            type: 'jpeg',
+            pixelRatio: 1.5,
+            backgroundColor: '#ffffff'
+          });
+        }
+      } catch (e) {
+        console.warn('ECharts snapshot error:', e);
+      }
+    }
+    // 2. 嘗試原生 canvas
+    const canvas = document.getElementById('mainChartCanvas') || document.querySelector('.canvas-wrapper canvas, canvas');
+    if (canvas && canvas.width > 0 && canvas.height > 0) {
+      try {
+        return canvas.toDataURL('image/jpeg', 0.85);
+      } catch (e) {
+        console.warn('Canvas snapshot error:', e);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * 處理並壓縮截圖 (客戶端等比例縮放至最長邊 1200px / JPEG 0.85，兼顧極速與清晰度)
+   */
+  function processAndAttachImage(dataUrlOrFile) {
+    return new Promise((resolve) => {
+      if (dataUrlOrFile instanceof Blob) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          compressAndSetImage(e.target.result).then(resolve);
+        };
+        reader.readAsDataURL(dataUrlOrFile);
+      } else if (typeof dataUrlOrFile === 'string') {
+        compressAndSetImage(dataUrlOrFile).then(resolve);
+      } else {
+        resolve(null);
+      }
+    });
+  }
+
+  function compressAndSetImage(dataUrl) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 1200;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', 0.85);
+
+        state.attachedImage = compressed;
+
+        const previewBar = document.getElementById('jitongImagePreviewBar');
+        const thumb = document.getElementById('jitongPreviewThumb');
+        if (previewBar && thumb) {
+          thumb.src = compressed;
+          previewBar.style.display = 'flex';
+        }
+        resolve(compressed);
+      };
+      img.onerror = () => {
+        state.attachedImage = dataUrl;
+        resolve(dataUrl);
+      };
+      img.src = dataUrl;
+    });
+  }
+
+  function clearAttachedImage() {
+    state.attachedImage = null;
+    const previewBar = document.getElementById('jitongImagePreviewBar');
+    const thumb = document.getElementById('jitongPreviewThumb');
+    if (previewBar) previewBar.style.display = 'none';
+    if (thumb) thumb.src = '';
+    const fileInput = document.getElementById('jitongImageFileInput');
+    if (fileInput) fileInput.value = '';
+  }
 
   function init() {
     ensureStylesheet();
@@ -113,15 +267,36 @@
       <!-- Quick Chips -->
       <div class="jitong-chips-row">
         <button type="button" class="jitong-chip-btn highlight" data-query="數位乩童的真身是誰？請開示背後創造者陳俊智博士的背景與神級戰績！">👑 數位乩童真身是誰？</button>
+        <button type="button" class="jitong-chip-btn" id="btnChipSnapChart" data-action="snap-chart" title="一鍵截取當前互動圖表並讓乩童視覺解讀">📸 截取圖表並分析</button>
+        <button type="button" class="jitong-chip-btn" id="btnChipReadPage" data-action="read-page" title="讓乩童讀取當前畫面設定與維度度量">👀 讀取當前畫面狀態</button>
         <button type="button" class="jitong-chip-btn" data-query="今天全日課程進度與時序是怎麼安排的？">🧭 今日課程進度</button>
         <button type="button" class="jitong-chip-btn" data-query="如何在圖表上同時比較幼年人口占比與勞動人口占比？">👶 幼年 vs 勞動人口比較</button>
         <button type="button" class="jitong-chip-btn" data-query="日本官方統計 e-Stat API 該如何申請？有哪些避坑要點？">🔑 e-Stat API 申請教學</button>
-        <button type="button" class="jitong-chip-btn" data-query="Data Atoms 視覺化儀表板包含哪 10 大原子圖表？">📊 什麼是 10 大 Data Atoms？</button>
+      </div>
+
+      <!-- Image Attachment Preview Bar -->
+      <div class="jitong-image-preview-bar" id="jitongImagePreviewBar" style="display: none;">
+        <div class="jitong-preview-thumb-wrap">
+          <img id="jitongPreviewThumb" src="" alt="截圖預覽">
+          <button type="button" class="jitong-preview-remove-btn" id="btnRemoveAttachedImage" title="移除截圖">✕</button>
+        </div>
+        <div class="jitong-preview-meta">
+          <div class="jitong-preview-title">📸 螢幕截圖已就緒</div>
+          <div class="jitong-preview-sub">可直接輸入問題，乩童將為您進行視覺開示</div>
+        </div>
+      </div>
+
+      <!-- Dropzone Overlay for Drag & Drop -->
+      <div class="jitong-drop-overlay" id="jitongDropOverlay">
+        <div class="jitong-drop-icon">📥</div>
+        <div class="jitong-drop-text">鬆開滑鼠，將截圖傳給數位乩童！</div>
       </div>
 
       <!-- Input Footer -->
       <div class="jitong-footer">
-        <textarea class="jitong-textarea" id="jitongInput" placeholder="向數位乩童請示問題... (Enter 發送，Shift+Enter 換行)" rows="1"></textarea>
+        <button type="button" class="jitong-tool-btn" id="btnJitongAttachImage" title="上傳或貼上螢幕截圖 (支援 Ctrl+V / 拖曳)">📷</button>
+        <input type="file" id="jitongImageFileInput" accept="image/*" style="display: none;">
+        <textarea class="jitong-textarea" id="jitongInput" placeholder="向數位乩童請示... (可 Ctrl+V 貼上截圖，Enter 發送)" rows="1"></textarea>
         <button type="button" class="jitong-send-btn" id="btnJitongSend" title="發送請教訊息">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -139,6 +314,9 @@
     const btnClose = document.getElementById('btnJitongClose');
     const btnSend = document.getElementById('btnJitongSend');
     const textarea = document.getElementById('jitongInput');
+    const btnAttach = document.getElementById('btnJitongAttachImage');
+    const fileInput = document.getElementById('jitongImageFileInput');
+    const btnRemoveImg = document.getElementById('btnRemoveAttachedImage');
 
     // 切換視窗開啟/關閉
     trigger.addEventListener('click', () => {
@@ -152,6 +330,67 @@
       state.isOpen = false;
       windowEl.classList.remove('open');
       trigger.classList.remove('hidden-by-chat');
+    });
+
+    // 點擊上傳截圖檔案按鈕
+    btnAttach?.addEventListener('click', () => {
+      fileInput?.click();
+    });
+
+    fileInput?.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) {
+        processAndAttachImage(file);
+      }
+    });
+
+    btnRemoveImg?.addEventListener('click', () => {
+      clearAttachedImage();
+    });
+
+    // 剪貼簿截圖貼上監聽 (Ctrl+V / Cmd+V)
+    windowEl.addEventListener('paste', (e) => {
+      const items = (e.clipboardData || window.clipboardData)?.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type && items[i].type.startsWith('image/')) {
+          const blob = items[i].getAsFile();
+          if (blob) {
+            e.preventDefault();
+            processAndAttachImage(blob);
+            break;
+          }
+        }
+      }
+    });
+
+    // 拖曳截圖丟入對話框 (Drag and Drop)
+    ['dragenter', 'dragover'].forEach(name => {
+      windowEl.addEventListener(name, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        windowEl.classList.add('drag-over');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(name => {
+      windowEl.addEventListener(name, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        windowEl.classList.remove('drag-over');
+      });
+    });
+
+    windowEl.addEventListener('drop', (e) => {
+      const files = e.dataTransfer?.files;
+      if (files && files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+          if (files[i].type.startsWith('image/')) {
+            processAndAttachImage(files[i]);
+            break;
+          }
+        }
+      }
     });
 
     // 發送訊息與輸入法 (IME) 選字保護
@@ -188,10 +427,33 @@
       handleUserSend();
     });
 
-    // 快捷膠囊點擊
+    // 快捷膠囊點擊 (支援 action 與 query)
     document.querySelectorAll('.jitong-chip-btn').forEach(btn => {
       btn.addEventListener('click', () => {
+        const action = btn.dataset.action;
         const query = btn.dataset.query;
+
+        if (action === 'snap-chart') {
+          const chartDataUrl = captureCurrentChart();
+          if (chartDataUrl) {
+            processAndAttachImage(chartDataUrl).then(() => {
+              textarea.value = '請幫我「通靈看圖」深度分析這張畫面截取的圖表，有什麼顯著趨勢、極端值或需要注意的數據特徵？';
+              handleUserSend();
+            });
+          } else {
+            textarea.value = '請告訴我如何使用截圖功能讓您進行視覺分析？';
+            handleUserSend();
+          }
+          return;
+        }
+
+        if (action === 'read-page') {
+          const pageCtx = getPageContextSummary();
+          textarea.value = `請依據我目前在畫面的操作狀態進行數據開示：\n${pageCtx}\n\n請問我目前配置的維度與度量有什麼洞察？下一步有何分析建議？`;
+          handleUserSend();
+          return;
+        }
+
         if (query) {
           textarea.value = query;
           handleUserSend();
@@ -209,12 +471,18 @@
   async function handleUserSend() {
     const textarea = document.getElementById('jitongInput');
     if (!textarea) return;
-    const message = textarea.value.trim();
-    if (!message || state.isLoading) return;
+    const rawMessage = textarea.value.trim();
+    const attachedImageToSend = state.attachedImage;
 
-    // 1. 同步立即清空輸入框並還原預設高度
+    // 若既沒有輸入文字也沒有截圖，或者正在加載中，則不處理
+    if ((!rawMessage && !attachedImageToSend) || state.isLoading) return;
+
+    const message = rawMessage || (attachedImageToSend ? '請幫我「通靈看圖」分析這張畫面截圖，為我解析圖表內容與洞察！' : '');
+
+    // 1. 同步立即清空輸入框並還原預設高度，同時移除附加截圖暫存
     textarea.value = '';
     textarea.style.height = '38px';
+    clearAttachedImage();
 
     // 2. 非同步再次確保清空 (防禦 IME 瀏覽器微任務將剛選取的字符二次塞回框中)
     setTimeout(() => {
@@ -222,10 +490,10 @@
       textarea.style.height = '38px';
     }, 0);
 
-    appendUserMessage(message);
+    appendUserMessage(message, attachedImageToSend);
 
-    // 3. 關鍵加速與真身專屬響應：若是詢問陳俊智博士 (Elvis Chen) 真身背景，立即提供權威認證宣傳卡
-    if (isMasterBioQuery(message)) {
+    // 3. 關鍵加速與真身專屬響應：若是詢問陳俊智博士 (Elvis Chen) 真身背景，立即提供權威認證宣傳卡 (無附帶截圖時)
+    if (!attachedImageToSend && isMasterBioQuery(message)) {
       const bioResponse = LOCAL_KNOWLEDGE['真身'];
       appendBotMessage(bioResponse);
       state.history.push({ role: 'user', content: message });
@@ -282,9 +550,32 @@
           }
         ];
 
-        // 呼叫 Google Apps Script Web App (串接 OpenRouter)
+        // 讀取當前學員操作情境 (包含選中圖表、維度度量、篩選器等)
+        const pageContext = getPageContextSummary();
+
+        let messagePayload;
+        if (attachedImageToSend) {
+          // 多模態 Vision 格式
+          messagePayload = [
+            {
+              type: 'text',
+              text: `${message}\n\n[當前學員網頁情境]\n${pageContext}`
+            },
+            {
+              type: 'image_url',
+              image_url: {
+                url: attachedImageToSend
+              }
+            }
+          ];
+        } else {
+          // 純文字訊息，附帶精簡頁面情境（避免干擾主對話，但讓模型知曉當前頁面）
+          const shortContext = `\n\n[附帶頁面情境: ${document.title} (${location.pathname.split('/').pop() || 'index.html'})]`;
+          messagePayload = message + shortContext;
+        }
+
         const payload = {
-          message: message,
+          message: messagePayload,
           sessionId: state.sessionId,
           history: [...personaContext, ...state.history]
         };
@@ -300,8 +591,8 @@
 
         if (data.success) {
           appendBotMessage(data.reply, data.reasoning_details);
-          // 儲存多輪上下文 (保留 reasoning_details)
-          state.history.push({ role: 'user', content: message });
+          // 儲存多輪上下文 (純文字格式，避免多輪歷史累積龐大 Base64 截圖)
+          state.history.push({ role: 'user', content: message || '（學員附加截圖分析）' });
           const assistItem = { role: 'assistant', content: data.reply };
           if (data.reasoning_details) assistItem.reasoning_details = data.reasoning_details;
           state.history.push(assistItem);
@@ -340,11 +631,27 @@
     }
   }
 
-  function appendUserMessage(text) {
+  function appendUserMessage(text, attachedImage = null) {
     const stream = document.getElementById('jitongMessagesStream');
     const msg = document.createElement('div');
     msg.className = 'jitong-msg user';
-    msg.innerHTML = `<div class="jitong-msg-bubble">${escapeHtml(text)}</div>`;
+
+    let imgHtml = '';
+    if (attachedImage) {
+      imgHtml = `
+        <div class="jitong-user-attached-img-wrap">
+          <img src="${attachedImage}" class="jitong-user-attached-img" alt="學員截圖" title="點擊在新分頁檢視大圖" onclick="window.open(this.src)">
+          <div class="jitong-attached-badge">📸 附加畫面截圖</div>
+        </div>
+      `;
+    }
+
+    msg.innerHTML = `
+      <div class="jitong-msg-bubble">
+        ${imgHtml}
+        <div>${escapeHtml(text)}</div>
+      </div>
+    `;
     stream.appendChild(msg);
     stream.scrollTop = stream.scrollHeight;
   }

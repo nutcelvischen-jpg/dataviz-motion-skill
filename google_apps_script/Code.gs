@@ -221,10 +221,23 @@ function logToSheet(sessionId, userMessage, assistantReply, reasoning, model, st
     }
 
     const timeStr = Utilities.formatDate(new Date(), 'Asia/Taipei', 'yyyy-MM-dd HH:mm:ss');
+    let logUserMessage = userMessage;
+    if (Array.isArray(userMessage)) {
+      logUserMessage = userMessage
+        .map(item => {
+          if (item.type === 'text') return item.text;
+          if (item.type === 'image_url') return '[📸 附加截圖分析]';
+          return JSON.stringify(item);
+        })
+        .join(' ');
+    } else if (typeof userMessage !== 'string') {
+      logUserMessage = JSON.stringify(userMessage);
+    }
+
     sheet.appendRow([
       timeStr,
       sessionId,
-      userMessage,
+      logUserMessage,
       assistantReply,
       reasoning,
       model,
