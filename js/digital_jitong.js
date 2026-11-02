@@ -7,6 +7,16 @@
   const STORAGE_KEY_GAS_URL = 'digital_jitong_gas_url';
   // 內建官方 Google Apps Script Web App 預設端點 (開箱即用，免手動重複輸入)
   const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyZJTyyxiK5C_ow8KPRhtCRlxZQOV3sg3vrZPVtTWp6xtjsypbRdm7a_zTgrV3jJAUk/exec';
+  
+  // 自動解析 Avatar 與 CSS 路徑，無論是首頁、次目錄或 GitHub Pages 皆能精準載入
+  const CURRENT_SCRIPT_SRC = (document.currentScript && document.currentScript.src) || '';
+  const AVATAR_IMG_URL = CURRENT_SCRIPT_SRC
+    ? new URL('../assets/avatar/cyberpunk_chibi_avatar_512.png', CURRENT_SCRIPT_SRC).href
+    : 'assets/avatar/cyberpunk_chibi_avatar_512.png';
+  const CSS_URL = CURRENT_SCRIPT_SRC
+    ? new URL('../css/digital_jitong.css', CURRENT_SCRIPT_SRC).href
+    : 'css/digital_jitong.css';
+
   const LOCAL_KNOWLEDGE = {
     '今日課程': `🔮 **數位乩童開示 · 11/05 全日實戰營進度**：\n\n- **第一階段（上午）**：大語言模型學習地圖，掌握 Agent AI 概念與世界競爭格局。\n- **第二階段（下午）**：資料分析師五階段工程工作流（取得 ➔ 清洗 ➔ 探索 ➔ 儀表板 ➔ 決策）。\n- **第三階段**：日本官方統計 e-Stat 資料庫架構與 API 申請避坑。\n- **第四階段**：17 領域研究指南與 10 大實戰視覺化分析法。\n- **第五階段**：Data Atoms 互動式工作台實作（包含雙軸複合、地理地圖與多指標對比）！`,
     '幼年': `👶 **幼年 vs 勞動人口占比對比靈光**：\n\n1. 請在 **Rows（Y 軸）** 槽位點擊 **\`[＋ 多指標比較]\`**。\n2. 直接點擊 **\`[👶 vs 💼 幼年 vs 勞動人口占比 (2指標)]\`** 一鍵套用。\n3. **折線圖** 會同圖繪製雙軌平滑曲線（幼年藍線、勞動橘線）；切換至 **相關散布圖（Scatter）** 則可立即觀測兩者的負相關分佈！`,
@@ -33,7 +43,7 @@
       const link = document.createElement('link');
       link.id = 'digital-jitong-style';
       link.rel = 'stylesheet';
-      link.href = 'css/digital_jitong.css';
+      link.href = CSS_URL;
       document.head.appendChild(link);
     }
   }
@@ -47,7 +57,9 @@
     trigger.className = 'jitong-floating-trigger';
     trigger.setAttribute('title', '點擊召喚「數位乩童」AI 小客服');
     trigger.innerHTML = `
-      <div class="jitong-avatar-halo">🔮</div>
+      <div class="jitong-avatar-halo">
+        <img class="jitong-avatar-img" src="${AVATAR_IMG_URL}" alt="數位乩童" onerror="this.onerror=null;this.src='Cyberpunk%20Chibi%20Tech%20Avatar.png';">
+      </div>
       <div class="jitong-trigger-text">
         <div class="jitong-trigger-name">
           <span>數位乩童</span>
@@ -66,7 +78,9 @@
       <!-- Header -->
       <div class="jitong-header">
         <div class="jitong-header-brand">
-          <span class="jitong-header-avatar">🔮</span>
+          <div class="jitong-header-avatar-wrap">
+            <img class="jitong-header-avatar-img" src="${AVATAR_IMG_URL}" alt="數位乩童" onerror="this.onerror=null;this.src='Cyberpunk%20Chibi%20Tech%20Avatar.png';">
+          </div>
           <div>
             <div class="jitong-header-title">
               <span>數位乩童</span>
@@ -98,8 +112,9 @@
       <div class="jitong-messages-stream" id="jitongMessagesStream">
         <!-- Initial Message -->
         <div class="jitong-msg bot">
+          <img class="jitong-msg-avatar" src="${AVATAR_IMG_URL}" alt="數位乩童" onerror="this.onerror=null;this.src='Cyberpunk%20Chibi%20Tech%20Avatar.png';">
           <div class="jitong-msg-bubble">
-            <strong>靈光乍現！我是你的課程 AI 助教「數位乩童」🔮</strong><br/><br/>
+            <strong>靈光乍現！我是你的課程 AI 助教「數位乩童」⚡</strong><br/><br/>
             今天全日課程學什麼、日本 e-Stat 官方數據怎麼串、或是 Data Atoms 儀表板如何比較幼年與勞動人口，隨時請我為您開示指路！
           </div>
         </div>
@@ -318,6 +333,7 @@
 
     const htmlContent = parseSimpleMarkdown(markdownText);
     msg.innerHTML = `
+      <img class="jitong-msg-avatar" src="${AVATAR_IMG_URL}" alt="數位乩童" onerror="this.onerror=null;this.src='Cyberpunk%20Chibi%20Tech%20Avatar.png';">
       <div class="jitong-msg-bubble">
         ${reasoningHtml}
         <div>${htmlContent}</div>
@@ -334,6 +350,7 @@
     msg.id = id;
     msg.className = 'jitong-msg bot';
     msg.innerHTML = `
+      <img class="jitong-msg-avatar" src="${AVATAR_IMG_URL}" style="animation: jitongPulse 1.2s infinite alternate;" alt="數位乩童" onerror="this.onerror=null;this.src='Cyberpunk%20Chibi%20Tech%20Avatar.png';">
       <div class="jitong-msg-bubble" style="color: #7c3aed; font-style: italic; display: flex; align-items: center; gap: 8px;">
         <span style="animation: jitongPulse 1s infinite alternate;">🔮</span>
         <span>數位乩童沉思通靈中...</span>
