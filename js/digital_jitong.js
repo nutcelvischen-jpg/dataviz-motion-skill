@@ -433,7 +433,7 @@
         // 自動聚焦並引導輸入
         const textarea = document.getElementById('jitongInput');
         if (textarea) {
-          textarea.placeholder = '向數位乩童請示這張截圖... (可直接輸入文字或按 Enter)';
+          textarea.placeholder = '請解簽';
           textarea.focus();
         }
 
@@ -486,7 +486,7 @@
           <span>數位乩童</span>
           <span class="jitong-online-dot"></span>
         </div>
-        <div class="jitong-trigger-sub">AI 助教在線解惑</div>
+        <div class="jitong-trigger-sub">請解簽</div>
       </div>
     `;
     document.body.appendChild(trigger);
@@ -563,7 +563,7 @@
         <button type="button" class="jitong-tool-btn jitong-snip-tool-btn" id="btnJitongSnip" title="✂️ 螢幕截圖：按一下即可在畫面上拖曳拉框截圖！">✂️</button>
         <button type="button" class="jitong-tool-btn" id="btnJitongAttachImage" title="上傳或貼上螢幕截圖 (支援 Ctrl+V / 拖曳)">📷</button>
         <input type="file" id="jitongImageFileInput" accept="image/*" style="display: none;">
-        <textarea class="jitong-textarea" id="jitongInput" placeholder="向數位乩童請示... (可 Ctrl+V 貼上截圖，Enter 發送)" rows="1"></textarea>
+        <textarea class="jitong-textarea" id="jitongInput" placeholder="請解簽" rows="1"></textarea>
         <button type="button" class="jitong-send-btn" id="btnJitongSend" title="發送請教訊息">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"></line>
