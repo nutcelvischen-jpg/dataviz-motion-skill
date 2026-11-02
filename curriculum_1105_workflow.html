@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>11/5 實戰課程流程藍圖 · 從大模型認知到 Tableau-like 儀表板開發</title>
+  <meta name="description" content="11/5 當日課程兩大核心規劃：第一塊為大語言模型學習地圖（認知 Agent AI 概念與全球競爭格局），第二塊為真實工具實作（Antigravity 介紹、e-Stat API、8 大 Skill 封裝到打造類似 Tableau 的互動儀表板）。">
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Noto+Sans+TC:wght@400;500;600;700&family=Schibsted+Grotesk:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
+
+  <style>
+/* Hallmark: dose / modern-minimal / light 97.6 88 / committed */
+:root {
+  --color-paper: oklch(97.6% 0.011 88);
+  --color-paper-2: oklch(95.5% 0.015 88);
+  --color-paper-3: oklch(92% 0.02 88);
+  --color-ink: oklch(18% 0.02 165);
+  --color-ink-2: oklch(34% 0.025 165);
+  --color-muted: oklch(48% 0.02 165);
+  --color-rule: oklch(88% 0.015 88);
+  --color-rule-soft: oklch(92% 0.01 88);
+  --color-white: oklch(100% 0 0);
+
+  /* Pharmacy green accent */
+  --color-accent: oklch(50% 0.13 160);
+  --color-accent-deep: oklch(38% 0.12 160);
+  --color-accent-soft: oklch(92% 0.04 160);
+  --color-accent-ink: oklch(99% 0.01 160);
+  --color-focus: oklch(50% 0.13 160);
+
+  /* Plastic pill tray compartments */
+  --p-mon: oklch(86.5% 0.042 38);
+  --p-tue: oklch(90% 0.052 68);
+  --p-tue-deep: oklch(55% 0.14 65);
+  --p-wed: oklch(91.5% 0.064 98);
+  --p-thu: oklch(86.5% 0.075 160);
+  --p-fri: oklch(87% 0.048 210);
+  --p-sat: oklch(84% 0.045 270);
+  --p-sun: oklch(84% 0.048 322);
+
+  --light: oklch(99.4% 0.016 84);
+  --glint: oklch(100% 0 0);
+
+  --font-display: "Schibsted Grotesk", "Noto Sans TC", ui-sans-serif, sans-serif;
+  --font-body: "Instrument Sans", "Noto Sans TC", ui-sans-serif, sans-serif;
+  --font-outlier: "DM Mono", ui-monospace, monospace;
+
+  --radius-card: 16px;
+  --radius-input: 8px;
+  --radius-pill: 999px;
+
+  --shadow-bar: 0 2px 10px oklch(0% 0 0 / 0.15);
+  --shadow-card: 0 1px 2px oklch(30% 0.03 165 / 0.08), 0 24px 48px -24px oklch(40% 0.08 165 / 0.35);
+  --shadow-lift: 0 1px 1px oklch(30% 0.03 165 / 0.10), 8px 18px 28px -14px oklch(36% 0.06 165 / 0.32), 18px 40px 60px -30px oklch(40% 0.08 165 / 0.30);
+  --tracking-display: -0.03em;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  overflow-x: clip;
+  scrollbar-color: var(--color-rule) var(--color-paper);
+}
+
+::selection {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-deep);
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  line-height: 1.55;
+  padding: 0 0 96px 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.05;
+  color: var(--color-ink);
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+.mono-label {
+  font-family: var(--font-outlier);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.step-nav-bar {
+  background: var(--color-ink);
+  color: var(--color-white);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-bar);
+}
+
+.stamp-badge {
+  font-family: var(--font-outlier);
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--color-accent);
+  color: var(--color-white);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.step-nav-pills {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.step-pill {
+  color: var(--color-white);
+  background: color-mix(in oklab, var(--color-paper) 12%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-paper) 20%, transparent);
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.15s ease;
+}
+.step-pill:hover {
+  background: color-mix(in oklab, var(--color-paper) 25%, transparent);
+}
+.step-pill.active {
+  background: var(--color-accent);
+  color: var(--color-white);
+  border-color: var(--color-accent);
+  font-weight: 700;
+}
+
+.hero-block {
+  padding: 48px 0 32px;
+}
+.hero-kicker {
+  font-family: var(--font-outlier);
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-headline {
+  font-size: clamp(28px, 3.6vw, 42px);
+  margin-bottom: 16px;
+  max-width: 980px;
+}
+.hero-sentence {
+  font-size: 16px;
+  color: var(--color-muted);
+  max-width: 860px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.btn {
+  height: 48px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--radius-input);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--color-rule), 0 3px 0 var(--color-rule);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  user-select: none;
+}
+.btn:active {
+  transform: translateY(3px);
+  box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--color-rule), 0 0 0 var(--color-rule);
+}
+.btn--primary {
+  background: linear-gradient(var(--color-accent), var(--color-accent-deep));
+  color: var(--color-accent-ink);
+  box-shadow: 0 0 0 1px var(--color-accent-deep), 0 3px 0 var(--color-accent-deep);
+}
+.btn--clear {
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+}
+.btn--sm {
+  height: 36px;
+  padding: 0 16px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+
+.plastic-tray {
+  position: relative;
+  border-radius: var(--radius-card);
+  background: linear-gradient(color-mix(in oklab, var(--glint) 32%, transparent), transparent 18%), color-mix(in oklab, var(--t, var(--p-thu)) 60%, transparent);
+  box-shadow: inset 0 1.5px 0 var(--glint), inset 0 -24px 36px -28px color-mix(in oklab, var(--t, var(--p-thu)) 45%, var(--color-ink)), var(--shadow-card);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.pharmacy-label {
+  background: var(--color-white);
+  border: 1px solid var(--color-rule);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.diagram-card {
+  width: 100%;
+  background: var(--color-white);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  box-shadow: var(--shadow-card);
+  overflow-x: auto;
+  margin-bottom: 32px;
+}
+
+.diagram-card svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 980px;
+}
+
+.tear-stub {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px dashed var(--color-rule);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .step-pill {
+    transition: none;
+  }
+}
+</style>
+</head>
+<body>
+
+  <header class="step-nav-bar">
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <span class="stamp-badge">11/05 workshop</span>
+      <span style="font-weight: 600;">資料分析實戰步驟：</span>
+    </div>
+    <nav class="step-nav-pills" aria-label="資料分析流程步驟">
+      <span class="step-pill active" aria-current="page">01. 全日課程架構 (當前)</span>
+      <a href="data_analysis.html" class="step-pill">02. 分析師工作流程</a>
+      <a href="estat_api_tutorial_simulator.html" class="step-pill">03. 日本資料與 API 申請</a>
+      <a href="estat_catalog_and_research_guide.html" class="step-pill">04. 17 領域研究指南與分析法</a>
+      <a href="data_atoms.html" class="step-pill">05. Data Atoms 儀表板實作</a>
+      <a href="https://www.e-stat.go.jp" target="_blank" class="step-pill" style="background: var(--color-accent); border-color: var(--color-accent-deep);">e-Stat 官網 ↗</a>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <section class="hero-block">
+      <div class="hero-kicker">
+        <span>track: curriculum architecture</span>
+        <span>/</span>
+        <span>environment: antigravity</span>
+        <span>/</span>
+        <span>theme: dose</span>
+      </div>
+      <h1 class="hero-headline">11/05 實戰課程流程藍圖：從大模型認知到打造 Tableau-like 儀表板</h1>
+      <p class="hero-sentence">
+        清楚交代今天「使用哪一套工具、用了哪些 Skill、串接哪一些 API」。課程嚴謹分為兩大階段：第一塊以《大語言模型學習地圖》建立 Agent 認知與全球競爭局勢；第二塊全面進入 Antigravity 實戰，串接日本官方 e-Stat API，調用 8 大 Skill，把類似 Tableau 的 10 大數據原子儀表板從無到有一步步做出來。
+      </p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+        <a href="data_analysis.html" class="btn btn--primary">進入分析師實戰工作流 ↗</a>
+        <a href="data_atoms.html" class="btn btn--clear">開啟 Data Atoms 儀表板 ↗</a>
+        <a href="https://github.com/nutcelvischen-jpg/data-analyst-skill" target="_blank" class="btn btn--clear">data-analyst 技能倉庫 ↗</a>
+      </div>
+    </section>
+
+    <!-- Blueprint Canvas Card -->
+    <div class="diagram-card">
+      <svg viewBox="0 0 1180 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="svg-title svg-desc">
+        <title id="svg-title">11/05 課程流程與工具技術架構圖</title>
+        <desc id="svg-desc">第一塊：大語言模型學習地圖（認知篇）；第二塊：Antigravity 真實工具實作、e-Stat API 與 Tableau-like 儀表板（實戰篇）。</desc>
+
+        <defs>
+          <linearGradient id="grad-warm" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fffbf7" />
+            <stop offset="100%" stop-color="#ffffff" />
+          </linearGradient>
+
+          <linearGradient id="grad-pharmacy" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#f2faf6" />
+            <stop offset="100%" stop-color="#ffffff" />
+          </linearGradient>
+
+          <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="#1b8354" />
+          </marker>
+          <marker id="arrow-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="#c26e10" />
+          </marker>
+        </defs>
+
+        <!-- BLOCK 1: 大語言模型學習地圖 (認知篇) -->
+        <g id="block-1-llm">
+          <rect x="20" y="20" width="340" height="540" rx="12" fill="url(#grad-warm)" stroke="#e4cfb8" stroke-width="1.6" />
+          
+          <rect x="36" y="36" width="105" height="22" rx="4" fill="#c26e10" />
+          <text x="88" y="51" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">第一塊 (認知篇)</text>
+          <text x="150" y="52" fill="#874706" font-size="12" font-weight="600">約 15% 課程時間</text>
+
+          <text x="36" y="86" fill="#4d2703" font-size="18" font-weight="700">大語言模型學習地圖</text>
+          <text x="36" y="106" fill="#874706" font-size="12.5">使用檔案：index.html (原版學習地圖)</text>
+
+          <!-- 1.1 -->
+          <rect x="36" y="125" width="308" height="120" rx="6" fill="#ffffff" stroke="#ecd9c6" stroke-width="1" />
+          <text x="50" y="148" fill="#c26e10" font-size="13" font-weight="700">1. Agent AI 核心概念</text>
+          <text x="50" y="170" fill="#475569" font-size="12">提問到完成工作：6 大核心通關站點</text>
+          <text x="50" y="190" fill="#475569" font-size="12">Token 分詞機率、上下文視窗 (Context)</text>
+          <text x="50" y="210" fill="#475569" font-size="12">RAG 向量知識庫檢索與對話歷史記憶</text>
+          <text x="50" y="230" fill="#475569" font-size="12">Tool Calling 函數呼叫與自主 Agent 循環</text>
+
+          <!-- 1.2 -->
+          <rect x="36" y="260" width="308" height="135" rx="6" fill="#ffffff" stroke="#ecd9c6" stroke-width="1" />
+          <text x="50" y="283" fill="#c26e10" font-size="13" font-weight="700">2. 目前世界的競爭格局</text>
+          <text x="50" y="305" fill="#475569" font-size="12">全球主流開源 vs 商用模型全景圖譜</text>
+          <text x="50" y="325" fill="#475569" font-size="12">GPT-4o, Claude 3.5, Gemini 2.0, DeepSeek</text>
+          <text x="50" y="345" fill="#475569" font-size="12">MoE 混合專家架構與端側推理技術</text>
+          <text x="50" y="365" fill="#475569" font-size="12">為什麼單純 LLM 不夠？需要外接環境</text>
+          <text x="50" y="383" fill="#1b8354" font-size="11.5" font-weight="700">引出今日主角：Antigravity Agentic 環境</text>
+
+          <!-- 1.3 -->
+          <rect x="36" y="410" width="308" height="130" rx="6" fill="#fffaf5" stroke="#ecd9c6" stroke-dasharray="4,4" />
+          <text x="50" y="434" fill="#874706" font-size="12.5" font-weight="700">認知篇結語：</text>
+          <text x="50" y="456" fill="#64748b" font-size="12">學員建立起對 Agent 與 Tool Calling 的底層</text>
+          <text x="50" y="474" fill="#64748b" font-size="12">認知後，不空談理論，立刻無縫切入真實</text>
+          <text x="50" y="492" fill="#64748b" font-size="12">世界工程工具，進行真實數據實戰！</text>
+          <text x="50" y="522" fill="#c26e10" font-size="12.5" font-weight="700">準備進入實戰篇 ➔➔➔</text>
+        </g>
+
+        <!-- Arrow between blocks -->
+        <path d="M 360 290 L 385 290" fill="none" stroke="#c26e10" stroke-width="2.5" marker-end="url(#arrow-amber)" />
+
+        <!-- BLOCK 2: 真實工具實作 (實戰篇) -->
+        <g id="block-2-hands-on">
+          <rect x="390" y="20" width="770" height="540" rx="12" fill="url(#grad-pharmacy)" stroke="#92d1b1" stroke-width="1.8" />
+          
+          <rect x="410" y="36" width="105" height="22" rx="4" fill="#1b8354" />
+          <text x="462" y="51" fill="#ffffff" font-size="11" font-weight="700" text-anchor="middle">第二塊 (實戰篇)</text>
+          <text x="525" y="52" fill="#0f5132" font-size="12" font-weight="600">約 85% 實戰實作時間 · 今日核心重頭戲</text>
+
+          <text x="410" y="86" fill="#093621" font-size="18" font-weight="700">真實工具實作：從 Antigravity 到打造 Tableau-like 儀表板</text>
+          <text x="410" y="106" fill="#1b8354" font-size="12.5">產出檔案：data_atoms.html (獨立儀表板工作台) ＋ 1080p 影音簡報</text>
+
+          <!-- Column 1: 使用哪一套工具 -->
+          <g id="col-tools" transform="translate(410, 125)">
+            <rect x="0" y="0" width="170" height="265" rx="6" fill="#ffffff" stroke="#c2e3d3" stroke-width="1.2" />
+            <rect x="0" y="0" width="170" height="28" rx="6 6 0 0" fill="#e2f5ec" />
+            <text x="12" y="19" fill="#0f5132" font-size="12.5" font-weight="700">① 使用哪一套工具？</text>
+            
+            <text x="12" y="48" fill="#182a20" font-size="13" font-weight="700">Antigravity</text>
+            <text x="12" y="65" fill="#64748b" font-size="11.5">Agentic Coding IDE</text>
+            <text x="12" y="85" fill="#334155" font-size="11.5">終端命令自動化執行</text>
+            <text x="12" y="102" fill="#334155" font-size="11.5">模組化 Skill 體系架構</text>
+            <text x="12" y="119" fill="#334155" font-size="11.5">人機結對編程 (Pairing)</text>
+
+            <path d="M 12 135 L 158 135" stroke="#eef3f0" stroke-width="1" />
+            <text x="12" y="154" fill="#182a20" font-size="12" font-weight="700">前端開源底層</text>
+            <text x="12" y="172" fill="#334155" font-size="11.5">Apache ECharts 5.5</text>
+            <text x="12" y="189" fill="#334155" font-size="11.5">Graphic Walker 編碼槽</text>
+            <text x="12" y="206" fill="#334155" font-size="11.5">Zero-Build 純前端運行</text>
+            
+            <rect x="12" y="222" width="146" height="32" rx="4" fill="#f4faf7" stroke="#bfe1d0" />
+            <text x="85" y="242" fill="#1b8354" font-size="11.5" font-weight="700" text-anchor="middle">無須安裝 Node 編譯</text>
+          </g>
+
+          <path d="M 585 240 L 598 240" fill="none" stroke="#1b8354" stroke-width="2" marker-end="url(#arrow-green)" />
+
+          <!-- Column 2: 哪一些 API -->
+          <g id="col-api" transform="translate(600, 125)">
+            <rect x="0" y="0" width="170" height="265" rx="6" fill="#ffffff" stroke="#c2e3d3" stroke-width="1.2" />
+            <rect x="0" y="0" width="170" height="28" rx="6 6 0 0" fill="#e2f5ec" />
+            <text x="12" y="19" fill="#0f5132" font-size="12.5" font-weight="700">② 串接哪一些 API？</text>
+            
+            <text x="12" y="48" fill="#182a20" font-size="13" font-weight="700">日本 e-Stat 官方 API</text>
+            <text x="12" y="65" fill="#64748b" font-size="11.5">總務省統計局 REST v3.0</text>
+            
+            <text x="12" y="85" fill="#334155" font-size="11.5">申請憑證：appId 金鑰</text>
+            <text x="12" y="102" fill="#334155" font-size="11.5">避坑：URL 填 test.localhost</text>
+            
+            <path d="M 12 118 L 158 118" stroke="#eef3f0" stroke-width="1" />
+            <text x="12" y="137" fill="#182a20" font-size="12" font-weight="700">調用核心端點</text>
+            <text x="12" y="154" fill="#1b8354" font-size="11" font-family="DM Mono">/getStatsList</text>
+            <text x="12" y="170" fill="#64748b" font-size="11">檢索 17 領域統計表</text>
+            <text x="12" y="188" fill="#1b8354" font-size="11" font-family="DM Mono">/getStatsData</text>
+            <text x="12" y="204" fill="#64748b" font-size="11">獲取半世紀人口與面板數據</text>
+            
+            <rect x="12" y="222" width="146" height="32" rx="4" fill="#f4faf7" stroke="#bfe1d0" />
+            <text x="85" y="242" fill="#182a20" font-size="11" font-weight="600" text-anchor="middle">取得 47 都道府縣實績</text>
+          </g>
+
+          <path d="M 775 240 L 788 240" fill="none" stroke="#1b8354" stroke-width="2" marker-end="url(#arrow-green)" />
+
+          <!-- Column 3: 用了哪些 Skill -->
+          <g id="col-skills" transform="translate(790, 125)">
+            <rect x="0" y="0" width="180" height="265" rx="6" fill="#ffffff" stroke="#c2e3d3" stroke-width="1.2" />
+            <rect x="0" y="0" width="180" height="28" rx="6 6 0 0" fill="#e2f5ec" />
+            <text x="12" y="19" fill="#0f5132" font-size="12.5" font-weight="700">③ 用了哪些 Skill？</text>
+            
+            <text x="12" y="44" fill="#1b8354" font-size="11.5" font-weight="700">★ data-analyst (示範)</text>
+            <text x="12" y="58" fill="#64748b" font-size="10.5">Prompt樣板+資料清洗腳本</text>
+
+            <text x="12" y="77" fill="#1b8354" font-size="11.5" font-weight="700">1. hallmark (dose 設計)</text>
+            <text x="12" y="91" fill="#64748b" font-size="10.5">極簡工程現代網頁系統</text>
+
+            <text x="12" y="110" fill="#1b8354" font-size="11.5" font-weight="700">2. diagram-design</text>
+            <text x="12" y="124" fill="#64748b" font-size="10.5">分析師流程時序圖 SVG</text>
+
+            <text x="12" y="143" fill="#1b8354" font-size="11.5" font-weight="700">3. dataviz (工業美學)</text>
+            <text x="12" y="157" fill="#64748b" font-size="10.5">Tufte 設計與色彩規範</text>
+
+            <text x="12" y="176" fill="#1b8354" font-size="11.5" font-weight="700">4. dataviz-motion</text>
+            <text x="12" y="190" fill="#64748b" font-size="10.5">1080p 60FPS 簡報+語音</text>
+
+            <text x="12" y="209" fill="#1b8354" font-size="11.5" font-weight="700">5. deeptutor-mentor</text>
+            <text x="12" y="223" fill="#64748b" font-size="10.5">港大架構自學 AI 導師</text>
+
+            <rect x="12" y="222" width="156" height="32" rx="4" fill="#f0fdf4" stroke="#86efac" />
+            <text x="90" y="242" fill="#15803d" font-size="11.5" font-weight="700" text-anchor="middle">8 大 Skill 協同驅動</text>
+          </g>
+
+          <path d="M 975 240 L 988 240" fill="none" stroke="#1b8354" stroke-width="2" marker-end="url(#arrow-green)" />
+
+          <!-- Column 4: 打造 Tableau-like 儀表板 -->
+          <g id="col-deliverable" transform="translate(990, 125)">
+            <rect x="0" y="0" width="155" height="265" rx="6" fill="#ffffff" stroke="#92d1b1" stroke-width="1.6" />
+            <rect x="0" y="0" width="155" height="28" rx="6 6 0 0" fill="#1b8354" />
+            <text x="12" y="19" fill="#ffffff" font-size="12.5" font-weight="700">④ 做出什麼功能？</text>
+            
+            <text x="12" y="48" fill="#0f5132" font-size="12.5" font-weight="700">類似 Tableau 的</text>
+            <text x="12" y="65" fill="#1b8354" font-size="13" font-weight="700">Data Atoms 儀表板</text>
+
+            <text x="12" y="88" fill="#334155" font-size="11.5">10 大數據圖表原子</text>
+            <text x="12" y="105" fill="#334155" font-size="11.5">X/Y/顏色/大小編碼槽</text>
+            <text x="12" y="122" fill="#334155" font-size="11.5">Tableau Prep 分類</text>
+            <text x="12" y="139" fill="#334155" font-size="11.5">地區與年份雙層篩選</text>
+            <text x="12" y="156" fill="#334155" font-size="11.5">自訂 CSV/Excel 匯入</text>
+
+            <path d="M 12 170 L 143 170" stroke="#eef3f0" stroke-width="1" />
+            <text x="12" y="188" fill="#15803d" font-size="12" font-weight="700">加碼影音產出</text>
+            <text x="12" y="205" fill="#64748b" font-size="11">34秒包豪斯動態簡報</text>
+            
+            <rect x="10" y="222" width="135" height="32" rx="4" fill="#1b8354" />
+            <text x="77" y="242" fill="#ffffff" font-size="11.5" font-weight="700" text-anchor="middle">學員實戰交付</text>
+          </g>
+
+          <!-- Bottom Pipeline Bar Connecting Phase 2 -->
+          <g id="bottom-bar" transform="translate(410, 410)">
+            <rect x="0" y="0" width="735" height="130" rx="8" fill="#ffffff" stroke="#c2e3d3" stroke-width="1.2" />
+            
+            <text x="20" y="28" fill="#0f5132" font-size="13.5" font-weight="700">實戰流程總結（從 Antigravity 到交付成果）：</text>
+            
+            <!-- Step badges -->
+            <rect x="20" y="44" width="130" height="30" rx="4" fill="#f4faf7" stroke="#c2e3d3" />
+            <text x="85" y="63" fill="#1b8354" font-size="11.5" font-weight="700" text-anchor="middle">1. Antigravity 環境</text>
+
+            <text x="160" y="64" fill="#1b8354" font-size="14" font-weight="bold">→</text>
+
+            <rect x="175" y="44" width="130" height="30" rx="4" fill="#f4faf7" stroke="#c2e3d3" />
+            <text x="240" y="63" fill="#1b8354" font-size="11.5" font-weight="700" text-anchor="middle">2. e-Stat API 抓取</text>
+
+            <text x="315" y="64" fill="#1b8354" font-size="14" font-weight="bold">→</text>
+
+            <rect x="330" y="44" width="130" height="30" rx="4" fill="#f0fdf4" stroke="#86efac" />
+            <text x="395" y="63" fill="#15803d" font-size="11.5" font-weight="700" text-anchor="middle">3. 8 大 Skill 封裝</text>
+
+            <text x="470" y="64" fill="#1b8354" font-size="14" font-weight="bold">→</text>
+
+            <rect x="485" y="44" width="130" height="30" rx="4" fill="#f4faf7" stroke="#92d1b1" />
+            <text x="550" y="63" fill="#1b8354" font-size="11.5" font-weight="700" text-anchor="middle">4. 深入分析與指南</text>
+
+            <text x="625" y="64" fill="#1b8354" font-size="14" font-weight="bold">→</text>
+
+            <rect x="640" y="44" width="85" height="30" rx="4" fill="#1b8354" />
+            <text x="682" y="63" fill="#ffffff" font-size="11.5" font-weight="700" text-anchor="middle">5. 儀表板實作</text>
+
+            <rect x="20" y="86" width="700" height="32" rx="4" fill="#f8fafc" />
+            <text x="30" y="106" fill="#475569" font-size="12">
+              配備 DeepTutor 自學導師機制：提供蘇格拉底式提問引導與三階提示，即使課後沒有老師在旁，學員也能獨立自學做出一模一樣的儀表板。
+            </text>
+          </g>
+
+        </g>
+      </svg>
+    </div>
+
+    <!-- Detail Breakdown Grid in dose Plastic Tray -->
+    <section class="plastic-tray" style="--t: var(--p-fri);">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
+        <h2 style="font-size: 22px;">課程兩大階段核心技術解構</h2>
+        <span class="mono-label">hands-on modules breakdown</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+        
+        <div class="pharmacy-label">
+          <div style="font-weight: 700; font-size: 13px; color: var(--p-tue-deep); margin-bottom: 4px;">第一塊：認知篇 (15%)</div>
+          <h3 style="font-size: 18px; margin-bottom: 8px;">大語言模型學習地圖 (index.html)</h3>
+          <p style="font-size: 13.5px; color: var(--color-muted); line-height: 1.6; margin-bottom: 12px;">
+            以原版《大語言模型學習地圖》為核心，引導學員建立底層世界觀與 Agent 概念：
+          </p>
+          <ul style="font-size: 13px; color: var(--color-ink-2); display: flex; flex-direction: column; gap: 6px; padding-left: 16px;">
+            <li><strong>通關 6 大站點：</strong>理解與生成、交代任務、查資料記憶、Tool Calling、Workflow、Evals 核對。</li>
+            <li><strong>全球競爭格局：</strong>全球主流開源與商用大模型全景（Claude 3.5, GPT-4o, Gemini 2.0, DeepSeek）。</li>
+            <li><strong>為什麼需要 Agent 工具：</strong>理解純語言模型在即時資料與精確計算上的極限，引出調用外部工具與 API 的必要性。</li>
+          </ul>
+        </div>
+
+        <div class="pharmacy-label" style="border-color: var(--color-accent);">
+          <div style="font-weight: 700; font-size: 13px; color: var(--color-accent-deep); margin-bottom: 4px;">第二塊：工具與 API (85%)</div>
+          <h3 style="font-size: 18px; margin-bottom: 8px;">使用哪套工具？串接哪一些 API？</h3>
+          <p style="font-size: 13.5px; color: var(--color-muted); line-height: 1.6; margin-bottom: 12px;">
+            真實工程環境與權威資料庫，拒絕假數據與空泛玩具代碼：
+          </p>
+          <ul style="font-size: 13px; color: var(--color-ink-2); display: flex; flex-direction: column; gap: 6px; padding-left: 16px;">
+            <li><strong>工具 1：Antigravity</strong>（Google DeepMind 開發之 Agentic Coding 環境，自主執行終端與 Skill 擴展）。</li>
+            <li><strong>工具 2：前端開源引擎</strong>（Apache ECharts 互動圖表與 Graphic Walker 拖曳編碼槽，Zero-Build 即開即用）。</li>
+            <li><strong>API：日本 e-Stat 官方 REST API v3.0</strong>（總務省統計局官方資料庫）。</li>
+            <li><strong>端點呼叫：</strong><code>/getStatsList</code> 取得 17 大領域代碼；<code>/getStatsData</code> 獲取半世紀面板數據。</li>
+          </ul>
+        </div>
+
+        <div class="pharmacy-label">
+          <div style="font-weight: 700; font-size: 13px; color: var(--color-accent-deep); margin-bottom: 4px;">第二塊：Skill 與成果交付</div>
+          <h3 style="font-size: 18px; margin-bottom: 8px;">用了哪些 Skill？做出什麼成果？</h3>
+          <p style="font-size: 13.5px; color: var(--color-muted); line-height: 1.6; margin-bottom: 12px;">
+            將複雜的資料處理、網頁版面與美學工程封裝為 8 大 Skill，附 GitHub 開源倉庫供學員探索：
+          </p>
+          <ul style="font-size: 13px; color: var(--color-ink-2); display: flex; flex-direction: column; gap: 6px; padding-left: 16px;">
+            <li><strong>data-analyst（示範）：</strong>分析師 Prompt 提示詞樣板與 <code>clean_data.py</code> 清洗腳本（<a href="https://github.com/nutcelvischen-jpg/data-analyst-skill" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
+            <li><strong>hallmark（網頁設計）：</strong>現代工程極簡網頁規範與 dose 藥盤主題（<a href="https://github.com/Nutlope/hallmark" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
+            <li><strong>diagram-design（架構流程）：</strong>繪製分析師 5 階段流程圖與全日時序圖 SVG（<a href="https://github.com/cathrynlavery/diagram-design" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
+            <li><strong>dataviz（圖表規範）：</strong>Tufte 工業級視覺化美學與 WCAG AA 對比度（<a href="https://github.com/jimliu/baoyu-design" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
+            <li><strong>dataviz-motion（動態影音）：</strong>將分析圖表轉化為 1080p 60FPS 包豪斯動態簡報（<a href="https://github.com/alchaincyf/huashu-motion" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
+            <li><strong>data-atoms-dashboard（儀表板）：</strong>一鍵產出 10 大數據原子、Tableau Prep 分類（<a href="https://github.com/Kanaries/graphic-walker" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">開源 ↗</a>）。</li>
+            <li><strong>deeptutor-mentor（自主學習）：</strong>港大 DeepTutor 架構，無老師也能靠三階提示獨立自學（<a href="https://github.com/HKUDS/DeepTutor" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="tear-stub">
+        <div class="mono-label">
+          architecture status: verified / curriculum date: 11-05
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <a href="data_analysis.html" style="font-size: 13px; color: var(--color-accent-deep); font-weight: 700; text-decoration: underline;">進入分析師工作流 ↗</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="js/digital_jitong.js"></script>
+</body>
+</html>

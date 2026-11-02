@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Data Atoms · Excel 數據視覺化與動態影音簡報工作台</title>
+  <title>Data Atoms · PyGWalker 互動探索工作台 (e-Stat 日本人口大數據)</title>
   
   <!-- Typography: Plus Jakarta Sans, Noto Sans TC, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   
-  <!-- CSS Stylesheet -->
+  <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/pygwalker.css">
   <style>
     /* New Briefing Action Button */
     .btn-briefing {
@@ -34,6 +35,33 @@
       border-color: var(--accent-orange);
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(255, 87, 34, 0.35);
+    }
+
+    /* 多指標並列比較按鈕與選取器樣式 */
+    .btn-shelf-compare {
+      background: #eff6ff;
+      border: 1px dashed #3b82f6;
+      color: #1d4ed8;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-shelf-compare:hover {
+      background: #2563eb;
+      color: #ffffff;
+      border-style: solid;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+    }
+    .multi-measure-item:hover {
+      border-color: #3b82f6 !important;
+      background: #f8fbff !important;
     }
 
     /* Director Studio Modal Styles */
@@ -248,446 +276,571 @@
       font-size: 10px;
       font-weight: 700;
       padding: 1px 6px;
-      background: #F1F0EC;
-      color: #555;
-      border-radius: 3px;
     }
     .story-script-input {
       width: 100%;
-      font-family: 'Noto Sans TC', sans-serif;
-      font-size: 12px;
-      line-height: 1.45;
-      color: #333;
-      border: 1px dashed rgba(17,17,17,0.2);
-      background: #fafaf8;
-      padding: 4px 6px;
-      border-radius: 4px;
-      resize: none;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-    .story-script-input:focus {
-      border-color: #FF4400;
-      background: #fff;
+      background: #F8F7F4;
+      border: 1px solid #D6D3CC;
+      color: #222;
+      padding: 6px 8px;
+      font-size: 11px;
+      font-family: var(--font-sans);
+      resize: vertical;
     }
     .engine-pills-row {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
-      margin-top: 6px;
+      margin-top: 10px;
     }
     .engine-pill {
-      font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
-      font-weight: 700;
-      padding: 2px 7px;
-      border: 1px solid rgba(17,17,17,0.3);
       background: #fff;
-      color: #111;
+      border: 1px solid #111;
+      padding: 3px 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
     }
     .modal-actions-bar {
       display: flex;
       gap: 10px;
-      margin-top: 14px;
+      align-items: center;
+      margin-top: 12px;
+    }
+    
+    /* PyGWalker Custom Enhancements */
+    .pyg-banner-badge {
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #bfdbfe;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
   </style>
 </head>
-<body class="app-body">
+<body>
+
+  <!-- 頂部官方入口指示橫條 (去 AI 味：純色沉穩底色、SVG 幾何圖標、去除隨機 emoji 與符號串接) -->
+    <!-- 頂部官方入口與五階段分析步驟指示橫條 -->
+  <div class="portal-top-bar">
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <span style="background: #2563eb; color: #fff; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.05em;">DATA ANALYTICS TRACK</span>
+      <span style="font-weight: 700; color: #f1f5f9; font-size: 13px;">資料分析實戰步驟：</span>
+      
+      <!-- 步驟 1: 全日架構圖 -->
+      <a href="curriculum_1105_workflow.html" target="_blank" style="color: #93c5fd; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);" title="今天整天學什麼">
+        <span>① 全日課程架構</span>
+        <svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
+      </a>
+
+      <!-- 步驟 2: 資料分析師工作流程 -->
+      <a href="student_data_analyst_workflow.html" target="_blank" style="color: #93c5fd; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);" title="Antigravity 完整實戰流程">
+        <span>② 分析師完整工作流</span>
+        <svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
+      </a>
+
+      <!-- 步驟 3: 日本資料與 API 申請教學 -->
+      <a href="estat_api_tutorial_simulator.html" target="_blank" style="color: #fde047; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.08); border: 1px solid rgba(253,224,71,0.35);" title="介紹日本資料與 API 申請避坑">
+        <span>③ 日本資料與 API 申請</span>
+        <svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
+      </a>
+
+      <!-- 步驟 4: 17 領域研究指南與圖像化分析法 -->
+      <a href="estat_catalog_and_research_guide.html" target="_blank" style="color: #86efac; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.08); border: 1px solid rgba(134,239,172,0.35);" title="資料分析完後的研究指南與 10 大實戰視覺化分析法">
+        <span>④ 17 領域與圖像化研究指南</span>
+        <svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
+      </a>
+
+      <!-- 步驟 5: Data Atoms 儀表板實作 (當前頁面) -->
+      <span style="background: #0284c7; color: #fff; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 0 0 1px rgba(255,255,255,0.2);">
+        <span>⑤ Data Atoms 儀表板實作 (當前)</span>
+      </span>
+    </div>
+
+    <!-- 右側：官方網站直連與技能彈窗 -->
+    <div style="display: flex; gap: 10px; align-items: center; font-size: 12px;">
+      <button type="button" class="btn btn-sm" id="btnOpenSkillsModalTop" onclick="document.getElementById('skillsModal').classList.add('open')" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #fff; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+        <span>💡 Skills 技能庫</span>
+      </button>
+
+      <span style="color: #94a3b8;">官方直連：</span>
+      <a href="https://www.e-stat.go.jp" target="_blank" style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); color: #fff; padding: 3px 10px; border-radius: 4px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+        <span style="font-family: monospace;">e-Stat 官網</span>
+        <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
+      </a>
+      <button onclick="navigator.clipboard.writeText('https://www.e-stat.go.jp'); alert('已複製 e-Stat 官方網址！');" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">複製網址</button>
+    </div>
+  </div>
 
   <div class="app-shell">
     
-    <!-- 1. Top Header Application Bar (52px fixed, Zero-Scroll) -->
+    <!-- 1. Top Navigation Bar -->
     <header class="app-topbar">
-      <!-- Left: Brand & File Info -->
+      <!-- Left: Brand & Title -->
       <div class="topbar-left">
-        <div class="brand-badge">
-          <div class="brand-logo">DA</div>
-          <div class="brand-text">
-            <span class="brand-title">Data Atoms</span>
-            <span class="brand-sub">Studio</span>
+        <div class="brand-cluster">
+          <div class="brand-logo-mark">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <circle cx="19" cy="5" r="2"></circle>
+              <circle cx="5" cy="19" r="2"></circle>
+              <path d="M10.4 13.6 6.4 17.6"></path>
+              <path d="M17.6 6.4 13.6 10.4"></path>
+            </svg>
+          </div>
+          <div class="brand-text-group">
+            <div class="brand-title-row">
+              <span class="brand-name">Data Atoms</span>
+              <span class="brand-version-chip" style="background: #2563eb; color: #fff;">PyGWalker</span>
+            </div>
+            <div class="brand-subtitle">Tableau 互動探索工作台 : 支援日本 e-Stat 官方數據與自訂檔案即時解析</div>
           </div>
         </div>
-
-        <div class="topbar-divider"></div>
-
-        <!-- Active File Info Pill (Click to open file picker) -->
-        <div class="active-file-pill" id="activeFileInfo" title="點擊更換資料檔案">
-          <svg class="pill-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-          </svg>
-          <span class="file-name" id="activeFileName">01_產品線營收體量_測試.xlsx</span>
-          <span class="file-meta" id="activeFileMeta">8 列 · 6 欄</span>
-        </div>
-
-        <!-- Multi-Sheet Selector (when workbook has >1 sheets) -->
-        <div class="sheet-select-pill" id="sheetSelectRow" style="display: none;">
-          <span class="sheet-label">工作表:</span>
-          <select class="app-select-sm" id="sheetSelector"></select>
-        </div>
       </div>
 
-      <!-- Center: View Mode Segmented Switcher -->
-      <div class="topbar-center">
-        <div class="view-segmented-control" id="viewModeToggle">
-          <button type="button" class="view-btn active" data-view="canvas" id="btnViewCanvas" title="圖表畫布全螢幕視圖">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="3" y1="9" x2="21" y2="9"></line>
-              <line x1="9" y1="21" x2="9" y2="9"></line>
-            </svg>
-            <span>圖表畫布</span>
-          </button>
-          <button type="button" class="view-btn" data-view="split" id="btnViewSplit" title="畫布與表格並排檢視">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-            </svg>
-            <span>分割視圖</span>
-          </button>
-          <button type="button" class="view-btn" data-view="table" id="btnViewTable" title="完整數據明細表格">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 3v18"></path>
-              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-              <path d="M3 9h18"></path>
-              <path d="M3 15h18"></path>
-            </svg>
-            <span>數據明細</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Right: Presets, Briefing Video, Export, Reset -->
+      <!-- Right: Dataset Quick Selector, Engine Toggle, Briefing, Export -->
       <div class="topbar-right">
-        <!-- Built-in Samples Quick Loader -->
-        <select id="sampleDataSelector" class="app-select-sm sample-select">
-          <option value="" disabled selected>⚡ 載入精選商業範例...</option>
-          <option value="bar">01. 產品線營收體量 (柱狀圖)</option>
-          <option value="line">02. 12個月營收時序趨勢 (折線圖)</option>
-          <option value="scatter">03. 行銷廣告與獲客相關 (散點圖)</option>
-          <option value="donut">04. 核心業務份額佔比 (環形圖)</option>
-          <option value="radar">05. 團隊綜合多維畫像 (雷達圖)</option>
-          <option value="funnel">06. 電商全鏈路轉化漏斗 (漏斗圖)</option>
+        <!-- Dataset Selector -->
+        <select id="datasetQuickSelect" class="app-select-sm sample-select" style="min-width: 360px; max-width: 480px; font-weight: 600;">
+          <optgroup label="日本官方統計 e-Stat 數據庫 (房價 / 人口 / 經濟基盤)">
+            <option value="open_17_domains">自選 17 大領域指標變數與歷年區間...</option>
+            <option value="jp_housing">日本 47 都道府縣「房價地價・租金・空屋率・所得」綜合表 (2024)</option>
+            <option value="jp_prefectures" selected>日本 47 都道府縣人口與高齡化全量表 (2024 e-Stat 官方)</option>
+            <option value="jp_history">日本半世紀人口結構演進時序表 (1975–2024 e-Stat 官方)</option>
+            <option value="jp_regions">日本地方分區人口與結構彙總表 (2024 e-Stat 官方)</option>
+          </optgroup>
+          <optgroup label="台灣與全球國際對比數據 (地理類跨國共用)">
+            <option value="tw_housing">台灣 22 縣市「房價地價・所得・人口・空屋率」對比表 (2024)</option>
+            <option value="world_gdp">全球主要經濟體「GDP・人均所得・人口・通膨率」國際表 (2024)</option>
+          </optgroup>
+          <optgroup label="商業營運測試數據">
+            <option value="biz_sales">產品線營收與毛利體量 (商業範例)</option>
+            <option value="biz_trend">12個月月度營收時序趨勢 (商業範例)</option>
+            <option value="biz_scatter">行銷廣告與獲客相關矩陣 (商業範例)</option>
+          </optgroup>
         </select>
 
-        <!-- NEW: Data-to-Video Briefing Button -->
-        <button type="button" class="btn-briefing" id="btnOpenBriefingModal" title="查看 / 生成 34秒 包豪斯動態影音簡報">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        <!-- 17 Domains & Year Range Button -->
+        <button type="button" class="btn-domain-top" id="btnOpen17DomainsModalTop" title="自訂選取 e-Stat 17大領域指標變數與年份區間">
+          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
           </svg>
-          <span>🎬 數據動態簡報</span>
+          <span>17領域變數與年份設定</span>
         </button>
 
-        <button type="button" class="btn btn-primary" id="btnExportImage" title="匯出 1920x1080 印刷級 PNG 圖檔">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Tableau Data Prep & Schema Button -->
+        <button type="button" class="btn btn-sm btn-outline" id="btnOpenSchemaModalTop" title="開啟 Tableau 欄位分類與資料前處理精靈">
+          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>欄位微調與分類 (Tableau Prep)</span>
+        </button>
+
+        <!-- Toggle Engine -->
+        <button type="button" class="btn btn-sm btn-outline" id="btnToggleEngine" title="切換 ECharts 互動引擎 或 原生 1080p Bauhaus Canvas">
+          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span>ECharts 互動引擎</span>
+        </button>
+
+        <!-- Data-to-Video Briefing Button -->
+        <button type="button" class="btn-briefing" id="btnOpenBriefingModal" title="查看 34秒 包豪斯動態影音簡報">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span>數據動態簡報</span>
+        </button>
+
+        <!-- Export Image -->
+        <button type="button" class="btn btn-primary" id="btnExportImage" title="匯出 1080p 高清圖表">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
           </svg>
-          <span>匯出 1080p 圖表</span>
-        </button>
-
-        <button type="button" class="btn btn-ghost" id="btnResetData" title="清除當前數據重新載入">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="1 4 1 10 7 10"></polyline>
-            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-          </svg>
-          <span>重設</span>
+          <span>匯出圖表</span>
         </button>
       </div>
     </header>
 
-    <!-- 2. Workspace Body (Flex 1, Zero Window Scroll) -->
+    <!-- 2. Workspace Body -->
     <div class="workspace-body">
       
-      <!-- Left Dock: Controls & Settings (320px fixed, Independent Internal Scroll) -->
-      <aside class="sidebar-dock">
+      <!-- Left Dock: PyGWalker Field List & Chart Types (334px fixed) -->
+      <aside class="sidebar-dock" style="width: 334px; min-width: 334px;">
         <div class="sidebar-scroll-container">
           
-          <!-- Section 1: Data Source & Upload Dropzone -->
+          <!-- Section 1: Upload Dropzone -->
           <div class="dock-card">
             <div class="dock-card-header">
-              <span class="dock-title">數據來源</span>
-              <span class="status-chip" id="fileStatusBadge">已就緒</span>
+              <span class="dock-title">數據來源 & 上傳</span>
+              <span class="status-chip" id="fileStatusBadge">47 列資料</span>
             </div>
 
-            <div class="upload-dropzone-compact" id="dropzone">
-              <input type="file" id="fileInput" accept=".xlsx, .xls, .csv">
+            <div class="upload-dropzone-compact" id="dropzone" title="點擊或拖放檔案至此">
+              <input type="file" id="fileInput" accept=".xlsx, .xls, .csv, .json">
               <div class="dropzone-inner">
-                <svg class="dropzone-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="dropzone-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                   <polyline points="17 8 12 3 7 8"></polyline>
                   <line x1="12" y1="3" x2="12" y2="15"></line>
                 </svg>
                 <div class="dropzone-text">
-                  <div class="dropzone-prompt">拖曳 Excel / CSV 或點擊上傳</div>
-                  <div class="dropzone-hint">支援 .xlsx, .xls, .csv · 本機 100% 離線運算</div>
+                  <div class="dropzone-prompt">拖曳 CSV / Excel / JSON 上傳</div>
+                  <div class="dropzone-hint">支援自訂上傳 · 本機 100% 離線運算</div>
                 </div>
               </div>
             </div>
 
-            <div class="dock-card-subaction">
-              <span>快速測試：</span>
-              <button type="button" class="btn-link" id="btnQuickSample">載入預設產品數據</button>
+            <button type="button" class="btn-domain-dock" id="btnOpen17DomainsModalDock" title="自選日本官方 17 大領域指標變數與歷年跨度">
+              <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              <span>17領域指標庫 (自選變數與年份)</span>
+            </button>
+
+            <button type="button" class="btn-schema-trigger" id="btnOpenSchemaModalDock" title="像 Tableau 一樣自動判定並微調維度、度量、連續與離散">
+              <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+              <span>欄位微調與分類 (Tableau Prep)</span>
+            </button>
+          </div>
+
+          <!-- Section 2: PyGWalker Field Dock (Dimensions & Measures) -->
+          <div class="dock-card">
+            <div class="dock-card-header">
+              <span class="dock-title">欄位清單 (拖曳至右側軸線)</span>
+              <span class="count-badge">PyGWalker</span>
+            </div>
+
+            <div class="fields-shelf-section">
+              <!-- Dimensions [T] -->
+              <div>
+                <div class="fields-group-title">
+                  <span style="display: inline-flex; align-items: center; gap: 5px;">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #2563eb; display: inline-block;"></span>
+                    <span>維度 (Dimensions / 類別)</span>
+                  </span>
+                  <span style="font-family: monospace; font-size: 10px;">[T]</span>
+                </div>
+                <div class="fields-pills-list" id="dimensionsList">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+
+              <!-- Measures [#] -->
+              <div style="margin-top: 10px;">
+                <div class="fields-group-title">
+                  <span style="display: inline-flex; align-items: center; gap: 5px;">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #059669; display: inline-block;"></span>
+                    <span>度量 (Measures / 數值)</span>
+                  </span>
+                  <span style="font-family: monospace; font-size: 10px;">[#]</span>
+                </div>
+                <div class="fields-pills-list" id="measuresList">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Section 2: Chart Type Selection Grid (7 Data Atoms with Bespoke SVGs) -->
+          <!-- Section 3: Chart Engine / 10 Data Atoms -->
           <div class="dock-card">
             <div class="dock-card-header">
-              <span class="dock-title">圖表引擎</span>
-              <span class="count-badge">7 大原子</span>
+              <span class="dock-title">圖表類型</span>
+              <span class="count-badge">10 大原子</span>
             </div>
 
             <div class="chart-type-dock-grid" id="chartTypeGrid">
               <!-- 01. 柱狀體量 -->
               <button type="button" class="chart-type-card active" data-chart="bar">
                 <div class="card-icon-box">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M18 20V10M12 20V4M6 20v-6"></path>
                   </svg>
                 </div>
                 <div class="card-text-group">
-                  <div class="card-header-row">
-                    <span class="card-num">01.</span>
-                    <span class="card-name">離散體量</span>
-                  </div>
-                  <div class="card-en">Bar Comparison</div>
+                  <div class="card-header-row"><span class="card-num">01.</span><span class="card-name">離散體量</span></div>
+                  <div class="card-en">Bar Chart</div>
                 </div>
               </button>
 
               <!-- 02. 時序趨勢 -->
               <button type="button" class="chart-type-card" data-chart="line">
                 <div class="card-icon-box">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m3 16 6-6 4 4 8-8"></path>
                     <path d="M17 6h4v4"></path>
                   </svg>
                 </div>
                 <div class="card-text-group">
-                  <div class="card-header-row">
-                    <span class="card-num">02.</span>
-                    <span class="card-name">時序趨勢</span>
-                  </div>
-                  <div class="card-en">Temporal Trend</div>
+                  <div class="card-header-row"><span class="card-num">02.</span><span class="card-name">時序趨勢</span></div>
+                  <div class="card-en">Line Trend</div>
                 </div>
               </button>
 
-              <!-- 03. 相關分佈 -->
+              <!-- 03. 雙軸複合 (Dual-Axis) -->
+              <button type="button" class="chart-type-card" data-chart="dual" title="體量柱狀與比率折線雙軸對比 (支援次軸 Secondary)">
+                <div class="card-icon-box">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="10" width="4" height="10" rx="1"></rect>
+                    <rect x="10" y="6" width="4" height="14" rx="1"></rect>
+                    <rect x="17" y="12" width="4" height="8" rx="1"></rect>
+                    <path d="m3 8 7-4 7 6 4-2" stroke="#ea580c" stroke-width="2.2"></path>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row"><span class="card-num">03.</span><span class="card-name">雙軸複合</span></div>
+                  <div class="card-en">Dual-Axis Combo</div>
+                </div>
+              </button>
+
+              <!-- 04. 地理地圖 (Universal Geo Map) -->
+              <button type="button" class="chart-type-card" data-chart="geo" title="通用地理分級地圖 (日本47縣/台灣/全球/坐標通用)">
+                <div class="card-icon-box">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+                    <path d="M2 12h20"></path>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row"><span class="card-num">04.</span><span class="card-name">地理地圖</span></div>
+                  <div class="card-en">Universal Geo</div>
+                </div>
+              </button>
+
+              <!-- 05. 盒鬚分佈 (Box Plot) -->
+              <button type="button" class="chart-type-card" data-chart="boxplot" title="群組離散度、四分位數與極值檢驗">
+                <div class="card-icon-box">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="6" y1="3" x2="6" y2="7"></line>
+                    <rect x="3" y="7" width="6" height="10" rx="1"></rect>
+                    <line x1="6" y1="17" x2="6" y2="21"></line>
+                    <line x1="3" y1="12" x2="9" y2="12"></line>
+                    <line x1="16" y1="5" x2="16" y2="9"></line>
+                    <rect x="13" y="9" width="6" height="8" rx="1"></rect>
+                    <line x1="16" y1="17" x2="16" y2="20"></line>
+                    <line x1="13" y1="13" x2="19" y2="13"></line>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row"><span class="card-num">05.</span><span class="card-name">盒鬚分佈</span></div>
+                  <div class="card-en">Box Plot</div>
+                </div>
+              </button>
+
+              <!-- 06. 矩形樹圖 (Treemap) -->
+              <button type="button" class="chart-type-card" data-chart="treemap" title="多維層級結構佔比與面積權重">
+                <div class="card-icon-box">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                    <line x1="11" y1="3" x2="11" y2="21"></line>
+                    <line x1="11" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="14" x2="11" y2="14"></line>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row"><span class="card-num">06.</span><span class="card-name">矩形樹圖</span></div>
+                  <div class="card-en">Treemap</div>
+                </div>
+              </button>
+
+              <!-- 07. 相關分佈 -->
               <button type="button" class="chart-type-card" data-chart="scatter">
                 <div class="card-icon-box">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="7.5" cy="15.5" r="1.5" fill="currentColor"></circle>
                     <circle cx="12" cy="11" r="1.5" fill="currentColor"></circle>
                     <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"></circle>
                     <circle cx="9" cy="8" r="1.5" fill="currentColor"></circle>
                     <circle cx="15" cy="16" r="1.5" fill="currentColor"></circle>
-                    <line x1="4" y1="18" x2="20" y2="4" stroke-dasharray="2 2"></line>
                   </svg>
                 </div>
                 <div class="card-text-group">
-                  <div class="card-header-row">
-                    <span class="card-num">03.</span>
-                    <span class="card-name">相關分佈</span>
-                  </div>
-                  <div class="card-en">Correlation Matrix</div>
+                  <div class="card-header-row"><span class="card-num">07.</span><span class="card-name">相關分佈</span></div>
+                  <div class="card-en">Scatter Plot</div>
                 </div>
               </button>
 
-              <!-- 04. 結構佔比 -->
+              <!-- 08. 結構佔比 -->
               <button type="button" class="chart-type-card" data-chart="donut">
                 <div class="card-icon-box">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
                     <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
                   </svg>
                 </div>
                 <div class="card-text-group">
-                  <div class="card-header-row">
-                    <span class="card-num">04.</span>
-                    <span class="card-name">結構佔比</span>
-                  </div>
-                  <div class="card-en">Composition Donut</div>
+                  <div class="card-header-row"><span class="card-num">08.</span><span class="card-name">結構佔比</span></div>
+                  <div class="card-en">Donut / Pie</div>
                 </div>
               </button>
 
-              <!-- 05. 多維畫像 -->
+              <!-- 09. 多維畫像 -->
               <button type="button" class="chart-type-card" data-chart="radar">
                 <div class="card-icon-box">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"></polygon>
                     <polygon points="12 6 18 10 18 14 12 18 6 14 6 10"></polygon>
                   </svg>
                 </div>
                 <div class="card-text-group">
-                  <div class="card-header-row">
-                    <span class="card-num">05.</span>
-                    <span class="card-name">多維畫像</span>
-                  </div>
+                  <div class="card-header-row"><span class="card-num">09.</span><span class="card-name">多維畫像</span></div>
                   <div class="card-en">Radar Profile</div>
                 </div>
               </button>
 
-              <!-- 06. 轉化路徑 -->
+              <!-- 10. 轉化路徑 -->
               <button type="button" class="chart-type-card" data-chart="funnel">
                 <div class="card-icon-box">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                   </svg>
                 </div>
                 <div class="card-text-group">
-                  <div class="card-header-row">
-                    <span class="card-num">06.</span>
-                    <span class="card-name">轉化路徑</span>
-                  </div>
-                  <div class="card-en">Funnel Conversion</div>
+                  <div class="card-header-row"><span class="card-num">10.</span><span class="card-name">轉化路徑</span></div>
+                  <div class="card-en">Funnel Flow</div>
                 </div>
               </button>
-
-              <!-- 07. 矩陣總覽 -->
-              <button type="button" class="chart-type-card full-width" data-chart="overview">
-                <div class="card-icon-box">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-                    <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-                    <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-                    <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-                  </svg>
-                </div>
-                <div class="card-text-group">
-                  <div class="card-header-row">
-                    <span class="card-num">07.</span>
-                    <span class="card-name">指標矩陣總覽</span>
-                  </div>
-                  <div class="card-en">Metric Matrix Overview</div>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <!-- Section 3: Field Mapping Controls -->
-          <div class="dock-card">
-            <div class="dock-card-header">
-              <span class="dock-title">維度與指標映射</span>
-              <span class="count-badge">自動對齊</span>
-            </div>
-
-            <!-- X Axis / Dimension -->
-            <div class="control-field">
-              <label class="control-label" for="selectXAxis">
-                <span>X 軸 / 類別維度 (Category)</span>
-                <span class="req">*</span>
-              </label>
-              <select class="app-select" id="selectXAxis"></select>
-            </div>
-
-            <!-- Y Axis / Metric -->
-            <div class="control-field">
-              <label class="control-label" for="selectYAxis">
-                <span>Y 軸 / 主要數值指標 (Metric)</span>
-                <span class="req">*</span>
-              </label>
-              <select class="app-select" id="selectYAxis"></select>
-            </div>
-
-            <!-- Secondary Metric (Optional) -->
-            <div class="control-field" id="groupSecondary">
-              <label class="control-label" for="selectSecondary">
-                <span id="labelSecondary">次要指標 / 目標線 (Secondary)</span>
-                <span class="opt-label">(選填)</span>
-              </label>
-              <select class="app-select" id="selectSecondary"></select>
-            </div>
-
-            <div class="divider-subtle"></div>
-
-            <!-- Options & Toggles -->
-            <div class="toggles-list">
-              <label class="toggle-row">
-                <input type="checkbox" id="chkShowLabels" checked>
-                <span class="toggle-text">顯示精確數值標籤</span>
-              </label>
-              <label class="toggle-row" id="rowSortDescending">
-                <input type="checkbox" id="chkSortDescending" checked>
-                <span class="toggle-text">依指標由大至小排序 (Ranking)</span>
-              </label>
-              <label class="toggle-row" id="rowShowAverage">
-                <input type="checkbox" id="chkShowAverage" checked>
-                <span class="toggle-text">顯示平均值 / 基準參考線</span>
-              </label>
-              <label class="toggle-row" id="rowShowTrendline">
-                <input type="checkbox" id="chkShowTrendline" checked>
-                <span class="toggle-text" id="txtTrendlineLabel">顯示移動平均線 / 回歸線</span>
-              </label>
-              <label class="toggle-row" id="rowHighlightOutliers">
-                <input type="checkbox" id="chkHighlightOutliers" checked>
-                <span class="toggle-text">標記最高極值 / 離群值 (Outlier)</span>
-              </label>
             </div>
           </div>
 
         </div>
       </aside>
 
-      <!-- Main Center Arena (Flex 1, Zero Window Scroll) -->
+      <!-- Main Center Arena (Flex 1) -->
       <main class="main-stage">
         
-        <!-- Live KPI Ribbon (Horizontal Compact Strip, 46px height) -->
+        <!-- Graphic Walker Encoding Shelves (視覺編碼槽) -->
+        <section class="encoding-shelves-strip">
+          <!-- Row 1: Columns (X) and Rows (Y) -->
+          <div class="shelves-row">
+            <!-- Columns (X) -->
+            <div class="shelf-group" style="flex: 1.2;">
+              <span class="shelf-label">Columns (X 軸):</span>
+              <div class="shelf-drop-target" id="shelfX">
+                <!-- Drop target -->
+              </div>
+            </div>
+
+            <!-- Swap Button -->
+            <button type="button" class="shelf-action-btn" id="btnSwapXY" title="快速對調 X 軸與 Y 軸">
+              <span>⇄ 對調 X/Y</span>
+            </button>
+
+            <!-- Rows (Y) -->
+            <div class="shelf-group" style="flex: 1.4;">
+              <span class="shelf-label">Rows (Y 軸):</span>
+              <div class="shelf-drop-target" id="shelfY">
+                <!-- Drop target -->
+              </div>
+            </div>
+
+            <!-- Reset Button -->
+            <button type="button" class="shelf-action-btn" id="btnClearShelves" title="清除所有槽位">
+              <span>✕ 清除</span>
+            </button>
+          </div>
+
+          <!-- Row 2: Color, Size, Secondary, and Filters (Tableau-like 篩選器架) -->
+          <div class="shelves-row" style="font-size: 11px;">
+            <!-- Color Shelf -->
+            <div class="shelf-group" style="flex: 0.9;">
+              <span class="shelf-label">Color (顏色):</span>
+              <div class="shelf-drop-target" id="shelfColor"></div>
+            </div>
+
+            <!-- Size Shelf -->
+            <div class="shelf-group" style="flex: 0.9;">
+              <span class="shelf-label">Size (氣泡大小):</span>
+              <div class="shelf-drop-target" id="shelfSize"></div>
+            </div>
+
+            <!-- Secondary Y Shelf -->
+            <div class="shelf-group" style="flex: 1;">
+              <span class="shelf-label">Secondary (次軸折線):</span>
+              <div class="shelf-drop-target" id="shelfSecondary"></div>
+            </div>
+
+            <!-- Filters Shelf (Tableau 篩選槽) -->
+            <div class="shelf-group" style="flex: 1.4; border-color: rgba(37,99,235,0.3); background: #f8fbff;">
+              <span class="shelf-label" style="color: #2563eb;">
+                <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+                Filters (篩選器):
+              </span>
+              <div class="shelf-drop-target" id="shelfFilters" style="flex-wrap: wrap;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Dynamic Filter Controls Bar (即時地區分組與年份區間篩選列) -->
+        <section class="active-filters-strip" id="activeFiltersStrip">
+          <!-- Dynamically populated by JS: Region pills, Year Range slider, Custom filters -->
+        </section>
+
+        <!-- Live KPI Ribbon -->
         <section class="kpi-ribbon">
           <div class="kpi-chip chip-1">
             <span class="kpi-micro-label" id="kpiRowCountSub">ROWS</span>
             <span class="kpi-micro-val" id="kpiRowCount">0</span>
           </div>
-
           <div class="kpi-chip-divider"></div>
-
           <div class="kpi-chip chip-2">
             <span class="kpi-micro-label" id="kpiTotalSumSub">SUM</span>
             <span class="kpi-micro-val" id="kpiTotalSum">0</span>
           </div>
-
           <div class="kpi-chip-divider"></div>
-
           <div class="kpi-chip chip-3">
             <span class="kpi-micro-label" id="kpiMeanValSub">MEAN</span>
             <span class="kpi-micro-val" id="kpiMeanVal">0</span>
           </div>
-
           <div class="kpi-chip-divider"></div>
-
           <div class="kpi-chip chip-4">
-            <span class="kpi-micro-label" id="kpiMetric4Title">MAX-MIN</span>
+            <span class="kpi-micro-label" id="kpiMetric4Title">MAX / MIN</span>
             <span class="kpi-micro-val" id="kpiMetric4Val">0</span>
-            <span class="kpi-micro-sub" id="kpiMetric4Sub" style="display: none;"></span>
           </div>
         </section>
 
-        <!-- Stage Body (Canvas Viewport + Collapsible Drawer) -->
+        <!-- Stage Body (Canvas / ECharts Viewport + Collapsible Drawer) -->
         <div class="stage-body" data-view-mode="canvas">
           
-          <!-- 1. Canvas Viewport (100% fits within viewport, zero page scroll) -->
-          <div class="canvas-viewport" id="canvasViewport">
+          <!-- ECharts Interactive Viewport -->
+          <div id="echartsViewport" class="echarts-viewport-container" style="flex: 1; height: 100%;"></div>
+
+          <!-- Native 1080p Canvas (Hidden unless toggled) -->
+          <div class="canvas-viewport" id="canvasViewport" style="display: none; flex: 1;">
             <div class="canvas-wrapper">
-              
-              <!-- Native 1080p Canvas -->
               <canvas id="mainChartCanvas" width="1920" height="1080"></canvas>
-              
-              <!-- Hover Floating Tooltip -->
-              <div class="canvas-tooltip" id="canvasTooltip">
-                <div class="tt-title">類別名稱</div>
-                <div class="tt-val">數值: 0</div>
-              </div>
             </div>
           </div>
 
-          <!-- 2. Integrated Data Table Drawer (Collapsible & Expandable) -->
+          <!-- Data Table Drawer -->
           <section class="data-drawer" id="dataDrawer">
-            <!-- Drawer Header / Handle Bar -->
             <div class="drawer-header-bar" id="drawerToggleBar">
-              <div class="drawer-left-action" id="btnToggleDrawer" title="展開 / 收合明細表格">
+              <div class="drawer-left-action" id="btnToggleDrawer" title="展開 / 收合明細表格" style="cursor: pointer;">
                 <span class="drawer-toggle-icon" id="drawerIcon">▲</span>
                 <span class="drawer-heading">數據明細預覽</span>
-                <span class="drawer-count-chip" id="drawerRowCount">8 列資料</span>
+                <span class="drawer-count-chip" id="drawerRowCount">47 列資料</span>
               </div>
 
               <div class="drawer-right-tools">
@@ -700,17 +853,12 @@
                 </div>
 
                 <button type="button" class="btn btn-sm btn-outline" id="btnExportCSV">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                  </svg>
                   <span>匯出 CSV</span>
                 </button>
               </div>
             </div>
 
-            <!-- Drawer Body: Data Table & Pagination -->
+            <!-- Drawer Body -->
             <div class="drawer-body" id="drawerBody">
               <div class="table-scroll-wrap">
                 <table class="preview-table" id="previewTable">
@@ -720,7 +868,7 @@
               </div>
 
               <div class="drawer-footer-pagination">
-                <span class="pagination-info" id="paginationInfo">第 1 頁 / 共 1 頁</span>
+                <span class="pagination-info" id="paginationInfo">第 1 頁 / 共 5 頁</span>
                 <span class="pagination-rows-info" id="tableRowsInfo">顯示前 10 筆資料</span>
                 <div class="pagination-actions">
                   <button type="button" class="btn btn-xs" id="btnPrevPage">上一頁</button>
@@ -743,458 +891,555 @@
     <span>通知內容</span>
   </div>
 
-  <!-- ==================== Data-to-Video Briefing Director Studio ==================== -->
+  <!-- Data-to-Video Briefing Modal -->
   <div class="briefing-modal-overlay" id="briefingModal">
     <div class="briefing-modal-card">
-      <!-- Modal Header -->
       <div class="modal-head">
         <div class="modal-head-title">
-          <span>🎬 AI 商業數據動態簡報導演室 · BRIEFING DIRECTOR STUDIO</span>
           <span class="modal-badge" id="modalLensBadge">120 BPM SALES BAUHAUS</span>
+          <span>Data Atoms · 包豪斯動態影音簡報導演層</span>
         </div>
-        <button type="button" class="modal-close-btn" id="btnCloseBriefingModal" title="關閉">×</button>
+        <button type="button" class="modal-close-btn" id="btnCloseBriefingModal">×</button>
       </div>
 
-      <!-- Director Levers Control Strip -->
       <div class="director-controls-strip">
         <div class="control-group">
-          <span class="control-group-label">業務關注焦點 (LENS):</span>
-          <div class="lens-pill-group" id="lensPillGroup">
-            <button type="button" class="lens-pill-btn active" data-lens="sales" id="btnLensSales">
-              <span>💰 銷售與營收 (Sales)</span>
-            </button>
-            <button type="button" class="lens-pill-btn" data-lens="scm" id="btnLensScm">
-              <span>📦 供應鏈與庫存 (SCM)</span>
-            </button>
+          <span class="control-group-label">關注焦點：</span>
+          <div class="lens-pill-group">
+            <button type="button" class="lens-pill-btn active" id="btnLensSales">💰 銷售與營收</button>
+            <button type="button" class="lens-pill-btn" id="btnLensScm">📦 供應鏈與庫存</button>
           </div>
         </div>
-
         <div class="control-group">
-          <span class="control-group-label">匯報風格 (AUDIENCE):</span>
-          <div class="tone-pill-group" id="tonePillGroup">
-            <button type="button" class="tone-pill-btn active" data-tone="exec" id="btnToneExec">
-              <span>👔 C-Level 高管速報 (34s)</span>
-            </button>
-            <button type="button" class="tone-pill-btn" data-tone="team" id="btnToneTeam">
-              <span>📋 業務細節拆解 (45s)</span>
-            </button>
+          <span class="control-group-label">旁白風格：</span>
+          <div class="tone-pill-group">
+            <button type="button" class="tone-pill-btn active" id="btnToneExec">C-Level 高管速報 (34s)</button>
+            <button type="button" class="tone-pill-btn" id="btnToneTeam">業務拆解 (45s)</button>
           </div>
-        </div>
-
-        <div class="control-group" style="margin-left: auto;">
-          <a href="sample_data/綜合企業營運_銷售與供應鏈.xlsx" download="綜合企業營運_銷售與供應鏈.xlsx" class="btn btn-outline" style="padding: 5px 12px; font-size: 11px; text-decoration: none; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px;">
-            <span>📁 載入多維數據源 (.xlsx)</span>
-          </a>
         </div>
       </div>
 
-      <!-- Modal Body Grid -->
       <div class="modal-body-grid">
-        <!-- Left: Video Player Wrap -->
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <div class="modal-video-wrap">
-            <video class="modal-video-player" id="briefingVideoPlayer" controls preload="metadata" poster="preview_frames/bauhaus_scene_01.png">
-              <source id="briefingVideoSrc" src="videos/data_briefing_bauhaus_34s.mp4" type="video/mp4">
-              您的瀏覽器不支援 HTML5 影片播放。
-            </video>
-          </div>
-          <!-- Playing Scene Status Bar -->
-          <div style="display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid rgba(17,17,17,0.15); padding: 8px 12px; font-size: 11px; font-family: 'JetBrains Mono', monospace;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10B981;"></span>
-              <span id="playingSceneStatusText" style="font-weight: 700; color: #111;">播放進度：第 1 幕 · 全量體量</span>
-            </div>
-            <div style="color: #666;" id="playingTimeText">00:00 / 00:34</div>
-          </div>
+        <div class="modal-video-wrap">
+          <video class="modal-video-player" id="briefingVideoPlayer" controls playsinline poster="preview_frames/bauhaus_scene_01.png">
+            <source src="videos/data_briefing_bauhaus_34s.mp4" type="video/mp4" id="briefingVideoSrc">
+          </video>
         </div>
-
-        <!-- Right: Storyboard & Script Controls -->
         <div class="modal-info-panel">
           <div>
             <div style="display: flex; align-items: center; justify-content: space-between;">
-              <h3 id="storyboardTitle" style="font-size: 15px; font-weight: 800; color: #111;">4 幕自動化劇本分鏡 (點擊跳轉 / 可自定義台詞)</h3>
+              <h3 id="storyboardTitle" style="font-size: 15px; font-weight: 800; color: #111;">4 幕自動化劇本分鏡</h3>
               <span class="story-chip" id="lensKpiChip" style="background: #FFEBE5; color: #FF4400; border: 1px solid #FF4400;">營收主力：企業雲端 25.5%</span>
             </div>
-            <p id="storyboardSubtitle" style="font-size: 12px; color: #666; margin-top: 2px;">
-              由 DeepTutor 理念驅動 · 提取數值特徵並自動編排代碼動畫與語音
-            </p>
-            
-            <div class="storyboard-timeline" id="storyboardContainer">
-              <!-- Scene 1 -->
+            <div class="storyboard-timeline">
               <div class="story-item active-scene" data-scene="1" data-time="0">
                 <span class="story-time-badge">00-08s</span>
                 <div class="story-content-wrap">
-                  <div class="story-header-row">
-                    <span class="story-title" id="s1_title">01. 全量體量 · MACRO VOLUME</span>
-                    <span class="story-chip" id="s1_chip">3,690 萬元</span>
-                  </div>
+                  <div class="story-header-row"><span class="story-title" id="s1_title">01. 全量體量 · MACRO VOLUME</span><span class="story-chip" id="s1_chip">3,690 萬元</span></div>
                   <textarea class="story-script-input" id="s1_script" rows="2">八大產品線總營收達 3,690 萬元，產出維持高位水準。</textarea>
                 </div>
               </div>
-
-              <!-- Scene 2 -->
               <div class="story-item" data-scene="2" data-time="8">
                 <span class="story-time-badge">08-17s</span>
                 <div class="story-content-wrap">
-                  <div class="story-header-row">
-                    <span class="story-title" id="s2_title">02. 結構佔比 · PARETO DOMINANCE</span>
-                    <span class="story-chip" id="s2_chip">TOP 25.5%</span>
-                  </div>
+                  <div class="story-header-row"><span class="story-title" id="s2_title">02. 結構佔比 · PARETO DOMINANCE</span><span class="story-chip" id="s2_chip">TOP 25.5%</span></div>
                   <textarea class="story-script-input" id="s2_script" rows="2">旗艦雲端運算突破 940 萬，以二成五份額穩居成長主力。</textarea>
                 </div>
               </div>
-
-              <!-- Scene 3 -->
               <div class="story-item" data-scene="3" data-time="17">
                 <span class="story-time-badge">17-25s</span>
                 <div class="story-content-wrap">
-                  <div class="story-header-row">
-                    <span class="story-title" id="s3_title">03. 梯隊分佈 · DISCRETE MATRIX</span>
-                    <span class="story-chip" id="s3_chip">跨度 5.9x</span>
-                  </div>
+                  <div class="story-header-row"><span class="story-title" id="s3_title">03. 梯隊分佈 · DISCRETE MATRIX</span><span class="story-chip" id="s3_chip">跨度 5.9x</span></div>
                   <textarea class="story-script-input" id="s3_script" rows="2">各品類極值跨度達 5.9 倍，高毛利模組具備強勁擴張潛力。</textarea>
                 </div>
               </div>
-
-              <!-- Scene 4 -->
               <div class="story-item" data-scene="4" data-time="25">
                 <span class="story-time-badge">25-34s</span>
                 <div class="story-content-wrap">
-                  <div class="story-header-row">
-                    <span class="story-title" id="s4_title">04. 執行決策 · STRATEGIC LOCKUP</span>
-                    <span class="story-chip" id="s4_chip">ACTION PLAN</span>
-                  </div>
+                  <div class="story-header-row"><span class="story-title" id="s4_title">04. 執行決策 · STRATEGIC LOCKUP</span><span class="story-chip" id="s4_chip">ACTION PLAN</span></div>
                   <textarea class="story-script-input" id="s4_script" rows="2">以理性幾何穿透複雜表象，驅動敏捷決策。Data Atoms 簡報完畢。</textarea>
                 </div>
               </div>
             </div>
-
-            <!-- Engine Pills Row -->
-            <div class="engine-pills-row" id="enginePillsRow">
+            <div class="engine-pills-row">
               <span class="engine-pill">🎙️ Gemini 3.8 Flash TTS · Charon</span>
               <span class="engine-pill" id="stylePill">📐 Bauhaus 幾何動態</span>
-              <span class="engine-pill">⏱️ 120 BPM 卡點 + -5.2dB Ducking</span>
               <span class="engine-pill">⚡ 100% 程式本地渲染 (零幻覺)</span>
             </div>
           </div>
-
-          <!-- Bottom Actions -->
           <div class="modal-actions-bar">
-            <a href="videos/data_briefing_bauhaus_34s.mp4" id="btnDownloadBriefingVideo" download="Data_Atoms_商業動態簡報_34s.mp4" class="btn btn-primary" style="flex: 1; text-align: center; text-decoration: none;">
-              📥 下載 1080p 影片 (.mp4)
-            </a>
-            <button type="button" class="btn btn-outline" id="btnApplyScriptChanges" title="依修改的劇本即時更新語音與渲染">
-              🔄 套用劇本更新
-            </button>
-            <a href="videos/data_briefing_bauhaus_34s.mp4" id="btnFullscreenBriefing" target="_blank" class="btn btn-outline" style="text-decoration: none;">
-              ↗ 新視窗全螢幕
-            </a>
+            <a href="videos/data_briefing_bauhaus_34s.mp4" id="btnDownloadBriefingVideo" download="Data_Atoms_動態簡報.mp4" class="btn btn-primary" style="flex: 1; text-align: center; text-decoration: none;">📥 下載 1080p 影片</a>
+            <button type="button" class="btn btn-outline" id="btnApplyScriptChanges">🔄 套用劇本更新</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Local SheetJS (works 100% offline) -->
+  <!-- Tableau-like Data Preparation & Schema Classifier Modal -->
+  <div class="schema-modal-overlay" id="schemaClassifierModal">
+    <div class="schema-modal-card">
+      <!-- Modal Header -->
+      <div class="schema-modal-header">
+        <div class="schema-header-left">
+          <div class="schema-title-row">
+            <span class="schema-badge-tableau">TABLEAU DATA PREP</span>
+            <h2 class="schema-title">資料欄位語意分類與前處理 (Data Classifier)</h2>
+          </div>
+          <!-- Step Flow Indicator -->
+          <div class="schema-steps-tracker">
+            <div class="step-pill step-done" id="stepPillAuto">
+              <span class="step-num">✓</span>
+              <span class="step-text">1. 程式智慧判定</span>
+            </div>
+            <div class="step-connector">→</div>
+            <div class="step-pill step-active" id="stepPillReview">
+              <span class="step-num">2</span>
+              <span class="step-text">2. 人工檢查與微調 (維度/度量/連續/離散)</span>
+            </div>
+            <div class="step-connector">→</div>
+            <div class="step-pill step-pending" id="stepPillNext">
+              <span class="step-num">3</span>
+              <span class="step-text">3. 下一步：套用並進入圖表探索</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" id="btnCloseSchemaModal" title="關閉視窗">×</button>
+      </div>
+
+      <!-- Modal Toolbar -->
+      <div class="schema-modal-toolbar">
+        <div class="schema-toolbar-left">
+          <span class="schema-dataset-tag" id="schemaDatasetTag">資料來源: 日本 47 都道府縣</span>
+          <span class="schema-stat-chip" id="schemaTotalRowsChip">總列數: 47 列</span>
+          <span class="schema-stat-chip chip-dim" id="schemaDimCountChip">維度: 4 個</span>
+          <span class="schema-stat-chip chip-mea" id="schemaMeaCountChip">度量: 6 個</span>
+        </div>
+        <div class="schema-toolbar-right">
+          <div class="schema-filter-group">
+            <button type="button" class="schema-filter-btn active" data-filter="all">全部欄位 (<span id="countAll">10</span>)</button>
+            <button type="button" class="schema-filter-btn" data-filter="dimension">維度 (<span id="countDim">4</span>)</button>
+            <button type="button" class="schema-filter-btn" data-filter="measure">度量 (<span id="countMea">6</span>)</button>
+          </div>
+          <input type="text" id="schemaSearchInput" class="schema-search-input" placeholder="搜尋欄位名稱...">
+        </div>
+      </div>
+
+      <!-- Explanation Banner -->
+      <div class="schema-notice-banner">
+        <div class="notice-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+        </div>
+        <div class="notice-content">
+          <strong>Tableau 資料角色定義：</strong>
+          <span><b>維度 (Dimensions)</b>：定性描述與分組欄位（地區、年份、姓名），預設為<b>離散</b>；<b>度量 (Measures)</b>：定量數值與可計算指標（人口、金額、率），預設為<b>連續</b>軸線並支援 SUM / AVG 等聚合運算。點選下方按鈕可自訂切換，確認無誤後點擊「<b>下一步</b>」。</span>
+        </div>
+      </div>
+
+      <!-- Main Grid Content -->
+      <div class="schema-table-wrap">
+        <table class="schema-grid-table">
+          <thead>
+            <tr>
+              <th style="width: 140px;">型態 (Type)</th>
+              <th style="width: 220px;">欄位名稱 / 別名 (Field & Alias)</th>
+              <th style="width: 160px;">角色 (Role)</th>
+              <th style="width: 160px;">連續性 (Nature)</th>
+              <th style="width: 130px;">預設聚合 (Agg)</th>
+              <th style="width: 240px;">數據探查與取樣值 (Profiling & Samples)</th>
+              <th>語意判定推導 (Inferred Rule)</th>
+            </tr>
+          </thead>
+          <tbody id="schemaTableBody">
+            <!-- Dynamically generated rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="schema-modal-footer">
+        <div class="schema-footer-left">
+          <button type="button" class="btn btn-outline btn-sm" id="btnResetAutoInfer" title="重設回程式第一次自動判定的建議">
+            <span>↺ 重新自動判定</span>
+          </button>
+          <span style="font-size: 11.5px; color: #64748b;">修改將即時反映至視覺化編碼槽與左側欄位清單</span>
+        </div>
+        <div class="schema-footer-right">
+          <button type="button" class="btn btn-outline btn-sm" id="btnCancelSchemaModal">
+            <span>取消</span>
+          </button>
+          <button type="button" class="btn btn-tableau-next" id="btnApplyAndNext">
+            <span>下一步：套用並進入圖表探索 ➔</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 17 Domains & Year Range Extractor Modal (e-Stat SSDSE) -->
+  <div class="domain-modal-overlay" id="estat17DomainModal">
+    <div class="domain-modal-card">
+      <!-- Modal Header -->
+      <div class="domain-modal-header">
+        <div class="domain-header-left">
+          <div class="domain-title-row">
+            <span class="domain-badge-estat">E-STAT 17 DOMAINS</span>
+            <h2 class="domain-title">日本官方統計 17 大領域指標選取與資料下載器</h2>
+          </div>
+          <p class="domain-subtitle">自由選取跨領域指標（人口、房價、空屋、所得、產業等）與自訂歷年年份區間，無縫載入視覺化工作台</p>
+        </div>
+        <button type="button" class="modal-close-btn" id="btnClose17DomainModal" title="關閉視窗">×</button>
+      </div>
+
+      <!-- Year Range Selection Strip -->
+      <div class="domain-year-strip">
+        <div class="year-strip-left">
+          <span class="year-strip-label">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span>資料年份區間:</span>
+          </span>
+          <div class="year-preset-chips" id="yearPresetGroup">
+            <button type="button" class="year-preset-btn active" data-range="2024">2024 最新基準年</button>
+            <button type="button" class="year-preset-btn" data-range="2020-2024">近 5 年 (2020–2024)</button>
+            <button type="button" class="year-preset-btn" data-range="2015-2024">近 10 年 (2015–2024)</button>
+            <button type="button" class="year-preset-btn" data-range="2005-2024">近 20 年 (2005–2024)</button>
+            <button type="button" class="year-preset-btn" data-range="1975-2024-step5">半世紀 (1975–2024 普查年)</button>
+          </div>
+        </div>
+        <div class="year-strip-right">
+          <div class="year-select-box">
+            <span>自訂：</span>
+            <select id="startYearSelect" class="year-select"></select>
+            <span>至</span>
+            <select id="endYearSelect" class="year-select"></select>
+            <select id="yearStepSelect" class="year-step-select">
+              <option value="1">逐年 (每年)</option>
+              <option value="5">每 5 年 (普查年)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Split Body -->
+      <div class="domain-modal-body">
+        <!-- Left: 17 Domains Sidebar -->
+        <div class="domain-nav-sidebar">
+          <div class="domain-nav-header">
+            <span>官方 17 大統計領域 (A–Q)</span>
+            <span id="domainTotalVarCount">全領域 70+ 指標</span>
+          </div>
+          <div class="domain-nav-list" id="domainNavList">
+            <!-- Dynamically injected via JS -->
+          </div>
+        </div>
+
+        <!-- Right: Variables Grid Content -->
+        <div class="domain-content-area">
+          <div class="domain-content-toolbar">
+            <div class="domain-info-block">
+              <div class="domain-current-title" id="currentDomainTitle">
+                <span class="domain-code-tag" id="currentDomainCode">A</span>
+                <span id="currentDomainName">人口・世帯 (家戶 / Households)</span>
+              </div>
+              <div class="domain-current-desc" id="currentDomainDesc">日本總務省統計局國勢調查與推計人口。</div>
+            </div>
+            <div class="domain-action-strip">
+              <div class="domain-search-box">
+                <svg aria-hidden="true" class="domain-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="domainVarSearchInput" class="domain-search-input" placeholder="搜尋指標名稱、代碼...">
+              </div>
+              <button type="button" class="btn-domain-action" id="btnSelectAllDomainVars">全選該領域</button>
+              <button type="button" class="btn-domain-action" id="btnClearDomainVars">清除</button>
+              <button type="button" class="btn-domain-action" id="btnResetCoreDomainVars">推薦核心</button>
+            </div>
+          </div>
+
+          <!-- Variable Cards Scroll Area -->
+          <div class="domain-var-scroll">
+            <div class="domain-var-grid" id="domainVarGrid">
+              <!-- Dynamically rendered variable cards -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="domain-modal-footer">
+        <div class="domain-footer-left">
+          <span>已勾選 <span class="domain-summary-tag" id="summaryVarCount">5</span> 個指標變數 · </span>
+          <span>跨越 <span class="domain-summary-tag" id="summaryYearCount">1</span> 個年份 (<span id="summaryYearSpan">2024</span>) · </span>
+          <span>預計產生 <span class="domain-summary-tag" id="summaryRowCount">47</span> 列都道府縣面版數據</span>
+        </div>
+        <div class="domain-footer-right">
+          <button type="button" class="btn-domain-export" id="btnExportDomainCSV" title="下載為 CSV 檔">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>下載 CSV</span>
+          </button>
+          <button type="button" class="btn-domain-export" id="btnExportDomainJSON" title="下載為 JSON 檔">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>下載 JSON</span>
+          </button>
+          <button type="button" class="btn-domain-apply" id="btnApplyDomainDataset" title="直接載入至視覺化工作台並啟動 Tableau 判定精靈">
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>載入至視覺化工作台 (進入 Tableau 欄位分類與繪圖) ➔</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Local Script Dependencies (100% Offline) -->
   <script src="js/xlsx.full.min.js"></script>
-  <!-- Application Script -->
-  <script src="js/app.js"></script>
+  <script src="js/echarts.min.js"></script>
+  <script src="js/data_atoms_jp_dataset.js"></script>
+  <script src="js/estat_17_domains_metadata.js"></script>
+  <script src="js/universal_geo_engine.js"></script>
+  <script src="js/pygwalker_data_atoms.js"></script>
   <script>
-    // ==================== Data-to-Video Briefing Director Controller ====================
-    (function initBriefingDirector() {
-      const btnOpenBriefingModal = document.getElementById('btnOpenBriefingModal');
-      const btnCloseBriefingModal = document.getElementById('btnCloseBriefingModal');
-      const briefingModal = document.getElementById('briefingModal');
-      const briefingVideo = document.getElementById('briefingVideoPlayer');
-      const briefingVideoSrc = document.getElementById('briefingVideoSrc');
-      const modalLensBadge = document.getElementById('modalLensBadge');
-      const lensKpiChip = document.getElementById('lensKpiChip');
-      const stylePill = document.getElementById('stylePill');
-      const btnDownloadBriefingVideo = document.getElementById('btnDownloadBriefingVideo');
-      const btnFullscreenBriefing = document.getElementById('btnFullscreenBriefing');
-      const playingSceneStatusText = document.getElementById('playingSceneStatusText');
-      const playingTimeText = document.getElementById('playingTimeText');
-      const btnApplyScriptChanges = document.getElementById('btnApplyScriptChanges');
+    // Briefing Modal Controller
+    (function() {
+      const btnOpen = document.getElementById('btnOpenBriefingModal');
+      const btnClose = document.getElementById('btnCloseBriefingModal');
+      const modal = document.getElementById('briefingModal');
+      const video = document.getElementById('briefingVideoPlayer');
 
-      const btnLensSales = document.getElementById('btnLensSales');
-      const btnLensScm = document.getElementById('btnLensScm');
-      const btnToneExec = document.getElementById('btnToneExec');
-      const btnToneTeam = document.getElementById('btnToneTeam');
-
-      const s1_title = document.getElementById('s1_title');
-      const s1_chip = document.getElementById('s1_chip');
-      const s1_script = document.getElementById('s1_script');
-
-      const s2_title = document.getElementById('s2_title');
-      const s2_chip = document.getElementById('s2_chip');
-      const s2_script = document.getElementById('s2_script');
-
-      const s3_title = document.getElementById('s3_title');
-      const s3_chip = document.getElementById('s3_chip');
-      const s3_script = document.getElementById('s3_script');
-
-      const s4_title = document.getElementById('s4_title');
-      const s4_chip = document.getElementById('s4_chip');
-      const s4_script = document.getElementById('s4_script');
-
-      let currentLens = 'sales';
-
-      const LENS_CONFIG = {
-        sales: {
-          badge: '120 BPM SALES BAUHAUS',
-          badgeColor: '#FF4400',
-          kpiChip: '營收主力：企業雲端 25.5%',
-          kpiBg: '#FFEBE5',
-          kpiColor: '#FF4400',
-          videoSrc: 'videos/data_briefing_bauhaus_34s.mp4',
-          posterSrc: 'preview_frames/bauhaus_scene_01.png',
-          downloadName: 'Data_Atoms_銷售營收動態簡報_34s.mp4',
-          stylePill: '📐 Bauhaus 幾何動態',
-          scenes: [
-            {
-              title: '01. 全量體量 · MACRO VOLUME',
-              chip: '3,690 萬元',
-              script: '八大產品線總營收達 3,690 萬元，產出維持高位水準。'
-            },
-            {
-              title: '02. 結構佔比 · PARETO DOMINANCE',
-              chip: 'TOP 25.5%',
-              script: '旗艦雲端運算突破 940 萬，以二成五份額穩居成長主力。'
-            },
-            {
-              title: '03. 梯隊分佈 · DISCRETE MATRIX',
-              chip: '跨度 5.9x',
-              script: '各品類極值跨度達 5.9 倍，高毛利模組具備強勁擴張潛力。'
-            },
-            {
-              title: '04. 執行決策 · STRATEGIC LOCKUP',
-              chip: 'ACTION PLAN',
-              script: '以理性幾何穿透複雜表象，驅動敏捷決策。Data Atoms 簡報完畢。'
-            }
-          ]
-        },
-        scm: {
-          badge: '120 BPM SCM LOGISTICS',
-          badgeColor: '#1E4FA3',
-          kpiChip: '最急警報：物聯網延遲 14.2%',
-          kpiBg: '#EBF2FF',
-          kpiColor: '#1E4FA3',
-          videoSrc: 'videos/briefing_supply_chain_34s.mp4',
-          posterSrc: 'preview_frames/scm_scene_01.png',
-          downloadName: 'Data_Atoms_供應鏈庫存動態簡報_34s.mp4',
-          stylePill: '📦 SCM 物流流體幾何動效',
-          scenes: [
-            {
-              title: '01. 庫存總量 · TOTAL INVENTORY',
-              chip: '14,800 件',
-              script: '供應鏈總庫存達 14,800 件，單品平均庫存 1,800 件。'
-            },
-            {
-              title: '02. 交付瓶頸 · BOTTLENECK ALERT',
-              chip: '延遲 14.2%',
-              script: '物聯網邊緣節點交期延遲率達 14%，構成關鍵供應鏈瓶頸。'
-            },
-            {
-              title: '03. 週轉分化 · TURNOVER SPREAD',
-              chip: '82天 vs 18天',
-              script: '庫存週轉天數極差達 64 天，智慧製造積壓 82 天亟需清理。'
-            },
-            {
-              title: '04. 調度決策 · SCM DISPATCH',
-              chip: 'DISPATCH PLAN',
-              script: '啟動動態配額與供應商平行分流，保證交付並壓降週轉成本。'
-            }
-          ]
-        }
-      };
-
-      function applyLens(lensKey) {
-        currentLens = lensKey;
-        const cfg = LENS_CONFIG[lensKey];
-        if (!cfg) return;
-
-        // Button states
-        if (lensKey === 'sales') {
-          btnLensSales.classList.add('active');
-          btnLensSales.classList.remove('lens-scm');
-          btnLensScm.classList.remove('active', 'lens-scm');
-        } else {
-          btnLensScm.classList.add('active', 'lens-scm');
-          btnLensSales.classList.remove('active', 'lens-scm');
-        }
-
-        // Header and badge
-        if (modalLensBadge) {
-          modalLensBadge.textContent = cfg.badge;
-          modalLensBadge.style.backgroundColor = cfg.badgeColor;
-        }
-
-        // KPI Chip
-        if (lensKpiChip) {
-          lensKpiChip.textContent = cfg.kpiChip;
-          lensKpiChip.style.backgroundColor = cfg.kpiBg;
-          lensKpiChip.style.color = cfg.kpiColor;
-          lensKpiChip.style.borderColor = cfg.kpiColor;
-        }
-
-        // Style Pill
-        if (stylePill) {
-          stylePill.textContent = cfg.stylePill;
-        }
-
-        // Storyboard fields
-        if (s1_title) s1_title.textContent = cfg.scenes[0].title;
-        if (s1_chip) s1_chip.textContent = cfg.scenes[0].chip;
-        if (s1_script) s1_script.value = cfg.scenes[0].script;
-
-        if (s2_title) s2_title.textContent = cfg.scenes[1].title;
-        if (s2_chip) s2_chip.textContent = cfg.scenes[1].chip;
-        if (s2_script) s2_script.value = cfg.scenes[1].script;
-
-        if (s3_title) s3_title.textContent = cfg.scenes[2].title;
-        if (s3_chip) s3_chip.textContent = cfg.scenes[2].chip;
-        if (s3_script) s3_script.value = cfg.scenes[2].script;
-
-        if (s4_title) s4_title.textContent = cfg.scenes[3].title;
-        if (s4_chip) s4_chip.textContent = cfg.scenes[3].chip;
-        if (s4_script) s4_script.value = cfg.scenes[3].script;
-
-        // Video and Download Links
-        if (briefingVideo) {
-          briefingVideo.poster = cfg.posterSrc;
-          briefingVideo.src = cfg.videoSrc;
-          briefingVideo.currentTime = 0;
-          briefingVideo.play().catch(() => {});
-        }
-        if (btnDownloadBriefingVideo) {
-          btnDownloadBriefingVideo.href = cfg.videoSrc;
-          btnDownloadBriefingVideo.download = cfg.downloadName;
-        }
-        if (btnFullscreenBriefing) {
-          btnFullscreenBriefing.href = cfg.videoSrc;
-        }
-
-        // Show Toast
-        if (window.showToast) {
-          window.showToast(`已切換至「${lensKey === 'sales' ? '💰 銷售與營收' : '📦 供應鏈與庫存'}」關注焦點，重新編排動態簡報！`);
-        }
-      }
-
-      // Event listeners for Lens pills
-      if (btnLensSales) {
-        btnLensSales.addEventListener('click', () => applyLens('sales'));
-      }
-      if (btnLensScm) {
-        btnLensScm.addEventListener('click', () => applyLens('scm'));
-      }
-
-      // Tone pills
-      if (btnToneExec) {
-        btnToneExec.addEventListener('click', () => {
-          btnToneExec.classList.add('active');
-          if (btnToneTeam) btnToneTeam.classList.remove('active');
-          if (window.showToast) window.showToast('已切換為「C-Level 高管速報 (34s)」風格');
+      if (btnOpen && modal) {
+        btnOpen.addEventListener('click', () => {
+          modal.classList.add('open');
+          if (video) { video.currentTime = 0; video.play().catch(()=>{}); }
         });
       }
-      if (btnToneTeam) {
-        btnToneTeam.addEventListener('click', () => {
-          btnToneTeam.classList.add('active');
-          if (btnToneExec) btnToneExec.classList.remove('active');
-          if (window.showToast) window.showToast('已切換為「業務細節拆解 (45s)」風格');
+      if (btnClose && modal) {
+        btnClose.addEventListener('click', () => {
+          modal.classList.remove('open');
+          if (video) video.pause();
         });
       }
-
-      // Open Modal
-      if (btnOpenBriefingModal && briefingModal) {
-        btnOpenBriefingModal.addEventListener('click', () => {
-          briefingModal.classList.add('open');
-          if (briefingVideo) {
-            briefingVideo.currentTime = 0;
-            briefingVideo.play().catch(() => {});
-          }
-        });
-      }
-
-      // Close Modal
-      if (btnCloseBriefingModal && briefingModal) {
-        btnCloseBriefingModal.addEventListener('click', () => {
-          briefingModal.classList.remove('open');
-          if (briefingVideo) briefingVideo.pause();
-        });
-      }
-
-      if (briefingModal) {
-        briefingModal.addEventListener('click', (e) => {
-          if (e.target === briefingModal) {
-            briefingModal.classList.remove('open');
-            if (briefingVideo) briefingVideo.pause();
-          }
-        });
-      }
-
-      // Storyboard interactive click to seek
-      const storyItems = document.querySelectorAll('.story-item');
-      storyItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-          if (e.target.tagName !== 'TEXTAREA') {
-            const seekTime = parseFloat(item.getAttribute('data-time') || 0);
-            if (briefingVideo) {
-              briefingVideo.currentTime = seekTime;
-              briefingVideo.play().catch(() => {});
-            }
-          }
-        });
-      });
-
-      // Video playback progress tracking
-      if (briefingVideo) {
-        briefingVideo.addEventListener('timeupdate', () => {
-          const cur = briefingVideo.currentTime;
-          const dur = briefingVideo.duration || 34;
-
-          const fmt = (s) => {
-            const m = Math.floor(s / 60).toString().padStart(2, '0');
-            const sec = Math.floor(s % 60).toString().padStart(2, '0');
-            return `${m}:${sec}`;
-          };
-          if (playingTimeText) {
-            playingTimeText.textContent = `${fmt(cur)} / ${fmt(dur)}`;
-          }
-
-          let activeIdx = 0;
-          if (cur >= 25) activeIdx = 3;
-          else if (cur >= 17) activeIdx = 2;
-          else if (cur >= 8) activeIdx = 1;
-          else activeIdx = 0;
-
-          storyItems.forEach((item, idx) => {
-            if (idx === activeIdx) {
-              item.classList.add('active-scene');
-            } else {
-              item.classList.remove('active-scene');
-            }
-          });
-
-          const currentCfg = LENS_CONFIG[currentLens];
-          if (playingSceneStatusText && currentCfg) {
-            playingSceneStatusText.textContent = `播放進度：${currentCfg.scenes[activeIdx].title.split(' · ')[0]}`;
-          }
-        });
-      }
-
-      // Apply script changes button
-      if (btnApplyScriptChanges) {
-        btnApplyScriptChanges.addEventListener('click', () => {
-          if (window.showToast) {
-            window.showToast('✅ 已儲存自定義劇本！語音引擎與代碼動畫已即時編排同步完成。');
-          }
-          if (briefingVideo) {
-            briefingVideo.currentTime = 0;
-            briefingVideo.play().catch(() => {});
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            modal.classList.remove('open');
+            if (video) video.pause();
           }
         });
       }
     })();
   </script>
+
+  <!-- 5. Skills Overview Modal (Data Atoms 視覺化所封裝之 Antigravity Skill 全集與開源倉庫) -->
+  <div class="briefing-modal-overlay" id="skillsModal">
+    <div class="briefing-modal-card" style="max-width: 920px; max-height: 88vh; overflow-y: auto; background: #ffffff; border-radius: 12px; box-shadow: 0 20px 45px rgba(0,0,0,0.25);">
+      <div class="modal-head" style="background: #0f172a; color: #ffffff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0;">
+        <div class="modal-head-title" style="display: flex; align-items: center; gap: 10px;">
+          <span style="background: #2563eb; color: #ffffff; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.05em;">ANTIGRAVITY SKILLS</span>
+          <span style="font-size: 17px; font-weight: 700;">Data Atoms 視覺化所封裝之核心 Skill 與開源架構</span>
+        </div>
+        <button type="button" class="modal-close-btn" id="btnCloseSkillsModal" onclick="document.getElementById('skillsModal').classList.remove('open')" style="background: transparent; border: none; color: #ffffff; font-size: 24px; cursor: pointer; line-height: 1;">×</button>
+      </div>
+
+      <div style="padding: 24px 28px; color: #1e293b; font-size: 14px; line-height: 1.6;">
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;">
+          <p style="margin: 0; color: #334155; font-size: 13.5px; line-height: 1.6;">
+            <strong>🎯 獨立檔案定位說明：</strong>本檔案（<code>data_atoms.html</code>）是數據視覺化與實戰分析的<strong>單一獨立檔案</strong>，與大語言模型學習地圖嚴格分開。<br>
+            在 Antigravity 代理人架構中，本工作台是由以下 <strong>6 大模組化 Skill</strong> 共同驅動，所有 Skill 皆已附上開源倉庫連結供學員參考與延伸學習：
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr; gap: 16px;">
+          
+          <!-- Skill: data-analyst (輕量級資料分析師技能包) -->
+          <div style="background: #ffffff; border: 1.5px solid #059669; border-radius: 8px; padding: 16px 20px; box-shadow: 0 2px 6px rgba(5,150,105,0.08);">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">💡</span>
+                <span style="font-weight: 800; font-size: 16px; color: #047857;">data-analyst</span>
+                <span style="background: #d1fae5; color: #065f46; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">分析師 Prompt + 清洗腳本</span>
+              </div>
+              <span style="font-size: 12px; color: #64748b; font-family: monospace;">.agents/skills/data-analyst</span>
+            </div>
+            <p style="margin: 0 0 10px 0; color: #334155; font-size: 13px;">
+              <strong>放了什麼進去：</strong>專為學員與 Agent 設計的輕量標準技能。內建 4 大標準 Prompt 樣板（需求界定、資料體檢、EDA 探索、三段論報告）、<code>clean_data.py</code> 自動化資料清洗腳本（處理千分位逗號、百分比、空白修剪與缺失值）與速查表。
+            </p>
+            <div style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 6px;">
+              <strong>開源獨立倉庫：</strong>
+              <a href="https://github.com/nutcelvischen-jpg/data-analyst-skill" target="_blank" style="color: #059669; font-weight: 700; text-decoration: underline;">https://github.com/nutcelvischen-jpg/data-analyst-skill ↗</a>
+            </div>
+          </div>
+          
+          <!-- Skill 1: data-atoms-dashboard -->
+          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">⚛️</span>
+                <span style="font-weight: 800; font-size: 16px; color: #1e293b;">data-atoms-dashboard</span>
+                <span style="background: #eff6ff; color: #1d4ed8; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">本工作台核心</span>
+              </div>
+              <span style="font-size: 12px; color: #64748b; font-family: monospace;">.agents/skills/data-atoms-dashboard</span>
+            </div>
+            <p style="margin: 0 0 10px 0; color: #334155; font-size: 13px;">
+              <strong>放了什麼進去：</strong>Tableau-like 視覺編碼槽（Columns、Rows、Color、Size、Secondary、Filters）、Tableau Prep 智慧資料分類判定引擎、跨國地理座標自適應引擎，與 10 大 Data Atoms 渲染。
+            </p>
+            <div style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 6px;">
+              <strong>開源獨立倉庫：</strong>
+              <a href="https://github.com/nutcelvischen-jpg/data-atoms-dashboard" target="_blank" style="color: #2563eb; font-weight: 700; text-decoration: underline;">https://github.com/nutcelvischen-jpg/data-atoms-dashboard ↗</a>
+            </div>
+          </div>
+
+          <!-- Skill 2: dataviz -->
+          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">🎨</span>
+                <span style="font-weight: 800; font-size: 16px; color: #1e293b;">dataviz</span>
+                <span style="background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">工業級設計法規</span>
+              </div>
+              <span style="font-size: 12px; color: #64748b; font-family: monospace;">.gemini/config/skills/dataviz</span>
+            </div>
+            <p style="margin: 0 0 10px 0; color: #334155; font-size: 13px;">
+              <strong>放了什麼進去：</strong>去除 AI 生硬味的工業級圖表設計法規。規範 0 基準線、雙軸刻度對齊、WCAG AA 色彩對比度、冷灰/藏青/暖琥珀色盤。
+            </p>
+            <div style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 6px;">
+              <strong>開源規範倉庫：</strong>
+              <a href="https://github.com/nutcelvischen-jpg/dataviz-rules" target="_blank" style="color: #2563eb; font-weight: 700; text-decoration: underline;">https://github.com/nutcelvischen-jpg/dataviz-rules ↗</a>
+            </div>
+          </div>
+
+          <!-- Skill 3: dataviz-motion -->
+          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">🎬</span>
+                <span style="font-weight: 800; font-size: 16px; color: #1e293b;">dataviz-motion</span>
+                <span style="background: #fdf2f8; color: #be185d; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">動態影音生成</span>
+              </div>
+              <span style="font-size: 12px; color: #64748b; font-family: monospace;">.gemini/config/skills/dataviz-motion</span>
+            </div>
+            <p style="margin: 0 0 10px 0; color: #334155; font-size: 13px;">
+              <strong>放了什麼進去：</strong>全自動程式碼控制影格，將數據分析圖表輸出為 1080p 60FPS Bauhaus 風格動態簡報，合成 120BPM 卡點音效與 Google TTS 語音旁白。
+            </p>
+            <div style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 6px;">
+              <strong>開源底層引擎：</strong>
+              <a href="https://github.com/remotion-dev/remotion" target="_blank" style="color: #2563eb; font-weight: 700; text-decoration: underline;">https://github.com/remotion-dev/remotion ↗</a>
+            </div>
+          </div>
+
+          <!-- Skill 4: diagram-design -->
+          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">📐</span>
+                <span style="font-weight: 800; font-size: 16px; color: #1e293b;">diagram-design</span>
+                <span style="background: #fefce8; color: #854d0e; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">架構流程圖</span>
+              </div>
+              <span style="font-size: 12px; color: #64748b; font-family: monospace;">.agents/skills/diagram-design</span>
+            </div>
+            <p style="margin: 0 0 10px 0; color: #334155; font-size: 13px;">
+              <strong>放了什麼進去：</strong>產出資料分析師 5 階段工程流程圖（取得 ➔ 清洗 ➔ 探索 ➔ 儀表板 ➔ 洞察決策）與 11/05 實戰營流程時序圖。
+            </p>
+            <div style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 6px;">
+              <strong>開源依據：</strong>
+              <a href="https://github.com/mermaid-js/mermaid" target="_blank" style="color: #2563eb; font-weight: 700; text-decoration: underline;">https://github.com/mermaid-js/mermaid ↗</a>
+            </div>
+          </div>
+
+          <!-- Skill 5: deeptutor-mentor -->
+          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">🎓</span>
+                <span style="font-weight: 800; font-size: 16px; color: #1e293b;">deeptutor-mentor</span>
+                <span style="background: #f0fdf4; color: #15803d; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">自主學習 AI 導師</span>
+              </div>
+              <span style="font-size: 12px; color: #64748b; font-family: monospace;">.agents/skills/deeptutor-mentor</span>
+            </div>
+            <p style="margin: 0 0 10px 0; color: #334155; font-size: 13px;">
+              <strong>放了什麼進去：</strong>蘇格拉底式引導教學系統。學員即使身邊沒有老師，也能透過 3 階漸進提示（不直接給代碼，先拆解思維與欄位架構）和 Error Doctor 自學搞定 Data Atoms。
+            </p>
+            <div style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 6px;">
+              <strong>開源依據：</strong>
+              <a href="https://github.com/HKUDS/DeepTutor" target="_blank" style="color: #2563eb; font-weight: 700; text-decoration: underline;">HKUDS/DeepTutor (香港大學) ↗</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Multi-Measure Comparison Modal (多指標並列比較選取器) -->
+  <div class="briefing-modal-overlay" id="multiMeasureModal">
+    <div class="briefing-modal-card" style="max-width: 680px; max-height: 85vh; overflow-y: auto; background: #ffffff; border-radius: 12px; box-shadow: 0 20px 45px rgba(0,0,0,0.25);">
+      <div class="modal-head" style="background: #1e293b; color: #ffffff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="background: #ea580c; color: #fff; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px;">MULTI-MEASURE</span>
+          <span style="font-size: 16px; font-weight: 700;">多數值指標並列比較 (支援 2~4+ 指標同圖繪製)</span>
+        </div>
+        <button type="button" onclick="document.getElementById('multiMeasureModal').classList.remove('open')" style="background: transparent; border: none; color: #fff; font-size: 22px; cursor: pointer;">✕</button>
+      </div>
+
+      <div style="padding: 20px 24px;">
+        <p style="font-size: 13px; color: #475569; margin: 0 0 16px 0; line-height: 1.5;">
+          選取 2 個或多個連續數值指標以在折線圖（多線走勢）、柱狀圖（分組並列）或散布圖（X vs Y 相關性）進行深度比對。
+        </p>
+
+        <!-- 一鍵快速對比預設 -->
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 18px;">
+          <div style="font-size: 12px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">⚡ 常用熱門對比組合 (一鍵套用)：</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <button type="button" class="btn btn-sm btn-outline" onclick="window.PyGWalker.applyMeasurePreset(['幼年人口占比(%)', '勞動人口占比(%)'])" style="font-size: 12px; font-weight: 600; border-color: #2563eb; color: #1d4ed8;">
+              👶 vs 💼 幼年 vs 勞動人口占比 (2指標)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline" onclick="window.PyGWalker.applyMeasurePreset(['幼年人口占比(%)', '勞動人口占比(%)', '老年人口占比(%)'])" style="font-size: 12px; font-weight: 600; border-color: #ea580c; color: #c2410c;">
+              📊 三世代全景：幼年 vs 勞動 vs 老年 (3指標)
+            </button>
+            <button type="button" class="btn btn-sm btn-outline" onclick="window.PyGWalker.applyMeasurePreset(['總人口(人)', '15-64歲勞動力人口(人)', '65歲以上高齡人口(人)'])" style="font-size: 12px; font-weight: 600;">
+              👥 總體量 vs 勞動力 vs 高齡體量 (3指標)
+            </button>
+          </div>
+        </div>
+
+        <!-- 指標勾選清單 -->
+        <div style="margin-bottom: 18px;">
+          <div style="font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 8px;">自選指標清單 (可多選)：</div>
+          <div id="multiMeasureCheckboxList" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 220px; overflow-y: auto; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff;">
+            <!-- 動態注入 -->
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e2e8f0; padding-top: 14px;">
+          <button type="button" class="btn btn-sm btn-ghost" onclick="window.PyGWalker.resetMultiMeasure()" style="color: #64748b;">重設為單一指標</button>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('multiMeasureModal').classList.remove('open')">取消</button>
+            <button type="button" class="btn btn-sm btn-primary" onclick="window.PyGWalker.confirmMultiMeasure()" style="background: #2563eb; color: #fff;">套用指標比較 ➔</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/digital_jitong.js"></script>
 </body>
 </html>

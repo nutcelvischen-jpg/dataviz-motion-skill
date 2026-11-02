@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>e-Stat 官方 API 申請實境指引 · 避坑教學與動態連線模擬器</title>
+  <meta name="description" content="手把手帶您取得日本政府統計局 e-Stat 官方 API 金鑰，完整解析核心避坑參數 http://test.localhost 與 Python 自動化抓取程式碼。">
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Noto+Sans+TC:wght@400;500;600;700&family=Schibsted+Grotesk:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
+
+  <style>
+/* Hallmark: dose / modern-minimal / light 97.6 88 / committed */
+:root {
+  --color-paper: oklch(97.6% 0.011 88);
+  --color-paper-2: oklch(95.5% 0.015 88);
+  --color-paper-3: oklch(92% 0.02 88);
+  --color-ink: oklch(18% 0.02 165);
+  --color-ink-2: oklch(34% 0.025 165);
+  --color-muted: oklch(48% 0.02 165);
+  --color-rule: oklch(88% 0.015 88);
+  --color-rule-soft: oklch(92% 0.01 88);
+  --color-white: oklch(100% 0 0);
+
+  /* Pharmacy green accent */
+  --color-accent: oklch(50% 0.13 160);
+  --color-accent-deep: oklch(38% 0.12 160);
+  --color-accent-soft: oklch(92% 0.04 160);
+  --color-accent-ink: oklch(99% 0.01 160);
+  --color-focus: oklch(50% 0.13 160);
+
+  /* Plastic pill tray compartments */
+  --p-mon: oklch(86.5% 0.042 38);
+  --p-tue: oklch(90% 0.052 68);
+  --p-tue-deep: oklch(55% 0.14 65);
+  --p-wed: oklch(91.5% 0.064 98);
+  --p-thu: oklch(86.5% 0.075 160);
+  --p-fri: oklch(87% 0.048 210);
+  --p-sat: oklch(84% 0.045 270);
+  --p-sun: oklch(84% 0.048 322);
+
+  --light: oklch(99.4% 0.016 84);
+  --glint: oklch(100% 0 0);
+
+  /* Terminal and e-Stat Mock Tokens */
+  --color-terminal: oklch(18% 0.02 165);
+  --color-code-text: oklch(88% 0.015 88);
+  --color-estat-navy: oklch(38% 0.11 245);
+  --color-estat-subnav: oklch(55% 0.14 230);
+  --color-estat-bluebar: oklch(32% 0.12 255);
+  --color-estat-cyan: oklch(65% 0.12 200);
+  --color-estat-cyan-soft: oklch(94% 0.03 200);
+  --color-danger: oklch(52% 0.20 25);
+  --color-warn-bg: oklch(94% 0.08 95);
+  --color-warn-ink: oklch(42% 0.12 75);
+
+  --font-display: "Schibsted Grotesk", "Noto Sans TC", ui-sans-serif, sans-serif;
+  --font-body: "Instrument Sans", "Noto Sans TC", ui-sans-serif, sans-serif;
+  --font-outlier: "DM Mono", ui-monospace, monospace;
+
+  --radius-card: 16px;
+  --radius-input: 8px;
+  --radius-pill: 999px;
+
+  --shadow-bar: 0 2px 10px oklch(0% 0 0 / 0.15);
+  --shadow-card: 0 1px 2px oklch(30% 0.03 165 / 0.08), 0 24px 48px -24px oklch(40% 0.08 165 / 0.35);
+  --shadow-lift: 0 1px 1px oklch(30% 0.03 165 / 0.10), 8px 18px 28px -14px oklch(36% 0.06 165 / 0.32), 18px 40px 60px -30px oklch(40% 0.08 165 / 0.30);
+  --tracking-display: -0.03em;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  overflow-x: clip;
+  scrollbar-color: var(--color-rule) var(--color-paper);
+}
+
+::selection {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-deep);
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  line-height: 1.55;
+  padding: 0 0 96px 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.05;
+  color: var(--color-ink);
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+.mono-label {
+  font-family: var(--font-outlier);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted);
+}
+
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.step-nav-bar {
+  background: var(--color-ink);
+  color: var(--color-white);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-bar);
+}
+
+.stamp-badge {
+  font-family: var(--font-outlier);
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--color-accent);
+  color: var(--color-white);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.step-nav-pills {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.step-pill {
+  color: var(--color-white);
+  background: color-mix(in oklab, var(--color-paper) 12%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-paper) 20%, transparent);
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.15s ease;
+}
+.step-pill:hover {
+  background: color-mix(in oklab, var(--color-paper) 25%, transparent);
+}
+.step-pill.active {
+  background: var(--color-accent);
+  color: var(--color-white);
+  border-color: var(--color-accent);
+  font-weight: 700;
+}
+
+.hero-block {
+  padding: 48px 0 32px;
+}
+.hero-kicker {
+  font-family: var(--font-outlier);
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hero-headline {
+  font-size: clamp(28px, 3.6vw, 42px);
+  margin-bottom: 16px;
+  max-width: 980px;
+}
+.hero-sentence {
+  font-size: 16px;
+  color: var(--color-muted);
+  max-width: 860px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.btn {
+  height: 48px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--radius-input);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--color-rule), 0 3px 0 var(--color-rule);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  user-select: none;
+}
+.btn:active {
+  transform: translateY(3px);
+  box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--color-rule), 0 0 0 var(--color-rule);
+}
+.btn--primary {
+  background: linear-gradient(var(--color-accent), var(--color-accent-deep));
+  color: var(--color-accent-ink);
+  box-shadow: 0 0 0 1px var(--color-accent-deep), 0 3px 0 var(--color-accent-deep);
+}
+.btn--clear {
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+}
+.btn--sm {
+  height: 36px;
+  padding: 0 16px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+
+.plastic-tray {
+  position: relative;
+  border-radius: var(--radius-card);
+  background: linear-gradient(color-mix(in oklab, var(--glint) 32%, transparent), transparent 18%), color-mix(in oklab, var(--t, var(--p-thu)) 60%, transparent);
+  box-shadow: inset 0 1.5px 0 var(--glint), inset 0 -24px 36px -28px color-mix(in oklab, var(--t, var(--p-thu)) 45%, var(--color-ink)), var(--shadow-card);
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.pharmacy-label {
+  background: var(--color-white);
+  border: 1px solid var(--color-rule);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+/* 擬真錄影播放器視窗 */
+.screen-player {
+  background: var(--color-white);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-lift);
+  position: relative;
+  margin-bottom: 32px;
+}
+
+.browser-topbar {
+  background: var(--color-paper-2);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.browser-url-bar {
+  flex: 1;
+  background: var(--color-white);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-input);
+  padding: 8px 12px;
+  font-family: var(--font-outlier);
+  font-size: 13px;
+  color: var(--color-ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 畫面模擬內容區域 (Canvas/Stage) */
+.viewport {
+  width: 100%;
+  height: 560px;
+  position: relative;
+  background: var(--color-white);
+  color: var(--color-ink);
+  overflow: hidden;
+}
+
+/* 虛擬游標 */
+.virtual-cursor {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%23182a20' stroke='%23ffffff' stroke-width='1.5'%3E%3Cpath d='M3 3l7 18 3-7 7-3L3 3z'/%3E%3C/svg%3E");
+  background-size: contain;
+  pointer-events: none;
+  z-index: 99;
+  transform: translate(100px, 100px);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.virtual-cursor.clicking::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-accent-soft);
+  animation: clickRing 0.5s ease-out;
+}
+@keyframes clickRing {
+  0% { transform: scale(0.2); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* 聚光框 */
+.spotlight-box {
+  position: absolute;
+  border: 2px solid var(--color-accent);
+  background: color-mix(in oklab, var(--color-accent) 15%, transparent);
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 50;
+  transition: top 0.4s ease, left 0.4s ease, width 0.4s ease, height 0.4s ease, opacity 0.4s ease;
+  box-shadow: 0 0 0 9999px color-mix(in oklab, var(--color-ink) 45%, transparent);
+}
+.spotlight-box.success {
+  border-color: var(--color-accent-deep);
+  background: color-mix(in oklab, var(--color-accent) 20%, transparent);
+}
+
+/* e-Stat 官方介面樣式 */
+.estat-ui {
+  font-family: var(--font-body);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-paper-2);
+}
+.estat-header {
+  background: var(--color-estat-navy);
+  color: var(--color-white);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.estat-logo {
+  font-weight: bold;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.estat-logo span {
+  font-size: 11px;
+  font-weight: normal;
+  color: var(--color-accent-soft);
+}
+.estat-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+}
+.estat-btn-link {
+  color: var(--color-white);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.estat-subnav {
+  background: var(--color-estat-subnav);
+  color: var(--color-white);
+  display: flex;
+  gap: 24px;
+  padding: 8px 24px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.estat-breadcrumb {
+  padding: 8px 24px;
+  font-size: 11px;
+  color: var(--color-muted);
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.estat-bluebar {
+  background: var(--color-estat-bluebar);
+  color: var(--color-white);
+  padding: 8px 24px;
+  display: flex;
+  gap: 20px;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.estat-action-link {
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.estat-action-link.active-action {
+  background: color-mix(in oklab, var(--color-white) 20%, transparent);
+}
+
+.estat-content-body {
+  padding: 16px 24px;
+  flex: 1;
+  overflow-y: auto;
+  background: var(--color-paper-2);
+}
+.estat-page-h2 {
+  font-size: 16px;
+  color: var(--color-estat-bluebar);
+  font-weight: bold;
+  border-left: 4px solid var(--color-estat-bluebar);
+  padding-left: 8px;
+  margin-bottom: 12px;
+}
+.estat-cyan-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--color-estat-cyan);
+  margin-bottom: 12px;
+}
+.cyan-tab-btn {
+  background: var(--color-estat-cyan-soft);
+  border: 1px solid color-mix(in oklab, var(--color-estat-cyan) 30%, transparent);
+  border-bottom: none;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-ink);
+  border-radius: 4px 4px 0 0;
+  margin-right: 4px;
+}
+.cyan-tab-btn.tab-selected {
+  background: var(--color-estat-cyan);
+  color: var(--color-white);
+}
+
+.estat-box {
+  background: var(--color-white);
+  border: 1px solid var(--color-rule);
+  padding: 16px;
+  border-radius: 4px;
+}
+.estat-box-title {
+  background: var(--color-paper-3);
+  font-size: 13px;
+  font-weight: bold;
+  padding: 8px 12px;
+  color: var(--color-ink);
+  margin-bottom: 12px;
+}
+.app-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.app-table td {
+  padding: 8px;
+  border: 1px solid var(--color-rule);
+  vertical-align: middle;
+}
+.app-table-row-num {
+  width: 32px;
+  text-align: center;
+  font-weight: bold;
+  background: var(--color-paper-2);
+}
+.app-table-form {
+  padding: 8px 16px;
+}
+.form-item-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.form-item-label {
+  width: 90px;
+  font-weight: bold;
+  color: var(--color-ink-2);
+}
+.form-item-label .req {
+  color: var(--color-danger);
+  margin-right: 2px;
+}
+.form-item-input-wrap {
+  flex: 1;
+}
+.official-input {
+  width: 320px;
+  padding: 6px 8px;
+  border: 1px solid var(--color-rule);
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.official-input.typing {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-soft);
+}
+.form-item-note {
+  font-size: 11px;
+  color: var(--color-danger);
+  margin-top: 4px;
+}
+.app-table-btns {
+  width: 90px;
+  text-align: center;
+}
+.official-btn {
+  display: block;
+  width: 76px;
+  padding: 4px 0;
+  margin: 4px auto;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  color: var(--color-white);
+}
+.btn-blue-issue { background: var(--color-estat-bluebar); }
+.btn-blue-issue.active-click {
+  background: var(--color-accent);
+  transform: scale(0.95);
+}
+.btn-secondary { background: var(--color-estat-subnav); }
+.btn-remove { background: var(--color-muted); }
+
+/* 浮動步驟講解卡 */
+.step-callout {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 340px;
+  background: var(--color-white);
+  border: 1.5px solid var(--color-accent);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--shadow-lift);
+  z-index: 60;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.callout-badge {
+  font-family: var(--font-outlier);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-accent-deep);
+  background: var(--color-accent-soft);
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+.callout-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin-bottom: 4px;
+  line-height: 1.35;
+}
+.callout-desc {
+  font-size: 12px;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+.pitfall-highlight {
+  background: var(--color-warn-bg);
+  color: var(--color-warn-ink);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+/* 控制列 */
+.controls-bar {
+  background: var(--color-paper-2);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--color-rule);
+  flex-wrap: wrap;
+}
+.ctrl-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.timeline-container {
+  flex: 1;
+  min-width: 200px;
+}
+.progress-track {
+  width: 100%;
+  height: 6px;
+  background: var(--color-rule);
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--color-accent);
+  width: 0%;
+  transform-origin: left;
+}
+
+.player-step-pills {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.player-pill {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--color-white);
+  border: 1px solid var(--color-rule);
+  color: var(--color-muted);
+  cursor: pointer;
+}
+.player-pill.active {
+  background: var(--color-accent);
+  color: var(--color-white);
+  border-color: var(--color-accent);
+}
+
+.code-panel {
+  background: var(--color-terminal);
+  color: var(--color-code-text);
+  border-radius: 8px;
+  padding: 16px;
+  font-family: var(--font-outlier);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+.tear-stub {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px dashed var(--color-rule);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .step-pill, .virtual-cursor, .spotlight-box {
+    transition: none;
+  }
+}
+</style>
+</head>
+<body>
+
+  <header class="step-nav-bar">
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <span class="stamp-badge">11/05 workshop</span>
+      <span style="font-weight: 600;">資料分析實戰步驟：</span>
+    </div>
+    <nav class="step-nav-pills" aria-label="資料分析流程步驟">
+      <a href="curriculum_1105_workflow.html" class="step-pill">01. 全日課程架構</a>
+      <a href="data_analysis.html" class="step-pill">02. 分析師工作流程</a>
+      <span class="step-pill active" aria-current="page">03. 日本資料與 API 申請 (當前)</span>
+      <a href="estat_catalog_and_research_guide.html" class="step-pill">04. 17 領域研究指南與分析法</a>
+      <a href="data_atoms.html" class="step-pill">05. Data Atoms 儀表板實作</a>
+      <a href="https://www.e-stat.go.jp" target="_blank" class="step-pill" style="background: var(--color-accent); border-color: var(--color-accent-deep);">e-Stat 官網 ↗</a>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <section class="hero-block">
+      <div class="hero-kicker">
+        <span>track: api ingestion</span>
+        <span>/</span>
+        <span>environment: antigravity</span>
+        <span>/</span>
+        <span>theme: dose</span>
+      </div>
+      <h1 class="hero-headline">手把手動態錄影：取得日本政府 e-Stat 統計 API 金鑰</h1>
+      <p class="hero-sentence">
+        完整還原日本總務省統計局官方介面。解析核心避坑參數 <code>http://test.localhost</code>，動態演示從登入、發行 40 碼專屬金鑰到以 Python 程式獲取 47 都道府縣面板數據的全流程。
+      </p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+        <button type="button" class="btn btn--primary" onclick="restartDemo()">重新播放實境錄影</button>
+        <a href="https://www.e-stat.go.jp" target="_blank" class="btn btn--clear">前往 e-Stat 官方首頁 ↗</a>
+        <a href="data_analysis.html" class="btn btn--clear">返回分析師工作流 ↗</a>
+      </div>
+    </section>
+
+    <!-- 擬真錄影播放器視窗 -->
+    <div class="screen-player">
+      <div class="browser-topbar">
+        <span class="stamp-badge" style="background: var(--color-accent-deep);">e-stat sandbox</span>
+        <div class="browser-url-bar">
+          <span style="color: var(--color-accent); font-weight: bold; font-size: 11px;">SECURE</span>
+          <span id="browserUrl">https://www.e-stat.go.jp/en/mypage/view/api</span>
+        </div>
+      </div>
+
+      <!-- 視窗內容舞台 -->
+      <div class="viewport" id="viewport">
+        <!-- 虛擬滑鼠游標 -->
+        <div class="virtual-cursor" id="cursor"></div>
+
+        <!-- 動態精確對齊聚光框 (Spotlight) -->
+        <div class="spotlight-box" id="spotlight" style="opacity: 0;"></div>
+
+        <!-- 模擬 e-Stat 官方真實介面 -->
+        <div class="estat-ui">
+          <div class="estat-header">
+            <div class="estat-logo">
+              e-Stat
+              <span>Portal Site of Official Statistics of Japan</span>
+            </div>
+            <div class="estat-nav-right">
+              <span class="estat-btn-link">Contact us</span>
+              <span class="estat-btn-link">Japanese</span>
+              <span style="color: var(--color-white); font-weight: 500;">workshop-student@antigravity.dev</span>
+              <span class="estat-btn-link" id="myPageLink" style="font-weight: 700; color: var(--color-white);">My page</span>
+              <span class="estat-btn-link">Logout</span>
+            </div>
+          </div>
+
+          <div class="estat-subnav">
+            <span>Browse Statistics</span>
+            <span>Visualisations and Tools</span>
+            <span>Resources</span>
+            <span>Links</span>
+          </div>
+
+          <div class="estat-breadcrumb">
+            Top Page / Display My page
+          </div>
+
+          <!-- 藍色功能條 -->
+          <div class="estat-bluebar">
+            <div class="estat-action-link">▶ Change user information</div>
+            <div class="estat-action-link active-action" id="targetApiFuncBar">▶ API function (application ID issuance)</div>
+            <div class="estat-action-link">▶ Dashboard</div>
+          </div>
+
+          <div class="estat-content-body">
+            <div class="estat-page-h2">Display My page</div>
+
+            <!-- 青綠色標籤列 -->
+            <div class="estat-cyan-tabs">
+              <button class="cyan-tab-btn" type="button">Search history</button>
+              <button class="cyan-tab-btn" type="button">Download history</button>
+              <button class="cyan-tab-btn tab-selected" id="targetApiTab" type="button">API functions</button>
+            </div>
+
+            <!-- 表單卡片 -->
+            <div class="estat-box">
+              <div class="estat-box-title">Get application ID</div>
+
+              <table class="app-table">
+                <tr>
+                  <td class="app-table-row-num">1</td>
+                  <td class="app-table-form">
+                    <!-- Name 欄位 -->
+                    <div class="form-item-row">
+                      <div class="form-item-label"><span class="req">*</span>name</div>
+                      <div class="form-item-input-wrap">
+                        <input type="text" id="targetInputName" class="official-input" placeholder="請輸入應用名稱 (例如 nutc52010606)">
+                      </div>
+                    </div>
+
+                    <!-- URL 欄位 (核心避坑重點) -->
+                    <div class="form-item-row" style="align-items: flex-start;">
+                      <div class="form-item-label" style="padding-top: 6px;"><span class="req">*</span>URL</div>
+                      <div class="form-item-input-wrap">
+                        <input type="text" id="targetInputUrl" class="official-input" placeholder="http://test.localhost">
+                        <div class="form-item-note">
+                          * http://localhost and private IP address cannot be registered.
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Overview -->
+                    <div class="form-item-row">
+                      <div class="form-item-label">Overview</div>
+                      <div class="form-item-input-wrap">
+                        <input type="text" id="targetInputOverview" class="official-input" value="Antigravity 11/05 workshop dashboard integration">
+                      </div>
+                    </div>
+
+                    <!-- appId 生成欄位 -->
+                    <div class="form-item-row">
+                      <div class="form-item-label">appId</div>
+                      <div class="form-item-input-wrap">
+                        <input type="text" id="targetOutputAppId" class="official-input" style="background: var(--color-paper-2); color: var(--color-accent-deep); font-weight: 700;" readonly>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="app-table-btns">
+                    <button class="official-btn btn-blue-issue" id="targetBtnIssue" type="button">Issue</button>
+                    <button class="official-btn btn-secondary" type="button">change</button>
+                    <button class="official-btn btn-remove" type="button">remove</button>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 浮動步驟講解卡 -->
+        <div class="step-callout" id="calloutBox">
+          <div>
+            <div class="callout-badge" id="calloutStepBadge">STEP 1 / 5</div>
+            <div class="callout-title" id="calloutTitle">登入並進入 My Page (個人中心)</div>
+            <div class="callout-desc" id="calloutDesc">登入後點擊右上角的「My page」，進入會員管理介面。</div>
+          </div>
+          <div style="font-family: var(--font-outlier); font-size: 13px; color: var(--color-accent-deep);" id="stepTimeIndicator">
+            00:03s
+          </div>
+        </div>
+      </div>
+
+      <!-- 播放器底部控制欄 -->
+      <div class="controls-bar">
+        <div class="ctrl-left">
+          <button class="btn btn--primary btn--sm" id="playPauseBtn" onclick="togglePlayPause()" type="button">暫停</button>
+          <div class="mono-label" id="timeDisplay" style="font-weight: 700; color: var(--color-ink);">00:00 / 00:24</div>
+        </div>
+
+        <div class="timeline-container">
+          <div class="progress-track" onclick="seekTrack(event)">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <div class="player-step-pills">
+          <span class="player-pill active" onclick="jumpToStep(1)">1. 登入</span>
+          <span class="player-pill" onclick="jumpToStep(2)">2. 進入API</span>
+          <span class="player-pill" onclick="jumpToStep(3)">3. 避坑填寫</span>
+          <span class="player-pill" onclick="jumpToStep(4)">4. 發行Key</span>
+          <span class="player-pill" onclick="jumpToStep(5)">5. 程式串接</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 下方教學分解與避坑解說 (dose Plastic Tray) -->
+    <section class="plastic-tray" style="--t: var(--p-wed);">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
+        <h2 style="font-size: 22px;">API 申請實體步驟速查與避坑說明</h2>
+        <span class="mono-label">step-by-step checklist</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+        
+        <div class="pharmacy-label">
+          <div class="mono-label" style="margin-bottom: 4px;">step 01</div>
+          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">登入並進入個人頁</div>
+          <p style="font-size: 13px; color: var(--color-muted); line-height: 1.5;">
+            前往 e-Stat 官網右上角點擊「<strong>My page</strong>」進入會員控制台。若原為日文版可切換為英文版。
+          </p>
+        </div>
+
+        <div class="pharmacy-label">
+          <div class="mono-label" style="margin-bottom: 4px;">step 02</div>
+          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">鎖定 API 機能選單</div>
+          <p style="font-size: 13px; color: var(--color-muted); line-height: 1.5;">
+            點擊深藍色功能橫條中的 <strong>▶ API function (application ID issuance)</strong> 進入金鑰管理表。
+          </p>
+        </div>
+
+        <div class="pharmacy-label" style="border-color: var(--p-tue-deep);">
+          <div class="mono-label" style="color: var(--p-tue-deep); font-weight: 700; margin-bottom: 4px;">step 03 / 避坑核心</div>
+          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">URL 嚴格規範</div>
+          <p style="font-size: 13px; color: var(--color-muted); line-height: 1.5;">
+            官方防禦機制嚴格禁止純 <code>localhost</code>！<strong>請務必填寫 <code>http://test.localhost</code></strong> 即可直接通過驗證。
+          </p>
+        </div>
+
+        <div class="pharmacy-label" style="border-color: var(--color-accent);">
+          <div class="mono-label" style="color: var(--color-accent-deep); font-weight: 700; margin-bottom: 4px;">step 04 / 取得金鑰</div>
+          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">點擊 Issue 發行</div>
+          <p style="font-size: 13px; color: var(--color-muted); line-height: 1.5;">
+            點擊右側 <strong>Issue</strong> 按鈕，系統立即生成 40 碼專屬金鑰（appId），後續呼叫 REST API 即可代入。
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Python 呼叫範例 Code Panel -->
+      <div style="margin-top: 20px;">
+        <div class="code-panel">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--color-code-text); font-size: 11px;">
+            <span>python: fetch_estat_api.py</span>
+            <span>REST v3.0</span>
+          </div>
+          <code>import requests<br>
+<br>
+app_id = "YOUR_40_CHAR_APP_ID"<br>
+url = "https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData"<br>
+params = {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"appId": app_id,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"statsDataId": "0000010101", # SSDSE-A 47都道府縣社會人口大表<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"metaGetFlg": "Y"<br>
+}<br>
+response = requests.get(url, params=params)<br>
+data = response.json()<br>
+print(f"獲取成功，共載入 {len(data['GET_STATS_DATA']['STATISTICAL_DATA']['DATA_INF']['VALUE'])} 筆紀錄")</code>
+        </div>
+      </div>
+
+      <div class="tear-stub">
+        <div class="mono-label">
+          endpoint: api.e-stat.go.jp/rest/3.0/app / status: operational
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <a href="data_analysis.html" style="font-size: 13px; color: var(--color-accent-deep); font-weight: 700; text-decoration: underline;">返回分析師工作流 ↗</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    let isPlaying = true;
+    let currentTime = 0;
+    const TOTAL_DURATION = 24;
+    let intervalId = null;
+
+    const viewport = document.getElementById('viewport');
+    const cursor = document.getElementById('cursor');
+    const spotlight = document.getElementById('spotlight');
+    const browserUrl = document.getElementById('browserUrl');
+    const inputName = document.getElementById('targetInputName');
+    const inputUrl = document.getElementById('targetInputUrl');
+    const outputAppId = document.getElementById('targetOutputAppId');
+    const btnIssue = document.getElementById('targetBtnIssue');
+    const progressFill = document.getElementById('progressFill');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const stepTimeIndicator = document.getElementById('stepTimeIndicator');
+    const calloutStepBadge = document.getElementById('calloutStepBadge');
+    const calloutTitle = document.getElementById('calloutTitle');
+    const calloutDesc = document.getElementById('calloutDesc');
+
+    function snapSpotlightTo(el, padX = 6, padY = 6, isSuccess = false) {
+      if (!el) return;
+      const vRect = viewport.getBoundingClientRect();
+      const rect = el.getBoundingClientRect();
+
+      const top = rect.top - vRect.top - padY;
+      const left = rect.left - vRect.left - padX;
+      const width = rect.width + padX * 2;
+      const height = rect.height + padY * 2;
+
+      spotlight.style.top = `${top}px`;
+      spotlight.style.left = `${left}px`;
+      spotlight.style.width = `${width}px`;
+      spotlight.style.height = `${height}px`;
+      spotlight.style.opacity = '1';
+      spotlight.className = isSuccess ? 'spotlight-box success' : 'spotlight-box';
+
+      const cx = left + width / 2;
+      const cy = top + height / 2;
+      cursor.style.transform = `translate(${cx}px, ${cy}px)`;
+    }
+
+    function hideSpotlight() {
+      spotlight.style.opacity = '0';
+    }
+
+    function updateAnimation(t) {
+      currentTime = t;
+      const progress = (t / TOTAL_DURATION) * 100;
+      progressFill.style.width = progress + '%';
+      timeDisplay.innerText = `00:${t < 10 ? '0' + t : t} / 00:${TOTAL_DURATION}`;
+      stepTimeIndicator.innerText = `00:${t < 10 ? '0' + t : t}s`;
+
+      if (t >= 0 && t < 4) {
+        setActiveStep(1);
+        browserUrl.innerText = 'https://www.e-stat.go.jp/en/mypage';
+        cursor.classList.remove('clicking');
+        inputName.value = '';
+        inputUrl.value = '';
+        outputAppId.value = '';
+        btnIssue.className = 'official-btn btn-blue-issue';
+
+        const myPageLink = document.getElementById('myPageLink');
+        snapSpotlightTo(myPageLink, 8, 4);
+
+        calloutStepBadge.innerText = 'STEP 1 / 5 · 會員中心入口';
+        calloutTitle.innerText = '前往 e-Stat 官方網站並登入個人中心';
+        calloutDesc.innerHTML = '在網站右上角點擊「<strong>My page</strong>」進入管理頁面。若為日文版可切換至英文版便於辨識。';
+      } 
+      else if (t >= 4 && t < 8) {
+        setActiveStep(2);
+        browserUrl.innerText = 'https://www.e-stat.go.jp/en/mypage/view/api';
+        
+        const targetApiBar = document.getElementById('targetApiFuncBar');
+        snapSpotlightTo(targetApiBar, 8, 4);
+
+        if (t === 5) cursor.classList.add('clicking');
+        else cursor.classList.remove('clicking');
+
+        calloutStepBadge.innerText = 'STEP 2 / 5 · 找到 API 申請入口';
+        calloutTitle.innerText = '精確點選「▶ API function (application ID issuance)」';
+        calloutDesc.innerHTML = '在 Display My page 藍色橫條中，直接點選中央的 <strong>API機能（應用程式ID發行）</strong> 按鈕進入申請表。';
+      } 
+      else if (t >= 8 && t < 15) {
+        setActiveStep(3);
+        cursor.classList.remove('clicking');
+
+        if (t >= 8 && t < 11) {
+          snapSpotlightTo(inputName, 4, 4);
+          inputName.classList.add('typing');
+          inputName.value = 'nutc52010606';
+          inputUrl.classList.remove('typing');
+
+          calloutStepBadge.innerText = 'STEP 3 / 5 · 表單填寫 (名稱)';
+          calloutTitle.innerText = '填寫應用名稱 (Name)';
+          calloutDesc.innerHTML = '輸入您的專案或組織代號，例如 <code>nutc52010606</code> 或 <code>JapanDataLab</code>。';
+        } else {
+          snapSpotlightTo(inputUrl, 4, 4);
+          inputName.classList.remove('typing');
+          inputUrl.classList.add('typing');
+          inputUrl.value = 'http://test.localhost';
+
+          calloutStepBadge.innerText = 'STEP 3 / 5 · 【極致避坑重點】URL 填寫規範';
+          calloutTitle.innerText = '⚠️ 嚴格禁止 localhost！必須輸入 http://test.localhost';
+          calloutDesc.innerHTML = '系統防禦阻擋了純 <code>http://localhost</code>。<strong>最省事解法是填入 <span class="pitfall-highlight">http://test.localhost</span></strong>，系統即可立即驗證通過！';
+        }
+      } 
+      else if (t >= 15 && t < 20) {
+        setActiveStep(4);
+        inputName.classList.remove('typing');
+        inputUrl.classList.remove('typing');
+
+        if (t >= 16) {
+          cursor.classList.add('clicking');
+          btnIssue.className = 'official-btn btn-blue-issue active-click';
+          outputAppId.value = 'd96194b7b3219075b1041948fddc842cfead7477';
+
+          snapSpotlightTo(outputAppId, 6, 4, true);
+
+          calloutStepBadge.innerText = 'STEP 4 / 5 · 發行成功 🎉';
+          calloutTitle.innerText = '點擊「Issue」按鈕，立即取得 40 位數金鑰 (appId)';
+          calloutDesc.innerHTML = '下方 appId 欄位立即生成專屬金鑰 <code>d96194...7477</code>，請複製保存，後續查詢將以此金鑰作為授權憑證。';
+        } else {
+          snapSpotlightTo(btnIssue, 6, 4);
+        }
+      } 
+      else {
+        setActiveStep(5);
+        hideSpotlight();
+        cursor.style.transform = `translate(450px, 360px)`;
+
+        calloutStepBadge.innerText = 'STEP 5 / 5 · 程式串接與數據獲取';
+        calloutTitle.innerText = '將金鑰帶入 Python 或 Web API 展開實戰！';
+        calloutDesc.innerHTML = '直接以 GET 呼叫 <code>getStatsList</code> 或 <code>getStatsData</code>，即刻取得日本半世紀國勢統計資料！';
+      }
+    }
+
+    function setActiveStep(stepNum) {
+      document.querySelectorAll('.player-pill').forEach((p, idx) => {
+        if (idx + 1 === stepNum) p.classList.add('active');
+        else p.classList.remove('active');
+      });
+    }
+
+    function jumpToStep(stepNum) {
+      const times = [0, 4, 8, 15, 20];
+      currentTime = times[stepNum - 1];
+      updateAnimation(currentTime);
+    }
+
+    function togglePlayPause() {
+      isPlaying = !isPlaying;
+      const btn = document.getElementById('playPauseBtn');
+      if (isPlaying) {
+        btn.innerText = '暫停';
+        startTimer();
+      } else {
+        btn.innerText = '播放';
+        clearInterval(intervalId);
+      }
+    }
+
+    function restartDemo() {
+      currentTime = 0;
+      isPlaying = true;
+      document.getElementById('playPauseBtn').innerText = '暫停';
+      clearInterval(intervalId);
+      startTimer();
+      updateAnimation(0);
+    }
+
+    function seekTrack(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      currentTime = Math.floor(pos * TOTAL_DURATION);
+      updateAnimation(currentTime);
+    }
+
+    function startTimer() {
+      clearInterval(intervalId);
+      intervalId = setInterval(() => {
+        currentTime++;
+        if (currentTime > TOTAL_DURATION) {
+          currentTime = 0;
+        }
+        updateAnimation(currentTime);
+      }, 1000);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        updateAnimation(0);
+        startTimer();
+      }, 50);
+    });
+  </script>
+  <script src="js/digital_jitong.js"></script>
+</body>
+</html>
