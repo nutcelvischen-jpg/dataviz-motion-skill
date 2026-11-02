@@ -99,9 +99,10 @@
 }
 
 .jitong-trigger-sub {
-  font-size: 10.5px;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
 /* 聊天視窗主體 */
