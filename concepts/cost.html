@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<html lang="zh-Hant"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>模型與成本：用量如何影響費用？｜查概念</title><link href="../css/content-layout.css?v=16" rel="stylesheet"/><script defer="" src="../js/model-reference-data.js?v=3"></script><script defer="" src="../js/reference.js?v=6"></script><script defer="" src="../js/concept-reader.js?v=2"></script><script defer="" src="../js/content-navigation.js?v=6"></script><link href="../css/concept-map.css?v=1" rel="stylesheet"/></head><body class="concept-page"><a class="skip-link" href="#main">跳到主要內容</a><header class="content-header"><div class="content-wrap content-header-inner"><a class="content-brand" href="../index.html"><span aria-hidden="true" class="content-brand-mark">學</span><span>大語言模型<br/>學習地圖</span></a><nav aria-label="主要導覽" class="content-nav"><a href="../index.html#learning-map">跟著學</a><a aria-current="page" href="../encyclopedia.html">查概念</a><a href="../lab.html">做實驗</a></nav></div></header>
+<main class="concept-reader" id="main"><p class="breadcrumbs"><a class="catalog-return" href="../encyclopedia.html#term-map">← 查閱目錄</a><span> ／ 用量與模型</span></p><section class="reading-section" id="pricing"><header class="page-intro"><h1 tabindex="-1">模型與成本：用量如何影響費用？</h1><p>輸入與輸出的用量都可能影響費用。下方以假設單價練習，正式成本應以實際服務的計費方式為準。</p></header><div class="lab-controls"><div class="cost-grid"><label>輸入 Token 數<input id="cost-input" inputmode="numeric" min="0" step="1" type="number" value="2000"/></label><label>輸出 Token 數<input id="cost-output" inputmode="numeric" min="0" step="1" type="number" value="500"/></label></div><p class="quiet">教學假設：輸入每百萬 Token 1 美元；輸出每百萬 Token 2 美元，非供應商報價。</p><p>預估教學費用：<strong aria-live="polite" id="cost-result">USD 0.003</strong></p><div aria-label="快速選擇輸入用量" class="button-row"><button class="action-button" data-quick="500">500</button><button class="action-button" data-quick="2000">2,000</button><button class="action-button" data-quick="8000">8,000</button><button class="action-button" data-quick="32000">32,000</button><button class="action-button" data-quick="128000">128K</button></div></div>
+<details class="deep-dive"><summary>查閱原教材費率資料</summary><p class="notice">既有教材費率與型號待核對，並非即時或正式報價。下方僅估算輸入用量；以相同的目前輸入數量計算。</p><div class="button-row"><button aria-pressed="true" class="action-button rate-mode" data-mode="official">原廠資料欄</button><button aria-pressed="false" class="action-button rate-mode" data-mode="openrouter">OpenRouter 資料欄</button></div><div class="table-scroll" tabindex="0"><table><thead><tr><th>原教材型號</th><th>輸入費率／百萬 Token</th><th>目前輸入估算</th><th>資料狀態</th></tr></thead><tbody id="price-rows"></tbody></table></div><details class="deep-dive"><summary>原教材：其他價格矩陣</summary><div class="legacy-material"><div class="matrix-card">
+<div class="matrix-card-header">
+<div class="matrix-card-title">矩陣二：商業雲端定價與推論經濟學對比 (Cloud Pricing &amp; Prompt Caching Economics)</div>
+<div class="matrix-card-badge">每百萬 Tokens 計 (單位：美元 USD)</div>
+</div>
+<table class="data-matrix-table">
+<thead>
+<tr>
+<th>模型名稱</th>
+<th>標準輸入費率</th>
+<th>標準輸出費率 (含思考)</th>
+<th>快取讀取 (Cache Hit) 費率</th>
+<th>特殊費率條件與計價說明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GPT-6 Astra</strong></td>
+<td class="mono-cell">$10.00</td>
+<td class="mono-cell">$50.00</td>
+<td class="mono-cell">$1.00</td>
+<td>單次請求輸入超過 272K Tokens 時，輸入與快取費率翻倍，輸出費率為 1.5 倍</td>
+</tr>
+<tr>
+<td><strong>Gemini 4 Argon</strong></td>
+<td class="mono-cell">$2.00 (推廣) / $4.00</td>
+<td class="mono-cell">$10.00 (推廣) / $20.00</td>
+<td class="mono-cell">依系統自動折抵</td>
+<td>無免費使用層級；所有輸出均包含思考過程的 Token 消耗</td>
+</tr>
+<tr>
+<td><strong>Claude Opus 5.5</strong></td>
+<td class="mono-cell">$4.00</td>
+<td class="mono-cell">$20.00</td>
+<td class="mono-cell" style="color: #166534; font-weight:700;">$0.20</td>
+<td>快取讀取較前代大幅降低 60%；Fast 專用通道為 $8.00 / $40.00</td>
+</tr>
+<tr>
+<td><strong>Grok 4.7</strong></td>
+<td class="mono-cell">$2.00</td>
+<td class="mono-cell">$6.00</td>
+<td class="mono-cell">支援即時 X 檢索</td>
+<td>提供雙倍速度與費率的 Fast 專用模式；同級別具備極高價格殺傷力</td>
+</tr>
+<tr>
+<td><strong>DeepSeek-V4-Pro</strong></td>
+<td class="mono-cell">$1.74</td>
+<td class="mono-cell">$3.48</td>
+<td class="mono-cell">$0.174 (原價 10%)</td>
+<td>離峰時段輸入降至 $0.66；全天提供 75% 彈性折扣方案</td>
+</tr>
+<tr>
+<td><strong>DeepSeek-V4.1-Flash</strong></td>
+<td class="mono-cell" style="color: #166534; font-weight:700;">$0.14</td>
+<td class="mono-cell" style="color: #166534; font-weight:700;">$0.28</td>
+<td class="mono-cell" style="color: #166534; font-weight:700;">$0.014</td>
+<td>極度適合長上下文代理的頻繁背景循環調用（性價比之王）</td>
+</tr>
+<tr>
+<td><strong>Kimi K3.1 Pro</strong></td>
+<td class="mono-cell">$2.00</td>
+<td class="mono-cell">$10.00</td>
+<td class="mono-cell">依系統自動折抵</td>
+<td>提供 Highspeed 高速版本（吞吐量提升 2 至 3 倍）</td>
+</tr>
+<tr>
+<td><strong>MiniMax M3</strong></td>
+<td class="mono-cell">$0.30 (≤512K)</td>
+<td class="mono-cell">$1.20 (≤512K)</td>
+<td class="mono-cell">$0.06</td>
+<td>輸入介於 512K 至 1M Tokens 時，輸入調整為 $0.60，輸出為 $2.40</td>
+</tr>
+</tbody>
+</table>
+</div></div></details></details>
+<h2 id="cost-part-1">如何讀一次 API 的用量？</h2><p>服務回傳的 Usage 可能分列輸入與輸出 Token；有些服務還會列出快取、工具或推理相關用量。欄位名稱和計費方式依供應商與模型而異，Token 數不等於直接扣款金額。</p><details class="deep-dive" id="api-trial"><summary>進階：檢視一次 API 用量</summary><p>預設為本地示範；選擇真實模型並按下送出才會發送請求。</p><label class="field-label" for="live-model">模型模式</label><select id="live-model"><option value="simulation">本地教學模擬</option><option value="openrouter:google/gemma-3-12b-it">OpenRouter · google/gemma-3-12b-it</option><option value="openrouter:deepseek/deepseek-r1">OpenRouter · deepseek-r1</option><option value="openrouter:deepseek/deepseek-chat">OpenRouter · deepseek-chat</option><option value="openrouter:anthropic/claude-3.7-sonnet">OpenRouter · claude-3.7-sonnet</option><option value="openrouter:qwen/qwen-2.5-72b-instruct">OpenRouter · qwen-2.5-72b</option><option value="openrouter:openai/gpt-4o">OpenRouter · gpt-4o</option><option value="gemini:gemini-3.6-flash">Google Gemini · gemini-3.6-flash</option></select><div hidden="" id="live-key-group"><label class="field-label" for="live-key">API Key</label><input autocomplete="off" id="live-key" type="password"/></div><label class="field-label" for="live-prompt">示範問題</label><textarea id="live-prompt">請簡短說明什麼是 Token。</textarea><div class="button-row"><button class="button-secondary" id="live-send">送出試演 →</button></div><div aria-live="polite" class="message-box" id="live-output" role="status">送出後顯示示範結果或 API 回覆與用量。</div><p class="quiet">用量以服務實際回傳為準；此處不推算真實扣款。舊教材的部分 OpenRouter 型號可能已變更，請以服務供應商為準。</p></details></section>
+<nav aria-label="閱讀下一步" class="concept-next"><a class="button-primary" href="../lab.html?experiment=memory&amp;mode=free#advanced">前往實驗室自由測試 →</a><a class="catalog-return" href="../encyclopedia.html#term-map">返回查閱目錄</a><a class="concept-map-link" href="overview.html#map-quality">看概念全圖 →</a></nav></main><footer class="content-footer"><div class="content-wrap">大語言模型學習地圖 · 按需要查閱，不影響課程進度。</div></footer></body></html>
+

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html lang="zh-Hant"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>如何比較模型？｜查概念</title><link href="../css/content-layout.css?v=16" rel="stylesheet"/><script defer="" src="../js/model-reference-data.js?v=3"></script><script defer="" src="../js/reference.js?v=6"></script><script defer="" src="../js/concept-reader.js?v=2"></script><script defer="" src="../js/content-navigation.js?v=6"></script><link href="../css/concept-map.css?v=1" rel="stylesheet"/></head><body class="concept-page"><a class="skip-link" href="#main">跳到主要內容</a><header class="content-header"><div class="content-wrap content-header-inner"><a class="content-brand" href="../index.html"><span aria-hidden="true" class="content-brand-mark">學</span><span>大語言模型<br/>學習地圖</span></a><nav aria-label="主要導覽" class="content-nav"><a href="../index.html#learning-map">跟著學</a><a aria-current="page" href="../encyclopedia.html">查概念</a><a href="../lab.html">做實驗</a></nav></div></header>
+<main class="concept-reader" id="main"><p class="breadcrumbs"><a class="catalog-return" href="../encyclopedia.html#term-map">← 查閱目錄</a><span> ／ 用量與模型</span></p><section class="reading-section" id="models"><header class="page-intro"><h1 tabindex="-1">如何比較模型？</h1><p>先問三件事：工作需要什麼能力？資料可以放在哪裡？使用條件與成本是什麼？</p></header><p class="notice">以下沿用原教材的模型與分類，名稱、功能、條件和價格均待核對，不是最新清單。</p><div aria-label="篩選模型" class="button-row"><button aria-pressed="true" class="action-button model-filter" data-filter="all">全部</button><button aria-pressed="false" class="action-button model-filter" data-filter="cloud">雲端服務</button><button aria-pressed="false" class="action-button model-filter" data-filter="open">開放權重</button><button aria-pressed="false" class="action-button model-filter" data-filter="local">本機部署</button></div><div class="table-scroll" tabindex="0"><table><thead><tr><th>名稱</th><th>取得／部署方式</th><th>用途說明</th><th>使用條件</th><th>資料狀態</th></tr></thead><tbody id="model-rows"></tbody></table></div><noscript><p>啟用 JavaScript 可篩選原教材模型。模型資料仍需核對來源與條件。</p></noscript><details class="deep-dive"><summary>原教材：模型規格矩陣</summary><p class="notice">既有教材資料，待核對。</p><div class="legacy-material"><div class="matrix-card">
+<div class="matrix-card-header">
+<div class="matrix-card-title">矩陣一：核心旗艦型號全景矩陣 (Frontier Specifications Matrix)</div>
+<div class="matrix-card-badge">2026 最新前沿架構橫向對比</div>
+</div>
+<table class="data-matrix-table">
+<thead>
+<tr>
+<th>研發機構</th>
+<th>官方型號名稱</th>
+<th>API 模型識別碼</th>
+<th>歸屬國</th>
+<th>權重開放性</th>
+<th>上下文視窗</th>
+<th>核心架構與代表性特點</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>OpenAI</strong></td>
+<td>GPT-6 Astra</td>
+<td><code class="code-pill">gpt-6-astra</code></td>
+<td><span class="country-tag tag-us">美國</span></td>
+<td><span class="country-tag tag-closed-api">閉源 (雲端 API)</span></td>
+<td class="mono-cell">1,050K Tokens</td>
+<td>循環深度動態推理；原生電腦桌面操作；Critical 級資安防禦架構</td>
+</tr>
+<tr>
+<td><strong>Google</strong></td>
+<td>Gemini 4 Argon</td>
+<td><code class="code-pill">gemini-4-argon</code></td>
+<td><span class="country-tag tag-us">美國</span></td>
+<td><span class="country-tag tag-closed-api">閉源 (雲端 API)</span></td>
+<td class="mono-cell">1,000K Tokens</td>
+<td>1M 統一脈絡與 Long Decode；多階思考調控；高抗提示注入能力 (IPI 0.7%)</td>
+</tr>
+<tr>
+<td><strong>Google</strong></td>
+<td>Gemini 4 Carbon</td>
+<td><code class="code-pill">Fairwind 內部預覽</code></td>
+<td><span class="country-tag tag-us">美國</span></td>
+<td><span class="country-tag tag-closed-api">閉源 (受限預覽)</span></td>
+<td class="mono-cell">1,000K Tokens</td>
+<td>AA Index v5.0 首位；超低漏洞代碼生成與自主零時差補丁研發</td>
+</tr>
+<tr>
+<td><strong>Anthropic</strong></td>
+<td>Claude Opus 5.5</td>
+<td><code class="code-pill">claude-opus-5-5</code></td>
+<td><span class="country-tag tag-us">美國</span></td>
+<td><span class="country-tag tag-closed-api">閉源 (雲端 API)</span></td>
+<td class="mono-cell">1,000K Tokens</td>
+<td>自適應思考常態化；沙箱逃逸率降 85%；取消強制工具呼叫語法</td>
+</tr>
+<tr>
+<td><strong>xAI (馬斯克)</strong></td>
+<td>Grok 4.7</td>
+<td><code class="code-pill">grok-4.7</code></td>
+<td><span class="country-tag tag-us">美國</span></td>
+<td><span class="country-tag tag-closed-api">閉源 (僅初代開源)</span></td>
+<td class="mono-cell">500K Tokens</td>
+<td>馬斯克 xAI 旗艦；打通 X 全球即時社群動態；Colossus 十萬卡超算訓練；幽默客觀反說教</td>
+</tr>
+<tr>
+<td><strong>Meta</strong></td>
+<td>Muse Spark Open</td>
+<td><code class="code-pill">開放權重下載</code></td>
+<td><span class="country-tag tag-us">美國</span></td>
+<td><span class="country-tag tag-open-license">開放權重 (地端/託管)</span></td>
+<td class="mono-cell">128K~512K Tokens</td>
+<td>延續 LLaMA 生態的高效開放架構，適配企業本地部署微調 (4090/A100)</td>
+</tr>
+<tr>
+<td><strong>DeepSeek</strong></td>
+<td>DeepSeek-V4-Pro</td>
+<td><code class="code-pill">deepseek-v4-pro</code></td>
+<td><span class="country-tag tag-cn">中國</span></td>
+<td><span class="country-tag tag-open-license">開源 (MIT 協議)</span></td>
+<td class="mono-cell">1,000K Tokens</td>
+<td>1.6T MoE (49B 激活)；DSA 稀疏注意力；深度適配華為昇騰與 FP4</td>
+</tr>
+<tr>
+<td><strong>DeepSeek</strong></td>
+<td>DeepSeek-V4.1-Flash</td>
+<td><code class="code-pill">deepseek-flash</code></td>
+<td><span class="country-tag tag-cn">中國</span></td>
+<td><span class="country-tag tag-open-license">開源 (MIT 協議)</span></td>
+<td class="mono-cell">1,000K Tokens</td>
+<td>284B MoE (13B 激活)；極低成本高頻代理；原生雙模態思考切換</td>
+</tr>
+<tr>
+<td><strong>Moonshot</strong></td>
+<td>Kimi K3.1 Pro</td>
+<td><code class="code-pill">kimi-k3.1-pro</code></td>
+<td><span class="country-tag tag-cn">中國</span></td>
+<td><span class="country-tag tag-open-license">開放權重 (Kimi 許可)</span></td>
+<td class="mono-cell">1,048K Tokens</td>
+<td>月之暗面旗艦 MoE；百萬長文本理解；長篇論文財報精讀；3D 空間建模</td>
+</tr>
+<tr>
+<td><strong>MiniMax</strong></td>
+<td>MiniMax M3</td>
+<td><code class="code-pill">MiniMax-M3</code></td>
+<td><span class="country-tag tag-cn">中國</span></td>
+<td><span class="country-tag tag-open-license">開放權重 / 雲端 API</span></td>
+<td class="mono-cell">1,000K Tokens</td>
+<td>428B MoE (22B 激活)；MSA 稀疏注意力 (提速15x)；NeMo 叢集微調支援</td>
+</tr>
+</tbody>
+</table>
+</div></div></details></section>
+<nav aria-label="閱讀下一步" class="concept-next"><a class="button-primary" href="../concepts/deployment.html">比較雲端與本機部署 →</a><a class="catalog-return" href="../encyclopedia.html#term-map">返回查閱目錄</a><a class="concept-map-link" href="overview.html#map-model">看概念全圖 →</a></nav></main><footer class="content-footer"><div class="content-wrap">大語言模型學習地圖 · 按需要查閱，不影響課程進度。</div></footer></body></html>
+

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<html lang="zh-Hant"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>文字如何切成 Token？｜查概念</title><link href="../css/content-layout.css?v=16" rel="stylesheet"/><script defer="" src="../js/model-reference-data.js?v=3"></script><script defer="" src="../js/reference.js?v=6"></script><script defer="" src="../js/concept-reader.js?v=2"></script><script defer="" src="../js/content-navigation.js?v=6"></script><link href="../css/concept-map.css?v=1" rel="stylesheet"/></head><body class="concept-page"><a class="skip-link" href="#main">跳到主要內容</a><header class="content-header"><div class="content-wrap content-header-inner"><a class="content-brand" href="../index.html"><span aria-hidden="true" class="content-brand-mark">學</span><span>大語言模型<br/>學習地圖</span></a><nav aria-label="主要導覽" class="content-nav"><a href="../index.html#learning-map">跟著學</a><a aria-current="page" href="../encyclopedia.html">查概念</a><a href="../lab.html">做實驗</a></nav></div></header>
+<main class="concept-reader" id="main"><p class="breadcrumbs"><a class="catalog-return" href="../encyclopedia.html#term-map">← 查閱目錄</a><span> ／ 模型與資料</span></p><section class="reading-section" id="token-visualizer-card"><header class="page-intro"><h1 tabindex="-1">文字如何切成 Token？</h1><p>Token 是模型處理文字時使用的單位之一，可能是一個字、詞的一部分或符號。不同模型的分詞方式可能不同。</p></header><div class="lab-controls"><p>輸入文字，觀察簡化規則產生的示意片段。</p><div class="button-row"><button class="action-button" data-token-preset="zh" type="button">繁體中文</button><button class="action-button" data-token-preset="en" type="button">English</button><button class="action-button" data-token-preset="strawberry" type="button">Strawberry</button><button class="action-button" data-token-preset="code" type="button">程式碼</button></div><label class="field-label" for="token-input">示範文字</label><textarea id="token-input" maxlength="1200">大語言模型如何回答問題？</textarea><p class="quiet">字元數：<strong id="token-characters">0</strong>　示意 Token 數：<strong id="token-count">0</strong></p><div aria-live="polite" class="token-pieces" id="token-pieces"></div><p class="quiet">示意切分，不能作為正式 BPE 或正式計費依據。</p></div>
+<div id="strawberry"><h2>數字母為什麼值得驗算？</h2><p>「strawberry」含有三個 r。模型的回答可能因情境與模型而異；需要精確計數時，可以逐字核對或使用程式工具。</p><details class="deep-dive"><summary>原教材：更多拆字說明</summary><p class="notice">既有教材資料，部分機制與模型表現尚待核對。</p><div class="legacy-material"><div class="strawberry-deep-dive">
+<div class="strawberry-header">
+<div class="strawberry-badge">🍓 經典字母計數陷阱視覺解密 · THE STRAWBERRY PARADOX</div>
+<h3 class="strawberry-title">為什麼大語言模型連小學生都會的「數字母」都數錯？</h3>
+<p class="strawberry-subtitle">
+            你問早期 ChatGPT：「strawberry 裡面有幾個 r？」它會自信地回答「2 個」。這絕非 AI 智商低，而是分詞壓縮帶來的<strong>「感官盲區（Sensory Blindness）」</strong>！請跟隨下方雙軌流程圖，看清人類眼睛與神經網路的認知鴻溝：
+          </p>
+</div>
+<!-- Dual Track Visual Flow -->
+<div class="dual-track-container">
+<!-- Track 1: Human Eye Optical Scan -->
+<div class="track-card track-human">
+<div class="track-header">
+<span class="track-tag tag-human">👁️ 人類認知路徑 · 字元級光學掃描 (100% 確定)</span>
+<span class="track-status">零認知盲區</span>
+</div>
+<div class="flow-steps">
+<div class="flow-step">
+<div class="step-num">01</div>
+<div class="step-content">
+<div class="step-title">視網膜光學感應與字元分離</div>
+<div class="step-desc">人類肉眼一眼望去，單字被拆解為 10 個清晰分離的英文字母實體：</div>
+<div class="char-boxes">
+<span class="char-box">s</span>
+<span class="char-box">t</span>
+<span class="char-box hit-r">r<span class="r-badge">#1</span></span>
+<span class="char-box">a</span>
+<span class="char-box">w</span>
+<span class="char-box">b</span>
+<span class="char-box">e</span>
+<span class="char-box hit-r">r<span class="r-badge">#2</span></span>
+<span class="char-box hit-r">r<span class="r-badge">#3</span></span>
+<span class="char-box">y</span>
+</div>
+</div>
+</div>
+<div class="flow-step">
+<div class="step-num">02</div>
+<div class="step-content">
+<div class="step-title">大腦指針循序點名比對 (Pointer Scan)</div>
+<div class="step-desc">
+                    視線由左至右移動：第 3 位是 <code>'r'</code>，第 8 位是 <code>'r'</code>，第 9 位是 <code>'r'</code>。
+                  </div>
+</div>
+</div>
+<div class="flow-step">
+<div class="step-num">03</div>
+<div class="step-content">
+<div class="step-title">確定性算術相加</div>
+<div class="step-desc">大腦將 3 次命中做累加：<code>1 + 1 + 1 = 3</code>。</div>
+<div class="result-badge-human">🎯 人類結論：精確命中 3 個 'r' (毫無負擔)</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Track 2: LLM BPE Tokenizer Vector -->
+<div class="track-card track-ai">
+<div class="track-header">
+<span class="track-tag tag-ai">🤖 LLM 運算路徑 · BPE 分詞黑盒子 (結構性盲區)</span>
+<span class="track-status warn">字母實體完全消失</span>
+</div>
+<div class="flow-steps">
+<div class="flow-step">
+<div class="step-num">01</div>
+<div class="step-content">
+<div class="step-title">BPE 切詞機查字典切塊 (Tokenize)</div>
+<div class="step-desc">Tokenizer 追求高壓縮率，將單字直接切成 2 塊語義積木：</div>
+<div class="token-boxes">
+<span class="token-chunk t-c1">
+<span class="t-name">Token #1: "straw"</span>
+<span class="t-id">ID: 11245</span>
+</span>
+<span class="t-plus">+</span>
+<span class="token-chunk t-c2">
+<span class="t-name">Token #2: "berry"</span>
+<span class="t-id">ID: 32884</span>
+</span>
+</div>
+</div>
+</div>
+<div class="flow-step">
+<div class="step-num">02</div>
+<div class="step-content">
+<div class="step-title">神經網路高維向量化 (Embedding)</div>
+<div class="step-desc">
+                    Token 被轉換為 4096 維數學浮點數向量。<strong>英文字母完全被封閉在語義箱子裡</strong>，模型內部根本看不見字母拼寫！
+                  </div>
+<div class="vector-box">
+<code>straw ➔ [ 0.34, -0.81, 0.45, ... ] (稻草/吸管概念)</code><br/>
+<code>berry ➔ [ -0.14, 0.77, 0.62, ... ] (莓果概念)</code>
+</div>
+</div>
+</div>
+<div class="flow-step">
+<div class="step-num">03</div>
+<div class="step-content">
+<div class="step-title">注意力偏誤與機率猜測 (Blind Guessing)</div>
+<div class="step-desc">
+                    模型沒有顯微鏡拆箱看字母！在語料中 "berry" 經常與 "double-r" (如 blueberry) 高度共現，注意力強烈指向「2」，脫口而出「有 2 個」，直接把前面 "straw" 的第 1 個 r 給忘了！
+                  </div>
+<div class="result-badge-ai">⚠️ 傳統 LLM 結論：頻繁猜錯為「2 個 'r'」</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 3 Engineering Fixes -->
+<div style="font-weight: 700; font-size: 16px; color: var(--ink); margin-top: 18px; margin-bottom: 6px;">
+          🛠️ 工程實務：徹底破解 Strawberry 陷阱的三大招式
+        </div>
+<div class="fixes-grid">
+<div class="fix-card">
+<div class="fix-num">招式 1</div>
+<h4>提示詞物理拆字 (Token Splitting)</h4>
+<p>指示 Prompt：「請把 strawberry 每個字母用空格分開：<code>s t r a w b e r r y</code> 再數」。強制 Tokenizer 將每個字母切成 1 個 Token，模型重獲視力！</p>
+</div>
+<div class="fix-card">
+<div class="fix-num">招式 2</div>
+<h4>工具調用與 Python 執行 (Tool Calling)</h4>
+<p>讓 AI 撰寫代碼執行：<code>"strawberry".count("r") ➔ 3</code>。以確定性程式消除機率幻覺，此為 Module 1 數據分析核心理念！</p>
+</div>
+<div class="fix-card">
+<div class="fix-num">招式 3</div>
+<h4>新一代 Reasoning 思維模型</h4>
+<p>使用 DeepSeek-R1、Claude 3.7 Sonnet 或 o3-mini。模型在 <code>&lt;think&gt;</code> 內建思維鏈中自主拆解字母驗算，自帶自我審查與反思！</p>
+</div>
+</div>
+</div></div></details></div><a href="../lab.html?experiment=tokens&amp;lesson=01">在實驗室切換文字 →</a><h2 id="tokenizer-bpe">Tokenizer 與 BPE 在做什麼？</h2><p>Tokenizer（分詞器）依詞彙表將文字轉成 Token，再對應到模型使用的編號。BPE 是建立次詞元詞彙表的方法之一，透過反覆合併常見片段形成新的單位；不同模型使用的詞彙表和規則可能不同。</p><p>同一句話的 Token 數不一定等於字數或詞數，也不能用固定的中英文倍率推算。下方彩色片段是簡化教學示意；正式用量應以模型的分詞器或服務回報為準。</p><p class="quiet">參考：<a href="https://huggingface.co/docs/tokenizers/python/latest/components.html">Hugging Face：Tokenizer 與 BPE</a>、<a href="https://ai.google.dev/gemini-api/docs/tokens">Gemini：計算 Token</a>。</p></section>
+<nav aria-label="閱讀下一步" class="concept-next"><a class="button-primary" href="../learn.html?lesson=01">在第一站動手試 →</a><a class="catalog-return" href="../encyclopedia.html#term-map">返回查閱目錄</a><a class="concept-map-link" href="overview.html#map-model">看概念全圖 →</a></nav></main><footer class="content-footer"><div class="content-wrap">大語言模型學習地圖 · 按需要查閱，不影響課程進度。</div></footer></body></html>
+

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>資料分析雙軌流程：純機率口算 vs. Python 代碼沙盒交叉驗算 | Diagram Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #fcfbf7;
+      --paper-2: #f5f3ec;
+      --ink: #1a1917;
+      --ink-strong: #111111;
+      --muted: #5e5953;
+      --soft: #78746d;
+      --rule: rgba(45, 40, 35, 0.12);
+      --rule-solid: #d5d1c8;
+      --accent: #c2410c;
+      --accent-tint: rgba(194, 65, 12, 0.08);
+      --link: #1d4ed8;
+      --font-title: 'Instrument Serif', 'Noto Serif TC', serif;
+      --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'Geist Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      padding: 40px 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .editorial-wrapper {
+      width: 100%;
+      max-width: 1080px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .diagram-header {
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 20px;
+    }
+
+    .diagram-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .diagram-tag::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .diagram-title {
+      font-family: var(--font-title);
+      font-size: 32px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .diagram-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 800px;
+    }
+
+    .diagram-container {
+      width: 100%;
+      overflow-x: auto;
+      background: var(--paper-2);
+      border: 1px solid var(--rule-solid);
+      border-radius: 6px;
+      padding: 16px;
+    }
+
+    svg {
+      width: 100%;
+      min-width: 960px;
+      height: auto;
+      display: block;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .summary-card {
+      background: var(--paper-2);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 16px;
+    }
+
+    .summary-card.focal {
+      border-color: var(--accent);
+      background: var(--accent-tint);
+    }
+
+    .summary-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .summary-card.focal .summary-label {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .summary-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .summary-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media print {
+      .diagram-container { overflow-x: visible; }
+      svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="editorial-wrapper">
+  <!-- Header -->
+  <header class="diagram-header">
+    <div class="diagram-tag">Paired Process · Semantic Pattern: Dual-Track Verification Pipeline</div>
+    <h1 class="diagram-title">資料分析雙軌流程：純機率口算 vs. Python 代碼沙盒交叉驗算</h1>
+    <p class="diagram-subtitle">
+      神經網絡本質是高維連續向量取樣器，天生缺乏離散暫存器與二進制進位邏輯。純文字口算在多位數乘除必然破綻百出；嚴謹資料分析必須強迫模型寫 Code，並以「加總等式交叉勾稽」達到 100% 零誤差。
+    </p>
+  </header>
+
+  <!-- SVG Diagram -->
+  <div class="diagram-container">
+    <svg viewBox="0 0 960 620" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Arrowhead: Muted -->
+        <marker id="arr-m" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#5e5953"/>
+        </marker>
+        <!-- Arrowhead: Breach Accent -->
+        <marker id="arr-err" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#c2410c"/>
+        </marker>
+        <!-- Arrowhead: Secure Link -->
+        <marker id="arr-ok" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#1d4ed8"/>
+        </marker>
+      </defs>
+
+      <!-- ==================== TOP TRACK: PURE LLM MOUTH-MATH ==================== -->
+      <g transform="translate(30, 20)">
+        <rect x="0" y="0" width="900" height="230" rx="6" fill="#fcfbf7" stroke="rgba(194, 65, 12, 0.4)" stroke-width="1.2"/>
+        
+        <!-- Header Tag -->
+        <rect x="16" y="14" width="230" height="20" rx="3" fill="rgba(194, 65, 12, 0.1)"/>
+        <text x="24" y="28" fill="#c2410c" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" letter-spacing="0.08em">
+          PATH A · 純語言模型口算 (機率猜測 · 財務高風險)
+        </text>
+
+        <!-- Step 1: Input Question -->
+        <g transform="translate(25, 55)">
+          <rect x="0" y="0" width="130" height="85" rx="4" fill="#f5f3ec" stroke="#5e5953" stroke-width="1"/>
+          <text x="12" y="22" fill="#1a1917" font-family="'Geist', sans-serif" font-size="11" font-weight="600">複雜財務計算題</text>
+          <text x="12" y="38" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="8">893,421 × 1.075</text>
+          <text x="12" y="54" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">多位數乘除與聚合</text>
+          <text x="12" y="70" fill="#78746d" font-family="'Geist Mono', monospace" font-size="8">Raw Math Prompt</text>
+        </g>
+
+        <!-- Arrow 1 -> 2 -->
+        <line x1="155" y1="97" x2="197" y2="97" stroke="#c2410c" stroke-width="1.2" marker-end="url(#arr-err)"/>
+
+        <!-- Step 2: Vector Space Mapping -->
+        <g transform="translate(205, 55)">
+          <rect x="0" y="0" width="180" height="85" rx="4" fill="#f5f3ec" stroke="#5e5953" stroke-width="1"/>
+          <text x="12" y="22" fill="#1a1917" font-family="'Geist', sans-serif" font-size="11" font-weight="600">高維連續向量映射</text>
+          <text x="12" y="38" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="8">Continuous Vector Space</text>
+          <text x="12" y="54" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">文字轉化為語意嵌入向量</text>
+          <text x="12" y="70" fill="#c2410c" font-family="'Geist Mono', monospace" font-size="8">數值離散進位特徵被模糊</text>
+        </g>
+
+        <!-- Arrow 2 -> 3 -->
+        <line x1="385" y1="97" x2="427" y2="97" stroke="#c2410c" stroke-width="1.2" marker-end="url(#arr-err)"/>
+
+        <!-- Step 3: Next Token Guessing -->
+        <g transform="translate(435, 55)">
+          <rect x="0" y="0" width="200" height="85" rx="4" fill="#f5f3ec" stroke="#c2410c" stroke-width="1.4"/>
+          <text x="12" y="22" fill="#c2410c" font-family="'Geist', sans-serif" font-size="11" font-weight="600">下一個字機率取樣</text>
+          <text x="12" y="38" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="8">Next-Token Probability Sampling</text>
+          <text x="12" y="54" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">模型不是在撥算盤，而是在猜</text>
+          <text x="12" y="70" fill="#c2410c" font-family="'Geist Mono', monospace" font-size="8">「哪個數字接在後面看起來順眼」</text>
+        </g>
+
+        <!-- Arrow 3 -> 4 -->
+        <line x1="635" y1="97" x2="677" y2="97" stroke="#c2410c" stroke-width="1.4" marker-end="url(#arr-err)"/>
+
+        <!-- Step 4: Hallucinated Output -->
+        <g transform="translate(685, 55)">
+          <rect x="0" y="0" width="185" height="85" rx="4" fill="rgba(194, 65, 12, 0.08)" stroke="#c2410c" stroke-width="1.6"/>
+          <text x="12" y="22" fill="#c2410c" font-family="'Geist', sans-serif" font-size="11" font-weight="700">💥 產生計算幻覺</text>
+          <text x="12" y="40" fill="#1a1917" font-family="'Geist Mono', monospace" font-size="9">結算: 960,427.5 (錯！)</text>
+          <text x="12" y="56" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="8">正確應為: 960,427.575</text>
+          <text x="12" y="70" fill="#c2410c" font-family="'Geist Mono', monospace" font-size="8">細項加總不符 · 無法勾稽</text>
+        </g>
+
+        <!-- Warning Callout Strip -->
+        <rect x="25" y="158" width="845" height="52" rx="4" fill="rgba(194, 65, 12, 0.05)" stroke="rgba(194, 65, 12, 0.2)" stroke-width="1"/>
+        <text x="40" y="178" fill="#c2410c" font-family="'Geist Mono', monospace" font-size="9" font-weight="600">🚨 口算盲區真相：</text>
+        <text x="135" y="178" fill="#5e5953" font-family="'Geist', sans-serif" font-size="11">
+          神經網絡口算多位數乘除時，只具備約 60%~75% 正確率！更危險的是，它的語氣往往「充滿自信、排版極其精美」，極易誤導非技術主管。
+        </text>
+        <text x="40" y="196" fill="#5e5953" font-family="'Geist', sans-serif" font-size="11">
+          讓純 LLM 憑空計算財務報表與百萬級數據，就如同要求文學詩人去審核上市企業資產負債表一樣致命。
+        </text>
+      </g>
+
+      <!-- ==================== BOTTOM TRACK: CODE INTERPRETER ==================== -->
+      <g transform="translate(30, 275)">
+        <rect x="0" y="0" width="900" height="320" rx="6" fill="#fcfbf7" stroke="#1d4ed8" stroke-width="1.2"/>
+        
+        <!-- Header Tag -->
+        <rect x="16" y="14" width="270" height="20" rx="3" fill="rgba(29, 78, 216, 0.1)"/>
+        <text x="24" y="28" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" letter-spacing="0.08em">
+          PATH B · Agent 代碼直譯器流水線 (Code-Interpreter · 零誤差)
+        </text>
+
+        <!-- Step 1: Analytical Prompt -->
+        <g transform="translate(25, 55)">
+          <rect x="0" y="0" width="130" height="135" rx="4" fill="#f5f3ec" stroke="#5e5953" stroke-width="1"/>
+          <text x="12" y="22" fill="#1a1917" font-family="'Geist', sans-serif" font-size="11" font-weight="600">強迫代碼提示詞</text>
+          <text x="12" y="38" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="8">Prompt for Code</text>
+          <rect x="8" y="50" width="114" height="72" rx="3" fill="#ffffff" stroke="#d5d1c8" stroke-width="0.8"/>
+          <text x="12" y="66" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="8">「嚴禁口算文字」</text>
+          <text x="12" y="80" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="8">「請撰寫 Python」</text>
+          <text x="12" y="96" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="8">「建立驗算等式」</text>
+          <text x="12" y="110" fill="#78746d" font-family="'Geist Mono', monospace" font-size="8">任務邊界鎖定</text>
+        </g>
+
+        <!-- Arrow 1 -> 2 -->
+        <line x1="155" y1="122" x2="187" y2="122" stroke="#1d4ed8" stroke-width="1.2" marker-end="url(#arr-ok)"/>
+
+        <!-- Step 2: Code Generation -->
+        <g transform="translate(195, 55)">
+          <rect x="0" y="0" width="165" height="135" rx="4" fill="#f5f3ec" stroke="#1d4ed8" stroke-width="1.4"/>
+          <rect x="0" y="0" width="165" height="24" rx="3" fill="rgba(29, 78, 216, 0.08)"/>
+          <text x="10" y="16" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="9" font-weight="600">STEP 01 · 語法代碼生成</text>
+          <text x="10" y="44" fill="#1a1917" font-family="'Geist', sans-serif" font-size="12" font-weight="600">LLM 僅負責寫 Code</text>
+          <text x="10" y="62" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="8">自然語言 ➔ 演算法邏輯</text>
+          <text x="10" y="80" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">利用 LLM 強大的代碼能力</text>
+          <text x="10" y="96" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">產出 Pandas/NumPy 腳本</text>
+          <text x="10" y="115" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="8">不承擔任何口算職責</text>
+        </g>
+
+        <!-- Arrow 2 -> 3 -->
+        <line x1="360" y1="122" x2="392" y2="122" stroke="#1d4ed8" stroke-width="1.2" marker-end="url(#arr-ok)"/>
+
+        <!-- Step 3: Sandbox CPU Execution -->
+        <g transform="translate(400, 55)">
+          <rect x="0" y="0" width="175" height="135" rx="4" fill="#f5f3ec" stroke="#1d4ed8" stroke-width="1.4"/>
+          <rect x="0" y="0" width="175" height="24" rx="3" fill="rgba(29, 78, 216, 0.08)"/>
+          <text x="10" y="16" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="9" font-weight="600">STEP 02 · 沙盒精確運算</text>
+          <text x="10" y="44" fill="#1a1917" font-family="'Geist', sans-serif" font-size="12" font-weight="600">Python CPU 原生執行</text>
+          <text x="10" y="62" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="8">64-bit IEEE 754 浮點精度</text>
+          <text x="10" y="80" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">二進制暫存器離散計算</text>
+          <text x="10" y="96" fill="#5e5953" font-family="'Geist', sans-serif" font-size="10">向量矩陣點積與精確聚合</text>
+          <text x="10" y="115" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="8">電腦算術 · 絕對確定性</text>
+        </g>
+
+        <!-- Arrow 3 -> 4 -->
+        <line x1="575" y1="122" x2="607" y2="122" stroke="#1d4ed8" stroke-width="1.2" marker-end="url(#arr-ok)"/>
+
+        <!-- Step 4: Cross-checking Reconciliation -->
+        <g transform="translate(615, 55)">
+          <rect x="0" y="0" width="145" height="135" rx="4" fill="#f5f3ec" stroke="#1d4ed8" stroke-width="1.4"/>
+          <rect x="0" y="0" width="145" height="24" rx="3" fill="rgba(29, 78, 216, 0.08)"/>
+          <text x="8" y="16" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="8" font-weight="600">STEP 03 · 交叉驗算勾稽</text>
+          <text x="8" y="44" fill="#1a1917" font-family="'Geist', sans-serif" font-size="11" font-weight="600">細項等式驗證</text>
+          <text x="8" y="62" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="8">assert sum(items) == total</text>
+          <text x="8" y="80" fill="#5e5953" font-family="'Geist', sans-serif" font-size="9">列加總 == 欄加總</text>
+          <text x="8" y="96" fill="#1d4ed8" font-family="'Geist', sans-serif" font-size="9" font-weight="600">橫向縱向雙向校核</text>
+          <text x="8" y="115" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="8">防幻覺三大法則</text>
+        </g>
+
+        <!-- Arrow 4 -> 5 -->
+        <line x1="760" y1="122" x2="782" y2="122" stroke="#1d4ed8" stroke-width="1.2" marker-end="url(#arr-ok)"/>
+
+        <!-- Step 5: 100% Reliable Report -->
+        <g transform="translate(790, 55)">
+          <rect x="0" y="0" width="95" height="135" rx="4" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.6"/>
+          <text x="8" y="24" fill="#1d4ed8" font-family="'Geist', sans-serif" font-size="11" font-weight="700">✅ 零誤差報告</text>
+          <text x="8" y="42" fill="#5e5953" font-family="'Geist Mono', monospace" font-size="8">Verified Table</text>
+          <text x="8" y="65" fill="#5e5953" font-family="'Geist', sans-serif" font-size="9">數據 100% 正確</text>
+          <text x="8" y="82" fill="#5e5953" font-family="'Geist', sans-serif" font-size="9">勾稽等式通過</text>
+          <text x="8" y="102" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="8">企業級交付</text>
+        </g>
+
+        <!-- Engineering Takeaway Strip -->
+        <rect x="25" y="210" width="860" height="90" rx="4" fill="rgba(29, 78, 216, 0.04)" stroke="rgba(29, 78, 216, 0.16)" stroke-width="1"/>
+        <text x="40" y="234" fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="10" font-weight="600">💡 Module 1 資料分析核心心法：讓上帝的歸上帝，凱撒的歸凱撒</text>
+        <text x="40" y="256" fill="#5e5953" font-family="'Geist', sans-serif" font-size="11">
+          1. <tspan font-weight="600" fill="#1a1917">分工明確</tspan>：LLM 的強項在於「理解自然語言意圖、設計演算法架構、撰寫代碼」；CPU 的強項在於「執行布林邏輯、乘除計算與零容錯聚合」。
+        </text>
+        <text x="40" y="274" fill="#5e5953" font-family="'Geist', sans-serif" font-size="11">
+          2. <tspan font-weight="600" fill="#1a1917">收尾勾稽等式</tspan>：在提示詞中強迫 AI 輸出「總和 = A+B+C+D」之驗算等式，若不符合自動拋出例外重新計算。
+        </text>
+        <text x="40" y="292" fill="#5e5953" font-family="'Geist', sans-serif" font-size="11">
+          3. <tspan font-weight="600" fill="#1a1917">落地 Antigravity</tspan>：在後續 Module 3 中，我們正是透過 Python REPL 工具協議賦予 Agent 執行能力，徹底杜絕口算幻覺。
+        </text>
+      </g>
+    </svg>
+  </div>
+
+  <!-- Summary Cards -->
+  <footer class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-label">01 / LIMITATION</div>
+      <div class="summary-title">連續向量無進位器</div>
+      <div class="summary-desc">
+        神經網絡運算於連續機率向量空間，缺乏離散進位暫存器，純文字口算在多位數乘除極易發生看似合理實則荒謬的幻覺。
+      </div>
+    </div>
+    <div class="summary-card focal">
+      <div class="summary-label">02 / BEST PRACTICE</div>
+      <div class="summary-title">強迫生成 Code 執行</div>
+      <div class="summary-desc">
+        將算術任務轉移給 Python（Pandas/NumPy）執行，利用 CPU 二進制運算的確定性，徹底消除 LLM 口算盲區。
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">03 / VERIFICATION</div>
+      <div class="summary-title">細項等式交叉勾稽</div>
+      <div class="summary-desc">
+        嚴肅分析報告必須遵循防幻覺法則，以橫向與縱向加總等式進行自動核對，打造 100% 值得信賴的商業決策儀表板。
+      </div>
+    </div>
+  </footer>
+</div>
+
+</body>
+</html>

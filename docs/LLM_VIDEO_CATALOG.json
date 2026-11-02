@@ -1,0 +1,72 @@
+[
+  {
+    "id": "ep0",
+    "file": "法器篇EP0_神明的後台.mp4",
+    "title": "EP0 神明的後台",
+    "subtitle": "LLM 基礎：Token、機率與生成",
+    "seconds": 133,
+    "summary": "模型怎麼處理文字？為什麼講得順，仍可能講錯？",
+    "page": "concepts/model.html",
+    "question": "為什麼講得順，不代表講得對？"
+  },
+  {
+    "id": "ep1",
+    "file": "法器篇EP1_咒語.mp4",
+    "title": "EP1 咒語",
+    "subtitle": "Prompt：把任務交代清楚",
+    "seconds": 131,
+    "summary": "從角色、範例到提示鏈，理解如何描述任務與輸出要求。",
+    "page": "concepts/prompt.html",
+    "question": "「幫我寫報告」還需要補哪些要求？"
+  },
+  {
+    "id": "ep2",
+    "file": "法器篇EP2_布壇.mp4",
+    "title": "EP2 布壇",
+    "subtitle": "Context Engineering：準備需要的資訊",
+    "seconds": 164,
+    "summary": "認識上下文容量，以及挑選、壓縮、記錄與隔離資訊。",
+    "page": "concepts/context-engineering.html",
+    "question": "這一題需要哪些資料？哪些可以先不放？"
+  },
+  {
+    "id": "ep3",
+    "file": "法器篇EP3_起乩循環.mp4",
+    "title": "EP3 起乩循環",
+    "subtitle": "Agent Loop：執行、觀察與核對",
+    "seconds": 139,
+    "summary": "工具如何加入循環，以及何時完成、暫停或請人確認。",
+    "page": "concepts/agent.html",
+    "question": "哪一步是模型提出請求，哪一步是工具真正執行？"
+  },
+  {
+    "id": "ep4",
+    "file": "法器篇EP4_宮廟.mp4",
+    "title": "EP4 宮廟",
+    "subtitle": "Harness：管理模型外圍的工作環境",
+    "seconds": 153,
+    "summary": "從上下文、工具、權限、隔離、紀錄與循環認識執行框架。",
+    "page": "concepts/agent-tools.html",
+    "question": "同一個模型放在不同框架中，能做的事為什麼不同？"
+  },
+  {
+    "id": "overview",
+    "file": "數位乩童.mp4",
+    "title": "數位乩童",
+    "subtitle": "Agent 架構總覽",
+    "seconds": 94,
+    "summary": "用一張符籙串起模型、提示詞、工具、人工確認與循環。",
+    "page": "concepts/overview.html#task-flow",
+    "question": "模型、程式、工具和人，分別負責什麼？"
+  },
+  {
+    "id": "funnel",
+    "file": "數位乩童開示_AI漏斗.mp4",
+    "title": "數位乩童開示：AI 漏斗",
+    "subtitle": "課前暖身：你如何使用 AI？",
+    "seconds": 149,
+    "summary": "從不同使用方式出發，思考能核對結果的小任務。",
+    "page": "index.html",
+    "question": "你想從哪個能核對結果的小任務開始？"
+  }
+]

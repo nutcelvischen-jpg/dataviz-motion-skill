@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html lang="zh-Hant"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>模型蒸餾與使用邊界｜專題選讀</title><link href="../css/content-layout.css?v=16" rel="stylesheet"/><script defer="" src="../js/concept-reader.js?v=1"></script></head><body><a class="skip-link" href="#main">跳到主要內容</a><header class="content-header"><div class="content-wrap content-header-inner"><a class="content-brand" href="../index.html"><span aria-hidden="true" class="content-brand-mark">學</span><span>大語言模型<br/>學習地圖</span></a><nav aria-label="主要導覽" class="content-nav"><a href="../index.html#learning-map">跟著學</a><a aria-current="page" href="../encyclopedia.html">查概念</a><a href="../lab.html">做實驗</a></nav></div></header><div class="content-wrap"><p class="breadcrumbs"><a class="catalog-return" href="../encyclopedia.html#further-reading">專題選讀</a> ／ 模型蒸餾與使用邊界</p><div class="content-shell"><aside class="content-sidebar desktop-toc"><strong>本頁目錄</strong><a href="#s1">蒸餾與使用情境</a><a href="#s2">原教材案例材料</a><a href="#s3">防護與代價</a><a href="#s4">權利與治理</a></aside><main class="content-main" id="main"><details class="mobile-toc"><summary>本頁目錄</summary><nav><a href="#s1">蒸餾與使用情境</a><a href="#s2">原教材案例材料</a><a href="#s3">防護與代價</a><a href="#s4">權利與治理</a></nav></details><header class="page-intro"><h1>模型蒸餾與使用邊界</h1><p>先理解蒸餾的用途，再區分授權、資料取得與安全問題。</p><ul class="objectives"><li>區分授權蒸餾與未授權擷取</li><li>理解防護方式與取捨</li></ul><p class="quiet">選讀，不影響六站學習進度；延伸既有教材。</p></header><p class="notice">以下引用既有教材資料，模型名稱、數據、案例與來源尚待核對；其中推演與觀點應與實際觀測分開閱讀。</p><section class="reading-section" id="s1"><h2>蒸餾與使用情境</h2><p>蒸餾可用於將較大模型的部分能力轉移到較小模型；用途與授權條件需分開判斷。</p><div class="legacy-material"><div style="border-radius: 8px; padding: 24px; margin-bottom: 24px">
+<div class="timeline-badge" style="border-color: #fca5a5">ATTACK MODALITIES · 攻擊形態</div>
+<h3 style="font-family: var(--font-title); font-size: 22px; margin: 8px 0 14px 0">
+        一、 模型蒸餾攻擊之技術原理、運作形態與工業級基礎設施
+      </h3>
+<p style="font-size: 16px; line-height: 1.8; margin-bottom: 16px">
+        傳統知識蒸餾原為內部輕量化部署技術；然而當前沿模型透過雲端 API 提供服務時，未經授權的大量查詢可能構成<strong>「模型擷取攻擊（Model Extraction Attacks）」</strong>；授權蒸餾與未授權擷取並非同一件事。攻擊者在黑盒或灰盒條件下，將目標 API 視為無標籤資料標註工廠，逆向探測內部決策邊界，大量生成高密度微調語料，藉對手前沿模型研發成果實現低成本跨代追趕。
+      </p>
+<!-- 3 Distillation Types Table -->
+<div style="font-weight: 700; font-size: 16px; margin-bottom: 8px">🎯 三大蒸餾攻擊類型與掠奪目標</div>
+<div class="table-container" style="margin-bottom: 20px">
+<table class="specs-table">
+<thead>
+<tr>
+<th style="width: 25%">蒸餾類型</th>
+<th style="width: 25%">運作機制</th>
+<th style="width: 25%">擷取核心目標</th>
+<th style="width: 25%">典型用途與效益評估</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>功能複寫 (Functionality Replication)</strong></td>
+<td>廣泛輸入通用或領域查詢，截取模型最終文本標籤</td>
+<td>對話風格、格式規範、指令遵循能力</td>
+<td>複製模型常規對話與基礎功能，節省逾 70% 預訓練與標註成本</td>
+</tr>
+<tr>
+<td><strong>思維軌跡擷取 (Reasoning Trace Extraction)</strong></td>
+<td>設計特定提示誘發模型逐步思維鏈，擷取解題脈絡</td>
+<td>邏輯演繹步驟、代碼架構分析、工具呼叫規劃</td>
+<td>用於監督微調與強化學習，教導學生模型思考邏輯而非單純模仿答案</td>
+</tr>
+<tr>
+<td><strong>強化學習獎勵標註 (Reward Model Synthesis)</strong></td>
+<td>利用模型對候選回應進行多維度評分與反饋篩選</td>
+<td>評分準則、偏好排序信號、品質打分</td>
+<td>取代人類回饋強化學習的高昂人工標註成本，低成本訓練自研獎勵模型</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Industrial Attack Infrastructure -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px">
+<div style="border-radius: 6px; padding: 16px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 6px">
+            🌐 「九頭蛇叢集」（Hydra Cluster）住宅代理池
+          </div>
+<div style="font-size: 16px; line-height: 1.7">
+            攻擊實體批量註冊成千上萬個虛假學術機構、新創公司帳戶，配合虛擬信用卡與外洩憑證，經由遍布全球的住宅代理節點分發高頻查詢請求。即便單一帳號被封禁，備援帳號數秒內無縫遞補，將惡意流量稀釋混入正常用戶請求中，<strong>使傳統單一 IP/Key 速率限制徹底失效</strong>。
+          </div>
+</div>
+<div style="border-radius: 6px; padding: 16px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 6px">
+            🔀 靜默流量重導向（Silent Redirection）與誘騙
+          </div>
+<div style="font-size: 16px; line-height: 1.7">
+            部分下游中繼平台在未告知使用者下，暗中將真實用戶提示詞轉發至 Claude 等前沿模型 API，將生成結果回傳用戶的同時，在後端完整留存提示與回應作為自研微調語料。同時藉由精密對抗性系統提示詞與結構化標籤，強迫模型吐出未經精簡的完整推論記憶區塊。
+          </div>
+</div>
+</div>
+</div></div></section><section class="reading-section" id="s2"><h2>原教材案例材料</h2><p>以下涉及具體機構與數據的敘述尚待查核，不當作已核實事件。</p><div class="legacy-material"><div style="border-radius: 8px; padding: 24px; margin-bottom: 24px">
+<div class="timeline-badge" style="border-color: #ddd6fe">THREAT INTEL · 2026 實錄案例</div>
+<h3 style="font-family: var(--font-title); font-size: 22px; margin: 8px 0 14px 0">
+        二、 案例剖析：Anthropic 披露之大規模蒸餾行動
+      </h3>
+<p style="font-size: 16px; line-height: 1.8; margin-bottom: 16px">
+        Anthropic 於 2026 年發布的威脅情報報告與防禦研究中，詳細揭露了多家機構對其旗艦 Claude Opus 與 Sonnet 級別模型發起的未授權蒸餾活動。攻擊目標全面聚焦於面對非確定性問題時的解題路徑與複雜工具整合能力：
+      </p>
+<!-- 4 Entities Case Table -->
+<div class="table-container" style="margin-bottom: 16px">
+<table class="specs-table">
+<thead>
+<tr>
+<th style="width: 22%">機構代號與實體</th>
+<th style="width: 18%">累計請求規模</th>
+<th style="width: 25%">核心鎖定能力領域</th>
+<th style="width: 35%">特殊攻擊手法與特徵跡證</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Alibaba / 阿里雲 (GTG-16005)</strong></td>
+<td><span style="font-weight: 700">逾 1 億 5,100 萬次交流</span></td>
+<td>深度邏輯推理、強化學習環境建構、微架構研發、核心代碼</td>
+<td>單日峰值逼近 300 萬次；注入固定提示詞強迫輸出思維鏈並以自訂標籤包裹；多帳戶共享之代理池與其他機構設施交疊。</td>
+</tr>
+<tr>
+<td><strong>Moonshot AI / 月之暗面 (GTG-16002)</strong></td>
+<td><span style="font-weight: 700">逾 2,300 萬次 (初期 340 萬)</span></td>
+<td>代理推理、工具調用、電腦操作代理、多模態視覺</td>
+<td>請求元數據直接關聯特定資深研發人員；採用靜默重導向將真實用戶提問轉發至 Claude 竊取雙向軌跡。</td>
+</tr>
+<tr>
+<td><strong>MiniMax</strong></td>
+<td><span style="font-weight: 700">逾 1,300 萬次交流</span></td>
+<td>代理式程式碼編寫、複雜工具排程、環境調用編排</td>
+<td>擷取時序高度契合其產品路線圖；Anthropic 上線新型號 24 小時內迅速將近半數流量遷移至新模型。</td>
+</tr>
+<tr>
+<td><strong>DeepSeek</strong></td>
+<td><span style="font-weight: 700">逾 1,200 萬次 (初期 15 萬)</span></td>
+<td>多步驟解題推理、獎勵模型標註準則、政治敏感話術對齊</td>
+<td>跨帳戶高度同步協同負載均衡；透過元數據追蹤至特定研究員；在 14 天內密集觸發千萬級高頻請求。</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div></div></section><section class="reading-section" id="s3"><h2>防護與代價</h2><p>防護方式應連同其限制與對正規使用者的影響一起閱讀。</p><div class="legacy-material"><div style="border-radius: 8px; padding: 24px; margin-bottom: 24px">
+<div class="timeline-badge" style="border-color: #bbf7d0">DEFENSE ARCHITECTURE · 三大防禦體系</div>
+<h3 style="font-family: var(--font-title); font-size: 22px; margin: 8px 0 14px 0">
+        三、 三大核心防禦技術體系與博弈機制
+      </h3>
+<div class="defense-card">
+<div class="defense-header">
+<div style="font-size: 16px; font-weight: 800">
+            🛡️ 防禦一：語境綁定與「保留思維」（Preserved Thinking）
+          </div>
+<span class="defense-num">密碼學簽名前綴綁定</span>
+</div>
+<div style="font-size: 16px; line-height: 1.7">
+          傳統 API 會將推理過程作為可見明文回傳，極易被蒸餾截取。Anthropic 導入<strong>「保留思維」機制</strong>：在模型思維鏈輸出區塊注入<strong>具備密碼學簽名的特殊前綴（Cryptographic Prefix Binding）</strong>。客戶端在進行多輪對話時，必須原封不動回傳該加密簽名區塊以證明上下文合法性；任何企圖以自訂標籤篡改、截斷或替換思維軌跡的請求將直接引發簽名校驗失敗而被中斷，從根本上切斷了自動化思維軌跡擷取管線。
+        </div>
+</div>
+<div class="defense-card">
+<div class="defense-header">
+<div style="font-size: 16px; font-weight: 800">
+            🧠 防禦二：兩階段憲法分類器與 MMD 語義分佈偏移檢驗
+          </div>
+<span class="defense-num">異常流量動態識別</span>
+</div>
+<div style="font-size: 16px; line-height: 1.7">
+          傳統基於關鍵字之過濾器極易遭改寫規避。新體系在請求入口部署輕量級<strong>憲法分類器（Constitutional Classifier）</strong>進行粗篩，並結合<strong>最大平均差異（Maximum Mean Discrepancy, MMD）演算法</strong>，在滑動時間視窗內監控跨 IP 請求的語義嵌入分佈。當偵測到大批獨立帳號的查詢在語義空間呈現非自然的高度聚集或網格化探測分佈時，分類器會在毫秒內對異常流量打標並動態升級至深度審查。
+        </div>
+</div>
+<div class="defense-card">
+<div class="defense-header">
+<div style="font-size: 16px; font-weight: 800">
+            🧬 防禦三：輸出統計浮水印與放射性溯源技術（Radioactive Genetics）
+          </div>
+<span class="defense-num">法庭級侵權溯源</span>
+</div>
+<div style="font-size: 16px; line-height: 1.7">
+          前沿實驗室在推論取樣階段，依據隨機數種子將詞表動態劃分為「綠色清單（Greenlist）」與「紅色清單（Redlist）」，對綠名單 Token 的 Logits 施加微不可察的偏置扰動。當未經授權機構使用大量被擾動之合成資料微調自身學生模型時，<strong>該統計偏置會被不可逆地「遺傳」至下游模型的權重分佈中</strong>。即便經過多輪二次微調，防禦方仍可透過假設檢定在極高置信度（p &lt; 10⁻⁶）下證明該模型源自被竊取之資料庫，提供法庭級侵權鐵證。
+        </div>
+</div>
+</div></div></section><section class="reading-section" id="s4"><h2>權利與治理</h2><p>使用模型輸出和資料時，應依實際授權條款與使用情境判斷。</p><div class="legacy-material"><div style="border-radius: 8px; padding: 24px">
+<div class="timeline-badge" style="border-color: #fed7aa">GEOPOLITICS &amp; IP · 戰略與治理意涵</div>
+<h3 style="font-family: var(--font-title); font-size: 22px; margin: 8px 0 14px 0">
+        四、 智慧財產權邊界、防禦代價與出口管制連動
+      </h3>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px">
+<div style="border-radius: 6px; padding: 16px">
+<div style="font-size: 16px; font-weight: 700; margin-bottom: 6px">
+            ⚠️ 防禦機制對正規生態之附帶衝擊
+          </div>
+<div style="font-size: 16px; line-height: 1.7">
+            為防堵推論區塊被探測而導入的「保留思維」強制前綴校驗，使合規開發者失去了在工作流程中<strong>動態修改上下文、壓縮長對話歷史與快取提示詞（Prompt Caching）</strong>的靈活性，間接推高了整個應用生態的開發門檻與推論延遲。
+          </div>
+</div>
+<div style="border-radius: 6px; padding: 16px">
+<div style="font-size: 16px; font-weight: 700; margin-bottom: 6px">
+            🌐 晶片出口管制與地緣戰略因果
+          </div>
+<div style="font-size: 16px; line-height: 1.7">
+            透過未授權蒸餾取得能力的外部機構，往往會在自研模型中<strong>剝離安全護欄</strong>，帶來嚴重外溢風險。另一方面，消化並訓練承接自前沿模型的蒸餾數據集仍需高效能算力叢集，此一技術連動進一步強化了<strong>先進晶片出口管制政策在硬體層面實體阻斷的戰略必要性</strong>。
+          </div>
+</div>
+</div>
+</div></div></section><div class="button-row"><a class="button-primary" href="../concepts/models.html">返回相關概念 →</a><a class="button-secondary catalog-return" href="../encyclopedia.html#further-reading">回到專題選讀</a></div></main></div></div><footer class="content-footer"><div class="content-wrap">大語言模型學習地圖 · 選讀不影響六站學習進度。</div></footer><script defer="" src="../js/content-navigation.js?v=4"></script><script defer="" src="../js/topic.js?v=2"></script></body></html>

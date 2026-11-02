@@ -1,0 +1,85 @@
+/* Concept relationships extend the existing editorial reading system. */
+.map-reader{width:min(1060px,calc(100% - 48px));margin:0 auto;padding-bottom:64px}
+.map-reader .breadcrumbs{margin:18px 0}
+.map-reader .page-intro{margin-bottom:12px;padding-bottom:18px}
+.map-reader .page-intro h1{font-size:clamp(30px,3vw,38px);margin-bottom:12px}
+.map-reader .page-intro p{max-width:46em;margin-bottom:0;font-size:17px;line-height:1.65}
+.map-reader [hidden]{display:none!important}
+.map-view-tabs{display:flex;gap:28px;border-bottom:1px solid var(--rule);margin-bottom:16px}
+.map-view-tabs button{border:0;border-bottom:3px solid transparent;background:transparent;color:var(--muted);padding:10px 2px;min-height:48px;font-weight:600}
+.map-view-tabs button[aria-selected=true]{color:var(--accent);border-bottom-color:var(--accent)}
+.map-view-tabs button:hover{color:var(--ink)}
+.map-instruction{font-size:15px;color:var(--muted);margin:0 0 16px}
+.mindmap-board{--map-stacked:0;position:relative;display:grid;grid-template-columns:176px minmax(0,1fr);gap:56px;align-items:center}
+.map-connectors{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;color:var(--olive)}
+.map-root{position:relative;font:600 24px/1.5 var(--serif)}
+.map-root small{display:block;font:400 14px/1.7 var(--sans);color:var(--muted);margin-top:12px}
+.map-branches{position:relative;list-style:none;padding:0;margin:0;display:grid;gap:10px;min-width:0}
+.map-branch{min-width:0;scroll-margin-top:24px}
+.map-branch-line{display:grid;grid-template-columns:208px minmax(0,1fr);gap:8px 18px;align-items:center}
+.map-branch-line h2{margin:0;font:600 17px/1.5 var(--sans)}
+.map-branch-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:48px;border:1px solid #a1a495;background:var(--surface);color:var(--ink);padding:9px 13px;border-radius:5px;text-align:left}
+.map-branch-toggle:hover{background:var(--pale)}
+.map-branch-toggle[aria-expanded=true]{background:var(--pale);border-color:var(--olive)}
+.map-chevron{width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);flex:none;transition:transform .15s ease-out}
+.map-branch-toggle[aria-expanded=true] .map-chevron{transform:rotate(225deg) translate(-1px,-1px)}
+.map-core-terms{display:flex;align-items:center;flex-wrap:wrap;gap:0 16px;margin:0;font-size:15px}
+.map-core-terms a{display:inline-flex;align-items:center;min-height:44px}
+.map-leaves{margin:12px 0 8px 14px;padding:0 0 0 18px;border-left:1px solid #a1a495;list-style:none;display:grid;gap:5px;font-size:15px}
+.map-leaves li{position:relative;min-width:0;padding:4px 0 4px 4px;overflow-wrap:anywhere}
+.map-leaves li::before{content:"";position:absolute;left:-19px;top:20px;width:15px;height:1px;background:#a1a495}
+.map-leaves a{display:inline-block;padding:4px 0}
+.map-leaves .leaf-role{color:var(--muted);margin-right:6px}
+.map-footnote{margin:26px 0 0;padding-top:18px;border-top:1px solid var(--rule);font-size:14px;color:var(--muted);max-width:none}
+.map-next{margin-top:30px}
+.task-brief{margin:0 0 24px}
+.task-brief h2{font-size:25px;margin:0 0 8px}
+.task-brief p{margin:0;color:var(--muted);font-size:15px}
+.agent-flow{position:relative;max-width:800px;margin:0 auto}
+.agent-flow-list{position:relative;list-style:none;margin:0 0 0 88px;padding:0;display:grid;gap:24px;counter-reset:agent-step}
+.agent-flow-node{display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;align-items:start;border:1px solid var(--rule);background:var(--surface);padding:12px 18px;border-radius:5px;counter-increment:agent-step}
+.agent-flow-node::before{content:counter(agent-step,decimal-leading-zero);font:500 20px/1.5 var(--serif);color:var(--olive)}
+.agent-flow-node[data-flow-step=model]{background:var(--pale);border-color:#a1a495}
+.agent-flow-node h3{font:600 18px/1.5 var(--sans);margin:0 0 5px}
+.agent-flow-node p{margin:0;font-size:15px;color:var(--muted)}
+.agent-flow-node a{display:inline-block;padding-block:3px}
+.agent-flow-node .flow-more{margin-top:5px}
+.flow-loop-label{position:absolute;left:0;width:68px;text-align:center;font-size:14px;line-height:1.6;background:var(--paper);color:var(--olive);padding:6px 0}
+.flow-loop-explanation{margin:20px 0 0 88px;font-size:15px;max-width:712px}
+.flow-stop{margin:24px 0 0 88px;padding:14px 0;border-block:1px solid var(--rule);font-size:15px;max-width:none}
+.flow-stop strong{color:var(--accent)}
+.flow-details{margin-left:88px;max-width:712px;font-size:15px}
+.flow-details p{margin-bottom:14px}
+.flow-details h3{margin-top:20px}
+.map-original{margin:38px 0 0;border-top:1px solid var(--rule);padding-top:12px}
+.map-original summary{min-height:44px;padding:6px 0;font-size:15px;font-weight:600}
+.map-original .flow{font-size:15px}
+.catalog-map-entry{display:flex;flex-wrap:wrap;gap:6px 24px;margin-top:12px}
+.catalog-map-entry a{display:inline-flex;align-items:center;min-height:44px}
+.lesson-map-link{display:inline-flex;align-items:center;min-height:44px;font-size:14px;color:var(--accent-dark);margin-top:10px}
+.concept-map-wayfinding{font-size:14px;margin:24px 0 0;padding-top:14px;border-top:1px solid var(--rule)}
+.concept-map-link[hidden]{display:none!important}
+.memory-layers{display:grid;grid-template-columns:1fr 1fr;gap:0 28px;list-style:none;margin:22px 0;padding:0}
+.memory-layers li{border-top:1px solid var(--rule);padding:18px 0}
+.memory-layers h3{margin:0 0 8px;font-size:18px}
+.memory-layers p{margin:0;font-size:15px}
+.workflow-compare{list-style:none;padding:0;margin:22px 0}
+.workflow-compare>li{padding:18px 0;border-top:1px solid var(--rule)}
+.workflow-compare h3{margin:0 0 6px}
+.workflow-compare p{margin:0}
+.workflow-compare .compare-path{margin-top:10px;color:var(--olive);font-size:15px}
+.map-preview{padding:28px;background:#e6e9dc}
+.map-preview h2{font:600 24px/1.4 var(--serif);margin:0 0 18px}
+.map-preview-tree{display:grid;grid-template-columns:85px minmax(0,1fr);gap:20px;align-items:center}
+.map-preview-root{font:600 17px/1.6 var(--serif)}
+.map-preview-tree ol{list-style:none;margin:0;padding:0 0 0 18px;border-left:1px solid #8e9987}
+.map-preview-tree li{position:relative;display:flex;align-items:center;flex-wrap:wrap;gap:0 16px;padding:5px 0}
+.map-preview-tree li::before{content:"";position:absolute;top:27px;left:-19px;width:12px;height:1px;background:#8e9987}
+.map-preview-branch{width:100%;font-size:14px;color:#3f4c3c}
+.map-preview-tree a{font-size:15px;display:inline-flex;align-items:center;min-height:44px;color:var(--accent-dark)}
+.map-preview-footer{margin-top:18px;border-top:1px solid #aeb8a7;padding-top:14px;display:flex;flex-wrap:wrap;gap:12px 24px;font-size:14px}
+.map-preview-footer a{display:inline-flex;align-items:center;min-height:44px}
+@media(max-width:760px){.map-branch-line{grid-template-columns:minmax(0,1fr);gap:0}.map-core-terms{gap:0 20px}.mindmap-board{grid-template-columns:150px minmax(0,1fr);gap:40px}.map-root{font-size:21px}}
+@media(max-width:600px){.map-reader{width:calc(100% - 32px);padding-bottom:40px}.map-reader .page-intro h1{font-size:29px}.map-reader .page-intro{padding-bottom:20px}.map-view-tabs{gap:24px}.map-instruction{font-size:14px}.mindmap-board{--map-stacked:1;grid-template-columns:minmax(0,1fr);gap:30px}.map-root{margin-left:26px;font-size:22px}.map-root small{margin-top:5px}.map-branches{margin-left:36px;gap:14px}.map-core-terms{font-size:15px}.map-branch-line h2{font-size:16px}.map-leaves{margin-left:8px;padding-left:15px}.map-leaves li::before{left:-16px;width:12px}.map-leaves a{padding-block:7px}.agent-flow-list{margin-left:58px;gap:24px}.agent-flow-node{grid-template-columns:1fr;gap:2px;padding:12px 14px}.agent-flow-node::before{font-size:14px}.agent-flow-node h3{font-size:17px}.agent-flow-node p{font-size:14px}.flow-loop-label{width:46px;font-size:13px}.flow-stop{margin-left:58px;font-size:14px}.task-brief h2{font-size:23px}.memory-layers{grid-template-columns:1fr}.map-preview{margin-top:32px;padding:22px}.map-preview-tree{grid-template-columns:70px minmax(0,1fr);gap:12px}}
+@media(prefers-reduced-motion:reduce){.map-chevron{transition:none}}
+@media(max-width:600px){.flow-details,.flow-loop-explanation{margin-left:0}}

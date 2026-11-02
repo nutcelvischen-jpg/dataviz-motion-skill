@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+
+<html lang="zh-Hant"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>前沿研究：推理、世界模型與算力｜專題選讀</title><link href="../css/content-layout.css?v=16" rel="stylesheet"/><script defer="" src="../js/concept-reader.js?v=1"></script></head><body><a class="skip-link" href="#main">跳到主要內容</a><header class="content-header"><div class="content-wrap content-header-inner"><a class="content-brand" href="../index.html"><span aria-hidden="true" class="content-brand-mark">學</span><span>大語言模型<br/>學習地圖</span></a><nav aria-label="主要導覽" class="content-nav"><a href="../index.html#learning-map">跟著學</a><a aria-current="page" href="../encyclopedia.html">查概念</a><a href="../lab.html">做實驗</a></nav></div></header><div class="content-wrap"><p class="breadcrumbs"><a class="catalog-return" href="../encyclopedia.html#further-reading">專題選讀</a> ／ 前沿研究：推理、世界模型與算力</p><div class="content-shell"><aside class="content-sidebar desktop-toc"><strong>本頁目錄</strong><a href="#s1">推理與驗證</a><a href="#s2">電腦操作</a><a href="#s3">世界模型</a><a href="#s4">即時模擬</a><a href="#s5">晶片與算力</a><a href="#s6">太空研究</a></aside><main class="content-main" id="main"><details class="mobile-toc"><summary>本頁目錄</summary><nav><a href="#s1">推理與驗證</a><a href="#s2">電腦操作</a><a href="#s3">世界模型</a><a href="#s4">即時模擬</a><a href="#s5">晶片與算力</a><a href="#s6">太空研究</a></nav></details><header class="page-intro"><h1>前沿研究：推理、世界模型與算力</h1><p>從推理方法、環境建模到運算基礎設施，分層閱讀原有研究材料。</p><ul class="objectives"><li>辨認推理、世界模型與算力的不同層次</li><li>依測試條件理解研究結果</li></ul><p class="quiet">選讀，不影響六站學習進度；延伸既有教材。</p></header><p class="notice">以下引用既有教材資料，模型名稱、數據、案例與來源尚待核對；其中推演與觀點應與實際觀測分開閱讀。</p><section class="reading-section" id="s1"><h2>推理與驗證</h2><p>把模型產生候選與外部形式驗證區分開來。</p><div class="legacy-material"><div style="border-radius: 8px; padding: 26px; margin-bottom: 24px">
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px">
+<div>
+<span class="concept-tag">PART I · MATHEMATICAL REASONING &amp; FORMAL VERIFICATION</span>
+<h3 style="font-family: var(--font-title); font-size: 24px; margin-top: 4px">
+            一、 數學推理能力的新維度：符號演算法、測試時計算縮放與競賽級突破
+          </h3>
+</div>
+<span style="font-size: 16px; font-weight: 700; padding: 4px 10px; border-radius: 20px">
+          IMO 銀牌 · ETH 爭議 · 陶哲軒思辨
+        </span>
+</div>
+<p style="font-size: 16px; line-height: 1.8; margin-bottom: 18px">
+        傳統自回歸大型語言模型在面對長程多步驟數學證明時，往往受限於解碼過程中的<strong>錯誤累積效應與幻覺</strong>，難以維持嚴格的邏輯自洽。為了解決這一基礎瓶頸，現代數理推理體系的分化主要沿著兩條路徑推進：
+        <strong>一是將神經網路作為啟發式生成器、並以嚴格形式化證明器為裁判的符號神經混合架構</strong>；
+        <strong>二是在純自然語言或半形式化語境下，透過強化學習激發模型的內部自我省思與搜索能力（Test-Time Compute Scaling）</strong>。
+      </p>
+<!-- Subgrid: AlphaProof vs Test-Time Scaling -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 22px">
+<!-- Left: AlphaProof -->
+<div style="border-radius: 6px; padding: 18px">
+<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px">
+<span style="font-size: 18px">🏆</span>
+<strong style="font-size: 16px">AlphaProof &amp; AlphaGeometry 2（IMO 銀牌突破）</strong>
+</div>
+<div style="font-size: 16px; line-height: 1.7">
+            • <strong>競賽成績</strong>：2024 年第 65 屆國際數學奧林匹亞（IMO 2024）滿分 42 分斬獲 <strong>28 分</strong>（銀牌門檻 28 分，金牌 29 分）。<br/>
+            • <strong>形式化轉譯網絡（Formalizer Network）</strong>：將 100 萬道自然語言數學題擴增轉譯為 <strong>8,000 萬道 Lean 4 形式化命題</strong>，徹底攻破開源形式化資料匱乏的冷啟動瓶頸。<br/>
+            • <strong>AlphaZero 搜尋與客觀裁判</strong>：以 Lean 4 解譯器作為絕對客觀的環境模擬器，價值網路預測「距離證明終點剩餘戰術步數（Tactic steps）」替代成功機率。<br/>
+            • <strong>競賽實況</strong>：幾何題僅耗時 <strong>19 秒</strong>（神經網路提出輔助點 <i>E</i> 引理）；攻克代數與全球僅 5 人滿分之第 6 題數論題；但在組合數學（第 3、5 題）遭遇戰術狀態空間爆炸未得分，且單題耗費 2~3 天 TPU 算力。
+          </div>
+</div>
+<!-- Right: Test-Time Compute Scaling -->
+<div style="border-radius: 6px; padding: 18px">
+<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px">
+<span style="font-size: 18px">⚡</span>
+<strong style="font-size: 16px">測試時計算縮放：OpenAI o3 &amp; DeepSeek-R1</strong>
+</div>
+<div style="font-size: 16px; line-height: 1.7">
+            • <strong>測試時 Scaling Law</strong>：擺脫單純擴大預訓練參數量，開闢在推論階段「以計算時間換取推理深度」的新維度。<br/>
+            • <strong>隱式思維鏈（Private Chain-of-Thought）</strong>：透過純強化學習（如 DeepSeek GRPO），模型在輸出答案前自主進行問題解構、動態反思、回溯驗證。<br/>
+            • <strong>頂級評測表現</strong>：OpenAI o3 在 AIME 與 MATH 測試集均達 <strong>96.7%</strong>；ARC-AGI 達 87.5%。<br/>
+            • <strong>FrontierMath 歷史性跨越</strong>：過往頂尖模型得分率低於 2%，OpenAI o3 在無外部 Python 執行器輔助下達到 <strong>25.2%</strong>，標誌著自然語言推理已能實質輔助高等數學前沿研究。
+          </div>
+</div>
+</div>
+<!-- Deep Dive: ETH Controversy & Terence Tao's Critique -->
+<div style="border-radius: 8px; padding: 20px; margin-bottom: 22px">
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px">
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-size: 20px">⚖️</span>
+<strong style="font-size: 16px">理論地震：推翻「指數時間假設（ETH）」爭議與菲爾茲獎得主陶哲軒的批判</strong>
+</div>
+<span style="font-size: 16px; font-weight: 800; padding: 3px 8px; border-radius: 4px">Complexity Theory Shock</span>
+</div>
+<div style="font-size: 16px; line-height: 1.8; margin-bottom: 14px">
+<strong>1. 指數時間假設（Exponential Time Hypothesis, ETH）的顛覆宣稱：</strong><br/>
+          1999 年 Impagliazzo 與 Paturi 提出 ETH，斷定 3-SAT 最壞情況不存在亞指數演算法（<code>2<sup>Ω(n)</sup></code>）。近三十年來，數百篇理論論文以此為基石推導 NP 困難計算下界。2026 年 10 月，OpenAI 發布論文宣稱 AI 發現固定寬度 <code><i>k</i>-SAT</code> 決定性計數演算法，將時間複雜度壓縮至亞指數級別 <code>exp(<i>n</i> / √<span style="text-decoration: overline">log <i>n</i></span>)</code>，並在 <strong>Lean 4</strong> 中完成機器可讀形式化驗證！原作者 Impagliazzo 與 MIT 團隊成立外部審查小組，Anthropic 亦獨立宣稱 Claude 推導出類似成果。
+        </div>
+<div style="border-radius: 6px; padding: 14px; margin-bottom: 12px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 6px">
+            🎯 菲爾茲獎得主陶哲軒（Terence Tao）的三大深刻批判與警醒：
+          </div>
+<div style="font-size: 16px; line-height: 1.8">
+            • <strong>警惕「暴力破解（Brute-force）」與「缺乏概念機制」</strong>：數學的核心價值不在於「蒐集孤立難題的解答」或「將某個常數界限微幅壓低」，而在於發明通往真理的新思維架構與概念工具（如陶哲軒與 Green 的「轉移原理」）。透過超大規模算力搜索、生硬拼湊出的龐雜驗證，若無法提煉出可遷移的抽象概念，對整體數學發展貢獻微乎其微。<br/>
+            • <strong>「演繹懸崖」（Deductive Overhang）風險</strong>：當<strong>驗證答案的能力</strong>與<strong>人類理解發現過程的認知能力</strong>嚴重脫節時，懸崖便會浮現。AI 數天內產出成百上千篇符合形式邏輯的長篇證明文件強行傾倒給學界，但人類受限於生物認知速度無法消化直覺幾何圖像，學術共同體將陷入認知窒息！<br/>
+            • <strong>置信度失準與歸屬權爭議</strong>：當前推理模型缺乏自我懷疑能力，常以「絕對肯定」語態輸出看似嚴密實則包含精巧謬誤的推導；未經同行評審拋出海量手稿，更模糊了學術發現的歸屬權。
+          </div>
+</div>
+</div>
+<!-- Comparison Table: 3 Frontier Math Reasoning Systems -->
+<div style="overflow-x: auto; margin-top: 14px">
+<table class="model-table" style="width: 100%; border-collapse: collapse; font-size: 16px">
+<thead>
+<tr style="text-align: left">
+<th style="padding: 10px">系統名稱</th>
+<th style="padding: 10px">核心推理技術路徑</th>
+<th style="padding: 10px">權威基準測試得分</th>
+<th style="padding: 10px">推論特性與算力消耗輪廓</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="padding: 10px; font-weight: 700">AlphaProof &amp; AlphaGeometry 2</td>
+<td style="padding: 10px">Lean 4 定理證明器 + AlphaZero 強化學習樹搜尋</td>
+<td style="padding: 10px; font-weight: 700">IMO 2024: 28/42 分（達到銀牌水準）</td>
+<td style="padding: 10px">產出無幻覺之形式化證明代碼；依賴形式化轉譯；單題推導耗費 2–3 天 TPU 算力。</td>
+</tr>
+<tr>
+<td style="padding: 10px; font-weight: 700">OpenAI o3</td>
+<td style="padding: 10px">強化學習驅動之測試時計算縮放與隱式思維鏈</td>
+<td style="padding: 10px; font-weight: 700">AIME: 96.7% | MATH: 96.7% | FrontierMath: 25.2%</td>
+<td style="padding: 10px">純自然語言生成；具備動態自省與策略調整；推論延遲顯著，單位成本隨思考預算指數上升。</td>
+</tr>
+<tr>
+<td style="padding: 10px; font-weight: 700">DeepSeek-R1</td>
+<td style="padding: 10px">大規模純強化學習（GRPO）激發之自我反思推理</td>
+<td style="padding: 10px; font-weight: 700">MATH-500: 97.3%</td>
+<td style="padding: 10px">完全開源思考軌跡；具備極低部署成本與高推理透明度；內建多輪自我糾錯迴路。</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div></div></section><section class="reading-section" id="s2"><h2>電腦操作</h2><p>操作介面需要觀察、執行與重新檢查，也需要權限邊界。</p><div class="legacy-material"><div style="border-radius: 8px; padding: 26px; margin-bottom: 24px">
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px">
+<div>
+<span class="concept-tag">PART II · INTERACTIVE AGENT &amp; COMPUTER USE</span>
+<h3 style="font-family: var(--font-title); font-size: 24px; margin-top: 4px">
+            二、 互動式代理人與即時演示進展：Anthropic 的「電腦操作（Computer Use）」突破
+          </h3>
+</div>
+<span style="font-size: 16px; font-weight: 700; padding: 4px 10px; border-radius: 20px">
+          OSWorld 14.9% · 視覺-動作閉環控制
+        </span>
+</div>
+<p style="font-size: 16px; line-height: 1.8; margin-bottom: 18px">
+        在大型語言模型向操作系統級通用代理人（Agent）演進的過程中，傳統架構普遍依賴預先定義的 API 或脆弱的 HTML DOM 樹解析，面對桌面原生軟體、動態圖形化介面（GUI）適配成本極高。Anthropic 透過升級後的 Claude 3.5 Sonnet 與 Haiku，推出了業界首個公開測試的<strong>「Computer Use」（電腦操作）</strong>功能，開創擬人化螢幕互動新範式：
+      </p>
+<!-- Architecture 4 Steps -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 20px">
+<div style="border-radius: 6px; padding: 14px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 4px">步驟 1 · 虛擬截圖採樣</div>
+<div style="font-size: 16px; line-height: 1.6">
+            沙盒容器調用虛擬顯示模組獲取當前作業系統螢幕截圖，神經網路對全螢幕像素進行幾何空間解析。
+          </div>
+</div>
+<div style="border-radius: 6px; padding: 14px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 4px">步驟 2 · 原生事件編譯</div>
+<div style="font-size: 16px; line-height: 1.6">
+            定位圖標、輸入欄、滾動條，將抽象高階指令直接編譯為精確像素坐標 (<i>x</i>, <i>y</i>) 的游標點擊、拖曳與鍵盤輸入。
+          </div>
+</div>
+<div style="border-radius: 6px; padding: 14px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 4px">步驟 3 · 閉環狀態校驗</div>
+<div style="font-size: 16px; line-height: 1.6">
+            操作完畢後立即捕捉新畫面判定狀態躍遷是否符合預期，遇到系統彈窗或延遲阻礙時自發動態重試與自我校正。
+          </div>
+</div>
+<div style="border-radius: 6px; padding: 14px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 4px">步驟 4 · 評測與資安挑戰</div>
+<div style="font-size: 16px; line-height: 1.6">
+            OSWorld 成功率達 <strong>14.9%</strong>（此前最佳 7.7%）；SWE-bench Verified 達 49.0%。嚴陣防範<strong>「間接提示詞注入（Indirect Prompt Injection）」</strong>，維持於 ASL-2 安全防護等級。
+          </div>
+</div>
+</div>
+</div></div></section><section class="reading-section" id="s3"><h2>世界模型</h2><p>不同研究方向以不同方法表達和預測環境。</p><div class="legacy-material"><div style="border-radius: 8px; padding: 26px; margin-bottom: 24px">
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px">
+<div>
+<span class="concept-tag">PART III · WORLD MODELS &amp; SPATIAL INTELLIGENCE</span>
+<h3 style="font-family: var(--font-title); font-size: 24px; margin-top: 4px">
+            三、 世界模型架構的兩大哲學分支：李飛飛「空間智慧」與楊立昆「JEPA 架構」
+          </h3>
+</div>
+<span style="font-size: 16px; font-weight: 700; padding: 4px 10px; border-radius: 20px">
+          3D 高斯潑濺 vs 潛空間能量因果
+        </span>
+</div>
+<p style="font-size: 16px; line-height: 1.8; margin-bottom: 18px">
+<strong>世界模型（World Models）</strong>被廣泛視為 AI 超越語言統計關聯、通向具身智慧與通用自主智慧的核心途徑。然而，學術與產業界在世界模型構建技術路線上形成了兩條對立且互補的哲學流派：
+      </p>
+<!-- Comparison Matrix Table -->
+<div style="overflow-x: auto; margin-bottom: 20px">
+<table class="model-table" style="width: 100%; border-collapse: collapse; font-size: 16px">
+<thead>
+<tr style="text-align: left">
+<th style="padding: 10px; width: 20%">比較維度</th>
+<th style="padding: 10px; width: 40%">李飛飛 / World Labs（空間智慧流派）</th>
+<th style="padding: 10px; width: 40%">楊立昆 / AMI Labs（JEPA 表徵流派）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="padding: 10px; font-weight: 700">本質核心定位</td>
+<td style="padding: 10px">生成式三維/四維幾何模擬器與神經渲染引擎</td>
+<td style="padding: 10px">非生成式潛空間能量模型與因果預測架構</td>
+</tr>
+<tr>
+<td style="padding: 10px; font-weight: 700">未來預測空間</td>
+<td style="padding: 10px">像素空間、深度場、3D 高斯潑濺（3DGS）流形</td>
+<td style="padding: 10px">高度抽象之潛在特徵向量（Latent Embeddings）</td>
+</tr>
+<tr>
+<td style="padding: 10px; font-weight: 700">對像素生成的態度</td>
+<td style="padding: 10px; font-weight: 600">認為高保真幾何還原是機器理解空間的必要條件</td>
+<td style="padding: 10px; font-weight: 600">批判像素生成耗費過度算力，將其視為通往 AGI 的死胡同</td>
+</tr>
+<tr>
+<td style="padding: 10px; font-weight: 700">抗環境隨機噪聲</td>
+<td style="padding: 10px">依賴嚴格相機幾何先驗與神經輻射場幾何約束</td>
+<td style="padding: 10px">透過資訊瓶頸與對比預測主動過濾微觀細節噪聲（如樹葉微晃）</td>
+</tr>
+<tr>
+<td style="padding: 10px; font-weight: 700">動作決策與規劃</td>
+<td style="padding: 10px">構建數位孿生（Real-to-Sim-to-Real）虛擬物理訓練場</td>
+<td style="padding: 10px">結合能量函數評估與模型預測控制（MPC）潛在路徑優化</td>
+</tr>
+<tr>
+<td style="padding: 10px; font-weight: 700">具體代表模型</td>
+<td style="padding: 10px; font-family: var(--font-mono)">Marble, Atlas, Spark 2.0 (3DGS), RTFM</td>
+<td style="padding: 10px; font-family: var(--font-mono)">V-JEPA 2, H-JEPA (分層規劃), LeWorldModel</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Detail Cards: World Labs vs JEPA -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px">
+<div style="border-radius: 6px; padding: 18px">
+<strong style="font-size: 16px">🌿 李飛飛：空間智慧與 3D 高斯潑濺（Spark 2.0）</strong>
+<p style="font-size: 16px; line-height: 1.7; margin-top: 6px">
+            生物億萬年前便進化出三維視覺、遮擋推理與運動肌肉協同系統，語言只是極晚期外殼。<strong>World Labs 的 Atlas 與 Marble</strong> 引入原生相機幾何先驗，單張圖推演出視角死角的 3D 流形；<strong>Spark 2.0 即時 3DGS 渲染引擎</strong>，將高保真連續場景推至行動裝置與網頁端，以 <strong>Real-to-Sim-to-Real（R2S2R）</strong> 閉環讓具身機器人在百萬級虛擬合成環境中零損耗演練！
+          </p>
+</div>
+<div style="border-radius: 6px; padding: 18px">
+<strong style="font-size: 16px">⚡ 楊立昆：JEPA 潛空間能量模型與 H-JEPA 分層規劃</strong>
+<p style="font-size: 16px; line-height: 1.7; margin-top: 6px">
+            微風吹拂樹葉的抖動、水面的微小漣漪等屬於無法預測的微觀噪聲，強行生成像素必定引發累積漂移。<strong>JEPA 放棄像素重構，在抽象潛空間中計算 <i>s<sub>x</sub></i> → <i>ŝ<sub>y</sub></i> 能量差距</strong>。<strong>H-JEPA</strong> 高層低頻制定宏觀路徑、底層高頻執行關節動作；<strong>V-JEPA 2</strong> 在潛空間平行模擬 800 種軌跡，零樣本機器人抓取成功率達 65%~80%！
+          </p>
+</div>
+</div>
+</div></div></section><section class="reading-section" id="s4"><h2>即時模擬</h2><p>模擬系統的結果應結合任務、測試方式與限制閱讀。</p><div class="legacy-material"><div style="border-radius: 8px; padding: 26px; margin-bottom: 24px">
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px">
+<div>
+<span class="concept-tag">PART IV · REAL-TIME NEURAL SIMULATION</span>
+<h3 style="font-family: var(--font-title); font-size: 24px; margin-top: 4px">
+            四、 即時動態環境模擬：Google GameNGen 與 Genie 4 的技術演進
+          </h3>
+</div>
+<span style="font-size: 16px; font-weight: 700; padding: 4px 10px; border-radius: 20px">
+          神經遊戲引擎 DOOM 20 FPS · Genie 4 混合架構
+        </span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px">
+<div style="border-radius: 6px; padding: 18px">
+<div style="font-size: 16px; font-weight: 700; margin-bottom: 6px">🎮 GameNGen：首個由神經網路直接驅動的即時遊戲引擎</div>
+<div style="font-size: 16px; line-height: 1.7">
+            • <strong>徹底顛覆傳統圖形管線</strong>：移除光柵化渲染、剛體物理與腳本代碼，完全依賴單顆 TPU 上的擴散模型以 <strong>&gt;20 FPS</strong> 即時互動模擬 3D 遊戲《毀滅戰士》（DOOM）！<br/>
+            • <strong>兩階段架構</strong>：強化學習代理人遊玩 9 億影格紀錄「動作-畫面」序列 ➔ 擴散模型以過去 64 影格與 64 鍵盤動作為條件變數 $c$。<br/>
+            • <strong>4 步蒸餾與噪聲增強</strong>：DDIM 蒸餾至 4 步（端到端延遲 50ms），輸入歷史影格人為施加特定高斯噪聲，學會自發動態修正偽影，徹底解決滾動預測畫面崩潰。
+          </div>
+</div>
+<div style="border-radius: 6px; padding: 18px">
+<div style="font-size: 16px; font-weight: 700; margin-bottom: 6px">🌐 Genie 4：多模態即時交互式世界模型的擴展</div>
+<div style="font-size: 16px; line-height: 1.7">
+            • <strong>Waymo World Model 整合</strong>：Genie 3 已能 24 FPS 即時生成具備持久 3D 結構世界，被 Waymo 深度整合生成罕見極端邊界交通工況（突發車禍、惡劣天候、奇異障礙）。<br/>
+            • <strong>Genie 4 跨越式擴展</strong>：融合音訊生成、動態對話與即時反饋，使用者不僅能自由導航，還能與 NPC 進行低延遲語音對話。<br/>
+            • <strong>混合世界模型（Hybrid World Models）</strong>：以 LLM 符號邏輯作為認知層，引導底層像素擴散神經網路執行精細物理動態模擬，穩定時長延伸至數分鐘以上。
+          </div>
+</div>
+</div>
+</div></div></section><section class="reading-section" id="s5"><h2>晶片與算力</h2><p>硬體、效率與成本比較需要一致的測試條件。</p><div class="legacy-material"><div style="border-radius: 8px; padding: 26px; margin-bottom: 24px">
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px">
+<div>
+<span class="concept-tag">PART V · COMPUTING SILICON &amp; HARDWARE TCO</span>
+<h3 style="font-family: var(--font-title); font-size: 24px; margin-top: 4px">
+            五、 AI 運算架構的典範轉移：Google TPU 與 NVIDIA Blackwell GPU 深度剖析
+          </h3>
+</div>
+<span style="font-size: 16px; font-weight: 700; padding: 4px 10px; border-radius: 20px">
+          ASIC 脈動陣列 vs GPGPU · OCS 光互聯
+        </span>
+</div>
+<p style="font-size: 16px; line-height: 1.8; margin-bottom: 18px">
+        支撐複雜形式推理、多代理人系統及即時世界模型的物理基石，是底層硬體晶片與超大規模分散式叢集的架構演進。當前全球算力基礎設施的核心對壘，聚焦於 <strong>Google 專用架構 TPU（Trillium v6e 與 Ironwood v7）</strong> 與 <strong>NVIDIA 通用架構 Blackwell（B200 及 GB200 NVL72）</strong> 的微架構與經濟學競爭：
+      </p>
+<!-- Hardware Comparison Table -->
+<div style="overflow-x: auto; margin-bottom: 20px">
+<table class="model-table" style="width: 100%; border-collapse: collapse; font-size: 16px">
+<thead>
+<tr style="text-align: left">
+<th style="padding: 10px">評估維度</th>
+<th style="padding: 10px">Google TPU Trillium (v6e)</th>
+<th style="padding: 10px">Google TPU Ironwood (v7 旗艦)</th>
+<th style="padding: 10px">NVIDIA Blackwell GB200 NVL72</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="padding: 10px; font-weight: 700">微架構基礎</td>
+<td style="padding: 10px">專用矩陣乘法 ASIC（256x256 脈動陣列）</td>
+<td style="padding: 10px; font-weight: 700">增強型脈動陣列 + SparseCore 2.0 (MoE 稀疏門控硬體卸載)</td>
+<td style="padding: 10px; font-weight: 700">高度通用串流多處理器（SM）+ 雙晶片 CoWoS-L (2,080 億晶體)</td>
+</tr>
+<tr>
+<td style="padding: 10px; font-weight: 700">記憶體與頻寬</td>
+<td style="padding: 10px">32 GB HBM，強化快取子系統</td>
+<td style="padding: 10px">8-Hi HBM3e，容量與頻寬達 Trillium 2 倍以上</td>
+<td style="padding: 10px">192–288 GB 12-Hi HBM3e，高達 8 TB/s 極限頻寬</td>
+</tr>
+<tr>
+<td style="padding: 10px; font-weight: 700">低精度量化支援</td>
+<td style="padding: 10px">支援 BF16、INT8，無原生 FP4 硬體引擎</td>
+<td style="padding: 10px">深度優化 FP8，針對動態稀疏矩陣特化</td>
+<td style="padding: 10px; font-weight: 700">原生第二代 Transformer 引擎 FP4 Tensor Core (9,000 TFLOPS)</td>
+</tr>
+<tr>
+<td style="padding: 10px; font-weight: 700">互連技術與拓撲</td>
+<td style="padding: 10px">雙倍頻寬 ICI，2D Torus 封閉拓撲 (單 Pod 256)</td>
+<td style="padding: 10px; font-weight: 700">全光路交換（OCS），單 Pod 擴展至 9,216 晶片 (42.5 ExaFLOPS)</td>
+<td style="padding: 10px">NVLink 5 (1.8 TB/s)，72 顆 GPU 全液冷共享記憶體機架 (120-130 kW)</td>
+</tr>
+<tr>
+<td style="padding: 10px; font-weight: 700">軟體堆疊相容性</td>
+<td style="padding: 10px">依賴 XLA 編譯器、JAX、MaxText 及 Jetstream</td>
+<td style="padding: 10px">JAX、PyTorch/XLA，與內部靜態圖編譯器強綁定</td>
+<td style="padding: 10px; font-weight: 700">二十年無可撼動的成熟 CUDA、Triton、TensorRT-LLM 及 vLLM</td>
+</tr>
+<tr>
+<td style="padding: 10px; font-weight: 700">算力經濟學優勢</td>
+<td style="padding: 10px">大批次穩態模型推論具極高能效比</td>
+<td style="padding: 10px; font-weight: 700">萬億參數 MoE 訓練 TCO 比 GB200 降低約 30%–44%！</td>
+<td style="padding: 10px">前沿不規則探索絕對首選；高達 70%+ 毛利使硬體 TCO 顯著偏高</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- MFU & TCO Analysis -->
+<div style="padding: 14px 18px; border-radius: 4px">
+<strong style="font-size: 16px">💡 算力利用率（MFU）與經濟學博弈：</strong>
+<p style="font-size: 16px; line-height: 1.7; margin-top: 4px">
+          NVIDIA GPU 因高功耗執行 GEMM 時易觸發動態電壓頻率縮放（DVFS）降頻，超萬卡訓練環境真實 MFU 落在 60%–70%；Google TPU 哲學為「系統優於微架構」，確定性管線排程不觸發動態降頻，全流程訓練 MFU 穩定達 40%。
+          根據 SemiAnalysis 核算，Google 與博通（Broadcom）共同設計、台積電代工的垂直整合鏈條，使 <strong>Ironwood 伺服器全包式 TCO 比 GB200 低約 44%</strong>，促使 Anthropic 簽署 1GW 級別 TPU 運算合約！
+        </p>
+</div>
+</div></div></section><section class="reading-section" id="s6"><h2>太空研究</h2><p>以下為既有教材中的研究與事件敘述，待查證其資料來源。</p><div class="legacy-material"><div style="border-radius: 8px; padding: 26px; margin-bottom: 24px">
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px">
+<div>
+<span class="concept-tag">PART VI · EXTREME EDGE COMPUTE &amp; ORBITAL TPU</span>
+<h3 style="font-family: var(--font-title); font-size: 24px; margin-top: 4px">
+            六、 極端環境算力部署與驗證：Google Project Suncatcher（追光計畫）與軌道 TPU 訊號回傳
+          </h3>
+</div>
+<span style="font-size: 16px; font-weight: 800; padding: 4px 10px; border-radius: 20px">
+          Space TPU · 軌道 Hello World
+        </span>
+</div>
+<p style="font-size: 16px; line-height: 1.8; margin-bottom: 18px">
+        地表超大規模資料中心的建置正逼近物理天花板：北美電網擴容週期長達 5 年以上，水冷與土地環境審查日益嚴苛，「電力與散熱」實質取代演算法成為核心瓶頸。Google Research 發起 <strong>Project Suncatcher（追光計畫）</strong>，在能源頂刊《Joule》發表軌道分散式 AI 資料中心論文，並成功將 TPU 晶片推向近地軌道實施運算驗證：
+      </p>
+<!-- Space TPU Haiku Box -->
+<div style="border-radius: 8px; padding: 20px 24px; margin-bottom: 22px">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px">
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-size: 18px">🛰️</span>
+<strong style="font-size: 16px">軌道推論的「Hello World」時刻（2026 年 10 月 30 日）</strong>
+</div>
+<span style="font-family: var(--font-mono); font-size: 16px">SpaceX Falcon 9 Transporter-18 · 晨昏太陽同步軌道</span>
+</div>
+<p style="font-size: 16px; line-height: 1.7; margin-bottom: 14px">
+          當原型驗證衛星以每秒逾 7 公里速度掠過挪威斯瓦巴群島（Svalbard）極地地面站上空時，地面工程師上行傳輸指令，機載 <strong>Google Trillium TPU</strong> 成功載入 <strong>Gemma 4</strong> 語言模型，以「身處太空的視角」自主生成三行俳句並透過微波成功下行回傳地球：
+        </p>
+<div style="padding: 12px 18px; border-radius: 4px; font-family: var(--font-mono); font-size: 16px; line-height: 1.8; margin-bottom: 12px">
+          “Blue marble below.<br/>
+          Data streams in silent grace.<br/>
+          Starlight feeds my core.”<br/>
+<span style="font-size: 16px">（中譯：藍色彈珠懸於下方。數據流在無聲的優雅中流淌。星光滋養著我的核心。）</span>
+</div>
+<div style="font-size: 16px">
+          ✨ <strong>工程意義</strong>：首度實質驗證地表資料中心級 TPU ASIC 能夠承受火箭高過載發射與劇烈振動，並在軌道高真空、微重力環境下重啟，完整執行神經網路張量推論！
+        </div>
+</div>
+<!-- 4 Space Challenges -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px">
+<div style="border-radius: 6px; padding: 14px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 4px">1. 電離輻射與單粒子翻轉 (SEU)</div>
+<div style="font-size: 16px; line-height: 1.6">
+            承受 &gt;15 krad(Si) 質子撞擊測試；推論具統計容錯彈性，但訓練須仰賴檢查點校驗與加固硬體 ECC 阻擋梯度崩潰。
+          </div>
+</div>
+<div style="border-radius: 6px; padding: 14px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 4px">2. 真空黑體輻射散熱極限</div>
+<div style="font-size: 16px; line-height: 1.6">
+            無空氣對流！依史特凡-波茲曼定律僅能靠熱輻射散逸。設計封閉相變熱導管將熱量導向背陽面展開式散熱板。
+          </div>
+</div>
+<div style="border-radius: 6px; padding: 14px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 4px">3. 雙向 1.6 Tbps 空間光互聯 (FSO)</div>
+<div style="font-size: 16px; line-height: 1.6">
+            密集波長分用（DWDM）雷射收發器，結合可微軌道動力學演算法保持 100–200 公尺緊密編隊飛行，防止碰撞。
+          </div>
+</div>
+<div style="border-radius: 6px; padding: 14px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 4px">4. 軌道經濟學損益平衡點</div>
+<div style="font-size: 16px; line-height: 1.6">
+            軌道資料中心折合每年每千瓦約 $810 美元（落於地表 $570–$3,000 區間），依賴 SpaceX Starship 將發射成本降至 $200/kg 以下。
+          </div>
+</div>
+</div>
+</div></div></section><div class="button-row"><a class="button-primary" href="../concepts/agent.html">返回相關概念 →</a><a class="button-secondary catalog-return" href="../encyclopedia.html#further-reading">回到專題選讀</a></div></main></div></div><footer class="content-footer"><div class="content-wrap">大語言模型學習地圖 · 選讀不影響六站學習進度。</div></footer><script defer="" src="../js/content-navigation.js?v=4"></script><script defer="" src="../js/topic.js?v=2"></script></body></html>
