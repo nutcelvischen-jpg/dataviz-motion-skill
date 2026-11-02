@@ -11,8 +11,8 @@
   // 自動解析 Avatar 與 CSS 路徑，無論是首頁、次目錄或 GitHub Pages 皆能精準載入
   const CURRENT_SCRIPT_SRC = (document.currentScript && document.currentScript.src) || '';
   const AVATAR_IMG_URL = CURRENT_SCRIPT_SRC
-    ? new URL('../assets/avatar/cyberpunk_chibi_avatar_512.png', CURRENT_SCRIPT_SRC).href
-    : 'assets/avatar/cyberpunk_chibi_avatar_512.png';
+    ? new URL('../assets/avatar/tech_headband_avatar_512.png', CURRENT_SCRIPT_SRC).href
+    : 'assets/avatar/tech_headband_avatar_512.png';
   const CSS_URL = CURRENT_SCRIPT_SRC
     ? new URL('../css/digital_jitong.css', CURRENT_SCRIPT_SRC).href
     : 'css/digital_jitong.css';
@@ -61,7 +61,7 @@
     trigger.setAttribute('title', '點擊召喚「數位乩童」AI 小客服');
     trigger.innerHTML = `
       <div class="jitong-avatar-halo">
-        <img class="jitong-avatar-img" src="${AVATAR_IMG_URL}" alt="數位乩童" onerror="this.onerror=null;this.src='Cyberpunk%20Chibi%20Tech%20Avatar.png';">
+        <img class="jitong-avatar-img" src="${AVATAR_IMG_URL}" alt="數位乩童" onerror="this.onerror=null;this.src='Tech-Headband%20Anime%20Portrait.png';">
       </div>
       <div class="jitong-trigger-text">
         <div class="jitong-trigger-name">
@@ -82,7 +82,7 @@
       <div class="jitong-header">
         <div class="jitong-header-brand">
           <div class="jitong-header-avatar-wrap">
-            <img class="jitong-header-avatar-img" src="${AVATAR_IMG_URL}" alt="數位乩童" onerror="this.onerror=null;this.src='Cyberpunk%20Chibi%20Tech%20Avatar.png';">
+            <img class="jitong-header-avatar-img" src="${AVATAR_IMG_URL}" alt="數位乩童" onerror="this.onerror=null;this.src='Tech-Headband%20Anime%20Portrait.png';">
           </div>
           <div>
             <div class="jitong-header-title">
@@ -101,7 +101,7 @@
       <div class="jitong-messages-stream" id="jitongMessagesStream">
         <!-- Initial Message -->
         <div class="jitong-msg bot">
-          <img class="jitong-msg-avatar" src="${AVATAR_IMG_URL}" alt="數位乩童" onerror="this.onerror=null;this.src='Cyberpunk%20Chibi%20Tech%20Avatar.png';">
+          <img class="jitong-msg-avatar" src="${AVATAR_IMG_URL}" alt="數位乩童" onerror="this.onerror=null;this.src='Tech-Headband%20Anime%20Portrait.png';">
           <div class="jitong-msg-bubble">
             <strong>靈光乍現！我是你的課程 AI 助教「數位乩童」⚡</strong><br/><br/>
             本乩童由<strong>國立臺中科技大學 陳俊智 博士（Elvis Chen）</strong>真身演算法加持鍛造！<br/><br/>
@@ -369,7 +369,7 @@
 
     const htmlContent = parseSimpleMarkdown(markdownText);
     msg.innerHTML = `
-      <img class="jitong-msg-avatar" src="${AVATAR_IMG_URL}" alt="數位乩童" onerror="this.onerror=null;this.src='Cyberpunk%20Chibi%20Tech%20Avatar.png';">
+      <img class="jitong-msg-avatar" src="${AVATAR_IMG_URL}" alt="數位乩童" onerror="this.onerror=null;this.src='Tech-Headband%20Anime%20Portrait.png';">
       <div class="jitong-msg-bubble">
         ${reasoningHtml}
         <div>${htmlContent}</div>
@@ -386,7 +386,7 @@
     msg.id = id;
     msg.className = 'jitong-msg bot';
     msg.innerHTML = `
-      <img class="jitong-msg-avatar" src="${AVATAR_IMG_URL}" style="animation: jitongPulse 1.2s infinite alternate;" alt="數位乩童" onerror="this.onerror=null;this.src='Cyberpunk%20Chibi%20Tech%20Avatar.png';">
+      <img class="jitong-msg-avatar" src="${AVATAR_IMG_URL}" style="animation: jitongPulse 1.2s infinite alternate;" alt="數位乩童" onerror="this.onerror=null;this.src='Tech-Headband%20Anime%20Portrait.png';">
       <div class="jitong-msg-bubble" style="color: #7c3aed; font-style: italic; display: flex; align-items: center; gap: 8px;">
         <span style="animation: jitongPulse 1s infinite alternate;">🔮</span>
         <span>數位乩童沉思通靈中...</span>
