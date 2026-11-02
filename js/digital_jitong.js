@@ -16,6 +16,9 @@
   const CSS_URL = CURRENT_SCRIPT_SRC
     ? new URL('../css/digital_jitong.css', CURRENT_SCRIPT_SRC).href
     : 'css/digital_jitong.css';
+  const HTML2CANVAS_URL = CURRENT_SCRIPT_SRC
+    ? new URL('html2canvas.min.js', CURRENT_SCRIPT_SRC).href
+    : 'js/html2canvas.min.js';
 
   const LOCAL_KNOWLEDGE = {
     '真身': `👑 **【數位乩童真身開示 · 陳俊智 博士（Elvis Chen）降臨！】**\n\n本乩童的靈動演算法與多代理人算力，全由我的真身締造者——**陳俊智 博士**親自鍛造加持！\n\n🎓 **本尊職務與學術背景**：\n- **國立臺中科技大學 國際貿易與經營系** 專任副教授\n- **商業智慧應用與研究中心** 主任\n- **智慧商務多代理人實驗室（ICMA Lab）** 主持人（🔥 全校最多 Token 的實驗室：「你有點子，老師有 Token！」）\n- 國立陽明交通大學（NYCU）管科所博士 · 美國北卡州立大學（NCSU）訪問學者\n- 曾任台灣康寧 (Corning Taiwan) 供應鏈數位轉型顧問、快思 (CRIS) 長期 AI 顧問\n\n🚀 **頂尖科研與神級戰績**：\n- **12 篇 SCI/SSCI 頂級期刊論文**，400+ 引用次數\n- **15+ 項國科會與大企業產學合作案**（康寧、工研院、世聚、寶暉等知名企業）\n- 指導學生榮獲 **2 次全國競賽冠軍**（堅持「作品直接進履歷，不寫厚報告」）\n- 實驗室坐擁 **3 座 NVIDIA DGX 頂級算力中心**（Token 吃到飽支援多代理人模擬）\n\n🛠️ **老師自研五大核心系統**：\n1. **「你說的算」** 敏捷碳盤查／碳足跡即時計算軟體 (ISO 14064 企業淨零神器)\n2. **「HelloIR」** 智慧校務大數據與機器學習預警決策平台\n3. **「StayPass 宅護照」** 100% 地端安全 AI 護照辨識系統 (正確率 98%)\n4. **「CNC 工廠數位孿生」** 3D 瀏覽器全沉浸碳排與電力即時監控\n5. **「國貿實戰學院」** 四合一進出口商業談判與展場人流模擬器\n\n🔗 **立即參拜真身個人成果網與產學合作詳情**：\n👉 [陳俊智博士個人學術與科研成果網](https://drchunchihchen.github.io/cv/)\n\n企業內訓、產學專案合作、專題演講或想加入 ICMA 實驗室，隨時歡迎聯繫 Elvis 老師！`,
@@ -189,6 +192,267 @@
     if (fileInput) fileInput.value = '';
   }
 
+  /**
+   * 動態載入 html2canvas (優先自本地 js/html2canvas.min.js，失敗自 CDN 備援)
+   */
+  function loadHtml2Canvas() {
+    return new Promise((resolve) => {
+      if (window.html2canvas) {
+        resolve(window.html2canvas);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = HTML2CANVAS_URL;
+      script.onload = () => {
+        if (window.html2canvas) {
+          resolve(window.html2canvas);
+        } else {
+          loadHtml2CanvasCDN(resolve);
+        }
+      };
+      script.onerror = () => {
+        loadHtml2CanvasCDN(resolve);
+      };
+      document.head.appendChild(script);
+    });
+  }
+
+  function loadHtml2CanvasCDN(resolve) {
+    if (window.html2canvas) {
+      resolve(window.html2canvas);
+      return;
+    }
+    const cdnScript = document.createElement('script');
+    cdnScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    cdnScript.onload = () => resolve(window.html2canvas || null);
+    cdnScript.onerror = () => resolve(null);
+    document.head.appendChild(cdnScript);
+  }
+
+  /**
+   * 啟動框選螢幕截圖工具 (Snipping Tool)
+   * 支援滑鼠與觸控拖曳拉框、即時寬高顯示、全螢幕一鍵快照與 ESC 取消
+   */
+  async function startSnippingTool() {
+    const windowEl = document.getElementById('jitongChatWindow');
+    const wasOpen = state.isOpen;
+
+    // 暫時隱藏對話視窗，避免遮擋畫面
+    if (windowEl) {
+      windowEl.style.display = 'none';
+    }
+
+    // 預先取得 html2canvas
+    const h2c = await loadHtml2Canvas();
+
+    // 建立或重置遮罩層
+    let overlay = document.getElementById('jitongSnipOverlay');
+    if (overlay) overlay.remove();
+
+    overlay = document.createElement('div');
+    overlay.id = 'jitongSnipOverlay';
+    overlay.className = 'jitong-snip-overlay';
+    overlay.innerHTML = `
+      <div class="jitong-snip-bar">
+        <div class="jitong-snip-title">
+          <span class="jitong-snip-icon">✂️</span>
+          <span>按住滑鼠左鍵拖曳框選截圖大小</span>
+          <span class="jitong-snip-key-hint">ESC 取消</span>
+        </div>
+        <div class="jitong-snip-actions">
+          <button type="button" class="jitong-snip-action-btn" id="btnSnipFull">📸 截取全螢幕</button>
+          <button type="button" class="jitong-snip-action-btn cancel" id="btnSnipCancel">✕ 取消</button>
+        </div>
+      </div>
+      <div class="jitong-snip-box" id="jitongSnipBox" style="display: none;">
+        <span class="jitong-snip-size-badge" id="jitongSnipBadge">0 × 0 px</span>
+        <div class="jitong-snip-handle nw"></div>
+        <div class="jitong-snip-handle ne"></div>
+        <div class="jitong-snip-handle sw"></div>
+        <div class="jitong-snip-handle se"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const snipBox = document.getElementById('jitongSnipBox');
+    const sizeBadge = document.getElementById('jitongSnipBadge');
+    const btnCancel = document.getElementById('btnSnipCancel');
+    const btnFull = document.getElementById('btnSnipFull');
+
+    let isDrawing = false;
+    let startX = 0;
+    let startY = 0;
+    let boxX = 0;
+    let boxY = 0;
+    let boxW = 0;
+    let boxH = 0;
+
+    function cleanup() {
+      if (overlay && overlay.parentNode) {
+        overlay.remove();
+      }
+      document.removeEventListener('keydown', handleKeyDown);
+      if (windowEl) {
+        windowEl.style.display = '';
+        if (wasOpen) {
+          windowEl.classList.add('open');
+          state.isOpen = true;
+        }
+      }
+    }
+
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') {
+        cleanup();
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown);
+
+    btnCancel.addEventListener('click', (e) => {
+      e.stopPropagation();
+      cleanup();
+    });
+
+    btnFull.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await performCapture(0, 0, window.innerWidth, window.innerHeight);
+    });
+
+    function getCoords(e) {
+      if (e.touches && e.touches.length > 0) {
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
+      return { x: e.clientX, y: e.clientY };
+    }
+
+    function onPointerDown(e) {
+      if (e.target.closest('.jitong-snip-bar')) return;
+      isDrawing = true;
+      const coords = getCoords(e);
+      startX = coords.x;
+      startY = coords.y;
+      boxX = startX;
+      boxY = startY;
+      boxW = 0;
+      boxH = 0;
+
+      snipBox.style.left = `${boxX}px`;
+      snipBox.style.top = `${boxY}px`;
+      snipBox.style.width = '0px';
+      snipBox.style.height = '0px';
+      snipBox.style.display = 'block';
+      sizeBadge.textContent = '0 × 0 px';
+    }
+
+    function onPointerMove(e) {
+      if (!isDrawing) return;
+      if (e.cancelable) e.preventDefault();
+      const coords = getCoords(e);
+
+      boxX = Math.min(startX, coords.x);
+      boxY = Math.min(startY, coords.y);
+      boxW = Math.abs(coords.x - startX);
+      boxH = Math.abs(coords.y - startY);
+
+      snipBox.style.left = `${boxX}px`;
+      snipBox.style.top = `${boxY}px`;
+      snipBox.style.width = `${boxW}px`;
+      snipBox.style.height = `${boxH}px`;
+      sizeBadge.textContent = `${boxW} × ${boxH} px`;
+    }
+
+    async function onPointerUp(e) {
+      if (!isDrawing) return;
+      isDrawing = false;
+
+      // 若滑鼠僅微晃點擊，取消該次繪製
+      if (boxW < 15 || boxH < 15) {
+        snipBox.style.display = 'none';
+        return;
+      }
+
+      await performCapture(boxX, boxY, boxW, boxH);
+    }
+
+    overlay.addEventListener('mousedown', onPointerDown);
+    overlay.addEventListener('mousemove', onPointerMove);
+    overlay.addEventListener('mouseup', onPointerUp);
+
+    overlay.addEventListener('touchstart', onPointerDown, { passive: false });
+    overlay.addEventListener('touchmove', onPointerMove, { passive: false });
+    overlay.addEventListener('touchend', onPointerUp);
+
+    async function performCapture(x, y, w, h) {
+      // 1. 隱藏遮罩層以防截到半透明深色遮罩與虛線
+      overlay.style.display = 'none';
+
+      // 2. 顯示輕量 Toast 提示
+      const toast = document.createElement('div');
+      toast.className = 'jitong-snip-toast';
+      toast.innerHTML = '⚡ 數位乩童正在截取畫面...';
+      document.body.appendChild(toast);
+
+      try {
+        const scrollX = window.pageXOffset || document.documentElement.scrollLeft || 0;
+        const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+        const captureX = Math.max(0, x + scrollX);
+        const captureY = Math.max(0, y + scrollY);
+
+        if (h2c) {
+          const renderedCanvas = await h2c(document.body, {
+            x: captureX,
+            y: captureY,
+            width: w,
+            height: h,
+            windowWidth: document.documentElement.clientWidth,
+            windowHeight: document.documentElement.clientHeight,
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+            scale: Math.min(window.devicePixelRatio || 1, 2)
+          });
+
+          const croppedDataUrl = renderedCanvas.toDataURL('image/jpeg', 0.88);
+          await processAndAttachImage(croppedDataUrl);
+        } else {
+          // 備援方案：若無 html2canvas 則抓取現存 chart canvas
+          const chartSnap = captureCurrentChart();
+          if (chartSnap) {
+            await processAndAttachImage(chartSnap);
+          } else {
+            throw new Error('未偵測到可用繪圖渲染引擎');
+          }
+        }
+
+        // 更新截圖標題為自訂寬高
+        const previewTitle = document.querySelector('.jitong-preview-title');
+        if (previewTitle) {
+          previewTitle.innerHTML = `✂️ 框選截圖已就緒 (${w} × ${h} px)`;
+        }
+
+        // 自動聚焦並引導輸入
+        const textarea = document.getElementById('jitongInput');
+        if (textarea) {
+          textarea.placeholder = '向數位乩童請示這張截圖... (可直接輸入文字或按 Enter)';
+          textarea.focus();
+        }
+
+      } catch (err) {
+        console.error('Snipping capture failed:', err);
+        // 嘗試備用圖表快照
+        const chartFallback = captureCurrentChart();
+        if (chartFallback) {
+          await processAndAttachImage(chartFallback);
+        } else {
+          alert('截圖時發生提示：' + err.message + '，您也可使用 Ctrl+V 直接貼上截圖。');
+        }
+      } finally {
+        if (toast && toast.parentNode) toast.remove();
+        cleanup();
+      }
+    }
+  }
+
   function init() {
     ensureStylesheet();
     createDOM();
@@ -247,6 +511,7 @@
           </div>
         </div>
         <div class="jitong-header-actions">
+          <button type="button" class="jitong-header-tool-btn" id="btnHeaderSnip" title="✂️ 直接框選螢幕截圖">✂️ 截圖</button>
           <button type="button" class="jitong-icon-btn" id="btnJitongClose" title="收起對話框">✕</button>
         </div>
       </div>
@@ -266,8 +531,9 @@
 
       <!-- Quick Chips -->
       <div class="jitong-chips-row">
+        <button type="button" class="jitong-chip-btn highlight" id="btnChipSnipArea" data-action="snip-area" title="像螢幕截圖一樣在畫面上拖曳框選大小">✂️ 框選螢幕截圖</button>
+        <button type="button" class="jitong-chip-btn" id="btnChipSnapChart" data-action="snap-chart" title="一鍵截取當前互動圖表並讓乩童視覺解讀">📸 截取整張圖表</button>
         <button type="button" class="jitong-chip-btn highlight" data-query="數位乩童的真身是誰？請開示背後創造者陳俊智博士的背景與神級戰績！">👑 數位乩童真身是誰？</button>
-        <button type="button" class="jitong-chip-btn" id="btnChipSnapChart" data-action="snap-chart" title="一鍵截取當前互動圖表並讓乩童視覺解讀">📸 截取圖表並分析</button>
         <button type="button" class="jitong-chip-btn" id="btnChipReadPage" data-action="read-page" title="讓乩童讀取當前畫面設定與維度度量">👀 讀取當前畫面狀態</button>
         <button type="button" class="jitong-chip-btn" data-query="今天全日課程進度與時序是怎麼安排的？">🧭 今日課程進度</button>
         <button type="button" class="jitong-chip-btn" data-query="如何在圖表上同時比較幼年人口占比與勞動人口占比？">👶 幼年 vs 勞動人口比較</button>
@@ -294,6 +560,7 @@
 
       <!-- Input Footer -->
       <div class="jitong-footer">
+        <button type="button" class="jitong-tool-btn jitong-snip-tool-btn" id="btnJitongSnip" title="✂️ 螢幕截圖：按一下即可在畫面上拖曳拉框截圖！">✂️</button>
         <button type="button" class="jitong-tool-btn" id="btnJitongAttachImage" title="上傳或貼上螢幕截圖 (支援 Ctrl+V / 拖曳)">📷</button>
         <input type="file" id="jitongImageFileInput" accept="image/*" style="display: none;">
         <textarea class="jitong-textarea" id="jitongInput" placeholder="向數位乩童請示... (可 Ctrl+V 貼上截圖，Enter 發送)" rows="1"></textarea>
@@ -335,6 +602,18 @@
     // 點擊上傳截圖檔案按鈕
     btnAttach?.addEventListener('click', () => {
       fileInput?.click();
+    });
+
+    // 點擊直接框選螢幕截圖按鈕 (工具列 & 頂部 Header)
+    const btnSnip = document.getElementById('btnJitongSnip');
+    const btnHeaderSnip = document.getElementById('btnHeaderSnip');
+
+    btnSnip?.addEventListener('click', () => {
+      startSnippingTool();
+    });
+
+    btnHeaderSnip?.addEventListener('click', () => {
+      startSnippingTool();
     });
 
     fileInput?.addEventListener('change', (e) => {
@@ -432,6 +711,11 @@
       btn.addEventListener('click', () => {
         const action = btn.dataset.action;
         const query = btn.dataset.query;
+
+        if (action === 'snip-area') {
+          startSnippingTool();
+          return;
+        }
 
         if (action === 'snap-chart') {
           const chartDataUrl = captureCurrentChart();

@@ -716,3 +716,185 @@
     padding: 8px 10px max(12px, env(safe-area-inset-bottom)) 10px;
   }
 }
+
+/* ==================== 螢幕框選截圖工具 (Snipping Tool Overlay) ==================== */
+.jitong-snip-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  cursor: crosshair;
+  user-select: none;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  animation: jitongFadeIn 0.2s ease-out;
+}
+
+.jitong-snip-bar {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  padding: 8px 16px 8px 18px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+  z-index: 10;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  white-space: nowrap;
+}
+
+.jitong-snip-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.jitong-snip-icon {
+  font-size: 16px;
+}
+
+.jitong-snip-key-hint {
+  font-size: 10.5px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: #cbd5e1;
+  font-family: monospace;
+}
+
+.jitong-snip-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jitong-snip-action-btn {
+  background: #7c3aed;
+  color: #ffffff;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.jitong-snip-action-btn:hover {
+  background: #6d28d9;
+  transform: scale(1.04);
+}
+
+.jitong-snip-action-btn.cancel {
+  background: rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+}
+
+.jitong-snip-action-btn.cancel:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* 框選矩形框 */
+.jitong-snip-box {
+  position: absolute;
+  border: 2px dashed #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  /* 超大 box-shadow 將框外區域暗化，框內區域明亮高光！ */
+  box-shadow: 0 0 0 99999px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.jitong-snip-size-badge {
+  position: absolute;
+  top: -28px;
+  left: 0;
+  background: #0284c7;
+  color: #ffffff;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+}
+
+/* 4 個角把手 */
+.jitong-snip-handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #ffffff;
+  border: 2px solid #0284c7;
+  border-radius: 2px;
+}
+.jitong-snip-handle.nw { top: -5px; left: -5px; }
+.jitong-snip-handle.ne { top: -5px; right: -5px; }
+.jitong-snip-handle.sw { bottom: -5px; left: -5px; }
+.jitong-snip-handle.se { bottom: -5px; right: -5px; }
+
+/* 截圖處理中 Toast */
+.jitong-snip-toast {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.92);
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 2147483647;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  animation: jitongPulse 1.2s infinite;
+}
+
+/* 框選工具按鈕樣式 */
+.jitong-snip-tool-btn {
+  background: #fdf4ff !important;
+  border-color: #f0abfc !important;
+  color: #c026d3 !important;
+  font-size: 16px !important;
+}
+.jitong-snip-tool-btn:hover {
+  background: #fae8ff !important;
+  border-color: #d946ef !important;
+  color: #a21caf !important;
+  transform: scale(1.08) !important;
+}
+
+.jitong-header-tool-btn {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.jitong-header-tool-btn:hover {
+  background: #c026d3;
+  border-color: #f0abfc;
+  transform: scale(1.05);
+}
