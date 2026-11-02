@@ -164,13 +164,33 @@
       appendBotMessage(`✅ 已儲存 Google Apps Script 連線！後續對話將透過 OpenRouter 模型回答並存檔於 Google Sheet。`);
     });
 
-    // 發送訊息
-    btnSend.addEventListener('click', handleUserSend);
+    // 發送訊息與輸入法 (IME) 選字保護
+    let isComposing = false;
+
+    textarea.addEventListener('compositionstart', () => {
+      isComposing = true;
+    });
+
+    textarea.addEventListener('compositionend', () => {
+      isComposing = false;
+    });
+
     textarea.addEventListener('keydown', (e) => {
+      // 關鍵保護：如果使用者正在進行中文選字 (注音/拼音/倉頡)，按下 Enter 僅確認字詞，絕不觸發送出！
+      if (e.isComposing || isComposing || e.keyCode === 229) {
+        return;
+      }
+
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
+        e.stopPropagation();
         handleUserSend();
       }
+    });
+
+    textarea.addEventListener('input', () => {
+      textarea.style.height = '38px';
+      textarea.style.height = Math.min(textarea.scrollHeight, 90) + 'px';
     });
 
     // 快捷膠囊點擊
@@ -187,11 +207,20 @@
 
   async function handleUserSend() {
     const textarea = document.getElementById('jitongInput');
+    if (!textarea) return;
     const message = textarea.value.trim();
     if (!message || state.isLoading) return;
 
-    // 清空輸入框
+    // 1. 同步立即清空輸入框並還原預設高度
     textarea.value = '';
+    textarea.style.height = '38px';
+
+    // 2. 非同步再次確保清空 (防禦 IME 瀏覽器微任務將剛選取的字符二次塞回框中)
+    setTimeout(() => {
+      textarea.value = '';
+      textarea.style.height = '38px';
+    }, 0);
+
     appendUserMessage(message);
 
     state.isLoading = true;
