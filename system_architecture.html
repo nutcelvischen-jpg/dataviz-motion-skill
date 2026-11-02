@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>系統架構實戰圖解：GitHub Pages ＋ Google Apps Script 無伺服器 AI 應用開發</title>
+  <meta name="description" content="零主機成本、安全隔離 API 金鑰、支援多模態問答與 Google Sheet 試算表持久化的現代輕量級 AI 應用系統架構。">
+
+  <!-- Typography & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/learning.css?v=10">
+  <link rel="stylesheet" href="css/dose_mobile.css">
+
+  <style>
+    /* diagram-design editorial design tokens */
+    :root {
+      --dd-paper: #f8fafc;
+      --dd-paper-card: #ffffff;
+      --dd-paper-tint: #f1f5f9;
+      --dd-ink: #0f172a;
+      --dd-ink-strong: #020617;
+      --dd-muted: #475569;
+      --dd-soft: #64748b;
+      --dd-rule: rgba(15, 23, 42, 0.10);
+      --dd-rule-solid: #cbd5e1;
+      --dd-accent: #bf4520;           /* Coral / Burnt-Tangerine Focal Token */
+      --dd-accent-tint: rgba(191, 69, 32, 0.08);
+      --dd-accent-border: #ea580c;
+      --dd-link: #2563eb;
+      --dd-green: #1b8354;
+      --dd-green-tint: #f0fdf4;
+      --dd-green-border: #86efac;
+
+      --font-serif: "Instrument Serif", Georgia, serif;
+      --font-sans: "Inter", "Noto Sans TC", -apple-system, sans-serif;
+      --font-mono: "DM Mono", Menlo, Monaco, monospace;
+    }
+
+    body {
+      background-color: var(--dd-paper);
+      color: var(--dd-ink);
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    /* Container */
+    .arch-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 5rem;
+    }
+
+    /* Breadcrumbs */
+    .arch-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--dd-soft);
+      margin-bottom: 1.5rem;
+    }
+    .arch-nav a {
+      color: var(--dd-green);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .arch-nav a:hover {
+      text-decoration: underline;
+    }
+
+    /* Editorial Header */
+    .arch-header {
+      background: var(--dd-paper-card);
+      border: 1px solid var(--dd-rule-solid);
+      border-radius: 12px;
+      padding: 2.25rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .arch-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--dd-accent);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .arch-header h1 {
+      font-family: var(--font-serif);
+      font-size: 2.5rem;
+      font-weight: 400;
+      line-height: 1.15;
+      margin: 0 0 1rem;
+      color: var(--dd-ink-strong);
+    }
+    .arch-lead {
+      font-size: 1.05rem;
+      color: var(--dd-muted);
+      max-width: 860px;
+      margin: 0 0 1.5rem;
+      line-height: 1.65;
+    }
+
+    /* Badges Pill Bar */
+    .badge-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+    .badge-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+    .badge-item.green {
+      background: var(--dd-green-tint);
+      color: var(--dd-green);
+      border: 1px solid var(--dd-green-border);
+    }
+    .badge-item.orange {
+      background: var(--dd-accent-tint);
+      color: var(--dd-accent);
+      border: 1px solid rgba(191,69,32,0.25);
+    }
+    .badge-item.blue {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+    .badge-item.slate {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+
+    /* Diagram Section Wrapper */
+    .diagram-frame {
+      background: var(--dd-paper-card);
+      border: 1px solid var(--dd-rule-solid);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .diagram-frame-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--dd-rule);
+      padding-bottom: 0.75rem;
+    }
+    .diagram-frame-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dd-ink);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .diagram-frame-hint {
+      font-size: 0.8125rem;
+      color: var(--dd-soft);
+      font-family: var(--font-mono);
+    }
+
+    .diagram-scroll-box {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: 8px;
+      background: #fafaf9;
+      padding: 0.5rem 0;
+    }
+    .diagram-scroll-box svg {
+      display: block;
+      min-width: 1080px;
+      margin: 0 auto;
+    }
+
+    /* Content Grid */
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.75rem;
+      margin-bottom: 2.5rem;
+    }
+    @media (max-width: 860px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .info-card {
+      background: var(--dd-paper-card);
+      border: 1px solid var(--dd-rule-solid);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+    .info-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--dd-ink-strong);
+      margin: 0 0 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .info-card p {
+      font-size: 0.925rem;
+      color: var(--dd-muted);
+      margin: 0 0 1rem;
+      line-height: 1.6;
+    }
+    .info-card ul {
+      margin: 0;
+      padding-left: 1.25rem;
+      color: var(--dd-muted);
+      font-size: 0.9rem;
+    }
+    .info-card li {
+      margin-bottom: 0.5rem;
+    }
+
+    /* Key Callout Box */
+    .callout-box {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 4px solid #f59e0b;
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2.5rem;
+    }
+    .callout-box h4 {
+      margin: 0 0 0.5rem;
+      color: #92400e;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    .callout-box p {
+      margin: 0;
+      color: #78350f;
+      font-size: 0.925rem;
+    }
+
+    /* Code Section with Tabs */
+    .code-container {
+      background: var(--dd-paper-card);
+      border: 1px solid var(--dd-rule-solid);
+      border-radius: 12px;
+      margin-bottom: 2.5rem;
+      overflow: hidden;
+    }
+    .tab-bar {
+      display: flex;
+      border-bottom: 1px solid var(--dd-rule-solid);
+      background: #f8fafc;
+    }
+    .tab-btn {
+      padding: 0.85rem 1.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--dd-soft);
+      border-bottom: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .tab-btn.active {
+      color: var(--dd-green);
+      background: #ffffff;
+      border-bottom: 2px solid var(--dd-green);
+    }
+    .tab-pane {
+      display: none;
+      padding: 1.5rem;
+    }
+    .tab-pane.active {
+      display: block;
+    }
+    
+    pre.code-block {
+      background: #1e293b;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.825rem;
+      line-height: 1.55;
+      overflow-x: auto;
+      margin: 0 0 1rem;
+    }
+    pre.code-block code {
+      font-family: inherit;
+    }
+
+    .code-annotation {
+      background: #f1f5f9;
+      border-radius: 6px;
+      padding: 1rem;
+      font-size: 0.875rem;
+      color: var(--dd-muted);
+    }
+
+    /* Step Checklist */
+    .step-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+    @media (max-width: 768px) {
+      .step-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .step-item {
+      background: #ffffff;
+      border: 1px solid var(--dd-rule-solid);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .step-num {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+      text-align: center;
+      background: var(--dd-green);
+      color: #ffffff;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .step-item h5 {
+      margin: 0 0 0.35rem;
+      font-size: 0.95rem;
+      color: var(--dd-ink);
+    }
+    .step-item p {
+      margin: 0;
+      font-size: 0.825rem;
+      color: var(--dd-muted);
+    }
+
+    /* Action Footer */
+    .page-footer-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--dd-rule-solid);
+      padding-top: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="arch-container">
+    <!-- Breadcrumb navigation -->
+    <nav class="arch-nav" aria-label="麵包屑導覽">
+      <a href="index.html">首頁</a>
+      <span>/</span>
+      <a href="curriculum_1105_workflow.html">11/5 實戰課程流程</a>
+      <span>/</span>
+      <span style="color: var(--dd-ink);">系統架構圖解</span>
+    </nav>
+
+    <!-- Header Banner -->
+    <header class="arch-header">
+      <span class="arch-eyebrow">SYSTEM ARCHITECTURE · ZERO SERVERLESS</span>
+      <h1>前端 GitHub ＋ 後端 Google Apps Script 架構解密</h1>
+      <p class="arch-lead">
+        這套架構是專為學生、獨立開發者與教學實戰設計的<strong>「完全免費、零維運主機、金鑰永久安全隔離」</strong>的現代 AI 全端解決方案。前端部署於 GitHub Pages，後端利用 Google Apps Script (GAS) 充當安全中繼代理，對接 OpenRouter 大模型並在 Google Sheet 寫入即時對話審計日誌。
+      </p>
+
+      <div class="badge-bar">
+        <span class="badge-item green">🌱 零主機費用 ($0 / 月)</span>
+        <span class="badge-item orange">🛡️ API Key 絕不落地外洩</span>
+        <span class="badge-item blue">⚡ 免管 Linux & 免維護 Docker</span>
+        <span class="badge-item slate">📸 支援多模態圖表截圖問答</span>
+        <span class="badge-item green">📊 Google Sheet 免費試算表日誌庫</span>
+      </div>
+    </header>
+
+    <!-- Architecture Diagram Box (diagram-design compliant) -->
+    <section class="diagram-frame">
+      <div class="diagram-frame-header">
+        <div class="diagram-frame-title">
+          <span>📐</span>
+          <span>系統端到端架構與數據流向圖 (System Topology & Data Flow)</span>
+        </div>
+        <div class="diagram-frame-hint">規範依循 diagram-design · 3 階區域劃分與直角正交走線</div>
+      </div>
+
+      <div class="diagram-scroll-box">
+        <!-- SVG Architecture Diagram compliant with diagram-design specifications -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 520" width="1100" height="520" style="background:#ffffff; font-family:'Inter', 'Noto Sans TC', sans-serif;">
+          <defs>
+            <!-- Arrow markers -->
+            <marker id="dd-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#475569" />
+            </marker>
+            <marker id="dd-arrow-accent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#bf4520" />
+            </marker>
+            <marker id="dd-arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
+            </marker>
+            <marker id="dd-arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#1b8354" />
+            </marker>
+          </defs>
+
+          <!-- ==================== TIER 1 ZONE: FRONTEND / CLIENT TIER ==================== -->
+          <rect x="25" y="40" width="310" height="450" rx="8" fill="rgba(15,23,42,0.02)" stroke="rgba(15,23,42,0.12)" stroke-width="1" />
+          <rect x="37" y="34" width="240" height="14" rx="2" fill="#ffffff" />
+          <text x="42" y="45" fill="#64748b" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.14em" font-weight="600">ZONE 1 · 前端與用戶瀏覽端 (GITHUB PAGES)</text>
+
+          <!-- Node 1: User Browser -->
+          <g id="node-browser" transform="translate(45, 65)">
+            <rect x="0" y="0" width="270" height="85" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+            <text x="14" y="22" fill="#64748b" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.12em">CLIENT BROWSER</text>
+            <text x="14" y="42" fill="#0f172a" font-size="13" font-weight="700">學員瀏覽器 (Desktop / Mobile)</text>
+            <text x="14" y="60" fill="#475569" font-size="11">DOM 視圖 · 圖表渲染 · 提問輸入框</text>
+            <text x="14" y="74" fill="#94a3b8" font-size="10" font-family="'DM Mono', monospace">無需安裝環境 · 跨手機 / 平板 / 筆電</text>
+          </g>
+
+          <!-- Node 2: GitHub Pages Static CDN -->
+          <g id="node-github" transform="translate(45, 175)">
+            <rect x="0" y="0" width="270" height="95" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+            <text x="14" y="22" fill="#64748b" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.12em">STATIC CDN HOSTING</text>
+            <text x="14" y="42" fill="#0f172a" font-size="13" font-weight="700">GitHub Pages 靜態託管</text>
+            <text x="14" y="60" fill="#475569" font-size="11">託管 HTML5 / CSS / Apache ECharts</text>
+            <text x="14" y="74" fill="#475569" font-size="11">免費全球 CDN 邊緣加速 · 零維護</text>
+            <text x="14" y="88" fill="#1b8354" font-size="10" font-weight="600" font-family="'DM Mono', monospace">🔒 公開 Repo 內絕無任何 API Key</text>
+          </g>
+
+          <!-- Node 3: Digital Jitong Frontend Module -->
+          <g id="node-jitong" transform="translate(45, 295)">
+            <rect x="0" y="0" width="270" height="175" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2" />
+            <rect x="0" y="0" width="270" height="24" rx="6 6 0 0" fill="#f1f5f9" />
+            <text x="12" y="16" fill="#334155" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">AGENT UI · digital_jitong.js</text>
+            
+            <text x="14" y="44" fill="#0f172a" font-size="13" font-weight="700">「數位乩童」客服前端模組</text>
+            <text x="14" y="64" fill="#475569" font-size="11">1. 對話狀態管理 (Session History)</text>
+            <text x="14" y="82" fill="#475569" font-size="11">2. 畫面上下文萃取 (getPageContext)</text>
+            <text x="14" y="100" fill="#475569" font-size="11">3. 多模態截圖 (Canvas to Base64)</text>
+            <text x="14" y="118" fill="#475569" font-size="11">4. fetch() 請求送出 (mode: 'cors')</text>
+            
+            <rect x="12" y="132" width="246" height="30" rx="4" fill="#f8fafc" stroke="#cbd5e1" />
+            <text x="135" y="151" fill="#2563eb" font-size="10" font-family="'DM Mono', monospace" text-anchor="middle" font-weight="600">redirect: "follow" (處理 302 重導向)</text>
+          </g>
+
+
+          <!-- ==================== TIER 2 ZONE: SERVERLESS BACKEND (GAS) ==================== -->
+          <rect x="375" y="40" width="350" height="450" rx="8" fill="rgba(191,69,32,0.02)" stroke="rgba(191,69,32,0.22)" stroke-width="1.2" />
+          <rect x="387" y="34" width="270" height="14" rx="2" fill="#ffffff" />
+          <text x="392" y="45" fill="#bf4520" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.14em" font-weight="700">ZONE 2 · 無伺服器中繼後端 (GOOGLE APPS SCRIPT)</text>
+
+          <!-- Node 4 (Focal Node ★): Google Apps Script Web App -->
+          <g id="node-gas-webapp" transform="translate(395, 65)">
+            <rect x="0" y="0" width="310" height="135" rx="6" fill="#fff7ed" stroke="#ea580c" stroke-width="1.8" />
+            <rect x="0" y="0" width="310" height="26" rx="6 6 0 0" fill="#ffedd5" />
+            <text x="12" y="18" fill="#9a3412" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">★ FOCAL GATEWAY · doPost(e) &amp; doGet(e)</text>
+            
+            <text x="14" y="48" fill="#7c2d12" font-size="13.5" font-weight="700">Google Apps Script Web App</text>
+            <text x="14" y="68" fill="#431407" font-size="11">接收前端 POST 請求，充當安全中繼代理 (BFF)</text>
+            <text x="14" y="86" fill="#431407" font-size="11">處理 302 跨域跳轉與 CORS 預檢安全機制</text>
+            <text x="14" y="104" fill="#431407" font-size="11">以 ContentService 回傳標準 JSON</text>
+            
+            <rect x="12" y="112" width="286" height="18" rx="3" fill="#ffffff" stroke="#fdba74" />
+            <text x="155" y="125" fill="#ea580c" font-size="9.5" font-family="'DM Mono', monospace" text-anchor="middle" font-weight="600">永久免費 · 每日高達 20,000 次 API 轉發額度</text>
+          </g>
+
+          <!-- Node 5: Script Properties (Key Vault) -->
+          <g id="node-gas-vault" transform="translate(395, 225)">
+            <rect x="0" y="0" width="310" height="85" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+            <text x="14" y="20" fill="#64748b" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.12em">INTERNAL KEY VAULT</text>
+            <text x="14" y="38" fill="#0f172a" font-size="13" font-weight="700">Script Properties 金鑰保險箱</text>
+            <text x="14" y="56" fill="#475569" font-size="11">PropertiesService.getScriptProperties()</text>
+            <text x="14" y="72" fill="#bf4520" font-size="10.5" font-weight="600">私密變數儲存 OPENROUTER_API_KEY，學生絕不外洩</text>
+          </g>
+
+          <!-- Node 6: UrlFetchApp Forwarding Engine -->
+          <g id="node-gas-engine" transform="translate(395, 335)">
+            <rect x="0" y="0" width="310" height="135" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+            <text x="14" y="20" fill="#64748b" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.12em">HTTP DISPATCH ENGINE</text>
+            <text x="14" y="38" fill="#0f172a" font-size="13" font-weight="700">UrlFetchApp 外部請求引擎</text>
+            <text x="14" y="58" fill="#475569" font-size="11">1. 自動附加 Authorization: Bearer Header</text>
+            <text x="14" y="76" fill="#475569" font-size="11">2. 將圖表 Base64 轉換為 OpenRouter 多模態格式</text>
+            <text x="14" y="94" fill="#475569" font-size="11">3. 呼叫 OpenRouter 進行 Claude Haiku 推論</text>
+            <text x="14" y="112" fill="#475569" font-size="11">4. 呼叫 SpreadsheetApp 進行非同步日誌入庫</text>
+          </g>
+
+
+          <!-- ==================== TIER 3 ZONE: CLOUD AI & PERSISTENCE ==================== -->
+          <rect x="765" y="40" width="310" height="450" rx="8" fill="rgba(15,23,42,0.02)" stroke="rgba(15,23,42,0.12)" stroke-width="1" />
+          <rect x="777" y="34" width="220" height="14" rx="2" fill="#ffffff" />
+          <text x="782" y="45" fill="#64748b" font-size="8" font-family="'DM Mono', monospace" letter-spacing="0.14em" font-weight="600">ZONE 3 · 雲端 AI 推論與試算表資料庫</text>
+
+          <!-- Node 7: OpenRouter AI Gateway -->
+          <g id="node-openrouter" transform="translate(785, 65)">
+            <rect x="0" y="0" width="270" height="150" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+            <rect x="0" y="0" width="270" height="24" rx="6 6 0 0" fill="#f8fafc" />
+            <text x="12" y="16" fill="#334155" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">LLM INFERENCE · CLOUD GATEWAY</text>
+            
+            <text x="14" y="44" fill="#0f172a" font-size="13" font-weight="700">OpenRouter API 閘道</text>
+            <text x="14" y="64" fill="#1b8354" font-size="11.5" font-weight="600">Claude Haiku 3.5 / 5.5</text>
+            <text x="14" y="82" fill="#475569" font-size="11">支援高智商推理、上下文追問與視覺圖表辨識</text>
+            <text x="14" y="100" fill="#475569" font-size="11">極低 Token 費率 · 秒級串流/完整解答</text>
+            
+            <rect x="12" y="112" width="246" height="26" rx="4" fill="#f0fdf4" stroke="#86efac" />
+            <text x="135" y="129" fill="#15803d" font-size="10.5" font-weight="600" text-anchor="middle">多模態圖表辨識 + 數位乩童人設</text>
+          </g>
+
+          <!-- Node 8: Google Sheets Persistent Log -->
+          <g id="node-sheets" transform="translate(785, 265)">
+            <rect x="0" y="0" width="270" height="205" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+            <rect x="0" y="0" width="270" height="24" rx="6 6 0 0" fill="#f0fdf4" />
+            <text x="12" y="16" fill="#15803d" font-size="8.5" font-family="'DM Mono', monospace" letter-spacing="0.12em" font-weight="700">FREE DATABASE · GOOGLE SHEETS</text>
+            
+            <text x="14" y="46" fill="#0f172a" font-size="13" font-weight="700">Google Sheets 對話歷史庫</text>
+            <text x="14" y="66" fill="#475569" font-size="11">免安裝 MySQL / PostgreSQL</text>
+            <text x="14" y="84" fill="#475569" font-size="11">SpreadsheetApp.openById().appendRow()</text>
+            
+            <text x="14" y="108" fill="#1e293b" font-size="11" font-weight="600">日誌寫入欄位：</text>
+            <text x="14" y="126" fill="#64748b" font-size="10" font-family="'DM Mono', monospace">1. Timestamp (時間戳記)</text>
+            <text x="14" y="142" fill="#64748b" font-size="10" font-family="'DM Mono', monospace">2. Question (學生提問內容)</text>
+            <text x="14" y="158" fill="#64748b" font-size="10" font-family="'DM Mono', monospace">3. Answer (AI 回覆開示摘要)</text>
+            <text x="14" y="174" fill="#64748b" font-size="10" font-family="'DM Mono', monospace">4. Model &amp; HasImage (多模態標記)</text>
+            
+            <rect x="12" y="180" width="246" height="18" rx="3" fill="#f1f5f9" />
+            <text x="135" y="193" fill="#475569" font-size="9" text-anchor="middle">老師可隨時以試算表篩選分析學員卡點</text>
+          </g>
+
+
+          <!-- ==================== CONNECTORS & DATA FLOWS ==================== -->
+          <!-- 1. Browser -> GitHub Pages: Load Static Assets (Straight Line) -->
+          <line x1="180" y1="150" x2="180" y2="175" stroke="#475569" stroke-width="1.2" marker-end="url(#dd-arrow)" />
+          <rect x="140" y="154" width="80" height="14" rx="2" fill="#ffffff" />
+          <text x="180" y="164" fill="#64748b" font-size="7.5" font-family="'DM Mono', monospace" text-anchor="middle">1. 載入網頁資源</text>
+
+          <!-- 2. Jitong UI -> GAS Web App: POST Payload (Orthogonal elbow path with r=8) -->
+          <!-- From (315, 340) to (395, 115). Mid = (315+395)/2 = 355 -->
+          <path d="M 315,340 H 347 Q 355,340 355,332 V 123 Q 355,115 363,115 H 395" 
+                fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#dd-arrow-blue)" />
+          <!-- Label mask and text -->
+          <rect x="325" y="220" width="60" height="26" rx="3" fill="#ffffff" stroke="#bfdbfe" />
+          <text x="355" y="232" fill="#1d4ed8" font-size="8" font-family="'DM Mono', monospace" font-weight="600" text-anchor="middle">2. POST</text>
+          <text x="355" y="242" fill="#2563eb" font-size="7" font-family="'DM Mono', monospace" text-anchor="middle">JSON+截圖</text>
+
+          <!-- 3. GAS Web App -> Script Properties: Read Secret Key (Vertical Line) -->
+          <line x1="550" y1="200" x2="550" y2="225" stroke="#bf4520" stroke-width="1.4" marker-end="url(#dd-arrow-accent)" />
+          <rect x="510" y="206" width="80" height="14" rx="2" fill="#ffffff" />
+          <text x="550" y="216" fill="#bf4520" font-size="7.5" font-family="'DM Mono', monospace" font-weight="600" text-anchor="middle">3. 讀取 API Key</text>
+
+          <!-- 4. GAS Engine -> OpenRouter: HTTPS Request (Orthogonal elbow path) -->
+          <!-- From (705, 380) to (785, 125). Mid = (705+785)/2 = 745 -->
+          <path d="M 705,380 H 737 Q 745,380 745,372 V 133 Q 745,125 753,125 H 785" 
+                fill="none" stroke="#1b8354" stroke-width="1.6" marker-end="url(#dd-arrow-green)" />
+          <rect x="715" y="240" width="60" height="26" rx="3" fill="#ffffff" stroke="#bbf7d0" />
+          <text x="745" y="252" fill="#15803d" font-size="8" font-family="'DM Mono', monospace" font-weight="600" text-anchor="middle">4. HTTPS</text>
+          <text x="745" y="262" fill="#1b8354" font-size="7" font-family="'DM Mono', monospace" text-anchor="middle">Bearer Key</text>
+
+          <!-- 5. OpenRouter -> GAS Engine: Response Return (Dashed Orthogonal path) -->
+          <!-- From (785, 175) to (705, 410). Mid = 745. Hop/Bridge over crossing if needed -->
+          <path d="M 785,175 H 753 Q 745,175 745,183 V 402 Q 745,410 737,410 H 705" 
+                fill="none" stroke="#64748b" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#dd-arrow)" />
+          <rect x="715" y="300" width="60" height="14" rx="2" fill="#ffffff" />
+          <text x="745" y="310" fill="#475569" font-size="7.5" font-family="'DM Mono', monospace" text-anchor="middle">5. 回傳推論</text>
+
+          <!-- 6. GAS Engine -> Google Sheets: appendRow (Orthogonal elbow path) -->
+          <!-- From (705, 450) to (785, 370). Mid = 745 -->
+          <path d="M 705,450 H 737 Q 745,450 745,442 V 378 Q 745,370 753,370 H 785" 
+                fill="none" stroke="#475569" stroke-width="1.2" marker-end="url(#dd-arrow)" />
+          <rect x="715" y="415" width="60" height="14" rx="2" fill="#ffffff" />
+          <text x="745" y="425" fill="#475569" font-size="7.5" font-family="'DM Mono', monospace" text-anchor="middle">6. 寫入日誌</text>
+
+          <!-- 7. GAS Web App -> Jitong Frontend: Return JSON Response (Dashed Orthogonal path) -->
+          <!-- From (395, 150) to (315, 390). Mid = 355 -->
+          <path d="M 395,150 H 363 Q 355,150 355,158 V 382 Q 355,390 347,390 H 315" 
+                fill="none" stroke="#2563eb" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#dd-arrow-blue)" />
+          <rect x="325" y="270" width="60" height="14" rx="2" fill="#ffffff" />
+          <text x="355" y="280" fill="#2563eb" font-size="7.5" font-family="'DM Mono', monospace" text-anchor="middle">7. JSON 響應</text>
+
+        </svg>
+      </div>
+    </section>
+
+    <!-- Four Core Architectural Highlights -->
+    <section class="content-grid">
+      <div class="info-card">
+        <h3><span>🛡️</span> 1. 金鑰安全隔離（絕不外洩原則）</h3>
+        <p>
+          在全端開發中，學生最常犯的重大資安事故，就是把 OpenAI 或 OpenRouter 的 API Key 直接寫進前端 HTML / JS，然後推上公開的 GitHub 倉庫，幾分鐘內就會被自動爬蟲盜刷掏空。
+        </p>
+        <ul>
+          <li><strong>金鑰存於後端保險箱：</strong>API Key 儲存在 Google Apps Script 的專案屬性 (Script Properties) 中，只有 Google 伺服端具備讀取權限。</li>
+          <li><strong>前端靜態碼零暴露：</strong>公開在 GitHub Pages 上的代碼只有一個無鑑權的 GAS Web App 呼叫網址，就算任何人「右鍵檢查原始碼」也永遠挖不到金鑰。</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3><span>🔄</span> 2. 突破跨域阻隔（CORS 與 302 重導向）</h3>
+        <p>
+          當前端網頁 (<code>drchunchihchen.github.io</code>) 嘗試呼叫外部 API 時，瀏覽器會嚴格執行同源政策 (CORS)。此外，Google Apps Script 執行時會將請求從 <code>script.google.com</code> 經由 <strong>HTTP 302</strong> 重導向至 <code>script.googleusercontent.com</code>。
+        </p>
+        <ul>
+          <li><strong>前端必備參數：</strong>呼叫時必須顯式指定 <code>redirect: "follow"</code> 與 <code>mode: "cors"</code>，否則請求會在重導向階段被瀏覽器強制中斷。</li>
+          <li><strong>後端標準回傳：</strong>GAS 必須使用 <code>ContentService.createTextOutput()</code> 並設置 MimeType 為 JSON，才能讓瀏覽器安心接收數據。</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3><span>💰</span> 3. 永久免費與零伺服器維護 ($0/月)</h3>
+        <p>
+          傳統架設後端需要租用 AWS EC2、GCP VM 或 Heroku，每月需支付 150～800 元台幣，還得自己設定 Nginx 反向代理、SSL 憑證定時更新與 Linux 防火牆。
+        </p>
+        <ul>
+          <li><strong>GitHub Pages：</strong>提供全球邊緣 CDN 免費靜態託管，頻寬充沛、無限流量。</li>
+          <li><strong>Google Apps Script：</strong>免費個人 Google 帳號每日可執行高達 20,000 次 URL 轉發，免裝 Node.js、免管 Docker，完全「無伺服器 (Serverless)」。</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3><span>📊</span> 4. Google Sheets 免費關聯資料庫</h3>
+        <p>
+          不需要再花時間安裝 MySQL 或設定 MongoDB，直接將 Google 試算表當成雲端持久化資料庫使用！
+        </p>
+        <ul>
+          <li><strong>一行程式碼存檔：</strong>GAS 原生支援 <code>SpreadsheetApp.openById().appendRow([...])</code>，以超低延遲自動寫入新列。</li>
+          <li><strong>視覺化與後續分析：</strong>老師或專案負責人打開 Google 試算表，就能看到所有學生的即時問答、提問時段與 Token 耗用情況，直接做成統計圖表！</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Student Crucial Hint Box -->
+    <div class="callout-box">
+      <h4>💡 教學重點小提醒（BFF 架構思維）：</h4>
+      <p>
+        這種<strong>「前端靜態純展示 ＋ 輕量無伺服器做 BFF (Backend For Frontend) ＋ 外部大模型 API」</strong>的模式，是目前敏捷開發 AI 應用最精煉的實戰架構。學生學會這套模式後，無論是寫個人履歷網站、期末專題、商業數據儀表板，都能在「0 元成本」的前提下隨插即用！
+      </p>
+    </div>
+
+    <!-- Interactive Code Snippets -->
+    <section class="code-container">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(0)">
+          <span>💻</span> 前端調用程式碼 (JavaScript)
+        </button>
+        <button class="tab-btn" onclick="switchTab(1)">
+          <span>⚙️</span> 後端中繼程式碼 (Google Apps Script)
+        </button>
+        <button class="tab-btn" onclick="switchTab(2)">
+          <span>📝</span> 3 步驟部屬圖文指南
+        </button>
+      </div>
+
+      <!-- Tab 1: Frontend Code -->
+      <div class="tab-pane active" id="tab-0">
+        <p style="margin-top:0; font-size:0.925rem; color:var(--dd-muted);">
+          這是放在 GitHub Pages 靜態網站中（例如 <code>digital_jitong.js</code>）用來向 Google Apps Script 發送請求的精簡程式碼：
+        </p>
+        <pre class="code-block"><code>// 1. 設定你的 Google Apps Script 部署網址 (Web App URL)
+const GAS_BACKEND_URL = "https://script.google.com/macros/s/AKfycbyZJTyyxiK5C_ow8KPRhtCRlxZQOV3sg3vrZPVtTWp6xtjsypbRdm7a_zTgrV3jJAUk/exec";
+
+/**
+ * 向 GAS 後端發送對話與截圖資訊
+ * @param {string} promptText 學生提問文字
+ * @param {string|null} base64Image 多模態截圖 (可選，Base64 字串)
+ * @param {string} pageContext 當前頁面圖表與篩選條件上下文
+ */
+async function askDigitalJitong(promptText, base64Image = null, pageContext = "") {
+  const payload = {
+    message: promptText,
+    context: pageContext,
+    imageBase64: base64Image || null,
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    // 關鍵設定：method 為 POST，mode 為 cors，redirect 必須為 follow！
+    const response = await fetch(GAS_BACKEND_URL, {
+      method: "POST",
+      mode: "cors",
+      cache: "no-cache",
+      redirect: "follow", // 重要！GAS 執行時會 302 重導向到 script.googleusercontent.com
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8" // 避免觸發複雜預檢 (preflight)
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error(`伺服器回應異常，狀態碼: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("【數位乩童開示回傳】:", data.reply);
+    return data.reply;
+
+  } catch (error) {
+    console.error("【連線失敗】:", error);
+    throw error;
+  }
+}</code></pre>
+
+        <div class="code-annotation">
+          <strong>🔍 前端關鍵要點解析：</strong><br>
+          1. <code>redirect: "follow"</code>：這是與 GAS 通訊<strong>最關鍵的一行</strong>。Google 在執行 Apps Script 時，會先回傳 HTTP 302 狀態碼，告訴瀏覽器真正的執行容器在 <code>googleusercontent.com</code>。如果沒有設定 <code>follow</code>，瀏覽器會直接中斷並拋出 CORS 錯誤。<br>
+          2. <code>headers: {"Content-Type": "text/plain"}</code>：在簡單 POST 請求中使用純文字或標準 JSON 封裝，能大幅降低瀏覽器觸發 OPTIONS 預檢失敗的機率。
+        </div>
+      </div>
+
+      <!-- Tab 2: Backend Code -->
+      <div class="tab-pane" id="tab-1">
+        <p style="margin-top:0; font-size:0.925rem; color:var(--dd-muted);">
+          這是部署在 Google Apps Script 中的 <code>Code.gs</code> 核心程式碼：
+        </p>
+        <pre class="code-block"><code>/**
+ * 處理前端 POST 請求 (BFF 安全中繼)
+ */
+function doPost(e) {
+  try {
+    // 1. 安全取得儲存在專案屬性中的 API Key (前端完全看不到！)
+    const props = PropertiesService.getScriptProperties();
+    const apiKey = props.getProperty("OPENROUTER_API_KEY");
+    const sheetId = props.getProperty("LOG_SHEET_ID"); // 儲存日誌的 Google Sheet ID
+    
+    if (!apiKey) {
+      return jsonResponse({ error: "尚未設定 OPENROUTER_API_KEY 金鑰" }, 500);
+    }
+
+    // 2. 解析前端傳來的 JSON 數據
+    const contents = e.postData.contents;
+    const requestData = JSON.parse(contents);
+    const userMessage = requestData.message || "";
+    const pageContext = requestData.context || "";
+    const imageBase64 = requestData.imageBase64 || null;
+
+    // 3. 組裝發往 OpenRouter 的 Prompt 與多模態 Payload
+    const messages = [
+      {
+        role: "system",
+        content: "你是「數位乩童」，說話靈光四溢、帶有玄學幽默但技術極度扎實的 AI 導師。你的真身是香港中文大學資訊工程系博士陳純質。"
+      }
+    ];
+
+    // 多模態訊息組裝
+    const userContent = [];
+    userContent.push({
+      type: "text",
+      text: (pageContext ? `【學員當前操作畫面上下文】\n${pageContext}\n\n` : "") + userMessage
+    });
+
+    if (imageBase64) {
+      userContent.push({
+        type: "image_url",
+        image_url: {
+          url: imageBase64.startsWith("data:") ? imageBase64 : `data:image/png;base64,${imageBase64}`
+        }
+      });
+    }
+
+    messages.push({ role: "user", content: userContent });
+
+    // 4. 呼叫 OpenRouter API 進行 Claude Haiku 推論
+    const openRouterUrl = "https://openrouter.ai/api/v1/chat/completions";
+    const payload = {
+      model: "anthropic/claude-3.5-haiku",
+      messages: messages,
+      temperature: 0.7
+    };
+
+    const options = {
+      method: "post",
+      contentType: "application/json",
+      headers: {
+        "Authorization": "Bearer " + apiKey,
+        "HTTP-Referer": "https://github.com/drchunchihchen/dataviz",
+        "X-Title": "Digital Jitong Course Assistant"
+      },
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    };
+
+    const response = UrlFetchApp.fetch(openRouterUrl, options);
+    const resJson = JSON.parse(response.getContentText());
+    const replyText = resJson.choices[0].message.content;
+
+    // 5. 異步記錄到 Google Sheets 試算表
+    if (sheetId) {
+      try {
+        const sheet = SpreadsheetApp.openById(sheetId).getActiveSheet();
+        sheet.appendRow([
+          new Date(),
+          userMessage,
+          replyText.substring(0, 500),
+          imageBase64 ? "有截圖" : "無截圖",
+          "claude-3.5-haiku"
+        ]);
+      } catch (sheetErr) {
+        Logger.log("日誌記錄失敗: " + sheetErr.message);
+      }
+    }
+
+    // 6. 回傳標準 JSON 格式給前端
+    return jsonResponse({
+      status: "success",
+      reply: replyText
+    });
+
+  } catch (err) {
+    return jsonResponse({ error: err.message }, 500);
+  }
+}
+
+/**
+ * 輔助函式：建立符合 CORS 規範的 JSON 輸出
+ */
+function jsonResponse(data, statusCode = 200) {
+  const output = ContentService.createTextOutput(JSON.stringify(data));
+  output.setMimeType(ContentService.MimeType.JSON);
+  return output;
+}
+
+/**
+ * 支援健康檢查 GET 請求
+ */
+function doGet(e) {
+  return jsonResponse({
+    status: "online",
+    service: "數位乩童 GAS Backend Gateway",
+    time: new Date()
+  });
+}</code></pre>
+
+        <div class="code-annotation">
+          <strong>🔍 後端關鍵要點解析：</strong><br>
+          1. <code>PropertiesService.getScriptProperties()</code>：將敏感密鑰隔離在雲端環境變數中，即便專案程式碼截圖展示給學生看，金鑰也絕不會外洩。<br>
+          2. <code>ContentService.createTextOutput().setMimeType(ContentService.MimeType.JSON)</code>：GAS 專屬的輸出方式，能正確附帶 JSON MIME 標頭。<br>
+          3. <code>SpreadsheetApp.appendRow()</code>：自動在試算表尾端新增一行，免寫 SQL，天然具備時間戳與資料庫審計功能。
+        </div>
+      </div>
+
+      <!-- Tab 3: Step-by-Step Deployment Guide -->
+      <div class="tab-pane" id="tab-2">
+        <h4 style="margin-top:0; color:var(--dd-ink-strong);">Google Apps Script 3 步驟極速部署指南</h4>
+        <div class="step-grid">
+          <div class="step-item">
+            <span class="step-num">1</span>
+            <h5>建立 GAS 專案</h5>
+            <p>前往 <a href="https://script.google.com" target="_blank" rel="noopener">script.google.com</a> 點擊「新增專案」，清空原本內容並完整貼上 Tab 2 的 <code>Code.gs</code> 程式碼，命名為「數位乩童後端中繼」。</p>
+          </div>
+          <div class="step-item">
+            <span class="step-num">2</span>
+            <h5>設定金鑰屬性</h5>
+            <p>點選左側齒輪「專案設定」，拉至下方「指令碼屬性」，點擊「新增指令碼屬性」，屬性名稱填 <code>OPENROUTER_API_KEY</code>，值貼上你的 OpenRouter 憑證，儲存完成隔離。</p>
+          </div>
+          <div class="step-item">
+            <span class="step-num">3</span>
+            <h5>部署為 Web 應用程式</h5>
+            <p>點擊右上角「部署」→「新增部署作業」→ 選擇齒輪「網路應用程式」：<br>
+            • <strong>執行身分：</strong>我 (你的 Google 帳號)<br>
+            • <strong>誰可以存取：</strong><strong style="color:var(--dd-accent);">任何人 (Anyone)</strong>（重要！）<br>
+            取得 <code>https://script.google.com/macros/s/.../exec</code> 網址即可！</p>
+          </div>
+        </div>
+
+        <div style="margin-top:1.25rem; font-size:0.875rem; color:var(--dd-muted); background:#f8fafc; padding:1rem; border-radius:6px; border:1px solid var(--dd-rule-solid);">
+          <strong>⚠️ 學生常見避坑提示：</strong>每次修改 <code>Code.gs</code> 程式碼後，必須點擊「部署」→「管理部署作業」→ 點擊鉛筆圖示編輯 → 選擇<strong>「新版本」</strong>再點儲存！如果沒有切換成新版本，外面的 Web 網址依舊會執行舊程式碼。
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom Navigation Footer -->
+    <div class="page-footer-nav">
+      <a href="curriculum_1105_workflow.html" class="button" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; text-decoration:none; padding:0.6rem 1.25rem; border-radius:6px; font-weight:600;">
+        ← 返回 11/5 實戰課程流程藍圖
+      </a>
+      <a href="index.html" class="button button-primary" style="background:var(--dd-green); color:#ffffff; text-decoration:none; padding:0.6rem 1.25rem; border-radius:6px; font-weight:600;">
+        前往大語言模型學習地圖首頁 →
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Tab Switch Script -->
+  <script>
+    function switchTab(index) {
+      const tabs = document.querySelectorAll('.tab-btn');
+      const panes = document.querySelectorAll('.tab-pane');
+      tabs.forEach((tab, i) => {
+        if (i === index) {
+          tab.classList.add('active');
+          panes[i].classList.add('active');
+        } else {
+          tab.classList.remove('active');
+          panes[i].classList.remove('active');
+        }
+      });
+    }
+  </script>
+
+  <!-- Load Digital Jitong Agent Component (Students can ask about architecture live!) -->
+  <script src="js/digital_jitong.js"></script>
+</body>
+</html>
