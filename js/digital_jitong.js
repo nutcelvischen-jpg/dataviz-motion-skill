@@ -5,8 +5,8 @@
  */
 (function() {
   const STORAGE_KEY_GAS_URL = 'digital_jitong_gas_url';
-  
-  // 內建知識庫預設回應（未填寫 Apps Script URL 或離線時使用）
+  // 內建官方 Google Apps Script Web App 預設端點 (開箱即用，免手動重複輸入)
+  const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbyZJTyyxiK5C_ow8KPRhtCRlxZQOV3sg3vrZPVtTWp6xtjsypbRdm7a_zTgrV3jJAUk/exec';
   const LOCAL_KNOWLEDGE = {
     '今日課程': `🔮 **數位乩童開示 · 11/05 全日實戰營進度**：\n\n- **第一階段（上午）**：大語言模型學習地圖，掌握 Agent AI 概念與世界競爭格局。\n- **第二階段（下午）**：資料分析師五階段工程工作流（取得 ➔ 清洗 ➔ 探索 ➔ 儀表板 ➔ 決策）。\n- **第三階段**：日本官方統計 e-Stat 資料庫架構與 API 申請避坑。\n- **第四階段**：17 領域研究指南與 10 大實戰視覺化分析法。\n- **第五階段**：Data Atoms 互動式工作台實作（包含雙軸複合、地理地圖與多指標對比）！`,
     '幼年': `👶 **幼年 vs 勞動人口占比對比靈光**：\n\n1. 請在 **Rows（Y 軸）** 槽位點擊 **\`[＋ 多指標比較]\`**。\n2. 直接點擊 **\`[👶 vs 💼 幼年 vs 勞動人口占比 (2指標)]\`** 一鍵套用。\n3. **折線圖** 會同圖繪製雙軌平滑曲線（幼年藍線、勞動橘線）；切換至 **相關散布圖（Scatter）** 則可立即觀測兩者的負相關分佈！`,
@@ -16,7 +16,7 @@
 
   const state = {
     isOpen: false,
-    gasUrl: localStorage.getItem(STORAGE_KEY_GAS_URL) || '',
+    gasUrl: localStorage.getItem(STORAGE_KEY_GAS_URL) || DEFAULT_GAS_URL,
     sessionId: 'jitong_' + Math.random().toString(36).substring(2, 9),
     history: [], // [{role: 'user', content: '...'}, {role: 'assistant', content: '...', reasoning_details: '...'}]
     isLoading: false
