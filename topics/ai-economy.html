@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html lang="zh-Hant"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>AI 與經濟：觀察、推演和爭議｜專題選讀</title><link href="../css/content-layout.css?v=16" rel="stylesheet"/><script defer="" src="../js/concept-reader.js?v=1"></script></head><body><a class="skip-link" href="#main">跳到主要內容</a><header class="content-header"><div class="content-wrap content-header-inner"><a class="content-brand" href="../index.html"><span aria-hidden="true" class="content-brand-mark">學</span><span>大語言模型<br/>學習地圖</span></a><nav aria-label="主要導覽" class="content-nav"><a href="../index.html#learning-map">跟著學</a><a aria-current="page" href="../encyclopedia.html">查概念</a><a href="../lab.html">做實驗</a></nav></div></header><div class="content-wrap"><p class="breadcrumbs"><a class="catalog-return" href="../encyclopedia.html#further-reading">專題選讀</a> ／ AI 與經濟：觀察、推演和爭議</p><div class="content-shell"><aside class="content-sidebar desktop-toc"><strong>本頁目錄</strong><a href="#s1">觀測資料與任務變化</a><a href="#s2">情境推演</a><a href="#s3">爭議與不同觀點</a><a href="#s4">政策與制度</a><a href="#s5">原教材指標</a></aside><main class="content-main" id="main"><details class="mobile-toc"><summary>本頁目錄</summary><nav><a href="#s1">觀測資料與任務變化</a><a href="#s2">情境推演</a><a href="#s3">爭議與不同觀點</a><a href="#s4">政策與制度</a><a href="#s5">原教材指標</a></nav></details><header class="page-intro"><h1>AI 與經濟：觀察、推演和爭議</h1><p>分開閱讀觀測資料、模型情境、不同觀點與政策選擇。</p><ul class="objectives"><li>分辨觀測資料與情境假設</li><li>比較研究觀點與政策選項</li></ul><p class="quiet">選讀，不影響六站學習進度；延伸既有教材。</p></header><p class="notice">以下引用既有教材資料，模型名稱、數據、案例與來源尚待核對；其中推演與觀點應與實際觀測分開閱讀。</p><section class="reading-section" id="s1"><h2>觀測資料與任務變化</h2><p>以下為原教材對研究資料的整理；數字與統計口徑待核對。</p><div class="legacy-material"><div style="border-radius: 8px; padding: 24px; margin-bottom: 24px">
+<div class="timeline-badge" style="border-color: #bbf7d0">EMPIRICAL EVIDENCE · 微觀實證</div>
+<h3 style="font-family: var(--font-title); font-size: 22px; margin: 8px 0 14px 0">
+        一、 緒論與勞動市場微觀機制：觀測暴露度、任務重組與組織演進
+      </h3>
+<p style="font-size: 16px; line-height: 1.8; margin-bottom: 16px">
+        傳統文獻多依據 Eloundou 等人的理論可行性指標（β 評分）評估衝擊，但 Anthropic 建立的<strong>「Anthropic 經濟指數」（Anthropic Economic Index, AEI）</strong>採樣數百萬筆來自 Claude.ai 終端對話與企業級第一方 API 互動數據，由 Maxim Massenkoff 與 Peter McCrory 主導創立了<strong>「觀測暴露度」（Observed Exposure）</strong>指標，將理論可行性與真實職場採納進行計量分離。
+      </p>
+<div style="padding: 12px 16px; border-radius: 4px; font-size: 16px; line-height: 1.7; margin-bottom: 20px">
+<strong>計量核心發現：</strong> 由實際使用數據構建的「觀測暴露度」能有效預測美國勞工統計局（BLS）2024 至 2034 年的長期就業成長軌跡，<strong>觀測暴露度每上升 10 個百分點，預測就業成長率相應下修 0.6 個百分點</strong>；反之，若僅使用純理論潛能指標，則與官方就業預測完全缺乏統計顯著性。這證實企業自動化決策受「邊際替代成本與組織吸納效率」主導，而非單純的技術理論可能。
+      </div>
+<!-- Job Exposure Comparison Table -->
+<div style="font-weight: 700; font-size: 16px; margin-bottom: 8px">📊 職業群體之理論暴露度 vs 實證觀測暴露度對比表</div>
+<div class="table-container" style="margin-bottom: 20px">
+<table class="specs-table">
+<thead>
+<tr>
+<th style="width: 25%">職業群體 / 代表性工種</th>
+<th style="width: 20%">理論暴露評分 (β)</th>
+<th style="width: 20%">實證觀測暴露度 (Observed)</th>
+<th style="width: 35%">核心任務特徵與主要互動架構</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>電腦程式設計師 (Computer Programmers)</strong></td>
+<td>~98%</td>
+<td><span style="font-weight: 700">75% (極高)</span></td>
+<td>系統除錯、單元測試、代碼生成與架構重構（API 與開發工具高度自動化）</td>
+</tr>
+<tr>
+<td><strong>資料輸入員 (Data Entry Keyers)</strong></td>
+<td>~95%</td>
+<td><span style="font-weight: 700">67% (高度)</span></td>
+<td>原始單據辨識、結構化資料提取、跨系統批次建檔</td>
+</tr>
+<tr>
+<td><strong>客戶服務代表 (Customer Service Reps)</strong></td>
+<td>~90%</td>
+<td><span style="font-weight: 700">高度暴露 (High)</span></td>
+<td>第一方 API 批次處理、即時客訴分類、標準問題自主對答與摘要</td>
+</tr>
+<tr>
+<td><strong>辦公室與行政支援 (Office &amp; Admin Support)</strong></td>
+<td>90%</td>
+<td><span style="font-weight: 700">中高暴露 (Med-High)</span></td>
+<td>行程調度、商務信函起草、簡報彙編、日常流程協同</td>
+</tr>
+<tr>
+<td><strong>實體操作與藍領群體 (Cooks, Mechanics, etc.)</strong></td>
+<td>~0%</td>
+<td><span style="font-weight: 700">0% (零覆蓋)</span></td>
+<td>現場體力操作、三維動態環境交互、非結構化實體維修</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- 任務維度模式分流與人口特徵 -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 20px">
+<div style="border-radius: 6px; padding: 14px">
+<div style="font-size: 16px; font-weight: 700; margin-bottom: 6px">🔄 替代與增強動態演化（模式分流）</div>
+<div style="font-size: 16px; line-height: 1.6">
+            • <strong>個人終端介面</strong>：<strong>增強模式（Augmentation）佔 57%~60%</strong>，個人多將模型作為思考延伸或校對工具。<br/>
+            • <strong>企業 API 流量</strong>：<strong>自動化模式（Automation）佔 80%+ 絕對優勢</strong>，企業傾向以無人化軟體管線封閉執行。<br/>
+            • <strong>認知從業者溢價悖論</strong>：重度依賴自動化委託者，對職涯前景與實質薪資成長展現出最高樂觀度，因其工作向上躍遷至目標設定與邊界審查的高附加價值環節。
+          </div>
+</div>
+<div style="border-radius: 6px; padding: 14px">
+<div style="font-size: 16px; font-weight: 700; margin-bottom: 6px">👥 暴露勞動力的社會經濟學特徵</div>
+<div style="font-size: 16px; line-height: 1.6">
+            • <strong>學歷與所得偏向</strong>：暴露度前 25% 的勞工平均薪資高出 <strong>47%</strong>，碩博士比例達 <strong>17.4%</strong>（未暴露組僅 4.5%）。<br/>
+            • <strong>人口結構特徵</strong>：女性比例高出 16 個百分點，白人高 11 個百分點，亞裔佔比擴大至接近兩倍。<br/>
+            • <strong>歷史範式反轉</strong>：歷史自動化（蒸氣機、微電腦）符合偏向技能技術進步（SBTC），衝擊中低技術；本輪 AI 卻直接將替代壓力聚焦於<strong>高所得、高學歷之認知白領</strong>！
+          </div>
+</div>
+</div>
+<!-- 學徒制斷階現象與 Anthropic 內部指標 -->
+<div style="margin-top: 24px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 6px">
+          ⚠️ 總體就業悖論與「學徒制斷階」（Apprenticeship Pipeline）
+        </div>
+<p style="font-size: 16px; line-height: 1.7; margin-bottom: 14px">
+          雖然高暴露職業總體失業率未出現驟升，但勞動市場邊際調整以<strong>「初階招聘凍結」（Hiring Slowdown）</strong>展開，22 至 25 歲年輕從業人員就業人數實質下滑 <strong>6% 至 16%</strong>！當企業全面以 AI 替代初階代碼編寫與文件審核，初階人員無法在實戰中積累隱性知識（Tacit Knowledge），動搖未來資深架構師的養成管線：
+        </p>
+<!-- Anthropic Internal Case Table -->
+<div style="font-weight: 700; font-size: 16px; margin-bottom: 8px">🔬 前沿研發環境微觀試驗場：Anthropic 內部人機協同營運指標表</div>
+<div class="table-container" style="margin-bottom: 16px">
+<table class="specs-table">
+<thead>
+<tr>
+<th style="width: 22%">組織維度 / 營運指標</th>
+<th style="width: 22%">基準期 (2025 年中)</th>
+<th style="width: 22%">演進期 (2026 年下半年)</th>
+<th style="width: 34%">微觀機制與經濟意涵</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>代理人工時與人類工時比</strong></td>
+<td>人類工時佔絕大多數</td>
+<td><span style="font-weight: 700">6 : 1 (代理工時遠超人類)</span></td>
+<td>2026年3月代理人自主工時首度超越人類，8月達到極端擴展</td>
+</tr>
+<tr>
+<td><strong>初階技術職位比例 (Junior Share)</strong></td>
+<td>技術編制佔比 21%</td>
+<td><span style="font-weight: 700">收縮至 14% (新聘由 27% 劇降至 9%)</span></td>
+<td>管理層大幅減緩入門技術招聘，初階入行門檻劇烈拉高</td>
+</tr>
+<tr>
+<td><strong>人均營收產出能力</strong></td>
+<td>快速成長型軟體公司常態</td>
+<td><span style="font-weight: 700">達 Meta/Google 同期之 2~4 倍</span></td>
+<td>AI 承擔常規除錯與編寫，企業維持極度緊湊精幹之核心團隊</td>
+</tr>
+<tr>
+<td><strong>工程師與產品經理比 (SWE / PM)</strong></td>
+<td>傳統科技公司常態比例</td>
+<td><span style="font-weight: 700">大幅攀升至約 17 : 1</span></td>
+<td>非編程協調角色大幅收縮，資深工程師透過 AI 直接管理端到端流程</td>
+</tr>
+<tr>
+<td><strong>組織內部流動性 (Mobility)</strong></td>
+<td>傳統專案型調整</td>
+<td><span style="font-weight: 700">滿一年者輪調率激增 50%</span></td>
+<td>常規職能被自動化後，原團隊轉型為模型評測、代理提示詞優化與行為監管</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Meta-Work Box -->
+<div style="border-radius: 6px; padding: 14px 18px; font-size: 16px; line-height: 1.7">
+          🧠 <strong>認知注意力瓶頸與「元工作」（Meta-Work）轉型：</strong> 在生產力函數中，AI 代理人有高達 <strong>80% 的掛鐘時間處於閒置狀態</strong>，等待人類使用者審查核准！約 20% 的員工表明其工作核心已從「親力親為」轉變為「管理多個 Claude 代理系統」，員工必須設置中斷檢查點與優化通訊架構，<strong>批判性邏輯與非確定性情境下的架構決策權限</strong>成為新的核心溢價要素。
+        </div>
+</div>
+</div></div></section><section class="reading-section" id="s2"><h2>情境推演</h2><p>情境是建立在假設上的可能路徑，不代表已經發生。</p><div class="legacy-material"><div style="border-radius: 8px; padding: 24px; margin-bottom: 24px">
+<div class="timeline-badge" style="border-color: #ddd6fe">DYNAMIC MACRO MODEL · 2030 情境推演</div>
+<h3 style="font-family: var(--font-title); font-size: 22px; margin: 8px 0 14px 0">
+        二、 總體經濟與分配效應：2030 三種情境模擬與要素收益轉變
+      </h3>
+<p style="font-size: 16px; line-height: 1.8; margin-bottom: 16px">
+        Anthropic 經濟研究團隊聯合 Anton Korinek 與 Charles I. Jones 構建動態任務基礎模型（替代彈性設定為 σ = 0.5），體現現代經濟的<strong>「O 型環特徵」（O-Ring Property）與弱連結瓶頸</strong>：即便 AI 在認知任務釋放數倍生產力，總體經濟擴張仍嚴格受限於難以自動化的實體任務。依據 Hulten 定理，全要素生產力（TFP）的躍升等於 AI 介入任務份額與成本降幅之乘積。
+      </p>
+<!-- 2030 3 Scenarios Table -->
+<div style="font-weight: 700; font-size: 16px; margin-bottom: 8px">📈 2030 年三大總體情境與關鍵經濟指標比較表</div>
+<div class="table-container" style="margin-bottom: 20px">
+<table class="specs-table">
+<thead>
+<tr>
+<th style="width: 22%">總體經濟變數與關鍵指標</th>
+<th style="width: 18%">無 AI 基準路徑</th>
+<th style="width: 20%">溫和變革情境 (Modest)</th>
+<th style="width: 20%">實質重塑情境 (Substantial)</th>
+<th style="width: 20%">極端顛覆情境 (Extreme)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>美國實質 GDP 規模</strong></td>
+<td>基準線 ($33.6 兆)</td>
+<td>$34.1 兆 (+1.6%)</td>
+<td>$36.3 兆 (+8.3%)</td>
+<td><span style="font-weight: 700">$44.4 兆 (+32.4%)</span></td>
+</tr>
+<tr>
+<td><strong>年化經濟成長動能</strong></td>
+<td>~2.0% 歷史趨勢</td>
+<td>類似早期網路緩步提升</td>
+<td>達歷史常態之 2 倍</td>
+<td><span style="font-weight: 700">達年增 15% (每 4.5 年翻倍)</span></td>
+</tr>
+<tr>
+<td><strong>要素分配：勞動所得份額 (s_L)</strong></td>
+<td>60.0%</td>
+<td>59.4% (-0.6%)</td>
+<td>56.1% (-3.9%)</td>
+<td><span style="font-weight: 700">45.2% (暴跌 14.8 個百分點)</span></td>
+</tr>
+<tr>
+<td><strong>要素分配：資本所得份額 (s_K)</strong></td>
+<td>40.0%</td>
+<td>40.6% (+0.6%)</td>
+<td>43.9% (+3.9%)</td>
+<td><span style="font-weight: 700">54.8% (大增 14.8 個百分點)</span></td>
+</tr>
+<tr>
+<td><strong>認知型白領工資相較基準變化</strong></td>
+<td>基準線</td>
+<td>微幅下滑 -0.4%</td>
+<td>大致持平 (~0%)</td>
+<td><span style="font-weight: 700">實質暴跌 -11.5%</span></td>
+</tr>
+<tr>
+<td><strong>非認知 / 實體型工資相較基準變化</strong></td>
+<td>基準線</td>
+<td>小幅上升 +0.7%</td>
+<td>顯著成長 (Significant)</td>
+<td><span style="font-weight: 700">大幅暴漲 +34.0%</span></td>
+</tr>
+<tr>
+<td><strong>全社會平均實質工資變化</strong></td>
+<td>基準線</td>
+<td>微增 +0.7%</td>
+<td>穩步上揚</td>
+<td>總體上升 +10.0%</td>
+</tr>
+<tr>
+<td><strong>認知部門失業與跨部門轉移</strong></td>
+<td>~4.0% 自然摩擦</td>
+<td>維持歷史常態波動</td>
+<td>認知就業萎縮 4%，總失業 4.6%~5%</td>
+<td><span style="font-weight: 700">認知失業攀至 20%，積壓沉澱</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Baumol Reversal Box -->
+<div style="border-radius: 6px; padding: 14px 18px; font-size: 16px; line-height: 1.7">
+        ⚖️ <strong>Baumol 成本病的反轉現象（Baumol's Cost Disease Reversal）：</strong> 傳統經濟學中，難以提升生產力的實體服務業成本會相對上升；而在 AI 時代，認知軟體邊際成本趨近於零，<strong>水電管線、房屋營造、實體維修與高接觸護理</strong>等具備物理邊界的工種獲得巨大的定價權與要素溢價，實質工資在極端情境大幅暴漲 34%！然而，認知型白領在遭遇擠壓時面臨搜尋折價阻尼（μ ≈ 0.17），無法順暢轉移至實體技術，產生嚴重技能折損。
+      </div>
+</div></div></section><section class="reading-section" id="s3"><h2>爭議與不同觀點</h2><p>比較不同觀點時，需要回到各自的資料、假設與研究範圍。</p><div class="legacy-material"><div style="border-radius: 8px; padding: 24px; margin-bottom: 24px">
+<div class="timeline-badge" style="border-color: #fca5a5">ACADEMIC DEBATE · 經濟學界批判與檢驗</div>
+<h3 style="font-family: var(--font-title); font-size: 22px; margin: 8px 0 14px 0">
+        三、 經濟學界學術論辯與批判性檢視
+      </h3>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+<div style="border-radius: 6px; padding: 16px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 6px">
+            1. Daron Acemoglu 的 TFP 成長下限與負向外部性
+          </div>
+<div style="font-size: 16px; line-height: 1.7">
+            麻省理工學院教授 Acemoglu 指出，LLM 目前能顯著滲透的僅是整體經濟支出中佔比有限的標準化任務，在考量複雜非結構化任務後，<strong>未來十年全要素生產力（TFP）累積提升可能僅約 0.5% 至 1%</strong>。且模型系統性忽略了<strong>合成內容氾濫、商業搜尋成本激增與合約驗證信任維繫損耗</strong>等負向社會外部性。
+          </div>
+</div>
+<div style="border-radius: 6px; padding: 16px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 6px">
+            2. Ilan Strauss 統計穩健性與匯總偏誤爭議
+          </div>
+<div style="font-size: 16px; line-height: 1.7">
+            倫敦大學學院學者 Strauss 等人指出 Anthropic 聲稱「全球 AI 採納可由人均 GDP 解釋（β=0.71）」存在<strong>嚴重的樣本匯總偏誤（Aggregation Bias）</strong>。若對中等所得國家子樣本檢驗，決定係數 R² 驟降至 7%~17%，統計上完全不顯著；且單一閉源廠商流量存在選擇性偏差，不能代表全球總體採納。
+          </div>
+</div>
+<div style="border-radius: 6px; padding: 16px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 6px">
+            3. 高登股利折現模型之「金融市場定價檢驗」
+          </div>
+<div style="font-size: 16px; line-height: 1.7">
+            Tyler Cowen 依高登折現公式 P/E = 1 / (r - g) 指出：若 2030 年實質 GDP 能年增 15%，資本市場本益比與折現率理應劇烈重組。當前 S&amp;P 500 本益比約 20 倍與 TIPS 實質殖利率（~2.4%）顯示，<strong>金融資本市場隱含的長期實質增長預期仍牢固鎖定在每年 1.9%~2.0% 歷史趨勢線上</strong>，並未採信極端情境。
+          </div>
+</div>
+</div>
+</div></div></section><section class="reading-section" id="s4"><h2>政策與制度</h2><p>政策建議是有條件的選擇，與觀測結果屬不同層次。</p><div class="legacy-material"><div style="border-radius: 8px; padding: 24px">
+<div class="timeline-badge" style="border-color: #fde68a">POLICY FRAMEWORK · 制度與稅制改革</div>
+<h3 style="font-family: var(--font-title); font-size: 22px; margin: 8px 0 14px 0">
+        四、 制度與政策響應架構：三級失業防禦機制與 Korinek-Lockwood 稅收架構
+      </h3>
+<!-- 3 Tier Framework Table -->
+<div style="font-weight: 700; font-size: 16px; margin-bottom: 8px">🛡️ Anthropic 經濟政策架構：三級失業觸發防禦機制（Tiered Labor Market Framework）</div>
+<div class="table-container" style="margin-bottom: 20px">
+<table class="specs-table">
+<thead>
+<tr>
+<th style="width: 20%">政策響應階層 / 啟動標準</th>
+<th style="width: 25%">總體經濟與就業情境判定</th>
+<th style="width: 27%">核心制度干預方針</th>
+<th style="width: 28%">公共財政與再分配機制重點</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>基礎準備期 (Baseline)</strong></td>
+<td>任何就業水準均適用之長態機制</td>
+<td>大幅投資國家統計機構提升採樣頻率；翻新失業救濟發放之數位底座。</td>
+<td>建立實時產業預警體系，徹底修復突發衝擊下易遭擊潰的社福 IT 系統。</td>
+</tr>
+<tr>
+<td><strong>第一級防禦 (Tier 1)</strong></td>
+<td>失業率約 5%（自然摩擦，但內部換手加劇）</td>
+<td>建立普遍預先分配型資本帳戶；鬆綁職業許可限制；在職技能重訓補助。</td>
+<td>允許公共帳戶直接持有前沿 AI 企業股權以分享資本回報；導入工資損失保險。</td>
+</tr>
+<tr>
+<td><strong>第二級防禦 (Tier 2)</strong></td>
+<td>失業率約 10%（衰退級衝擊，換手受阻）</td>
+<td>失業給付自動無條件延長；重點受衝擊行業定向支援補貼；基本生活與醫療保障。</td>
+<td>若 AI 呈現廣泛勞動替代，支持政府實施統一且具約束力的企業級技術擴散節奏監管，遏止惡性逐底裁員。</td>
+</tr>
+<tr>
+<td><strong>第三級防禦 (Tier 3)</strong></td>
+<td>失業率超越歷史常態峰值（轉革性顛覆）</td>
+<td>無條件基本收入 (Universal Basic Income, UBI)；成立 AI 主權財富基金；推行全民股權份額共有制。</td>
+<td>政策典範由「輔助重返職場」徹底轉型為「持續性所得替代」；重塑國家稅基以支撐大規模再分配。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Korinek-Lockwood Tax Framework -->
+<div style="border-radius: 6px; padding: 18px; margin-bottom: 16px">
+<div style="font-size: 16px; font-weight: 800; margin-bottom: 8px">
+          🏛️ 公共財政與稅制現代化：Korinek-Lockwood 稅收架構四大原則
+        </div>
+<div style="font-size: 16px; line-height: 1.8">
+          1. <strong>支持終端消費課徵「代幣稅」（Token Tax）</strong>：針對個人娛樂生成、個人助理訂閱或零售級產出按量課稅。<br/>
+          2. <strong>堅決反對課徵「算力稅（Compute Tax）」與「機器人稅」</strong>：對硬體或伺服器運算直接課稅將直接懲罰生產性資本積累，扭曲資源配置並壓抑 TFP 成長。<br/>
+          3. <strong>貫徹中間生產環節免稅原則</strong>：對企業間（B2B）API 呼叫與工業整合免除間接稅，避免產生連鎖稅收級聯效應（Tax Cascading）。<br/>
+          4. <strong>重點課徵超額經濟租（Economic Rents）</strong>：鎖定供給完全缺乏彈性之要素（土地價值、頻譜特許、專有稀缺數據集、AI 巨頭平台獨佔利潤）。
+        </div>
+</div>
+<div style="font-size: 16px; line-height: 1.6; padding-top: 12px">
+        🌱 <strong>企業治理承諾：</strong> Anthropic 內部建立職位演變「早期預警系統」，並出資 2 億美元設立「經濟未來研究基金」資助實證政策隨機對照試驗，出資 1.5 億美元成立「國家研究員計畫」協助初階人才跨越轉型門檻。
+      </div>
+</div></div></section><section class="reading-section" id="s5"><h2>原教材指標</h2><p>以下摘要指標保留原文，需查證來源與計算口徑。</p><div class="legacy-material"><div class="macro-metric-grid">
+<div class="macro-metric-card">
+<div class="macro-metric-label">實證 vs 理論鴻溝</div>
+<div class="macro-metric-num">33% vs 94%</div>
+<div class="macro-metric-sub">電腦類理論暴露 94%，但實證觀測僅 33%；制度摩擦顯著</div>
+</div>
+<div class="macro-metric-card">
+<div class="macro-metric-label">學徒制招聘減緩</div>
+<div class="macro-metric-num">-6% ~ -16%</div>
+<div class="macro-metric-sub">高度暴露職業之 22~25 歲初階新進勞工就業人數實質萎縮</div>
+</div>
+<div class="macro-metric-card">
+<div class="macro-metric-label">人機工時比 (Anthropic 內部)</div>
+<div class="macro-metric-num">6 : 1</div>
+<div class="macro-metric-sub">互動式代理工時全面超越人類員工，SWE/PM 比例升至 17:1</div>
+</div>
+<div class="macro-metric-card">
+<div class="macro-metric-label">Baumol 成本病反轉</div>
+<div class="macro-metric-num">+34% vs -11%</div>
+<div class="macro-metric-sub">2030 極端情境：實體藍領薪資暴漲 34%，認知白領萎縮 11.5%</div>
+</div>
+</div></div></section><div class="button-row"><a class="button-primary" href="../concepts/evidence.html">返回相關概念 →</a><a class="button-secondary catalog-return" href="../encyclopedia.html#further-reading">回到專題選讀</a></div></main></div></div><footer class="content-footer"><div class="content-wrap">大語言模型學習地圖 · 選讀不影響六站學習進度。</div></footer><script defer="" src="../js/content-navigation.js?v=4"></script><script defer="" src="../js/topic.js?v=2"></script></body></html>

@@ -1,0 +1,22 @@
+{
+  "pages": 35,
+  "local_references": 717,
+  "link_errors": [],
+  "existing_concept_content_units": 246,
+  "missing_content_units": [],
+  "existing_catalog_entries": 45,
+  "missing_catalog_entries": [],
+  "protected_files_unchanged": {
+    "lab.html": true,
+    "js/lab.js": true,
+    "js/lab-legacy-data.js": true,
+    "js/learning-progress.js": true,
+    "js/learning-data.js": true,
+    "js/reference.js": true,
+    "js/reference-routes.js": true
+  },
+  "new_term_count": 45,
+  "resources": 10,
+  "loop_accessible_group": true,
+  "visible_return_loop_text": true
+}

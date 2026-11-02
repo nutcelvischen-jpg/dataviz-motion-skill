@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html lang="zh-Hant"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>雲端與本機有什麼不同？｜查概念</title><link href="../css/content-layout.css?v=16" rel="stylesheet"/><script defer="" src="../js/concept-reader.js?v=2"></script><script defer="" src="../js/content-navigation.js?v=6"></script><link href="../css/concept-map.css?v=1" rel="stylesheet"/></head><body class="concept-page"><a class="skip-link" href="#main">跳到主要內容</a><header class="content-header"><div class="content-wrap content-header-inner"><a class="content-brand" href="../index.html"><span aria-hidden="true" class="content-brand-mark">學</span><span>大語言模型<br/>學習地圖</span></a><nav aria-label="主要導覽" class="content-nav"><a href="../index.html#learning-map">跟著學</a><a aria-current="page" href="../encyclopedia.html">查概念</a><a href="../lab.html">做實驗</a></nav></div></header>
+<main class="concept-reader" id="main"><p class="breadcrumbs"><a class="catalog-return" href="../encyclopedia.html#term-map">← 查閱目錄</a><span> ／ 用量與模型</span></p><section class="reading-section" id="cloud-vs-local"><header class="page-intro"><h1 tabindex="-1">雲端與本機有什麼不同？</h1><p>以整理報名資料為例，先確認資料送往哪裡、由誰管理環境，以及可能有哪些成本。</p></header><div class="contrast-grid"><div class="contrast-panel"><h2>雲端服務</h2><p><strong>資料流向：</strong>依服務設定送至外部服務處理。</p><p><strong>維護：</strong>服務供應商與使用者依各自責任管理。</p><p><strong>成本：</strong>視用量、方案與其他條件而定。</p></div><div class="contrast-panel"><h2>本機或自建</h2><p><strong>資料流向：</strong>取決於系統與網路設定。</p><p><strong>維護：</strong>需自行處理硬體、更新與權限。</p><p><strong>成本：</strong>可能包含硬體、電力及維護，不能只看 Token 帳單。</p></div></div><p>部署位置本身不保證隱私或符合法規；仍需檢查資料流、設定與實際條件。</p><details class="deep-dive"><summary>原教材：部署圖與硬體矩陣</summary><p class="notice">既有教材資料與硬體條件待核對。</p><div class="legacy-material"><div class="diagram-container">
+<svg viewbox="0 0 960 480" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="arr-cloud" markerheight="6" markerwidth="8" orient="auto" refx="7" refy="3">
+<polygon fill="#1d4ed8" points="0 0, 8 3, 0 6"></polygon>
+</marker>
+<marker id="arr-local" markerheight="6" markerwidth="8" orient="auto" refx="7" refy="3">
+<polygon fill="#c2410c" points="0 0, 8 3, 0 6"></polygon>
+</marker>
+</defs>
+<!-- Left Column: Cloud API Pipeline -->
+<g transform="translate(30, 20)">
+<rect fill="#fcfbf7" height="440" rx="6" stroke="#1d4ed8" stroke-width="1.2" width="430" x="0" y="0"></rect>
+<rect fill="rgba(29, 78, 216, 0.08)" height="22" rx="3" width="180" x="16" y="16"></rect>
+<text fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" x="24" y="31">CLOUD API · 雲端計量模式</text>
+<!-- Node 1: Client Browser -->
+<rect fill="#f5f3ec" height="60" rx="4" stroke="#dedad2" stroke-width="1" width="380" x="25" y="55"></rect>
+<text fill="#1a1917" font-family="'Geist', sans-serif" font-size="12" font-weight="600" x="40" y="80">用戶端（Client App / Browser）</text>
+<text fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" x="40" y="98">攜帶 API Key · 發起 HTTPS POST 請求</text>
+<!-- Arrow 1 -> 2 -->
+<line marker-end="url(#arr-cloud)" stroke="#1d4ed8" stroke-width="1.2" x1="215" x2="215" y1="115" y2="148"></line>
+<rect fill="#fcfbf7" height="16" width="140" x="145" y="124"></rect>
+<text fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle" x="215" y="136">公網傳輸 (TLS 加密)</text>
+<!-- Node 2: Cloud Ingress & Token Metering -->
+<rect fill="#f5f3ec" height="70" rx="4" stroke="#1d4ed8" stroke-width="1.2" width="380" x="25" y="155"></rect>
+<text fill="#1d4ed8" font-family="'Geist', sans-serif" font-size="12" font-weight="600" x="40" y="180">供應商雲端網關（API Gateway）</text>
+<text fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" x="40" y="198">身份認證 · 速率限制 (Rate Limit) · Token 計費扣款</text>
+<text fill="#8c867e" font-family="'Geist Mono', monospace" font-size="8" x="40" y="214">按百萬 Token 計價 ($0.15 ~ $3.00 / 1M)</text>
+<!-- Arrow 2 -> 3 -->
+<line marker-end="url(#arr-cloud)" stroke="#1d4ed8" stroke-width="1.2" x1="215" x2="215" y1="225" y2="258"></line>
+<!-- Node 3: Supercomputer GPU Cluster -->
+<rect fill="#ffffff" height="85" rx="4" stroke="#1d4ed8" stroke-width="1.6" width="380" x="25" y="265"></rect>
+<text fill="#1d4ed8" font-family="'Geist', sans-serif" font-size="12" font-weight="600" x="40" y="292">數萬張 H100 / TPU 超級叢集</text>
+<text fill="#1a1917" font-family="'Geist Mono', monospace" font-size="9" x="40" y="310">o3 / Claude 3.7 Sonnet / Gemini 2.0 / R1</text>
+<text fill="#5e5953" font-family="'Geist', sans-serif" font-size="10" x="40" y="328">數千億 MoE 頂級參數 · 智能推理天花板</text>
+<text fill="#15803d" font-family="'Geist Mono', monospace" font-size="8" x="40" y="342">零本機硬體門檻 · 即開即用</text>
+<!-- Cloud Highlights -->
+<rect fill="rgba(29, 78, 216, 0.05)" height="60" rx="4" stroke="rgba(29, 78, 216, 0.2)" stroke-width="0.8" width="380" x="25" y="365"></rect>
+<text fill="#1d4ed8" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" x="38" y="386">優勢：</text>
+<text fill="#5e5953" font-family="'Geist', sans-serif" font-size="10" x="75" y="386">智能極致、免運維、支援百萬超長上下文。</text>
+<text fill="#c2410c" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" x="38" y="408">劣勢：</text>
+<text fill="#5e5953" font-family="'Geist', sans-serif" font-size="10" x="75" y="408">高並發帳單成本持續增加、敏感資料經外部網路。</text>
+</g>
+<!-- Right Column: Local On-Premise Pipeline -->
+<g transform="translate(500, 20)">
+<rect fill="#fcfbf7" height="440" rx="6" stroke="#c2410c" stroke-width="1.2" width="430" x="0" y="0"></rect>
+<rect fill="rgba(194, 65, 12, 0.08)" height="22" rx="3" width="180" x="16" y="16"></rect>
+<text fill="#c2410c" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" x="24" y="31">LOCAL ON-PREM · 地端離線模式</text>
+<!-- Node 1: Client App -->
+<rect fill="#f5f3ec" height="60" rx="4" stroke="#dedad2" stroke-width="1" width="380" x="25" y="55"></rect>
+<text fill="#1a1917" font-family="'Geist', sans-serif" font-size="12" font-weight="600" x="40" y="80">用戶端（內部業務系統 / 腳本）</text>
+<text fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" x="40" y="98">呼叫本機 http://localhost:11434 端口</text>
+<!-- Arrow 1 -> 2 -->
+<line marker-end="url(#arr-local)" stroke="#c2410c" stroke-width="1.2" x1="215" x2="215" y1="115" y2="148"></line>
+<rect fill="#fcfbf7" height="16" width="160" x="135" y="124"></rect>
+<text fill="#c2410c" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle" x="215" y="136">示意：離線執行</text>
+<!-- Node 2: Ollama Local Runtime -->
+<rect fill="#f5f3ec" height="70" rx="4" stroke="#c2410c" stroke-width="1.2" width="380" x="25" y="155"></rect>
+<text fill="#c2410c" font-family="'Geist', sans-serif" font-size="12" font-weight="600" x="40" y="180">Ollama / vLLM 本機執行引擎</text>
+<text fill="#5e5953" font-family="'Geist Mono', monospace" font-size="9" x="40" y="198">llama.cpp 底層推理 · GGUF 4-bit 量化載入</text>
+<text fill="#15803d" font-family="'Geist Mono', monospace" font-size="8" x="40" y="214">Token 費用 $0.00 · 無限量本地調用</text>
+<!-- Arrow 2 -> 3 -->
+<line marker-end="url(#arr-local)" stroke="#c2410c" stroke-width="1.2" x1="215" x2="215" y1="225" y2="258"></line>
+<!-- Node 3: Local Hardware Hardware (GPU/VRAM) -->
+<rect fill="#ffffff" height="85" rx="4" stroke="#c2410c" stroke-width="1.6" width="380" x="25" y="265"></rect>
+<text fill="#c2410c" font-family="'Geist', sans-serif" font-size="12" font-weight="600" x="40" y="292">本機晶片與顯存（Apple Silicon / RTX）</text>
+<text fill="#1a1917" font-family="'Geist Mono', monospace" font-size="9" x="40" y="310">DeepSeek-R1-Distill · Qwen 2.5 · Llama 3.3</text>
+<text fill="#5e5953" font-family="'Geist', sans-serif" font-size="10" x="40" y="328">資料可留在受控環境，仍需管理風險</text>
+<text fill="#c2410c" font-family="'Geist Mono', monospace" font-size="8" x="40" y="342">依賴本地顯存 (8GB 跑 7B, 24GB+ 跑 32B/70B)</text>
+<!-- Local Highlights -->
+<rect fill="rgba(194, 65, 12, 0.05)" height="60" rx="4" stroke="rgba(194, 65, 12, 0.2)" stroke-width="0.8" width="380" x="25" y="365"></rect>
+<text fill="#15803d" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" x="38" y="386">優勢：</text>
+<text fill="#5e5953" font-family="'Geist', sans-serif" font-size="10" x="75" y="386">依設定可離線；隱私、成本與維護仍需評估。</text>
+<text fill="#c2410c" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" x="38" y="408">劣勢：</text>
+<text fill="#5e5953" font-family="'Geist', sans-serif" font-size="10" x="75" y="408">受限本機硬體顯存，超大模型（70B+）運行緩慢。</text>
+</g>
+</svg>
+</div><div class="compare-container">
+<table class="compare-table">
+<thead>
+<tr>
+<th style="width: 18%;">決策維度</th>
+<th class="cloud-col" style="width: 41%;">☁️ 雲端 API 模式 (OpenAI, Gemini, Claude)</th>
+<th class="local-col" style="width: 41%;">🏠 地端自建模式 (Ollama, vLLM, 私有伺服器)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>🔒 數據隱私與合規</strong></td>
+<td>
+<strong>資料需傳送至外部伺服器</strong><br/>
+              雖然商業 API 承諾不使用客戶資料訓練，但在高度管制的金融、醫療、國防領域，外部傳輸本身即可能違反法規。
+            </td>
+<td>
+<strong>資料流向取決於部署與網路設定</strong><br/>
+              能否離線及是否符合規範，取決於實際系統、資料流與管理措施。
+            </td>
+</tr>
+<tr>
+<td><strong>💰 成本結構與收費</strong></td>
+<td>
+<strong>按量計費（Pay-as-you-go）</strong><br/>
+              前期投入為 0；但如果業務流量極大（如每秒數百次呼叫），累積的 Token 帳單將非常可觀。
+            </td>
+<td>
+<strong>前期硬體固定資產投入</strong><br/>
+              日常呼叫 Token 邊際成本為 0！但需要投資高階 GPU（如 RTX 4090、A100 或 Mac M3/M4 Max 高統一記憶體）。
+            </td>
+</tr>
+<tr>
+<td><strong>🧠 智能天花板與推理力</strong></td>
+<td>
+<strong>極致頂級（Frontier Intelligence）</strong><br/>
+              背後是數千億甚至上兆參數的龐大叢集（如 GPT-4o, Claude 3.5 Sonnet），在複雜邏輯、跨領域推理遙遙領先。
+            </td>
+<td>
+<strong>受限於本機顯存（VRAM）</strong><br/>
+              個人筆電通常只能跑 7B~14B 模型，70B 需高階顯卡。在嚴密邏輯或細膩文筆上與雲端旗艦有明顯落差。
+            </td>
+</tr>
+<tr>
+<td><strong>⚡ 部署與維運難度</strong></td>
+<td>
+<strong>零維運（Serverless）</strong><br/>
+              申請 API Key，一行 <code>requests.post</code> 或官方 SDK 即可呼叫，全世界高可用性由巨頭維護。
+            </td>
+<td>
+<strong>需要掌握基礎運維知識</strong><br/>
+              需安裝 Ollama、配置 CUDA 驅動、處理量化格式（GGUF）、記憶體溢出（OOM）與高並發排隊問題。
+            </td>
+</tr>
+<tr>
+<td><strong>🎯 最佳推薦實戰場景</strong></td>
+<td>
+              • 企業核心業務決策分析<br/>
+              • 複雜 Python 資料分析代碼自動編寫<br/>
+              • 多語言翻譯與數十萬字長文本綜合研讀
+            </td>
+<td>
+              • 敏感財務報表初篩與個人隱私資料清洗<br/>
+              • 內部私有文檔搜索（離線 RAG）<br/>
+              • 飛機、高鐵等無網路狀態下的個人生產力
+            </td>
+</tr>
+</tbody>
+</table>
+</div> <div class="matrix-card">
+<div class="matrix-card-header">
+<div class="matrix-card-title">矩陣三：地端與私有化部署硬體門檻對照表 (On-Premises Hardware Configuration)</div>
+<div class="matrix-card-badge">企業合規與私有算力選型</div>
+</div>
+<table class="data-matrix-table">
+<thead>
+<tr>
+<th>開源模型名稱</th>
+<th>總參數 / 激活參數</th>
+<th>建議量化推論格式</th>
+<th>最低地端硬體配置 (滿足基本流水線)</th>
+<th>生產級高併發建議硬體架構</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>DeepSeek-V4.1-Flash</strong></td>
+<td class="mono-cell">284B / 13B</td>
+<td>INT4 / FP4 / FP8</td>
+<td>4× NVIDIA A100/H100 (80GB) 或 4× 華為昇騰 910B</td>
+<td>8× H100/H200 NVLink 節點；單卡推論吞吐可達 120+ tok/s</td>
+</tr>
+<tr>
+<td><strong>DeepSeek-V4-Pro</strong></td>
+<td class="mono-cell">1.6T / 49B</td>
+<td>FP4 (InferenceX/SGLang)</td>
+<td>2 節點 (共 16× H100 80GB，透過 InfiniBand 互連)</td>
+<td>4 節點 B200/B300 叢集或同等規格大規模昇騰叢集</td>
+</tr>
+<tr>
+<td><strong>Kimi K3.1 Pro</strong></td>
+<td class="mono-cell">2.8T~3.0T / 104B</td>
+<td>MXFP4 權重 / MXFP8 激活</td>
+<td>4 個 8 卡節點 (共 32× H100/H200 80GB)</td>
+<td>8 節點 HGX H200 / B200 叢集；需龐大高速 RDMA 網絡支撐專家路由</td>
+</tr>
+<tr>
+<td><strong>MiniMax M3</strong></td>
+<td class="mono-cell">428B / 22B</td>
+<td>BF16 / FP8</td>
+<td>8× NVIDIA H100/A100 (80GB)</td>
+<td>2 節點 (16× GPU) NeMo AutoModel 部署，維持滿載 1M KV 顯存</td>
+</tr>
+<tr>
+<td><strong>Grok-1 (早期開源權重)</strong></td>
+<td class="mono-cell">314B / 2 專家激活</td>
+<td>INT4 / FP8 / BF16</td>
+<td>8× NVIDIA A100 (80GB) 伺服器</td>
+<td>官方開源 JAX 權重（Apache 2.0）；注意：Grok 3 與 Grok 4 系列均未開源</td>
+</tr>
+<tr>
+<td><strong>Muse Spark Open</strong></td>
+<td class="mono-cell">~70B 密集或中小 MoE</td>
+<td>INT4 / INT8 / FP16</td>
+<td>2× RTX 4090 (24GB) 或 1× A100 (80GB)</td>
+<td>單台 4× A100/H100 伺服器即可滿足中大型企業內部部門級併發</td>
+</tr>
+</tbody>
+</table>
+</div></div></details></section>
+<nav aria-label="閱讀下一步" class="concept-next"><a class="button-primary" href="../concepts/models.html">查閱模型比較 →</a><a class="catalog-return" href="../encyclopedia.html#term-map">返回查閱目錄</a><a class="concept-map-link" href="overview.html#map-model">看概念全圖 →</a></nav></main><footer class="content-footer"><div class="content-wrap">大語言模型學習地圖 · 按需要查閱，不影響課程進度。</div></footer></body></html>
+

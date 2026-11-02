@@ -4,7 +4,22 @@
 
 ---
 
-### 1. [`data_atoms_launch_charon_38s.mp4`](./data_atoms_launch_charon_38s.mp4)
+### 1. [`data_briefing_bauhaus_34s.mp4`](./data_briefing_bauhaus_34s.mp4) 🌟 *(最新突破：DeepTutor 理念自生成簡報)*
+- **規格**：1920×1080 @ 30 FPS，長度 34.0 秒，檔案大小約 2.1 MB
+- **主題**：**Data Atoms 商業數據動態影音簡報 (Data-to-Video Briefing)**
+- **設計哲學**：融合 **DeepTutor** 自動教學影片架構、**`Vincentwei1021/mg-styles-15`** 包豪斯幾何美學、**`showheyohtaki/motion-prompt`** 動態標記語彙與 **`cth9191/animate`** 程序化渲染管線。
+- **聲音陣容**：
+  - **人聲旁白**：OpenRouter **Google Gemini 3.8 Flash TTS**（`Charon` 沉穩男性專業音色）
+  - **精準卡點配樂**：120 BPM 機械律動 Rhodes 電鋼琴 + 節奏鼓組（一拍一個動作，人聲時自動避讓 -5.2dB，空檔上湧）
+- **4 幕數據劇本**：
+  1. **00-08s (宏觀體量)**：`#Counter-Roll` 數字計數滾動至 3,690 萬元，8 大產線全覆蓋。
+  2. **08-17s (結構分化)**：包豪斯雙色環形圖扇區展開，`#Pulsing-Halo` 高亮核心雲端平台 25.5% 份額。
+  3. **17-25s (梯隊極值)**：8 階水平柱狀圖動態生長，標註 461.3 萬基準均線，標記 5.9 倍極端值跨度。
+  4. **25-34s (決策總結)**：3 塊包豪斯結構卡片組裝定格，沉澱下一階段資源配置決策。
+
+---
+
+### 2. [`data_atoms_launch_charon_38s.mp4`](./data_atoms_launch_charon_38s.mp4)
 - **規格**：1920×1080 @ 30 FPS，長度 38.0 秒，檔案大小約 8.5 MB
 - **主題**：**Data Atoms Studio 軟體產品發表片**
 - **風格系統**：`huashu-motion` 方向 A — **工作流真實演繹 (`cursor-demo` + `data-story`)**

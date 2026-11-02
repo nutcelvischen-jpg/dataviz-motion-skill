@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html lang="zh-Hant"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>模型如何使用知識與適應任務？｜專題選讀</title><link href="../css/content-layout.css?v=16" rel="stylesheet"/><script defer="" src="../js/concept-reader.js?v=1"></script></head><body><a class="skip-link" href="#main">跳到主要內容</a><header class="content-header"><div class="content-wrap content-header-inner"><a class="content-brand" href="../index.html"><span aria-hidden="true" class="content-brand-mark">學</span><span>大語言模型<br/>學習地圖</span></a><nav aria-label="主要導覽" class="content-nav"><a href="../index.html#learning-map">跟著學</a><a aria-current="page" href="../encyclopedia.html">查概念</a><a href="../lab.html">做實驗</a></nav></div></header><div class="content-wrap"><p class="breadcrumbs"><a class="catalog-return" href="../encyclopedia.html#further-reading">專題選讀</a> ／ 模型如何使用知識與適應任務？</p><div class="content-shell"><aside class="content-sidebar desktop-toc"><strong>本頁目錄</strong><a href="#s1">語意表示與檢索</a><a href="#s2">微調與 LoRA</a><a href="#s3">MoE 混合專家架構</a></aside><main class="content-main" id="main"><details class="mobile-toc"><summary>本頁目錄</summary><nav><a href="#s1">語意表示與檢索</a><a href="#s2">微調與 LoRA</a><a href="#s3">MoE 混合專家架構</a></nav></details><header class="page-intro"><h1>模型如何使用知識與適應任務？</h1><p>分別理解語意表示、檢索、微調與模型架構在處理任務時扮演的角色。</p><ul class="objectives"><li>辨認向量、檢索與微調的不同用途</li><li>區分模型架構與知識取得方式</li></ul><p class="quiet">選讀，不影響六站學習進度；延伸既有教材。</p></header><p class="notice">以下引用既有教材資料，模型名稱、數據、案例與來源尚待核對；其中推演與觀點應與實際觀測分開閱讀。</p><section class="reading-section" id="s1"><h2>語意表示與檢索</h2><p>向量可用來比較表示；檢索系統仍需要資料選擇與結果核對。</p><div class="legacy-material"><div class="concept-card">
+<div>
+<div class="concept-card-header">
+<span class="concept-tag">06 / GEOMETRIC SEMANTICS</span>
+<span class="code-pill">Cosine Similarity: cos(θ)</span>
+</div>
+<div class="concept-term">Embeddings（向量嵌入空間）</div>
+<div class="concept-subtitle">「文字的宇宙 GPS 座標，讓電腦用幾何距離理解意義」</div>
+<p class="concept-desc">
+            Embeddings 把文字轉成向量表示。向量之間的距離可以反映某些相似或相關性；相反的詞也可能因共同語境而接近，結果取決於模型與任務。
+          </p>
+<!-- Flowchart 6 -->
+<div class="concept-flow-box">
+<div class="flow-step-label">語意空間測量流程圖：詞彙到高維座標</div>
+<div class="flow-steps-flex">
+<span class="flow-node"><span>💬</span><strong>輸入文字 ("貓咪")</strong></span>
+<span class="flow-arrow">➔</span>
+<span class="flow-node"><span>🧭</span><strong>1536 維座標投影機</strong></span>
+<span class="flow-arrow">➔</span>
+<span class="flow-node"><span>📐</span><strong>[0.82, 0.15, -0.4...]</strong></span>
+<span class="flow-arrow">➔</span>
+<span class="flow-node"><span>🎯</span><strong>餘弦相似度測距</strong></span>
+</div>
+<div style="font-size: 16px; font-family: var(--font-mono); margin-top: 4px; padding: 6px 8px; border-radius: 4px">
+              經典向量數學：👑 國王 - 👨 男人 + 👩 女人 ≈ <strong>👸 女王</strong>
+</div>
+</div>
+</div>
+<div class="concept-callout callout-insight">
+          💡 <strong>RAG 知識庫真相：</strong> 檢索可以採用關鍵字、向量或混合方法；向量相似度不是唯一方式，檢索後仍要核對來源與內容。
+        </div>
+</div></div></section><section class="reading-section" id="s2"><h2>微調與 LoRA</h2><p>微調會調整模型的行為；不同技術在成本與使用限制上各有差異。</p><div class="legacy-material"><div class="concept-card" style="grid-column: 1 / -1">
+<div>
+<div class="concept-card-header">
+<span class="concept-tag">08 / MODEL ADAPTATION &amp; UNSLOTH</span>
+<span class="code-pill">PEFT · Low-Rank Adaptation</span>
+</div>
+<div class="concept-term">Fine-tuning（微調 / 洗模型）與 LoRA（低秩適應）</div>
+<div class="concept-subtitle">「凍結通用大腦，只插極小專屬外掛矩陣；Unsloth 手寫算子提速 5 倍」</div>
+<p class="concept-desc">
+            預訓練（Pre-training）花費數千萬美元讓模型讀通全世界；而<strong>微調（Fine-tuning，業界俗稱洗模型）</strong>則是企業崗前培訓，讓模型死守特定業務規則與輸出格式。
+            <strong>LoRA（Low-Rank Adaptation）</strong>完全不改動原模型龐大參數，只在旁邊插上小於 1% 的低秩外掛矩陣，幾十 MB 隨插隨換。
+          </p>
+<!-- Conceptual Comparison Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 14px; margin-bottom: 18px">
+<div style="border-radius: 6px; padding: 14px">
+<strong style="font-size: 16px">🎓 預訓練（Pre-training）＝ 讀完大學通識</strong>
+<p style="font-size: 16px; line-height: 1.6; margin-top: 6px">
+                花費幾千萬美元、幾萬張 GPU 讀完全世界維基百科與互聯網。模型什麼都懂一點，是通才，但不懂您公司的專屬名詞、隱私數據與特殊業務格式。
+              </p>
+</div>
+<div style="border-radius: 6px; padding: 14px">
+<strong style="font-size: 16px">🎯 微調（Fine-tuning / 洗模型）＝ 企業崗前培訓</strong>
+<p style="font-size: 16px; line-height: 1.6; margin-top: 6px">
+                拿自家公司的 1,000 條客服對話、法務審查標準或醫療病例，對模型進行<strong>「定向特訓」</strong>。讓它一張口就是道地的行業行話、死守固定 JSON 格式！
+              </p>
+</div>
+<div style="border-radius: 6px; padding: 14px">
+<strong style="font-size: 16px">🧩 LoRA（低秩適應）＝ 輕量熱插拔外掛</strong>
+<p style="font-size: 16px; line-height: 1.6; margin-top: 6px">
+                傳統微調要把 80 億個參數全改一遍（顯存爆炸）。<strong>LoRA 完全凍結原本大腦，只在旁邊插上兩個極小矩陣（參數不到 1%）</strong>！幾十 MB 的外掛包，單張顯卡就能訓完，隨時熱插拔抽換！
+              </p>
+</div>
+</div>
+<!-- UNSLOTH AI DEEP DIVE CARD -->
+<div style="border-radius: 8px; padding: 18px; margin-bottom: 12px">
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px">
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-size: 20px">🦥</span>
+<div>
+<strong style="font-size: 16px">Unsloth AI（unsloth.ai）：全球開發者狂熱的微調加速神庫</strong>
+<div style="font-size: 16px">創辦人：Daniel Han &amp; Michael Han 兄弟 · 開源熱門度 No.1</div>
+</div>
+</div>
+<a href="https://unsloth.ai" rel="noopener noreferrer" style="font-size: 16px; text-decoration: none; font-weight: 700; padding: 4px 10px; border-radius: 12px" target="_blank">
+                🦥 訪問 unsloth.ai 官網 ➔
+              </a>
+</div>
+<p style="font-size: 16px; line-height: 1.6; margin-bottom: 12px">
+              在過去，就算用 LoRA 微調一個 8B 模型，也需要一張頂級 A100 GPU；而 <strong>Unsloth</strong> 徹底顛覆了這一切！它以<strong>「手寫 OpenAI Triton GPU 算子與純手工推導反向傳播求導」</strong>，徹底消滅了 PyTorch 的記憶體浪費：
+            </p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 12px">
+<div style="padding: 10px 12px; border-radius: 6px">
+<div style="font-size: 16px; font-weight: 700">🚀 訓練速度飆升</div>
+<div style="font-size: 20px; font-weight: 800; font-family: var(--font-mono)">2x ~ 5x 提速</div>
+<div style="font-size: 16px">長文本下更高達 30x</div>
+</div>
+<div style="padding: 10px 12px; border-radius: 6px">
+<div style="font-size: 16px; font-weight: 700">💾 顯存消耗狂降</div>
+<div style="font-size: 20px; font-weight: 800; font-family: var(--font-mono)">-70% ~ 80%</div>
+<div style="font-size: 16px">徹底根絕 CUDA OOM 爆顯存</div>
+</div>
+<div style="padding: 10px 12px; border-radius: 6px">
+<div style="font-size: 16px; font-weight: 700">🎯 精度損失</div>
+<div style="font-size: 20px; font-weight: 800; font-family: var(--font-mono)">0% 零損失</div>
+<div style="font-size: 16px">數學精度 100% 吻合</div>
+</div>
+<div style="padding: 10px 12px; border-radius: 6px">
+<div style="font-size: 16px; font-weight: 700">💻 平民硬體支援</div>
+<div style="font-size: 20px; font-weight: 800; font-family: var(--font-mono)">RTX 3090/4090</div>
+<div style="font-size: 16px">免費 Colab T4 亦可微調</div>
+</div>
+</div>
+<div style="font-size: 16px; line-height: 1.6">
+              • <strong>支援全明星陣容</strong>：Llama 3.3/3.2、DeepSeek-R1（支援 GRPO 深度推理微調）、Qwen 2.5、Mistral、Gemma 2。<br/>
+              • <strong>1 行代碼導出 GGUF / Ollama</strong>：微調完成後，只要 <code>model.save_pretrained_gguf("my_model", tokenizer)</code>，就能立刻轉成 GGUF 扔進 Ollama 或本機筆電離線運行，打通了「數據 ➔ 微調 ➔ 本機私有化部署」的終極閉環！
+            </div>
+</div>
+</div>
+<div class="concept-callout callout-insight">
+          💡 <strong>心智模型：</strong> 預訓練是讀博通曉古今，微調是入職入行培訓，LoRA 是隨身工牌，Unsloth 是讓培訓加速 5 倍的超級高鐵！
+        </div>
+</div></div></section><section class="reading-section" id="s3"><h2>MoE 混合專家架構</h2><p>混合專家是一種模型架構，與是否使用檢索或微調是不同層面的選擇。<a href="../concepts/moe.html">先看 MoE 的架構與流程 →</a></p><p class="notice">以下為原教材圖解；專家分工是比喻，模型數字、速度與成本宣稱尚待逐項核對。實際專家是訓練得到的網路模組，不一定對應明確學科，也不保證固定的效能或成本。</p><div class="legacy-material"><div style="margin: 36px 0; border-radius: 8px; padding: 24px">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px">
+<div style="display: flex; align-items: center; gap: 8px">
+<span style="font-size: 16px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; font-family: var(--font-mono)">Architecture Deep Dive</span>
+<strong style="font-size: 20px">專題圖解：什麼是 MoE（混合專家架構）？為什麼 DeepSeek、Qwen、Kimi 都在用？</strong>
+</div>
+<span style="font-size: 16px; font-weight: 700; padding: 4px 10px; border-radius: 20px">
+          2026 前沿模型核心標配
+        </span>
+</div>
+<p style="font-size: 16px; line-height: 1.7; margin-bottom: 16px">
+        在過去，大模型多採用 <strong>Dense（稠密大腦）</strong>架構；而現在全球最火紅的模型（如 DeepSeek-V3/R1、Qwen 2.5-Max、Mixtral、Kimi）全面轉向 <strong>MoE（Mixture of Experts，混合專家架構）</strong>。為什麼它能做到「智商更高、速度更快、成本更低」？用一個<strong>「醫院分科會診」</strong>的比喻就能徹底秒懂：
+      </p>
+<!-- Mental Model Visual Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 20px">
+<!-- Dense Model -->
+<div style="border-radius: 8px; padding: 18px">
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px">
+<strong style="font-size: 16px">🏥 傳統 Dense 架構（鄉村全科醫生）</strong>
+<span style="font-size: 16px; padding: 2px 8px; border-radius: 4px">全腦啟動</span>
+</div>
+<div style="font-size: 16px; line-height: 1.6; margin-bottom: 10px">
+            • <strong>運作方式</strong>：不論病人是感冒喉嚨痛、骨折、還是要做複雜心臟手術，<strong>全院所有醫護人員（所有神經元參數）必須全體集合一起動員</strong>。<br/>
+            • <strong>致命缺點</strong>：參數量一旦做到 6,000 億，每講一個字就要把 6,000 億參數全部算一遍，計算極慢、耗電驚人、顯存直接爆滿！
+          </div>
+</div>
+<!-- MoE Model -->
+<div style="border-radius: 8px; padding: 18px">
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px">
+<strong style="font-size: 16px">🏛️ 現代 MoE 架構（綜合大醫院＋分診台）</strong>
+<span style="font-size: 16px; font-weight: 700; padding: 2px 8px; border-radius: 4px">按需動態激活</span>
+</div>
+<div style="font-size: 16px; line-height: 1.6; margin-bottom: 10px">
+            • <strong>運作方式</strong>：大腦內部拆解為數十位專科專家（代碼專家、數學專家、歷史專家...）。大門口設有<strong>「門控分診台（Router / Gating Network）」</strong>。<br/>
+            • <strong>神奇優勢</strong>：當用戶問「幫我寫 Python 爬蟲」，分診台在 1 毫秒內研判領域，<strong>只呼叫 2~3 位代碼專家，其他專家全部休眠關燈</strong>！
+          </div>
+</div>
+</div>
+<!-- MoE Flowchart -->
+<div style="border-radius: 8px; padding: 16px; margin-bottom: 16px">
+<div style="font-size: 16px; font-weight: 700; margin-bottom: 8px">⚡ MoE 呼叫流程視覺化：以 DeepSeek-V3 總參數 671B（激活 37B）為例</div>
+<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; text-align: center; font-size: 16px">
+<div style="padding: 10px 14px; border-radius: 6px; flex: 1; min-width: 140px">
+<strong>① 用戶提問</strong><br/><span>「解這道微積分題」</span>
+</div>
+<div style="font-weight: 800">➔</div>
+<div style="padding: 10px 14px; border-radius: 6px; flex: 1.2; min-width: 160px">
+<strong>② 門控路由器 (Router)</strong><br/><span>計算機率：數學專長 = 98%</span>
+</div>
+<div style="font-weight: 800">➔</div>
+<div style="padding: 10px 14px; border-radius: 6px; flex: 1.5; min-width: 180px">
+<strong>③ 激活對應專家</strong><br/><span>僅激活 37B 數學專家 (其餘 634B 休眠)</span>
+</div>
+<div style="font-weight: 800">➔</div>
+<div style="padding: 10px 14px; border-radius: 6px; flex: 1; min-width: 140px">
+<strong>④ 飛速輸出解答</strong><br/><span>速度翻倍、算力節省 90%</span>
+</div>
+</div>
+</div>
+<div style="font-size: 16px; line-height: 1.6; padding: 12px 16px; border-radius: 6px">
+        💡 <strong>為什麼 MoE 是 2026 年大殺器？</strong> 它徹底化解了「知識量要大」與「推理速度要快」的物理矛盾——讓模型具備<strong>萬億級百科全書的知識儲備</strong>，但在真實計算時卻只消耗<strong>小模型的電費與推論顯存</strong>！這正是 DeepSeek 與中國開源模型價格能降至每百萬 Tokens 幾美分的核心王牌。
+      </div>
+</div></div></section><div class="button-row"><a class="button-primary" href="../concepts/model.html">返回相關概念 →</a><a class="button-secondary catalog-return" href="../encyclopedia.html#further-reading">回到專題選讀</a></div></main></div></div><footer class="content-footer"><div class="content-wrap">大語言模型學習地圖 · 選讀不影響六站學習進度。</div></footer><script defer="" src="../js/content-navigation.js?v=4"></script><script defer="" src="../js/topic.js?v=2"></script></body></html>

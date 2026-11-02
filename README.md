@@ -32,7 +32,7 @@ open 00_課程手冊與即時看板/WORKSHOP_BOARD.html
 | *10:20 - 10:30* | *中場休息 (10 mins)* | *助教現場環境排除* | |
 | **10:30 - 12:00**<br>(90 mins) | **Module 2：打造專屬 Skill 流程封裝** | • 行政/教學重複性流程 SOP 拆解<br>• System Prompt、邊界約束與 Few-shot 示範<br>• Claude Projects / Custom GPTs 封裝佈署 | [02_Module2 講義與 Skill 庫](./02_Module2_打造專屬Skill流程封裝/README.md)<br>• 公文企劃審核器 Skill<br>• 學生專案回饋器 Skill<br>• 會議紀錄萃取器 Skill |
 | *12:00 - 13:00* | *午餐休息 🍱 (60 mins)* | *午餐、交流與成果工作台體驗* | |
-| **13:00 - 14:20**<br>(80 mins) | **Module 3：Antigravity 建站與 MCP 串接** | • 現代 Agentic Coding 概念<br>• MCP 模型上下文協議與外部工具串接<br>• 資安守則：機敏資料脫敏、Token 防護 | [03_Module3 講義與建站指南](./03_Module3_Antigravity建站與MCP工具串接/README.md)<br>• [index.html 數據工作台](./index.html)<br>• MCP 設定檔範例 |
+| **13:00 - 14:20**<br>(80 mins) | **Module 3：Antigravity 建站與 MCP 串接** | • 現代 Agentic Coding 概念<br>• MCP 模型上下文協議與外部工具串接<br>• 資安守則：機敏資料脫敏、Token 防護 | [03_Module3 講義與建站指南](./03_Module3_Antigravity建站與MCP工具串接/README.md)<br>• [LLM 六站學習地圖](./index.html)<br>• MCP 設定檔範例 |
 | *14:20 - 14:30* | *中場休息 (10 mins)* | *伸展筋骨、短片分鏡構思* | |
 | **14:30 - 15:40**<br>(70 mins) | **Module 4：60 秒動態數據短片製作** | • 短影音黃金數據敘事五段式（Hook $\rightarrow$ 行動）<br>• Data Atoms 視覺美學（幾何形變、阻尼過衝）<br>• Earshot 物理音效與 Auto-Ducking 智慧避讓 | [04_Module4 講義與分鏡腳本](./04_Module4_60秒動態數據短片製作/README.md)<br>• 60秒短片分鏡腳本範本<br>• 自動化渲染管線操作指南 |
 | **15:40 - 16:00**<br>(20 mins) | 結業成果發表與學習地圖 | 學員作品觀摩快閃、講師總結、研習證明發放 | 回饋問卷與電子研習證明說明 |
@@ -74,7 +74,12 @@ open 00_課程手冊與即時看板/WORKSHOP_BOARD.html
 │   ├── video_production_guide.md # DataViz Motion 全自動渲染管線操作指南
 │   └── sample_scripts/         # 示範分鏡腳本 (校務行政篇、商管行銷篇)
 │
-├── index.html                  # 📊 Excel 數據視覺化互動工作台 (Data Atoms Studio)
+├── index.html                  # 📖 大語言模型六站學習地圖
+├── learn.html                  # 六站課程與免 Key 教學示範
+├── encyclopedia.html           # 可搜尋、可分類的概念查閱目錄
+├── concepts/                   # 21 個獨立概念／參考主題
+├── lab.html                    # 互動實驗室
+├── topics/                     # 模型、案例與研究選讀
 ├── css/ & js/                  # 互動工作台樣式與 SheetJS 離線解析引擎
 ├── sample_data/                # 豐富的測試資料集 (.xlsx / .csv)
 ├── videos/                     # 🎬 專案生成之 1080p 示範短片與母帶音軌
@@ -84,19 +89,19 @@ open 00_課程手冊與即時看板/WORKSHOP_BOARD.html
 
 ---
 
-## 📊 亮點工具：Excel 數據視覺化工作台 (Data Atoms Studio)
+## 📖 大語言模型六站學習路線
 
-在根目錄中，我們提供了一個純前端、開箱即用的互動工具 `index.html`：
-- **100% 離線運作**：內建 SheetJS，直接在瀏覽器記憶體中解析 Excel/CSV，資料不出本機，兼顧資安與隱私。
-- **7 大商業數據圖形**：離散體量（柱狀）、時序趨勢（平滑均線）、相關分佈（散點回歸）、結構佔比（環形）、多維畫像（雷達）、轉化路徑（漏斗）、統計矩陣。
-- **一鍵匯出**：支援匯出 1080p 超高解析度 PNG 圖片與 CSV 乾淨檔案。
+在進入資料分析前，可從 [學習地圖](./index.html) 依序學習模型如何回答、上下文、答案限制、查證、權限與工作流程。每站有免 Key 示範與理解檢查；課程進度儲存在本機瀏覽器。網站以「跟著學、查概念、做實驗」三個入口導覽。[查概念](./encyclopedia.html) 提供中英文搜尋及五種分類，點選後進入單一主題；完整說明、原教材與專題保留在各主題頁。[做實驗](./lab.html) 列出八個實驗，並保留自由測試、原預設與 API Key 設定。每站課程依「動手試 → 看解說 → 確認理解」閱讀；手機與電腦使用同一套內容。
 
-在終端機執行或雙擊開啟：
 ```bash
-open index.html
+python3 scripts/llm_preview.py
 ```
 
 ---
+
+啟動後在同一台電腦開啟 http://127.0.0.1:8765/index.html。預覽只提供網站所需的明確檔案；按 Ctrl+C 結束。進度保存在瀏覽器與預覽網址對應的本機儲存空間。原版仍可從 http://127.0.0.1:8765/dist_public_web/index.html 開啟。
+
+本輪調整與驗收紀錄：[簡化導覽驗收](docs/LLM_SIMPLE_NAVIGATION_VERIFICATION.md)。
 
 ## 🎬 專案示範影片
 
@@ -114,9 +119,9 @@ open index.html
 open 00_課程手冊與即時看板/WORKSHOP_BOARD.html
 ```
 
-### 啟動數據工作台：
+### 啟動 LLM 學習地圖：
 ```bash
-open index.html
+python3 scripts/llm_preview.py
 ```
 
 ### 執行 60 秒短片自動化渲染（需 Node.js 與 FFmpeg）：

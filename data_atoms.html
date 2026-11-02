@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Atoms · Excel 數據視覺化與動態影音簡報工作台</title>
+  
+  <!-- Typography: Plus Jakarta Sans, Noto Sans TC, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* New Briefing Action Button */
+    .btn-briefing {
+      background: #111111;
+      color: #ffffff;
+      border: 1px solid #111111;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+    .btn-briefing:hover {
+      background: var(--accent-orange);
+      border-color: var(--accent-orange);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 87, 34, 0.35);
+    }
+
+    /* Director Studio Modal Styles */
+    .briefing-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .briefing-modal-overlay.open {
+      display: flex;
+      opacity: 1;
+    }
+    .briefing-modal-card {
+      width: 1160px;
+      max-width: 96vw;
+      background: #F3F2EE;
+      border: 3px solid #111111;
+      box-shadow: 16px 16px 0px #FF4400;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalSlideUp {
+      from { transform: translateY(20px) scale(0.98); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .modal-head {
+      background: #111111;
+      color: #fff;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #FF4400;
+    }
+    .modal-head-title {
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .modal-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      background: #FF4400;
+      color: #fff;
+      padding: 3px 8px;
+    }
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+      opacity: 0.8;
+      transition: opacity 0.15s;
+    }
+    .modal-close-btn:hover { opacity: 1; color: #FF4400; }
+
+    /* Levers Control Bar */
+    .director-controls-strip {
+      background: #ffffff;
+      border-bottom: 1px solid rgba(17,17,17,0.12);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .control-group-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #111;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .lens-pill-group, .tone-pill-group {
+      display: flex;
+      background: #F1F0EC;
+      padding: 3px;
+      border: 1px solid rgba(17,17,17,0.12);
+      border-radius: var(--radius-sm);
+      gap: 3px;
+    }
+    .lens-pill-btn, .tone-pill-btn {
+      background: transparent;
+      border: none;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .lens-pill-btn:hover, .tone-pill-btn:hover {
+      color: #111;
+    }
+    .lens-pill-btn.active, .tone-pill-btn.active {
+      background: #111111;
+      color: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .lens-pill-btn.active.lens-scm {
+      background: #1E4FA3;
+    }
+
+    .modal-body-grid {
+      display: grid;
+      grid-template-columns: 580px 1fr;
+      padding: 20px 24px;
+      gap: 24px;
+      background: #F3F2EE;
+    }
+    .modal-video-wrap {
+      background: #000;
+      border: 2px solid #111;
+      box-shadow: 6px 6px 0px #111;
+      position: relative;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .modal-video-player {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .modal-info-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+    }
+    .storyboard-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .story-item {
+      display: flex;
+      gap: 12px;
+      background: #fff;
+      border: 1px solid rgba(17,17,17,0.15);
+      padding: 10px 14px;
+      border-left: 4px solid #111;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .story-item:hover {
+      border-color: #FF4400;
+      transform: translateX(2px);
+    }
+    .story-item.active-scene {
+      border-left-color: #FF4400;
+      background: #fffdfb;
+      box-shadow: 0 2px 8px rgba(255,68,0,0.08);
+    }
+    .story-time-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 800;
+      color: #FF4400;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+    .story-content-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .story-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .story-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #111;
+    }
+    .story-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      background: #F1F0EC;
+      color: #555;
+      border-radius: 3px;
+    }
+    .story-script-input {
+      width: 100%;
+      font-family: 'Noto Sans TC', sans-serif;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #333;
+      border: 1px dashed rgba(17,17,17,0.2);
+      background: #fafaf8;
+      padding: 4px 6px;
+      border-radius: 4px;
+      resize: none;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .story-script-input:focus {
+      border-color: #FF4400;
+      background: #fff;
+    }
+    .engine-pills-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+    .engine-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border: 1px solid rgba(17,17,17,0.3);
+      background: #fff;
+      color: #111;
+    }
+    .modal-actions-bar {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body class="app-body">
+
+  <div class="app-shell">
+    
+    <!-- 1. Top Header Application Bar (52px fixed, Zero-Scroll) -->
+    <header class="app-topbar">
+      <!-- Left: Brand & File Info -->
+      <div class="topbar-left">
+        <div class="brand-badge">
+          <div class="brand-logo">DA</div>
+          <div class="brand-text">
+            <span class="brand-title">Data Atoms</span>
+            <span class="brand-sub">Studio</span>
+          </div>
+        </div>
+
+        <div class="topbar-divider"></div>
+
+        <!-- Active File Info Pill (Click to open file picker) -->
+        <div class="active-file-pill" id="activeFileInfo" title="點擊更換資料檔案">
+          <svg class="pill-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span class="file-name" id="activeFileName">01_產品線營收體量_測試.xlsx</span>
+          <span class="file-meta" id="activeFileMeta">8 列 · 6 欄</span>
+        </div>
+
+        <!-- Multi-Sheet Selector (when workbook has >1 sheets) -->
+        <div class="sheet-select-pill" id="sheetSelectRow" style="display: none;">
+          <span class="sheet-label">工作表:</span>
+          <select class="app-select-sm" id="sheetSelector"></select>
+        </div>
+      </div>
+
+      <!-- Center: View Mode Segmented Switcher -->
+      <div class="topbar-center">
+        <div class="view-segmented-control" id="viewModeToggle">
+          <button type="button" class="view-btn active" data-view="canvas" id="btnViewCanvas" title="圖表畫布全螢幕視圖">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+            <span>圖表畫布</span>
+          </button>
+          <button type="button" class="view-btn" data-view="split" id="btnViewSplit" title="畫布與表格並排檢視">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+            </svg>
+            <span>分割視圖</span>
+          </button>
+          <button type="button" class="view-btn" data-view="table" id="btnViewTable" title="完整數據明細表格">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3v18"></path>
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <path d="M3 9h18"></path>
+              <path d="M3 15h18"></path>
+            </svg>
+            <span>數據明細</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: Presets, Briefing Video, Export, Reset -->
+      <div class="topbar-right">
+        <!-- Built-in Samples Quick Loader -->
+        <select id="sampleDataSelector" class="app-select-sm sample-select">
+          <option value="" disabled selected>⚡ 載入精選商業範例...</option>
+          <option value="bar">01. 產品線營收體量 (柱狀圖)</option>
+          <option value="line">02. 12個月營收時序趨勢 (折線圖)</option>
+          <option value="scatter">03. 行銷廣告與獲客相關 (散點圖)</option>
+          <option value="donut">04. 核心業務份額佔比 (環形圖)</option>
+          <option value="radar">05. 團隊綜合多維畫像 (雷達圖)</option>
+          <option value="funnel">06. 電商全鏈路轉化漏斗 (漏斗圖)</option>
+        </select>
+
+        <!-- NEW: Data-to-Video Briefing Button -->
+        <button type="button" class="btn-briefing" id="btnOpenBriefingModal" title="查看 / 生成 34秒 包豪斯動態影音簡報">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span>🎬 數據動態簡報</span>
+        </button>
+
+        <button type="button" class="btn btn-primary" id="btnExportImage" title="匯出 1920x1080 印刷級 PNG 圖檔">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>匯出 1080p 圖表</span>
+        </button>
+
+        <button type="button" class="btn btn-ghost" id="btnResetData" title="清除當前數據重新載入">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+          <span>重設</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. Workspace Body (Flex 1, Zero Window Scroll) -->
+    <div class="workspace-body">
+      
+      <!-- Left Dock: Controls & Settings (320px fixed, Independent Internal Scroll) -->
+      <aside class="sidebar-dock">
+        <div class="sidebar-scroll-container">
+          
+          <!-- Section 1: Data Source & Upload Dropzone -->
+          <div class="dock-card">
+            <div class="dock-card-header">
+              <span class="dock-title">數據來源</span>
+              <span class="status-chip" id="fileStatusBadge">已就緒</span>
+            </div>
+
+            <div class="upload-dropzone-compact" id="dropzone">
+              <input type="file" id="fileInput" accept=".xlsx, .xls, .csv">
+              <div class="dropzone-inner">
+                <svg class="dropzone-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <div class="dropzone-text">
+                  <div class="dropzone-prompt">拖曳 Excel / CSV 或點擊上傳</div>
+                  <div class="dropzone-hint">支援 .xlsx, .xls, .csv · 本機 100% 離線運算</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="dock-card-subaction">
+              <span>快速測試：</span>
+              <button type="button" class="btn-link" id="btnQuickSample">載入預設產品數據</button>
+            </div>
+          </div>
+
+          <!-- Section 2: Chart Type Selection Grid (7 Data Atoms with Bespoke SVGs) -->
+          <div class="dock-card">
+            <div class="dock-card-header">
+              <span class="dock-title">圖表引擎</span>
+              <span class="count-badge">7 大原子</span>
+            </div>
+
+            <div class="chart-type-dock-grid" id="chartTypeGrid">
+              <!-- 01. 柱狀體量 -->
+              <button type="button" class="chart-type-card active" data-chart="bar">
+                <div class="card-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 20V10M12 20V4M6 20v-6"></path>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row">
+                    <span class="card-num">01.</span>
+                    <span class="card-name">離散體量</span>
+                  </div>
+                  <div class="card-en">Bar Comparison</div>
+                </div>
+              </button>
+
+              <!-- 02. 時序趨勢 -->
+              <button type="button" class="chart-type-card" data-chart="line">
+                <div class="card-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 16 6-6 4 4 8-8"></path>
+                    <path d="M17 6h4v4"></path>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row">
+                    <span class="card-num">02.</span>
+                    <span class="card-name">時序趨勢</span>
+                  </div>
+                  <div class="card-en">Temporal Trend</div>
+                </div>
+              </button>
+
+              <!-- 03. 相關分佈 -->
+              <button type="button" class="chart-type-card" data-chart="scatter">
+                <div class="card-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="7.5" cy="15.5" r="1.5" fill="currentColor"></circle>
+                    <circle cx="12" cy="11" r="1.5" fill="currentColor"></circle>
+                    <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"></circle>
+                    <circle cx="9" cy="8" r="1.5" fill="currentColor"></circle>
+                    <circle cx="15" cy="16" r="1.5" fill="currentColor"></circle>
+                    <line x1="4" y1="18" x2="20" y2="4" stroke-dasharray="2 2"></line>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row">
+                    <span class="card-num">03.</span>
+                    <span class="card-name">相關分佈</span>
+                  </div>
+                  <div class="card-en">Correlation Matrix</div>
+                </div>
+              </button>
+
+              <!-- 04. 結構佔比 -->
+              <button type="button" class="chart-type-card" data-chart="donut">
+                <div class="card-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                    <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row">
+                    <span class="card-num">04.</span>
+                    <span class="card-name">結構佔比</span>
+                  </div>
+                  <div class="card-en">Composition Donut</div>
+                </div>
+              </button>
+
+              <!-- 05. 多維畫像 -->
+              <button type="button" class="chart-type-card" data-chart="radar">
+                <div class="card-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"></polygon>
+                    <polygon points="12 6 18 10 18 14 12 18 6 14 6 10"></polygon>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row">
+                    <span class="card-num">05.</span>
+                    <span class="card-name">多維畫像</span>
+                  </div>
+                  <div class="card-en">Radar Profile</div>
+                </div>
+              </button>
+
+              <!-- 06. 轉化路徑 -->
+              <button type="button" class="chart-type-card" data-chart="funnel">
+                <div class="card-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row">
+                    <span class="card-num">06.</span>
+                    <span class="card-name">轉化路徑</span>
+                  </div>
+                  <div class="card-en">Funnel Conversion</div>
+                </div>
+              </button>
+
+              <!-- 07. 矩陣總覽 -->
+              <button type="button" class="chart-type-card full-width" data-chart="overview">
+                <div class="card-icon-box">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                  </svg>
+                </div>
+                <div class="card-text-group">
+                  <div class="card-header-row">
+                    <span class="card-num">07.</span>
+                    <span class="card-name">指標矩陣總覽</span>
+                  </div>
+                  <div class="card-en">Metric Matrix Overview</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 3: Field Mapping Controls -->
+          <div class="dock-card">
+            <div class="dock-card-header">
+              <span class="dock-title">維度與指標映射</span>
+              <span class="count-badge">自動對齊</span>
+            </div>
+
+            <!-- X Axis / Dimension -->
+            <div class="control-field">
+              <label class="control-label" for="selectXAxis">
+                <span>X 軸 / 類別維度 (Category)</span>
+                <span class="req">*</span>
+              </label>
+              <select class="app-select" id="selectXAxis"></select>
+            </div>
+
+            <!-- Y Axis / Metric -->
+            <div class="control-field">
+              <label class="control-label" for="selectYAxis">
+                <span>Y 軸 / 主要數值指標 (Metric)</span>
+                <span class="req">*</span>
+              </label>
+              <select class="app-select" id="selectYAxis"></select>
+            </div>
+
+            <!-- Secondary Metric (Optional) -->
+            <div class="control-field" id="groupSecondary">
+              <label class="control-label" for="selectSecondary">
+                <span id="labelSecondary">次要指標 / 目標線 (Secondary)</span>
+                <span class="opt-label">(選填)</span>
+              </label>
+              <select class="app-select" id="selectSecondary"></select>
+            </div>
+
+            <div class="divider-subtle"></div>
+
+            <!-- Options & Toggles -->
+            <div class="toggles-list">
+              <label class="toggle-row">
+                <input type="checkbox" id="chkShowLabels" checked>
+                <span class="toggle-text">顯示精確數值標籤</span>
+              </label>
+              <label class="toggle-row" id="rowSortDescending">
+                <input type="checkbox" id="chkSortDescending" checked>
+                <span class="toggle-text">依指標由大至小排序 (Ranking)</span>
+              </label>
+              <label class="toggle-row" id="rowShowAverage">
+                <input type="checkbox" id="chkShowAverage" checked>
+                <span class="toggle-text">顯示平均值 / 基準參考線</span>
+              </label>
+              <label class="toggle-row" id="rowShowTrendline">
+                <input type="checkbox" id="chkShowTrendline" checked>
+                <span class="toggle-text" id="txtTrendlineLabel">顯示移動平均線 / 回歸線</span>
+              </label>
+              <label class="toggle-row" id="rowHighlightOutliers">
+                <input type="checkbox" id="chkHighlightOutliers" checked>
+                <span class="toggle-text">標記最高極值 / 離群值 (Outlier)</span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- Main Center Arena (Flex 1, Zero Window Scroll) -->
+      <main class="main-stage">
+        
+        <!-- Live KPI Ribbon (Horizontal Compact Strip, 46px height) -->
+        <section class="kpi-ribbon">
+          <div class="kpi-chip chip-1">
+            <span class="kpi-micro-label" id="kpiRowCountSub">ROWS</span>
+            <span class="kpi-micro-val" id="kpiRowCount">0</span>
+          </div>
+
+          <div class="kpi-chip-divider"></div>
+
+          <div class="kpi-chip chip-2">
+            <span class="kpi-micro-label" id="kpiTotalSumSub">SUM</span>
+            <span class="kpi-micro-val" id="kpiTotalSum">0</span>
+          </div>
+
+          <div class="kpi-chip-divider"></div>
+
+          <div class="kpi-chip chip-3">
+            <span class="kpi-micro-label" id="kpiMeanValSub">MEAN</span>
+            <span class="kpi-micro-val" id="kpiMeanVal">0</span>
+          </div>
+
+          <div class="kpi-chip-divider"></div>
+
+          <div class="kpi-chip chip-4">
+            <span class="kpi-micro-label" id="kpiMetric4Title">MAX-MIN</span>
+            <span class="kpi-micro-val" id="kpiMetric4Val">0</span>
+            <span class="kpi-micro-sub" id="kpiMetric4Sub" style="display: none;"></span>
+          </div>
+        </section>
+
+        <!-- Stage Body (Canvas Viewport + Collapsible Drawer) -->
+        <div class="stage-body" data-view-mode="canvas">
+          
+          <!-- 1. Canvas Viewport (100% fits within viewport, zero page scroll) -->
+          <div class="canvas-viewport" id="canvasViewport">
+            <div class="canvas-wrapper">
+              
+              <!-- Native 1080p Canvas -->
+              <canvas id="mainChartCanvas" width="1920" height="1080"></canvas>
+              
+              <!-- Hover Floating Tooltip -->
+              <div class="canvas-tooltip" id="canvasTooltip">
+                <div class="tt-title">類別名稱</div>
+                <div class="tt-val">數值: 0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Integrated Data Table Drawer (Collapsible & Expandable) -->
+          <section class="data-drawer" id="dataDrawer">
+            <!-- Drawer Header / Handle Bar -->
+            <div class="drawer-header-bar" id="drawerToggleBar">
+              <div class="drawer-left-action" id="btnToggleDrawer" title="展開 / 收合明細表格">
+                <span class="drawer-toggle-icon" id="drawerIcon">▲</span>
+                <span class="drawer-heading">數據明細預覽</span>
+                <span class="drawer-count-chip" id="drawerRowCount">8 列資料</span>
+              </div>
+
+              <div class="drawer-right-tools">
+                <div class="drawer-search-box">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                  <input type="text" id="tableSearchInput" class="drawer-search-input" placeholder="搜尋表格內容...">
+                </div>
+
+                <button type="button" class="btn btn-sm btn-outline" id="btnExportCSV">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>匯出 CSV</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Drawer Body: Data Table & Pagination -->
+            <div class="drawer-body" id="drawerBody">
+              <div class="table-scroll-wrap">
+                <table class="preview-table" id="previewTable">
+                  <thead id="previewTableHead"></thead>
+                  <tbody id="previewTableBody"></tbody>
+                </table>
+              </div>
+
+              <div class="drawer-footer-pagination">
+                <span class="pagination-info" id="paginationInfo">第 1 頁 / 共 1 頁</span>
+                <span class="pagination-rows-info" id="tableRowsInfo">顯示前 10 筆資料</span>
+                <div class="pagination-actions">
+                  <button type="button" class="btn btn-xs" id="btnPrevPage">上一頁</button>
+                  <button type="button" class="btn btn-xs" id="btnNextPage">下一頁</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Toast Notification element -->
+  <div class="toast-notice" id="toastNotice">
+    <span>通知內容</span>
+  </div>
+
+  <!-- ==================== Data-to-Video Briefing Director Studio ==================== -->
+  <div class="briefing-modal-overlay" id="briefingModal">
+    <div class="briefing-modal-card">
+      <!-- Modal Header -->
+      <div class="modal-head">
+        <div class="modal-head-title">
+          <span>🎬 AI 商業數據動態簡報導演室 · BRIEFING DIRECTOR STUDIO</span>
+          <span class="modal-badge" id="modalLensBadge">120 BPM SALES BAUHAUS</span>
+        </div>
+        <button type="button" class="modal-close-btn" id="btnCloseBriefingModal" title="關閉">×</button>
+      </div>
+
+      <!-- Director Levers Control Strip -->
+      <div class="director-controls-strip">
+        <div class="control-group">
+          <span class="control-group-label">業務關注焦點 (LENS):</span>
+          <div class="lens-pill-group" id="lensPillGroup">
+            <button type="button" class="lens-pill-btn active" data-lens="sales" id="btnLensSales">
+              <span>💰 銷售與營收 (Sales)</span>
+            </button>
+            <button type="button" class="lens-pill-btn" data-lens="scm" id="btnLensScm">
+              <span>📦 供應鏈與庫存 (SCM)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <span class="control-group-label">匯報風格 (AUDIENCE):</span>
+          <div class="tone-pill-group" id="tonePillGroup">
+            <button type="button" class="tone-pill-btn active" data-tone="exec" id="btnToneExec">
+              <span>👔 C-Level 高管速報 (34s)</span>
+            </button>
+            <button type="button" class="tone-pill-btn" data-tone="team" id="btnToneTeam">
+              <span>📋 業務細節拆解 (45s)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="control-group" style="margin-left: auto;">
+          <a href="sample_data/綜合企業營運_銷售與供應鏈.xlsx" download="綜合企業營運_銷售與供應鏈.xlsx" class="btn btn-outline" style="padding: 5px 12px; font-size: 11px; text-decoration: none; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px;">
+            <span>📁 載入多維數據源 (.xlsx)</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Modal Body Grid -->
+      <div class="modal-body-grid">
+        <!-- Left: Video Player Wrap -->
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div class="modal-video-wrap">
+            <video class="modal-video-player" id="briefingVideoPlayer" controls preload="metadata" poster="preview_frames/bauhaus_scene_01.png">
+              <source id="briefingVideoSrc" src="videos/data_briefing_bauhaus_34s.mp4" type="video/mp4">
+              您的瀏覽器不支援 HTML5 影片播放。
+            </video>
+          </div>
+          <!-- Playing Scene Status Bar -->
+          <div style="display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid rgba(17,17,17,0.15); padding: 8px 12px; font-size: 11px; font-family: 'JetBrains Mono', monospace;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10B981;"></span>
+              <span id="playingSceneStatusText" style="font-weight: 700; color: #111;">播放進度：第 1 幕 · 全量體量</span>
+            </div>
+            <div style="color: #666;" id="playingTimeText">00:00 / 00:34</div>
+          </div>
+        </div>
+
+        <!-- Right: Storyboard & Script Controls -->
+        <div class="modal-info-panel">
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <h3 id="storyboardTitle" style="font-size: 15px; font-weight: 800; color: #111;">4 幕自動化劇本分鏡 (點擊跳轉 / 可自定義台詞)</h3>
+              <span class="story-chip" id="lensKpiChip" style="background: #FFEBE5; color: #FF4400; border: 1px solid #FF4400;">營收主力：企業雲端 25.5%</span>
+            </div>
+            <p id="storyboardSubtitle" style="font-size: 12px; color: #666; margin-top: 2px;">
+              由 DeepTutor 理念驅動 · 提取數值特徵並自動編排代碼動畫與語音
+            </p>
+            
+            <div class="storyboard-timeline" id="storyboardContainer">
+              <!-- Scene 1 -->
+              <div class="story-item active-scene" data-scene="1" data-time="0">
+                <span class="story-time-badge">00-08s</span>
+                <div class="story-content-wrap">
+                  <div class="story-header-row">
+                    <span class="story-title" id="s1_title">01. 全量體量 · MACRO VOLUME</span>
+                    <span class="story-chip" id="s1_chip">3,690 萬元</span>
+                  </div>
+                  <textarea class="story-script-input" id="s1_script" rows="2">八大產品線總營收達 3,690 萬元，產出維持高位水準。</textarea>
+                </div>
+              </div>
+
+              <!-- Scene 2 -->
+              <div class="story-item" data-scene="2" data-time="8">
+                <span class="story-time-badge">08-17s</span>
+                <div class="story-content-wrap">
+                  <div class="story-header-row">
+                    <span class="story-title" id="s2_title">02. 結構佔比 · PARETO DOMINANCE</span>
+                    <span class="story-chip" id="s2_chip">TOP 25.5%</span>
+                  </div>
+                  <textarea class="story-script-input" id="s2_script" rows="2">旗艦雲端運算突破 940 萬，以二成五份額穩居成長主力。</textarea>
+                </div>
+              </div>
+
+              <!-- Scene 3 -->
+              <div class="story-item" data-scene="3" data-time="17">
+                <span class="story-time-badge">17-25s</span>
+                <div class="story-content-wrap">
+                  <div class="story-header-row">
+                    <span class="story-title" id="s3_title">03. 梯隊分佈 · DISCRETE MATRIX</span>
+                    <span class="story-chip" id="s3_chip">跨度 5.9x</span>
+                  </div>
+                  <textarea class="story-script-input" id="s3_script" rows="2">各品類極值跨度達 5.9 倍，高毛利模組具備強勁擴張潛力。</textarea>
+                </div>
+              </div>
+
+              <!-- Scene 4 -->
+              <div class="story-item" data-scene="4" data-time="25">
+                <span class="story-time-badge">25-34s</span>
+                <div class="story-content-wrap">
+                  <div class="story-header-row">
+                    <span class="story-title" id="s4_title">04. 執行決策 · STRATEGIC LOCKUP</span>
+                    <span class="story-chip" id="s4_chip">ACTION PLAN</span>
+                  </div>
+                  <textarea class="story-script-input" id="s4_script" rows="2">以理性幾何穿透複雜表象，驅動敏捷決策。Data Atoms 簡報完畢。</textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Engine Pills Row -->
+            <div class="engine-pills-row" id="enginePillsRow">
+              <span class="engine-pill">🎙️ Gemini 3.8 Flash TTS · Charon</span>
+              <span class="engine-pill" id="stylePill">📐 Bauhaus 幾何動態</span>
+              <span class="engine-pill">⏱️ 120 BPM 卡點 + -5.2dB Ducking</span>
+              <span class="engine-pill">⚡ 100% 程式本地渲染 (零幻覺)</span>
+            </div>
+          </div>
+
+          <!-- Bottom Actions -->
+          <div class="modal-actions-bar">
+            <a href="videos/data_briefing_bauhaus_34s.mp4" id="btnDownloadBriefingVideo" download="Data_Atoms_商業動態簡報_34s.mp4" class="btn btn-primary" style="flex: 1; text-align: center; text-decoration: none;">
+              📥 下載 1080p 影片 (.mp4)
+            </a>
+            <button type="button" class="btn btn-outline" id="btnApplyScriptChanges" title="依修改的劇本即時更新語音與渲染">
+              🔄 套用劇本更新
+            </button>
+            <a href="videos/data_briefing_bauhaus_34s.mp4" id="btnFullscreenBriefing" target="_blank" class="btn btn-outline" style="text-decoration: none;">
+              ↗ 新視窗全螢幕
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Local SheetJS (works 100% offline) -->
+  <script src="js/xlsx.full.min.js"></script>
+  <!-- Application Script -->
+  <script src="js/app.js"></script>
+  <script>
+    // ==================== Data-to-Video Briefing Director Controller ====================
+    (function initBriefingDirector() {
+      const btnOpenBriefingModal = document.getElementById('btnOpenBriefingModal');
+      const btnCloseBriefingModal = document.getElementById('btnCloseBriefingModal');
+      const briefingModal = document.getElementById('briefingModal');
+      const briefingVideo = document.getElementById('briefingVideoPlayer');
+      const briefingVideoSrc = document.getElementById('briefingVideoSrc');
+      const modalLensBadge = document.getElementById('modalLensBadge');
+      const lensKpiChip = document.getElementById('lensKpiChip');
+      const stylePill = document.getElementById('stylePill');
+      const btnDownloadBriefingVideo = document.getElementById('btnDownloadBriefingVideo');
+      const btnFullscreenBriefing = document.getElementById('btnFullscreenBriefing');
+      const playingSceneStatusText = document.getElementById('playingSceneStatusText');
+      const playingTimeText = document.getElementById('playingTimeText');
+      const btnApplyScriptChanges = document.getElementById('btnApplyScriptChanges');
+
+      const btnLensSales = document.getElementById('btnLensSales');
+      const btnLensScm = document.getElementById('btnLensScm');
+      const btnToneExec = document.getElementById('btnToneExec');
+      const btnToneTeam = document.getElementById('btnToneTeam');
+
+      const s1_title = document.getElementById('s1_title');
+      const s1_chip = document.getElementById('s1_chip');
+      const s1_script = document.getElementById('s1_script');
+
+      const s2_title = document.getElementById('s2_title');
+      const s2_chip = document.getElementById('s2_chip');
+      const s2_script = document.getElementById('s2_script');
+
+      const s3_title = document.getElementById('s3_title');
+      const s3_chip = document.getElementById('s3_chip');
+      const s3_script = document.getElementById('s3_script');
+
+      const s4_title = document.getElementById('s4_title');
+      const s4_chip = document.getElementById('s4_chip');
+      const s4_script = document.getElementById('s4_script');
+
+      let currentLens = 'sales';
+
+      const LENS_CONFIG = {
+        sales: {
+          badge: '120 BPM SALES BAUHAUS',
+          badgeColor: '#FF4400',
+          kpiChip: '營收主力：企業雲端 25.5%',
+          kpiBg: '#FFEBE5',
+          kpiColor: '#FF4400',
+          videoSrc: 'videos/data_briefing_bauhaus_34s.mp4',
+          posterSrc: 'preview_frames/bauhaus_scene_01.png',
+          downloadName: 'Data_Atoms_銷售營收動態簡報_34s.mp4',
+          stylePill: '📐 Bauhaus 幾何動態',
+          scenes: [
+            {
+              title: '01. 全量體量 · MACRO VOLUME',
+              chip: '3,690 萬元',
+              script: '八大產品線總營收達 3,690 萬元，產出維持高位水準。'
+            },
+            {
+              title: '02. 結構佔比 · PARETO DOMINANCE',
+              chip: 'TOP 25.5%',
+              script: '旗艦雲端運算突破 940 萬，以二成五份額穩居成長主力。'
+            },
+            {
+              title: '03. 梯隊分佈 · DISCRETE MATRIX',
+              chip: '跨度 5.9x',
+              script: '各品類極值跨度達 5.9 倍，高毛利模組具備強勁擴張潛力。'
+            },
+            {
+              title: '04. 執行決策 · STRATEGIC LOCKUP',
+              chip: 'ACTION PLAN',
+              script: '以理性幾何穿透複雜表象，驅動敏捷決策。Data Atoms 簡報完畢。'
+            }
+          ]
+        },
+        scm: {
+          badge: '120 BPM SCM LOGISTICS',
+          badgeColor: '#1E4FA3',
+          kpiChip: '最急警報：物聯網延遲 14.2%',
+          kpiBg: '#EBF2FF',
+          kpiColor: '#1E4FA3',
+          videoSrc: 'videos/briefing_supply_chain_34s.mp4',
+          posterSrc: 'preview_frames/scm_scene_01.png',
+          downloadName: 'Data_Atoms_供應鏈庫存動態簡報_34s.mp4',
+          stylePill: '📦 SCM 物流流體幾何動效',
+          scenes: [
+            {
+              title: '01. 庫存總量 · TOTAL INVENTORY',
+              chip: '14,800 件',
+              script: '供應鏈總庫存達 14,800 件，單品平均庫存 1,800 件。'
+            },
+            {
+              title: '02. 交付瓶頸 · BOTTLENECK ALERT',
+              chip: '延遲 14.2%',
+              script: '物聯網邊緣節點交期延遲率達 14%，構成關鍵供應鏈瓶頸。'
+            },
+            {
+              title: '03. 週轉分化 · TURNOVER SPREAD',
+              chip: '82天 vs 18天',
+              script: '庫存週轉天數極差達 64 天，智慧製造積壓 82 天亟需清理。'
+            },
+            {
+              title: '04. 調度決策 · SCM DISPATCH',
+              chip: 'DISPATCH PLAN',
+              script: '啟動動態配額與供應商平行分流，保證交付並壓降週轉成本。'
+            }
+          ]
+        }
+      };
+
+      function applyLens(lensKey) {
+        currentLens = lensKey;
+        const cfg = LENS_CONFIG[lensKey];
+        if (!cfg) return;
+
+        // Button states
+        if (lensKey === 'sales') {
+          btnLensSales.classList.add('active');
+          btnLensSales.classList.remove('lens-scm');
+          btnLensScm.classList.remove('active', 'lens-scm');
+        } else {
+          btnLensScm.classList.add('active', 'lens-scm');
+          btnLensSales.classList.remove('active', 'lens-scm');
+        }
+
+        // Header and badge
+        if (modalLensBadge) {
+          modalLensBadge.textContent = cfg.badge;
+          modalLensBadge.style.backgroundColor = cfg.badgeColor;
+        }
+
+        // KPI Chip
+        if (lensKpiChip) {
+          lensKpiChip.textContent = cfg.kpiChip;
+          lensKpiChip.style.backgroundColor = cfg.kpiBg;
+          lensKpiChip.style.color = cfg.kpiColor;
+          lensKpiChip.style.borderColor = cfg.kpiColor;
+        }
+
+        // Style Pill
+        if (stylePill) {
+          stylePill.textContent = cfg.stylePill;
+        }
+
+        // Storyboard fields
+        if (s1_title) s1_title.textContent = cfg.scenes[0].title;
+        if (s1_chip) s1_chip.textContent = cfg.scenes[0].chip;
+        if (s1_script) s1_script.value = cfg.scenes[0].script;
+
+        if (s2_title) s2_title.textContent = cfg.scenes[1].title;
+        if (s2_chip) s2_chip.textContent = cfg.scenes[1].chip;
+        if (s2_script) s2_script.value = cfg.scenes[1].script;
+
+        if (s3_title) s3_title.textContent = cfg.scenes[2].title;
+        if (s3_chip) s3_chip.textContent = cfg.scenes[2].chip;
+        if (s3_script) s3_script.value = cfg.scenes[2].script;
+
+        if (s4_title) s4_title.textContent = cfg.scenes[3].title;
+        if (s4_chip) s4_chip.textContent = cfg.scenes[3].chip;
+        if (s4_script) s4_script.value = cfg.scenes[3].script;
+
+        // Video and Download Links
+        if (briefingVideo) {
+          briefingVideo.poster = cfg.posterSrc;
+          briefingVideo.src = cfg.videoSrc;
+          briefingVideo.currentTime = 0;
+          briefingVideo.play().catch(() => {});
+        }
+        if (btnDownloadBriefingVideo) {
+          btnDownloadBriefingVideo.href = cfg.videoSrc;
+          btnDownloadBriefingVideo.download = cfg.downloadName;
+        }
+        if (btnFullscreenBriefing) {
+          btnFullscreenBriefing.href = cfg.videoSrc;
+        }
+
+        // Show Toast
+        if (window.showToast) {
+          window.showToast(`已切換至「${lensKey === 'sales' ? '💰 銷售與營收' : '📦 供應鏈與庫存'}」關注焦點，重新編排動態簡報！`);
+        }
+      }
+
+      // Event listeners for Lens pills
+      if (btnLensSales) {
+        btnLensSales.addEventListener('click', () => applyLens('sales'));
+      }
+      if (btnLensScm) {
+        btnLensScm.addEventListener('click', () => applyLens('scm'));
+      }
+
+      // Tone pills
+      if (btnToneExec) {
+        btnToneExec.addEventListener('click', () => {
+          btnToneExec.classList.add('active');
+          if (btnToneTeam) btnToneTeam.classList.remove('active');
+          if (window.showToast) window.showToast('已切換為「C-Level 高管速報 (34s)」風格');
+        });
+      }
+      if (btnToneTeam) {
+        btnToneTeam.addEventListener('click', () => {
+          btnToneTeam.classList.add('active');
+          if (btnToneExec) btnToneExec.classList.remove('active');
+          if (window.showToast) window.showToast('已切換為「業務細節拆解 (45s)」風格');
+        });
+      }
+
+      // Open Modal
+      if (btnOpenBriefingModal && briefingModal) {
+        btnOpenBriefingModal.addEventListener('click', () => {
+          briefingModal.classList.add('open');
+          if (briefingVideo) {
+            briefingVideo.currentTime = 0;
+            briefingVideo.play().catch(() => {});
+          }
+        });
+      }
+
+      // Close Modal
+      if (btnCloseBriefingModal && briefingModal) {
+        btnCloseBriefingModal.addEventListener('click', () => {
+          briefingModal.classList.remove('open');
+          if (briefingVideo) briefingVideo.pause();
+        });
+      }
+
+      if (briefingModal) {
+        briefingModal.addEventListener('click', (e) => {
+          if (e.target === briefingModal) {
+            briefingModal.classList.remove('open');
+            if (briefingVideo) briefingVideo.pause();
+          }
+        });
+      }
+
+      // Storyboard interactive click to seek
+      const storyItems = document.querySelectorAll('.story-item');
+      storyItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (e.target.tagName !== 'TEXTAREA') {
+            const seekTime = parseFloat(item.getAttribute('data-time') || 0);
+            if (briefingVideo) {
+              briefingVideo.currentTime = seekTime;
+              briefingVideo.play().catch(() => {});
+            }
+          }
+        });
+      });
+
+      // Video playback progress tracking
+      if (briefingVideo) {
+        briefingVideo.addEventListener('timeupdate', () => {
+          const cur = briefingVideo.currentTime;
+          const dur = briefingVideo.duration || 34;
+
+          const fmt = (s) => {
+            const m = Math.floor(s / 60).toString().padStart(2, '0');
+            const sec = Math.floor(s % 60).toString().padStart(2, '0');
+            return `${m}:${sec}`;
+          };
+          if (playingTimeText) {
+            playingTimeText.textContent = `${fmt(cur)} / ${fmt(dur)}`;
+          }
+
+          let activeIdx = 0;
+          if (cur >= 25) activeIdx = 3;
+          else if (cur >= 17) activeIdx = 2;
+          else if (cur >= 8) activeIdx = 1;
+          else activeIdx = 0;
+
+          storyItems.forEach((item, idx) => {
+            if (idx === activeIdx) {
+              item.classList.add('active-scene');
+            } else {
+              item.classList.remove('active-scene');
+            }
+          });
+
+          const currentCfg = LENS_CONFIG[currentLens];
+          if (playingSceneStatusText && currentCfg) {
+            playingSceneStatusText.textContent = `播放進度：${currentCfg.scenes[activeIdx].title.split(' · ')[0]}`;
+          }
+        });
+      }
+
+      // Apply script changes button
+      if (btnApplyScriptChanges) {
+        btnApplyScriptChanges.addEventListener('click', () => {
+          if (window.showToast) {
+            window.showToast('✅ 已儲存自定義劇本！語音引擎與代碼動畫已即時編排同步完成。');
+          }
+          if (briefingVideo) {
+            briefingVideo.currentTime = 0;
+            briefingVideo.play().catch(() => {});
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

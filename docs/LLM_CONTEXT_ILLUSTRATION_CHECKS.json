@@ -1,0 +1,23 @@
+{
+  "protected_files_unchanged": {
+    "lab.html": true,
+    "js/lab.js": true,
+    "js/lab-legacy-data.js": true,
+    "js/learning-progress.js": true,
+    "js/learning-data.js": true,
+    "js/learning.js": true,
+    "js/reference.js": true,
+    "js/concept-map.js": true,
+    "concepts/overview.html": true
+  },
+  "original_teaching_units": 34,
+  "missing_teaching_units": [],
+  "missing_links": [],
+  "missing_ids": [],
+  "image": {
+    "path": "assets/illustrations/context-memory-v1.png",
+    "width": 1774,
+    "height": 887,
+    "bytes": 2562670
+  }
+}
