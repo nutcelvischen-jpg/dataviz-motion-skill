@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API 金鑰資安防護與前後端架構圖解 · Diagram Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper: #f8f9fa;
+      --color-paper-card: #ffffff;
+      --color-ink: #2d3142;
+      --color-muted: #5c677d;
+      --color-rule: rgba(45, 49, 66, 0.12);
+      --color-accent: #bf4520; /* 警示橘紅 */
+      --color-accent-tint: rgba(191, 69, 32, 0.08);
+      --color-success: #1b7a43; /* 安全綠 */
+      --color-success-tint: rgba(27, 122, 67, 0.08);
+      --color-brand: #2e5aa8; /* 架構藍 */
+      --color-brand-tint: rgba(46, 90, 168, 0.08);
+      --font-sans: 'Geist', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+      --font-serif: 'Instrument Serif', Georgia, serif;
+      --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      color: var(--color-ink);
+      background: var(--color-paper);
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .frame {
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    /* 頂部標題區 */
+    .header-bar {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--color-rule);
+      padding-bottom: 1.5rem;
+    }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--color-accent);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .eyebrow::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--color-accent);
+      border-radius: 50%;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 3.2vw + 1rem, 2.75rem);
+      line-height: 1.15;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      color: var(--color-ink);
+      margin-bottom: 0.75rem;
+    }
+    .subtitle {
+      max-width: 84ch;
+      font-size: 1rem;
+      line-height: 1.65;
+      color: var(--color-muted);
+    }
+    .subtitle strong {
+      color: var(--color-ink);
+      font-weight: 600;
+    }
+
+    /* 新聞教訓橫幅 (BlockTempo 事件) */
+    .incident-callout {
+      background: #ffffff;
+      border: 1px solid #ffd0c7;
+      border-left: 4px solid var(--color-accent);
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1.25rem;
+    }
+    .incident-content {
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: var(--color-ink);
+    }
+    .incident-tag {
+      display: inline-block;
+      background: var(--color-accent-tint);
+      color: var(--color-accent);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      margin-bottom: 0.35rem;
+    }
+    .incident-meta {
+      font-size: 0.8rem;
+      color: var(--color-muted);
+      margin-top: 0.3rem;
+    }
+    .incident-link {
+      color: var(--color-brand);
+      text-decoration: underline;
+      font-weight: 500;
+    }
+    .incident-badge {
+      flex-shrink: 0;
+      background: #fff0ed;
+      border: 1px solid #ffccd2;
+      border-radius: 6px;
+      padding: 0.6rem 0.9rem;
+      text-align: right;
+    }
+    .incident-badge .num {
+      font-family: var(--font-mono);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--color-accent);
+      display: block;
+      line-height: 1.1;
+    }
+    .incident-badge .label {
+      font-size: 0.7rem;
+      color: var(--color-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* 架構圖主容器 */
+    .diagram-card {
+      background: var(--color-paper-card);
+      border: 1px solid var(--color-rule);
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+      overflow-x: auto;
+    }
+    .diagram-container {
+      width: 100%;
+      min-width: 1140px;
+    }
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    /* 互動 Hover 與狀態樣式 */
+    .ledger-row {
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .ledger-row:hover rect.ledger-bg {
+      fill: rgba(46, 90, 168, 0.06);
+    }
+    .component-box {
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+    .component-box:hover {
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.06));
+    }
+
+    /* 底部操作與教學指引 */
+    .instruction-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+    .instruction-card {
+      background: #ffffff;
+      border: 1px solid var(--color-rule);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+    .instruction-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .instruction-card p {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--color-muted);
+    }
+    .code-chip {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      background: rgba(45, 49, 66, 0.06);
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      color: var(--color-ink);
+    }
+
+    @media (max-width: 900px) {
+      .instruction-grid { grid-template-columns: 1fr; }
+      .incident-callout { flex-direction: column; }
+      .incident-badge { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="frame">
+    <!-- 頂部導言 -->
+    <header class="header-bar">
+      <p class="eyebrow">Architecture Delta · Security Specification</p>
+      <h1>API 金鑰資安防護與前後端分層架構</h1>
+      <p class="subtitle">
+        新手開發 AI 應用最致命的直覺錯誤：<strong>「直接在前端 HTML / JS 中寫死 API Key」</strong>。
+        只要造訪者按一下滑鼠右鍵「檢視網頁原始碼」或按 F12，金鑰在 30 秒內就會被爬蟲抓走。本圖解以編輯級架構對比，示範如何透過 <strong>BFF（Backend-for-Frontend）後端代理</strong> 實現零信任資安隔離。
+      </p>
+    </header>
+
+    <!-- 真實災難案例呼應 -->
+    <section class="incident-callout" role="note">
+      <div class="incident-content">
+        <span class="incident-tag">真實資安血淚代價</span>
+        <p>
+          <strong>韓國開發者遭 Claude API 扣款 1,660 萬美元（約 5.3 億台幣）</strong>：
+          開發者因程式碼缺乏預算熔斷機制、金鑰未於安全後端隔離，且遭外部併發循環觸發，短時間內累積上千億 Token 帳單。
+        </p>
+        <p class="incident-meta">
+          新聞報導資料來源：<a class="incident-link" href="https://www.blocktempo.com/anthropic-claude-api-billing-glitch-166-million-charge-zero-dashboard/" target="_blank" rel="noopener noreferrer">動區動趨 BlockTempo · Anthropic 異常帳單事件</a>
+        </p>
+      </div>
+      <div class="incident-badge">
+        <span class="num">$16.6M</span>
+        <span class="label">最高單次扣款紀錄 (NT$ 5.3 億)</span>
+      </div>
+    </section>
+
+    <!-- SVG Architecture Delta 畫布 -->
+    <div class="diagram-card">
+      <div class="diagram-container" role="region" aria-label="API 安全架構演進：前後對比與安全重構日誌" tabindex="0">
+        <svg viewBox="0 0 1200 680" xmlns="http://www.w3.org/2000/svg" data-diagram="architecture-delta" role="img" aria-labelledby="diagram-title diagram-desc">
+          <title id="diagram-title">API 金鑰防護：從前端直連到後端代理架構演進</title>
+          <desc id="diagram-desc">左側為高風險前端直連架構，金鑰暴露於客戶端；中間為六大安全重構變更日誌；右側為後端代理與環境變數隔離架構，確保零金鑰外洩。</desc>
+          
+          <defs>
+            <!-- 箭頭定義 -->
+            <marker id="arrow-muted" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+              <polygon points="0 0, 8 3, 0 6" fill="#5c677d"/>
+            </marker>
+            <marker id="arrow-danger" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+              <polygon points="0 0, 8 3, 0 6" fill="#bf4520"/>
+            </marker>
+            <marker id="arrow-success" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+              <polygon points="0 0, 8 3, 0 6" fill="#1b7a43"/>
+            </marker>
+            <marker id="arrow-brand" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+              <polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/>
+            </marker>
+          </defs>
+
+          <!-- 畫布底色 -->
+          <rect width="1200" height="680" fill="#f8f9fa"/>
+
+          <!-- 頂部三欄標題 -->
+          <!-- 左欄：Before -->
+          <text x="24" y="32" fill="#2d3142" font-size="16" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="700">Before · 致命前端直連</text>
+          <text x="24" y="54" fill="#bf4520" font-size="11" font-family="'Geist Mono', monospace" font-weight="600">FATAL · CLIENT-SIDE LEAK (v1)</text>
+
+          <!-- 中欄：Changes Ledger -->
+          <text x="424" y="32" fill="#2d3142" font-size="16" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="700">Changes · 安全重構日誌</text>
+          <text x="424" y="54" fill="#5c677d" font-size="11" font-family="'Geist Mono', monospace">6 ACTIONS · ZERO CLIENT TRUST</text>
+
+          <!-- 右欄：After -->
+          <text x="840" y="32" fill="#2d3142" font-size="16" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="700">After · 安全後端代理 (BFF)</text>
+          <text x="840" y="54" fill="#1b7a43" font-size="11" font-family="'Geist Mono', monospace" font-weight="600">SECURE · VAULT &amp; RATE-LIMITED (v2)</text>
+
+          <!-- 兩條縱向分界線 -->
+          <path d="M 392 16 V 576 M 808 16 V 576" stroke="rgba(45,49,66,0.12)" stroke-width="1" stroke-dasharray="2 4"/>
+
+          <!-- ================================================================= -->
+          <!-- 左欄：BEFORE SNAPSHOT (translate 24, 80) -->
+          <!-- ================================================================= -->
+          <g data-snapshot="before" transform="translate(24, 80)">
+            <!-- 連線 r1: 瀏覽器原始碼被攻擊者竊取 (Danger Dashed) -->
+            <path data-kind="relationship" data-object-id="r1" data-status="removed" d="M 120 72 V 120 Q 120 130 110 130 H 70 V 160" fill="none" stroke="#bf4520" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-danger)"/>
+            
+            <!-- 連線 r2: 瀏覽器直接攜帶金鑰呼叫 LLM 雲端 (Fatal Direct Link) -->
+            <path data-kind="relationship" data-object-id="r2" data-status="rewired" d="M 230 72 V 340" fill="none" stroke="#bf4520" stroke-width="2" stroke-dasharray="8 3 2 3" marker-end="url(#arrow-danger)"/>
+
+            <!-- 連線 r3: 攻擊者竊取金鑰後發動惡意盜刷 (High Volume Attack) -->
+            <path data-kind="relationship" data-object-id="r3" data-status="removed" d="M 70 236 V 290 Q 70 300 85 300 H 160 Q 170 300 170 315 V 340" fill="none" stroke="#bf4520" stroke-width="2.5" marker-end="url(#arrow-danger)"/>
+
+            <!-- 連線標籤 -->
+            <rect x="238" y="180" width="100" height="20" rx="3" fill="#ffffff" stroke="#ffd0c7" stroke-width="1"/>
+            <text x="244" y="194" fill="#bf4520" font-size="9" font-family="'Geist Mono', monospace" font-weight="600">r2 · 明文直連 (危險)</text>
+
+            <rect x="18" y="125" width="86" height="18" rx="3" fill="#ffffff" stroke="#ffd0c7" stroke-width="1"/>
+            <text x="24" y="138" fill="#bf4520" font-size="8.5" font-family="'Geist Mono', monospace">r1 · 右鍵偷金鑰</text>
+
+            <rect x="80" y="278" width="80" height="18" rx="3" fill="#ffffff" stroke="#ffd0c7" stroke-width="1"/>
+            <text x="86" y="291" fill="#bf4520" font-size="8.5" font-family="'Geist Mono', monospace">r3 · 併發盜刷</text>
+
+            <!-- 元件 1: 前端瀏覽器 (致命設計) -->
+            <g class="component-box" data-kind="component" data-object-id="browser_leaky" data-status="changed">
+              <rect x="70" y="0" width="230" height="72" rx="8" fill="#ffffff" stroke="#bf4520" stroke-width="1.8"/>
+              <!-- 危險紅邊指示條 -->
+              <path d="M 71 8 V 64" stroke="#bf4520" stroke-width="4" stroke-linecap="round"/>
+              <text x="86" y="18" fill="#bf4520" font-size="8.5" font-family="'Geist Mono', monospace" font-weight="600">~ CLIENT · EXPOSED KEY</text>
+              <text x="86" y="38" fill="#2d3142" font-size="13" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="700">前端網頁 (Client HTML/JS)</text>
+              <text x="86" y="56" fill="#bf4520" font-size="9.5" font-family="'Geist Mono', monospace">const KEY = "sk-ant-api03..."</text>
+            </g>
+
+            <!-- 元件 2: 攻擊者 / 惡意爬蟲 (即將被阻絕) -->
+            <g class="component-box" data-kind="component" data-object-id="attacker" data-status="removed">
+              <rect x="10" y="160" width="150" height="76" rx="8" fill="#ffffff" stroke="#5c677d" stroke-width="1.2" stroke-dasharray="4 4"/>
+              <text x="22" y="178" fill="#bf4520" font-size="8" font-family="'Geist Mono', monospace" font-weight="600">− ATTACKER · SCRAPER</text>
+              <text x="22" y="198" fill="#2d3142" font-size="12" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="600">惡意爬蟲 / 訪客</text>
+              <text x="22" y="216" fill="#5c677d" font-size="9" font-family="'Geist', 'Noto Sans TC', sans-serif">F12 檢視原始碼 30秒取走</text>
+            </g>
+
+            <!-- 元件 3: Claude / LLM 雲端 API (無辜扣款) -->
+            <g class="component-box" data-kind="component" data-object-id="llm_cloud" data-status="unchanged">
+              <rect x="70" y="340" width="230" height="80" rx="8" fill="#ffffff" stroke="#5c677d" stroke-width="1.2"/>
+              <text x="86" y="358" fill="#5c677d" font-size="8.5" font-family="'Geist Mono', monospace">= LLM PROVIDER · UNCHANGED</text>
+              <text x="86" y="378" fill="#2d3142" font-size="13" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="700">Anthropic Claude API</text>
+              <text x="86" y="396" fill="#5c677d" font-size="9.5" font-family="'Geist Mono', monospace">api.anthropic.com/v1/messages</text>
+              <text x="86" y="411" fill="#bf4520" font-size="9" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="600">⚠️ 只要有 Key 一律扣款！無防護</text>
+            </g>
+
+            <!-- 警語小框 -->
+            <rect x="10" y="435" width="290" height="34" rx="4" fill="rgba(191,69,32,0.06)" stroke="rgba(191,69,32,0.2)" stroke-width="1"/>
+            <text x="20" y="456" fill="#bf4520" font-size="10" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="500">❌ 弱點：用戶端代碼完全公開，任何人皆可盜刷金鑰</text>
+          </g>
+
+          <!-- ================================================================= -->
+          <!-- 中欄：CHANGES LEDGER (424, 80) -->
+          <!-- ================================================================= -->
+          <g data-role="ledger" transform="translate(424, 80)">
+            <!-- 變更 01 -->
+            <g class="ledger-row" data-change="REMOVED" data-target="client_key">
+              <rect class="ledger-bg" x="-8" y="0" width="370" height="52" rx="4" fill="transparent"/>
+              <text x="0" y="16" fill="#bf4520" font-size="9" font-family="'Geist Mono', monospace" font-weight="700">01</text>
+              <text x="26" y="16" fill="#bf4520" font-size="8.5" font-family="'Geist Mono', monospace" font-weight="700" letter-spacing="0.08em">REMOVED · client_key</text>
+              <text x="26" y="34" fill="#2d3142" font-size="11.5" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="600">徹底刪除瀏覽器中任何明文金鑰</text>
+              <text x="26" y="47" fill="#5c677d" font-size="9" font-family="'Geist', 'Noto Sans TC', sans-serif">前端 JS 絕不出現 sk-ant- / sk-proj- 字串</text>
+              <path d="M 0 54 H 350" stroke="rgba(45,49,66,0.08)" stroke-width="1"/>
+            </g>
+
+            <!-- 變更 02 -->
+            <g class="ledger-row" data-change="ADDED" data-target="proxy_server" transform="translate(0, 58)">
+              <rect class="ledger-bg" x="-8" y="0" width="370" height="52" rx="4" fill="transparent"/>
+              <text x="0" y="16" fill="#1b7a43" font-size="9" font-family="'Geist Mono', monospace" font-weight="700">02</text>
+              <text x="26" y="16" fill="#1b7a43" font-size="8.5" font-family="'Geist Mono', monospace" font-weight="700" letter-spacing="0.08em">ADDED · backend_proxy</text>
+              <text x="26" y="34" fill="#2d3142" font-size="11.5" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="600">建立 BFF 後端伺服器 (Node.js/FastAPI)</text>
+              <text x="26" y="47" fill="#5c677d" font-size="9" font-family="'Geist', 'Noto Sans TC', sans-serif">所有 AI 呼叫皆轉由伺服器內部發起</text>
+              <path d="M 0 54 H 350" stroke="rgba(45,49,66,0.08)" stroke-width="1"/>
+            </g>
+
+            <!-- 變更 03 -->
+            <g class="ledger-row" data-change="ADDED" data-target="env_vault" transform="translate(0, 116)">
+              <rect class="ledger-bg" x="-8" y="0" width="370" height="52" rx="4" fill="transparent"/>
+              <text x="0" y="16" fill="#1b7a43" font-size="9" font-family="'Geist Mono', monospace" font-weight="700">03</text>
+              <text x="26" y="16" fill="#1b7a43" font-size="8.5" font-family="'Geist Mono', monospace" font-weight="700" letter-spacing="0.08em">ADDED · env_vault</text>
+              <text x="26" y="34" fill="#2d3142" font-size="11.5" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="600">金鑰隔離至 .env 與雲端 Secret Manager</text>
+              <text x="26" y="47" fill="#5c677d" font-size="9" font-family="'Geist', 'Noto Sans TC', sans-serif">僅在伺服器記憶體中讀取，永不上傳前端</text>
+              <path d="M 0 54 H 350" stroke="rgba(45,49,66,0.08)" stroke-width="1"/>
+            </g>
+
+            <!-- 變更 04 -->
+            <g class="ledger-row" data-change="ADDED" data-target="security_guard" transform="translate(0, 174)">
+              <rect class="ledger-bg" x="-8" y="0" width="370" height="52" rx="4" fill="transparent"/>
+              <text x="0" y="16" fill="#1b7a43" font-size="9" font-family="'Geist Mono', monospace" font-weight="700">04</text>
+              <text x="26" y="16" fill="#1b7a43" font-size="8.5" font-family="'Geist Mono', monospace" font-weight="700" letter-spacing="0.08em">ADDED · rate_limit &amp; budget_cap</text>
+              <text x="26" y="34" fill="#2d3142" font-size="11.5" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="600">後端防護網：限速 + 每日花費上限熔斷</text>
+              <text x="26" y="47" fill="#5c677d" font-size="9" font-family="'Geist', 'Noto Sans TC', sans-serif">限制每 IP 5次/分；超過預算自動停機保護</text>
+              <path d="M 0 54 H 350" stroke="rgba(45,49,66,0.08)" stroke-width="1"/>
+            </g>
+
+            <!-- 變更 05 -->
+            <g class="ledger-row" data-change="REWIRED" data-target="r2" transform="translate(0, 232)">
+              <rect class="ledger-bg" x="-8" y="0" width="370" height="52" rx="4" fill="transparent"/>
+              <text x="0" y="16" fill="#2e5aa8" font-size="9" font-family="'Geist Mono', monospace" font-weight="700">05</text>
+              <text x="26" y="16" fill="#2e5aa8" font-size="8.5" font-family="'Geist Mono', monospace" font-weight="700" letter-spacing="0.08em">REWIRED · client_traffic</text>
+              <text x="26" y="34" fill="#2d3142" font-size="11.5" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="600">前端請求改發內部端點 POST /api/chat</text>
+              <text x="26" y="47" fill="#5c677d" font-size="9" font-family="'Geist', 'Noto Sans TC', sans-serif">改用 Session/Cookie 驗證，絕不傳遞 API Key</text>
+              <path d="M 0 54 H 350" stroke="rgba(45,49,66,0.08)" stroke-width="1"/>
+            </g>
+
+            <!-- 變更 06 -->
+            <g class="ledger-row" data-change="ADDED" data-target="r4" transform="translate(0, 290)">
+              <rect class="ledger-bg" x="-8" y="0" width="370" height="52" rx="4" fill="transparent"/>
+              <text x="0" y="16" fill="#1b7a43" font-size="9" font-family="'Geist Mono', monospace" font-weight="700">06</text>
+              <text x="26" y="16" fill="#1b7a43" font-size="8.5" font-family="'Geist Mono', monospace" font-weight="700" letter-spacing="0.08em">ADDED · server_secure_link</text>
+              <text x="26" y="34" fill="#2d3142" font-size="11.5" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="600">受控環境私密發送至 Anthropic API</text>
+              <text x="26" y="47" fill="#5c677d" font-size="9" font-family="'Geist', 'Noto Sans TC', sans-serif">回傳結果先由後端清洗，再送給前端渲染</text>
+              <path d="M 0 54 H 350" stroke="rgba(45,49,66,0.08)" stroke-width="1"/>
+            </g>
+
+            <!-- 底部保持不變清單 -->
+            <g transform="translate(0, 360)">
+              <rect x="0" y="0" width="350" height="48" rx="4" fill="rgba(45,49,66,0.04)"/>
+              <text x="12" y="18" fill="#5c677d" font-size="8" font-family="'Geist Mono', monospace" font-weight="600" letter-spacing="0.14em">PRESERVED COMPONENTS</text>
+              <text x="12" y="36" fill="#2d3142" font-size="10.5" font-family="'Geist', 'Noto Sans TC', sans-serif">
+                前端使用者操作介面 · Claude 頂級 AI 模型能力
+              </text>
+            </g>
+          </g>
+
+          <!-- ================================================================= -->
+          <!-- 右欄：AFTER SNAPSHOT (translate 840, 80) -->
+          <!-- ================================================================= -->
+          <g data-snapshot="after" transform="translate(840, 80)">
+            <!-- 連線 r_safe1: 前端到後端代理 (Secure Session Request) -->
+            <path data-kind="relationship" data-object-id="r4" data-status="added" d="M 170 72 V 150" fill="none" stroke="#2e5aa8" stroke-width="2" marker-end="url(#arrow-brand)"/>
+
+            <!-- 連線 r_safe2: 後端安全調用 Claude (Internal Secure Link) -->
+            <path data-kind="relationship" data-object-id="r5" data-status="added" d="M 170 295 V 340" fill="none" stroke="#1b7a43" stroke-width="2" marker-end="url(#arrow-success)"/>
+
+            <!-- 連線標籤 -->
+            <rect x="180" y="98" width="130" height="20" rx="3" fill="#ffffff" stroke="#c4d6f0" stroke-width="1"/>
+            <text x="186" y="112" fill="#2e5aa8" font-size="9" font-family="'Geist Mono', monospace" font-weight="600">POST /api/chat (零金鑰)</text>
+
+            <rect x="180" y="306" width="130" height="20" rx="3" fill="#ffffff" stroke="#bfe5cf" stroke-width="1"/>
+            <text x="186" y="320" fill="#1b7a43" font-size="9" font-family="'Geist Mono', monospace" font-weight="600">帶 .env 金鑰私密調用</text>
+
+            <!-- 阻絕的攻擊者連線 (被阻絕) -->
+            <path d="M 50 110 V 165 Q 50 175 60 175 H 68" fill="none" stroke="#bf4520" stroke-width="1.2" stroke-dasharray="2 3"/>
+            <text x="12" y="145" fill="#bf4520" font-size="8.5" font-family="'Geist Mono', monospace">🚫 403 阻絕</text>
+
+            <!-- 元件 1: 前端瀏覽器 (安全改造後) -->
+            <g class="component-box" data-kind="component" data-object-id="browser_safe" data-status="changed">
+              <rect x="55" y="0" width="230" height="72" rx="8" fill="#ffffff" stroke="#2e5aa8" stroke-width="1.6"/>
+              <path d="M 56 8 V 64" stroke="#2e5aa8" stroke-width="4" stroke-linecap="round"/>
+              <text x="70" y="18" fill="#2e5aa8" font-size="8.5" font-family="'Geist Mono', monospace" font-weight="600">~ CLIENT · ZERO SECRETS</text>
+              <text x="70" y="38" fill="#2d3142" font-size="13" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="700">前端網頁 (Client Browser)</text>
+              <text x="70" y="56" fill="#1b7a43" font-size="9.5" font-family="'Geist Mono', monospace">🛡️ 原始碼零金鑰 · 僅送用戶輸入</text>
+            </g>
+
+            <!-- 元件 2: 後端 BFF 代理伺服器 (新增核心) -->
+            <g class="component-box" data-kind="component" data-object-id="backend_proxy" data-status="added">
+              <!-- 外框：代理伺服器 -->
+              <rect x="55" y="150" width="230" height="145" rx="8" fill="#ffffff" stroke="#1b7a43" stroke-width="1.8"/>
+              <text x="70" y="170" fill="#1b7a43" font-size="8.5" font-family="'Geist Mono', monospace" font-weight="700">+ BACKEND PROXY (BFF) · ADDED</text>
+              <text x="70" y="190" fill="#2d3142" font-size="13" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="700">受保護伺服器 (Node / Python)</text>
+
+              <!-- 內部安全模組 1: .env 金鑰金庫 -->
+              <rect x="68" y="202" width="204" height="26" rx="4" fill="rgba(27,122,67,0.06)" stroke="#bfe5cf" stroke-width="0.8"/>
+              <text x="76" y="219" fill="#1b7a43" font-size="8.5" font-family="'Geist Mono', monospace" font-weight="600">🔒 .env Vault : process.env.ANTHROPIC_KEY</text>
+
+              <!-- 內部安全模組 2: 限速與預算熔斷 -->
+              <rect x="68" y="233" width="204" height="26" rx="4" fill="rgba(46,90,168,0.06)" stroke="#c4d6f0" stroke-width="0.8"/>
+              <text x="76" y="250" fill="#2e5aa8" font-size="8.5" font-family="'Geist Mono', monospace" font-weight="600">⚡ Rate Limit (5次/分) + Spending Cap</text>
+
+              <!-- 內部安全模組 3: 驗證防護 -->
+              <rect x="68" y="264" width="204" height="22" rx="4" fill="#f8f9fa" stroke="#e0e2ec" stroke-width="0.8"/>
+              <text x="76" y="279" fill="#5c677d" font-size="8" font-family="'Geist Mono', monospace">🛡️ Session Auth / CORS 白名單嚴格校驗</text>
+            </g>
+
+            <!-- 元件 3: Claude / LLM 雲端 API (受到保護) -->
+            <g class="component-box" data-kind="component" data-object-id="llm_cloud_safe" data-status="unchanged">
+              <rect x="55" y="340" width="230" height="80" rx="8" fill="#ffffff" stroke="#1b7a43" stroke-width="1.4"/>
+              <text x="70" y="358" fill="#1b7a43" font-size="8.5" font-family="'Geist Mono', monospace" font-weight="600">= LLM PROVIDER · PROTECTED</text>
+              <text x="70" y="378" fill="#2d3142" font-size="13" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="700">Anthropic Claude API</text>
+              <text x="70" y="396" fill="#5c677d" font-size="9.5" font-family="'Geist Mono', monospace">api.anthropic.com/v1/messages</text>
+              <text x="70" y="411" fill="#1b7a43" font-size="9" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="600">✅ 僅接受後端受控調用 · 預算有熔斷保護</text>
+            </g>
+
+            <!-- 安全確認小框 -->
+            <rect x="10" y="435" width="290" height="34" rx="4" fill="rgba(27,122,67,0.06)" stroke="rgba(27,122,67,0.2)" stroke-width="1"/>
+            <text x="20" y="456" fill="#1b7a43" font-size="10" font-family="'Geist', 'Noto Sans TC', sans-serif" font-weight="600">✅ 成果：任何人右鍵檢視原始碼，均找不到任何金鑰！</text>
+          </g>
+
+          <!-- ================================================================= -->
+          <!-- 底部標準圖例與註釋 (遵守 diagram-design 規範) -->
+          <!-- ================================================================= -->
+          <path d="M 24 600 H 1176" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+
+          <g transform="translate(24, 616)">
+            <!-- 圖例 1: Unchanged -->
+            <rect x="0" y="0" width="20" height="16" rx="3" fill="#ffffff" stroke="#5c677d" stroke-width="1"/>
+            <text x="28" y="12" fill="#5c677d" font-size="11" font-family="'Geist', 'Noto Sans TC', sans-serif">= 保留不變 (Unchanged)</text>
+
+            <!-- 圖例 2: Added -->
+            <rect x="210" y="0" width="20" height="16" rx="3" fill="#ffffff" stroke="#1b7a43" stroke-width="1.5"/>
+            <rect x="214" y="4" width="12" height="8" rx="1" fill="none" stroke="#1b7a43" stroke-width="0.8"/>
+            <text x="238" y="12" fill="#1b7a43" font-size="11" font-family="'Geist', 'Noto Sans TC', sans-serif">+ 新增防護 (Added)</text>
+
+            <!-- 圖例 3: Removed -->
+            <rect x="420" y="0" width="20" height="16" rx="3" fill="#ffffff" stroke="#bf4520" stroke-width="1" stroke-dasharray="3 3"/>
+            <text x="448" y="12" fill="#bf4520" font-size="11" font-family="'Geist', 'Noto Sans TC', sans-serif">− 廢除危險端點 (Removed)</text>
+
+            <!-- 圖例 4: Changed -->
+            <rect x="650" y="0" width="20" height="16" rx="3" fill="#ffffff" stroke="#2e5aa8" stroke-width="1"/>
+            <path d="M 651 4 V 12" stroke="#2e5aa8" stroke-width="3"/>
+            <text x="678" y="12" fill="#2e5aa8" font-size="11" font-family="'Geist', 'Noto Sans TC', sans-serif">~ 架構改道 (Changed)</text>
+
+            <!-- 圖例 5: Rewired -->
+            <path d="M 860 8 H 880" fill="none" stroke="#2e5aa8" stroke-width="1.5" stroke-dasharray="6 2 2 2" marker-end="url(#arrow-brand)"/>
+            <text x="892" y="12" fill="#2e5aa8" font-size="11" font-family="'Geist', 'Noto Sans TC', sans-serif">⇢ 重定向流量 (Rewired)</text>
+
+            <!-- 規範註記 -->
+            <text x="0" y="38" fill="#5c677d" font-size="9" font-family="'Geist', 'Noto Sans TC', sans-serif">
+              規範說明：依據 diagram-design 體系，元件 ID 與生命週期跨快照持久化；線條虛實代表架構演進變更，非協議差異。
+            </text>
+            <text x="1152" y="38" fill="#5c677d" font-size="9" font-family="'Geist Mono', monospace" text-anchor="end">
+              6 COMPONENTS · 5 RELATIONSHIPS · 6 DELTA ACTIONS
+            </text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- 課程學員必背的三大工程守則 -->
+    <section class="instruction-grid">
+      <article class="instruction-card">
+        <h3>🚨 守則一：前端代碼視為「公共廣場」</h3>
+        <p>
+          任何在瀏覽器執行的代碼（HTML, JS, CSS, Webpack 打包檔），只要造訪者按一下右鍵「檢視原始碼」或 F12，其內部的字串完全公開透明。
+          <strong>任何寫在前端的 API Key 都等於直接貼在公車站牌上。</strong>
+        </p>
+      </article>
+
+      <article class="instruction-card">
+        <h3>🛡️ 守則二：金鑰必須放在「伺服器金庫」</h3>
+        <p>
+          API Key 必須存放在只有伺服器能讀取的環境變數（<span class="code-chip">.env</span> 或 Cloud Secret Manager），
+          且 <span class="code-chip">.env</span> 必須加入 <span class="code-chip">.gitignore</span>，絕對不可推送至 GitHub！
+        </p>
+      </article>
+
+      <article class="instruction-card">
+        <h3>💸 守則三：必須設定「每日花費熔斷」</h3>
+        <p>
+          在 OpenAI / Anthropic 儀表板中，務必設定 <strong>Monthly Budget Limit（預算硬性上限）</strong> 與 <strong>Usage Alerts</strong>。
+          即使不幸外洩，最多扣完預設額度（例如 \$20 美元）即刻斷線，絕不會引發 1,660 萬美元的滅頂災難。
+        </p>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    // 互動點擊高亮邏輯
+    const ledgerRows = document.querySelectorAll('.ledger-row');
+    const components = document.querySelectorAll('.component-box');
+
+    ledgerRows.forEach(row => {
+      row.addEventListener('mouseenter', () => {
+        const target = row.getAttribute('data-target');
+        highlightTarget(target, true);
+      });
+      row.addEventListener('mouseleave', () => {
+        const target = row.getAttribute('data-target');
+        highlightTarget(target, false);
+      });
+    });
+
+    function highlightTarget(target, active) {
+      if (!target) return;
+      components.forEach(comp => {
+        const objId = comp.getAttribute('data-object-id');
+        if (target.includes('client') && (objId.includes('browser'))) {
+          comp.style.transform = active ? 'translateY(-2px) scale(1.02)' : 'none';
+        } else if (target.includes('proxy') && objId.includes('backend')) {
+          comp.style.transform = active ? 'translateY(-2px) scale(1.02)' : 'none';
+        } else if (target.includes('key') && (objId.includes('attacker') || objId.includes('browser_leaky'))) {
+          comp.style.transform = active ? 'translateY(-2px) scale(1.02)' : 'none';
+        } else if (target.includes('env') && objId.includes('backend')) {
+          comp.style.transform = active ? 'translateY(-2px) scale(1.02)' : 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

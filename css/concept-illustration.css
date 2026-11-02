@@ -1,0 +1,21 @@
+/* Teaching illustrations inherit the concept reader's colors and type. */
+.concept-illustration{margin:24px 0 30px}
+.concept-illustration img{display:block;width:100%;height:auto;max-width:100%}
+.concept-illustration figcaption{margin-top:16px}
+.illustration-labels{display:grid;grid-template-columns:minmax(0,1fr) 92px minmax(0,1fr);gap:20px;align-items:start}
+.illustration-labels p{margin:0;font-size:15px;line-height:1.65}
+.illustration-labels strong{display:block;font-size:17px;color:var(--ink);margin-bottom:4px}
+.illustration-labels .illustration-select{color:var(--olive);text-align:center;padding-top:4px;font-size:14px}
+.illustration-arrow{display:block;position:relative;width:44px;height:12px;margin:7px auto 0;border-top:1px solid currentColor}
+.illustration-arrow::after{content:"";position:absolute;right:0;top:-4px;width:6px;height:6px;border-right:1px solid currentColor;border-top:1px solid currentColor;transform:rotate(45deg)}
+.concept-illustration .illustration-takeaway{margin:20px 0 8px;font-size:17px;line-height:1.75}
+.concept-illustration .illustration-note{margin:0;color:var(--muted);font-size:14px;line-height:1.7}
+@media(max-width:600px){
+  .concept-illustration{margin:20px 0 26px}
+  .illustration-labels{grid-template-columns:minmax(0,1fr) 32px minmax(0,1fr);gap:12px}
+  .illustration-labels strong{font-size:16px}
+  .illustration-labels p{font-size:14px}
+  .illustration-labels .illustration-select{font-size:13px}
+  .illustration-arrow{width:26px}
+  .concept-illustration .illustration-takeaway{font-size:16px}
+}

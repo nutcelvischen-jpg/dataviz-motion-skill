@@ -1,0 +1,9 @@
+.teaching-diagram{margin:28px 0;max-width:100%}
+.teaching-diagram img{display:block;width:100%;height:auto}
+.teaching-diagram figcaption{font-size:14px;color:var(--muted);line-height:1.8;margin-top:12px}
+.teaching-diagram figcaption a{margin-left:12px}
+.agent-diagram{max-width:480px;margin-inline:auto}
+.flow-original{margin:28px 0}
+.wide-diagram{overflow-x:auto}
+.wide-diagram img{min-width:640px}
+@media(max-width:600px){.agent-diagram{margin-block:20px}.teaching-diagram figcaption a{display:inline-block;margin-left:0;min-height:44px;padding-top:8px}}

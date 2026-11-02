@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Atoms · Bauhaus Geometric Motion Briefing</title>
+  <!-- Typography: Plus Jakarta Sans, JetBrains Mono, Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <!-- GSAP for deterministic code-driven timeline -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    :root {
+      --bg-cream: #F3F2EE;
+      --bauhaus-black: #111111;
+      --bauhaus-red: #FF4400;
+      --bauhaus-blue: #1E4FA3;
+      --bauhaus-yellow: #F2B705;
+      --bauhaus-slate: #475569;
+      --bauhaus-muted: #888884;
+      --grid-line: rgba(17, 17, 17, 0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-cream);
+      color: var(--bauhaus-black);
+      font-family: 'Plus Jakarta Sans', 'Noto Sans TC', sans-serif;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #viewport {
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      background: var(--bg-cream);
+      overflow: hidden;
+    }
+    /* 120px Modular Grid Layer */
+    .grid-layer {
+      position: absolute;
+      inset: 0;
+      background-size: 120px 120px;
+      background-image: 
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+      pointer-events: none;
+      z-index: 1;
+    }
+    /* Corner Registration Crosshairs */
+    .reg-mark {
+      position: absolute;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--bauhaus-muted);
+      z-index: 2;
+    }
+    .reg-tl { top: 24px; left: 36px; }
+    .reg-tr { top: 24px; right: 36px; }
+    .reg-bl { bottom: 24px; left: 36px; }
+    .reg-br { bottom: 24px; right: 36px; }
+
+    /* Top Bauhaus Status Banner */
+    .header-banner {
+      position: absolute;
+      top: 48px;
+      left: 120px;
+      right: 120px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--bauhaus-black);
+      padding-bottom: 12px;
+      z-index: 10;
+    }
+    .header-left {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+    .brand-mark {
+      background: var(--bauhaus-black);
+      color: #fff;
+      font-weight: 900;
+      font-size: 18px;
+      padding: 4px 10px;
+      letter-spacing: -0.04em;
+    }
+    .report-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .report-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--bauhaus-red);
+      color: #fff;
+      padding: 3px 8px;
+    }
+    .header-right {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--bauhaus-slate);
+    }
+
+    /* Scene Stage Containers */
+    .scene-container {
+      position: absolute;
+      inset: 0;
+      padding: 130px 120px 80px;
+      display: flex;
+      flex-direction: column;
+      z-index: 5;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* SCENE 1: MACRO OVERVIEW */
+    #scene1 {
+      justify-content: center;
+      align-items: center;
+    }
+    .hero-number-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+    .hero-kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--bauhaus-red);
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+    .hero-number {
+      font-size: 150px;
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      display: flex;
+      align-items: baseline;
+    }
+    .hero-unit {
+      font-size: 48px;
+      font-weight: 800;
+      margin-left: 12px;
+      color: var(--bauhaus-black);
+    }
+    .hero-sub {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--bauhaus-slate);
+      margin-top: 24px;
+    }
+    .hero-geometry {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border: 3px solid var(--bauhaus-red);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.25;
+    }
+    .hero-geometry-square {
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border: 2px solid var(--bauhaus-blue);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.2;
+    }
+
+    /* SCENE 2: STRUCTURE & TOP SHARE */
+    #scene2 {
+      display: grid;
+      grid-template-columns: 540px 1fr;
+      align-items: center;
+      gap: 60px;
+    }
+    .donut-graphic-box {
+      width: 480px;
+      height: 480px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .donut-center-info {
+      position: absolute;
+      text-align: center;
+    }
+    .donut-center-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--bauhaus-muted);
+    }
+    .donut-center-val {
+      font-size: 54px;
+      font-weight: 900;
+      color: var(--bauhaus-black);
+      line-height: 1;
+      margin: 4px 0;
+    }
+    .donut-center-desc {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--bauhaus-red);
+    }
+    .scene2-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .scene-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--bauhaus-blue);
+      letter-spacing: 0.08em;
+    }
+    .scene-h2 {
+      font-size: 46px;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    .top-focus-card {
+      background: #fff;
+      border: 2px solid var(--bauhaus-black);
+      padding: 24px 30px;
+      box-shadow: 12px 12px 0px var(--bauhaus-red);
+      margin-top: 10px;
+    }
+    .card-top-title {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .card-stats-row {
+      display: flex;
+      gap: 36px;
+      margin-top: 14px;
+    }
+    .stat-block .stat-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--bauhaus-red);
+    }
+    .stat-block .stat-lbl {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--bauhaus-slate);
+    }
+
+    /* SCENE 3: DISTRIBUTION & TIERS */
+    #scene3 {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .bars-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+      position: relative;
+    }
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .bar-name {
+      width: 170px;
+      font-size: 15px;
+      font-weight: 700;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .bar-track {
+      flex: 1;
+      height: 32px;
+      background: rgba(17, 17, 17, 0.04);
+      border-left: 2px solid var(--bauhaus-black);
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .bar-fill {
+      height: 100%;
+      background: var(--bauhaus-black);
+      width: 0%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 12px;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .bar-fill.accent-top {
+      background: var(--bauhaus-red);
+    }
+    .bar-fill.accent-sec {
+      background: var(--bauhaus-blue);
+    }
+    /* Average vertical reference line */
+    .mean-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 49.1%; /* 461.25 / 940 = ~49.1% */
+      width: 2px;
+      background: var(--bauhaus-red);
+      border-right: 1px dashed #fff;
+      z-index: 10;
+    }
+    .mean-tag {
+      position: absolute;
+      top: -26px;
+      left: 49.1%;
+      transform: translateX(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 800;
+      background: var(--bauhaus-red);
+      color: #fff;
+      padding: 2px 6px;
+      white-space: nowrap;
+    }
+
+    /* SCENE 4: STRATEGIC LOCKUP */
+    #scene4 {
+      justify-content: center;
+      align-items: center;
+    }
+    .lockup-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 460px);
+      gap: 40px;
+      margin-top: 36px;
+    }
+    .lockup-card {
+      background: #fff;
+      border: 3px solid var(--bauhaus-black);
+      padding: 36px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 320px;
+      box-shadow: 10px 10px 0 var(--bauhaus-black);
+    }
+    .lockup-card.card-accent {
+      background: var(--bauhaus-black);
+      color: #fff;
+      box-shadow: 10px 10px 0 var(--bauhaus-red);
+    }
+    .card-idx {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--bauhaus-red);
+    }
+    .lockup-card.card-accent .card-idx {
+      color: var(--bauhaus-yellow);
+    }
+    .card-core-val {
+      font-size: 48px;
+      font-weight: 900;
+      line-height: 1;
+      margin: 12px 0 6px;
+      letter-spacing: -0.02em;
+    }
+    .card-core-sub {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--bauhaus-slate);
+    }
+    .lockup-card.card-accent .card-core-sub {
+      color: rgba(255, 255, 255, 0.75);
+    }
+    .card-footer-desc {
+      font-size: 14px;
+      font-weight: 700;
+      border-top: 1px solid var(--grid-line);
+      padding-top: 14px;
+    }
+    .lockup-card.card-accent .card-footer-desc {
+      border-top-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Bottom Subtitle Caption Bar */
+    .caption-banner {
+      position: absolute;
+      bottom: 40px;
+      left: 120px;
+      right: 120px;
+      height: 52px;
+      background: #fff;
+      border: 2px solid var(--bauhaus-black);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+      z-index: 20;
+    }
+    .caption-indicator {
+      width: 10px;
+      height: 10px;
+      background: var(--bauhaus-red);
+      flex-shrink: 0;
+    }
+    .caption-text {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--bauhaus-black);
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+</head>
+<body>
+
+<div id="viewport">
+  <div class="grid-layer"></div>
+
+  <!-- Registration Marks -->
+  <div class="reg-mark reg-tl">+ LAT 120.4 : SEC 01</div>
+  <div class="reg-mark reg-tr">GRID 120PX : 60FPS +</div>
+  <div class="reg-mark reg-bl">+ DATA ATOMS STUDIO</div>
+  <div class="reg-mark reg-br">BAUHAUS PROTOCOL +</div>
+
+  <!-- Top Header Banner -->
+  <header class="header-banner">
+    <div class="header-left">
+      <div class="brand-mark">DA</div>
+      <div class="report-title">Data Atoms · 商業數據影音簡報</div>
+      <div class="report-badge" id="sceneBadge">SCENE 01 / 04</div>
+    </div>
+    <div class="header-right" id="headerTimer">00:00 / 00:34</div>
+  </header>
+
+  <!-- ==================== SCENE 1 ==================== -->
+  <section class="scene-container" id="scene1">
+    <div class="hero-number-wrap">
+      <div class="hero-geometry" id="geoCircle"></div>
+      <div class="hero-geometry-square" id="geoSquare"></div>
+      <div class="hero-kicker">01. 商業體量全量收錄 · MACRO VOLUME</div>
+      <div class="hero-number">
+        <span id="counterNum">0</span>
+        <span class="hero-unit">萬元</span>
+      </div>
+      <div class="hero-sub">八大核心業務產品線季度總體量 · 平均單元 461.3 萬</div>
+    </div>
+  </section>
+
+  <!-- ==================== SCENE 2 ==================== -->
+  <section class="scene-container" id="scene2">
+    <div class="donut-graphic-box">
+      <svg width="460" height="460" viewBox="0 0 460 460">
+        <!-- Donut Background Track -->
+        <circle cx="230" cy="230" r="160" fill="none" stroke="rgba(17,17,17,0.06)" stroke-width="48"></circle>
+        <!-- Slice 1: Top Share (25.5% = 256.3 stroke-dasharray out of 1005.3 circumference) -->
+        <circle id="donutSliceTop" cx="230" cy="230" r="160" fill="none" stroke="var(--bauhaus-red)" stroke-width="48"
+          stroke-dasharray="0 1005.3" stroke-dashoffset="251.3" transform="rotate(-90 230 230)" stroke-linecap="butt"></circle>
+        <!-- Slice 2: Second (19.5% = 196) -->
+        <circle id="donutSlice2" cx="230" cy="230" r="160" fill="none" stroke="var(--bauhaus-blue)" stroke-width="48"
+          stroke-dasharray="0 1005.3" stroke-dashoffset="0" transform="rotate(2 230 230)"></circle>
+        <!-- Slice 3: Third (15.7% = 158) -->
+        <circle id="donutSlice3" cx="230" cy="230" r="160" fill="none" stroke="var(--bauhaus-yellow)" stroke-width="48"
+          stroke-dasharray="0 1005.3" stroke-dashoffset="-196" transform="rotate(2 230 230)"></circle>
+        <!-- Center Border -->
+        <circle cx="230" cy="230" r="135" fill="#F3F2EE" stroke="var(--bauhaus-black)" stroke-width="2"></circle>
+      </svg>
+      <div class="donut-center-info">
+        <div class="donut-center-sub">TOP CONTRIBUTOR</div>
+        <div class="donut-center-val">25.5%</div>
+        <div class="donut-center-desc">940 萬元</div>
+      </div>
+    </div>
+
+    <div class="scene2-content">
+      <div class="scene-tag">02. 結構佔比與頭部效益 · PARETO DOMINANCE</div>
+      <h2 class="scene-h2">核心雲端平台突破 940 萬<br>驅動本季體量擴張主軸</h2>
+      <div class="top-focus-card" id="topFocusCard">
+        <div class="card-top-title">企業雲端運算平台 (SaaS)</div>
+        <p style="color: var(--bauhaus-slate); font-size: 14px;">活躍企業客戶 342 家 · 目標達成率 117.5%</p>
+        <div class="card-stats-row">
+          <div class="stat-block">
+            <div class="stat-num">940 萬</div>
+            <div class="stat-lbl">季度貢獻營收</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-num">25.5%</div>
+            <div class="stat-lbl">全盤營收份額</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-num">78.5%</div>
+            <div class="stat-lbl">綜合毛利率</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SCENE 3 ==================== -->
+  <section class="scene-container" id="scene3">
+    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+      <div>
+        <div class="scene-tag">03. 梯隊分佈與極值分析 · DISCRETE MATRIX</div>
+        <h2 class="scene-h2" style="font-size: 38px;">8 大產品線梯隊層級分明 · 極值跨度達 5.9 倍</h2>
+      </div>
+      <div style="font-family: 'JetBrains Mono'; font-size: 14px; font-weight: 700; color: var(--bauhaus-red);">
+        PEAK: 940萬 / MIN: 160萬 (RATIO: 5.88x)
+      </div>
+    </div>
+
+    <div class="bars-container" id="barsContainer">
+      <div class="mean-line"></div>
+      <div class="mean-tag">均值 461.3萬</div>
+
+      <div class="bar-row">
+        <div class="bar-name">企業雲端運算平台</div>
+        <div class="bar-track"><div class="bar-fill accent-top" data-pct="100">940萬</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">智能數據中台</div>
+        <div class="bar-track"><div class="bar-fill accent-sec" data-pct="76.6">720萬</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">AI視覺辨識模組</div>
+        <div class="bar-track"><div class="bar-fill" data-pct="61.7">580萬</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">物聯網邊緣節點</div>
+        <div class="bar-track"><div class="bar-fill" data-pct="45.7">430萬</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">零信任資安套件</div>
+        <div class="bar-track"><div class="bar-fill" data-pct="38.3">360萬</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">開發者行動端SDK</div>
+        <div class="bar-track"><div class="bar-fill" data-pct="30.8">290萬</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">私有化部署諮詢</div>
+        <div class="bar-track"><div class="bar-fill" data-pct="22.3">210萬</div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">維運技術支援</div>
+        <div class="bar-track"><div class="bar-fill" data-pct="17.0">160萬</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SCENE 4 ==================== -->
+  <section class="scene-container" id="scene4">
+    <div style="text-align: center;">
+      <div class="scene-tag">04. 執行決策總結 · STRATEGIC LOCKUP</div>
+      <h2 class="scene-h2" style="font-size: 44px; margin-top: 6px;">以理性數據穿透表象 · 驅動下一階段資源配置</h2>
+    </div>
+
+    <div class="lockup-cards-grid">
+      <div class="lockup-card">
+        <div class="card-idx">01/</div>
+        <div>
+          <div class="card-core-val">3,690萬</div>
+          <div class="card-core-sub">全盤營收規模</div>
+        </div>
+        <div class="card-footer-desc">8 條核心業務產線覆蓋，季度體量穩健擴張。</div>
+      </div>
+
+      <div class="lockup-card card-accent">
+        <div class="card-idx">02/</div>
+        <div>
+          <div class="card-core-val">25.5%</div>
+          <div class="card-core-sub">頭部核心雲貢獻</div>
+        </div>
+        <div class="card-footer-desc">旗艦平台突破 940 萬超標達成，作為基石業務。</div>
+      </div>
+
+      <div class="lockup-card">
+        <div class="card-idx">03/</div>
+        <div>
+          <div class="card-core-val">精準聚焦</div>
+          <div class="card-core-sub">第二梯隊高轉化</div>
+        </div>
+        <div class="card-footer-desc">數據中台與高毛利資安模組具備爆發性，建議加注投放。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bottom Captions Bar -->
+  <div class="caption-banner">
+    <div class="caption-indicator"></div>
+    <div class="caption-text" id="captionText">本期商業數據全量收錄。八大核心產品線總營收達 3690 萬元，季度平均產出維持 461 萬高位水準。</div>
+  </div>
+</div>
+
+<script>
+  /**
+   * Data Atoms · 34s Bauhaus Code-Driven Motion Briefing
+   * Synchronized strictly to 120 BPM (0.5s per beat, 68 beats total)
+   */
+  const tl = gsap.timeline({ paused: true });
+
+  const captions = [
+    { t: 0.5, text: "本期商業數據全量收錄。八大核心產品線總營收達 3690 萬元，季度平均產出維持 461 萬高位水準。" },
+    { t: 8.8, text: "營收結構呈現顯著頭部效益。旗艦雲端運算平台突破 940 萬，以 25.5% 份額成為驅動成長的絕對主力。" },
+    { t: 17.3, text: "極值跨度達 5.9 倍。智能數據與視覺模組穩居第二梯隊，服務諮詢類別具備高利潤率，資源應精準聚焦。" },
+    { t: 25.8, text: "以理性幾何穿透複雜表象，驅動下一階段敏捷決策。Data Atoms 商業數據簡報完畢。" }
+  ];
+
+  // Helper for counter
+  const counterObj = { val: 0 };
+
+  // ================= SCENE 1 (0.0s - 8.5s) =================
+  tl.set('#sceneBadge', { textContent: 'SCENE 01 / 04 · MACRO VOLUME' }, 0)
+    .to('#scene1', { opacity: 1, duration: 0.4, ease: 'power2.out' }, 0)
+    .to('#geoCircle', { rotate: 360, duration: 8.5, ease: 'none' }, 0)
+    .to('#geoSquare', { rotate: -180, duration: 8.5, ease: 'none' }, 0)
+    .to(counterObj, {
+      val: 3690,
+      duration: 3.2,
+      ease: 'power3.out',
+      onUpdate: () => {
+        document.getElementById('counterNum').textContent = Math.round(counterObj.val).toLocaleString();
+      }
+    }, 0.6)
+    .to('#scene1', { opacity: 0, duration: 0.3, ease: 'power2.in' }, 8.2);
+
+  // ================= SCENE 2 (8.5s - 17.0s) =================
+  tl.set('#sceneBadge', { textContent: 'SCENE 02 / 04 · PARETO SHARE' }, 8.5)
+    .call(() => { document.getElementById('captionText').textContent = captions[1].text; }, null, 8.8)
+    .to('#scene2', { opacity: 1, duration: 0.4, ease: 'power2.out' }, 8.5)
+    // Donut Slices sweep (#Bar-Sweep from motion-prompt)
+    .to('#donutSliceTop', { strokeDasharray: '256.3 1005.3', duration: 1.8, ease: 'power3.out' }, 8.8)
+    .to('#donutSlice2', { strokeDasharray: '196 1005.3', duration: 1.6, ease: 'power3.out' }, 9.2)
+    .to('#donutSlice3', { strokeDasharray: '158 1005.3', duration: 1.4, ease: 'power3.out' }, 9.6)
+    .from('#topFocusCard', { x: 50, opacity: 0, duration: 1.0, ease: 'power3.out' }, 9.0)
+    .to('#scene2', { opacity: 0, duration: 0.3, ease: 'power2.in' }, 16.7);
+
+  // ================= SCENE 3 (17.0s - 25.5s) =================
+  tl.set('#sceneBadge', { textContent: 'SCENE 03 / 04 · DISCRETE TIERS' }, 17.0)
+    .call(() => { document.getElementById('captionText').textContent = captions[2].text; }, null, 17.3)
+    .to('#scene3', { opacity: 1, duration: 0.4, ease: 'power2.out' }, 17.0)
+    // Staggered Bauhaus Bar Growth
+    .to('.bar-fill', {
+      width: (idx, target) => target.getAttribute('data-pct') + '%',
+      duration: 1.4,
+      stagger: 0.12,
+      ease: 'power3.out'
+    }, 17.4)
+    .from('.mean-line', { scaleY: 0, transformOrigin: 'top center', duration: 0.6, ease: 'power2.out' }, 18.2)
+    .from('.mean-tag', { opacity: 0, y: -10, duration: 0.4, ease: 'power2.out' }, 18.4)
+    .to('#scene3', { opacity: 0, duration: 0.3, ease: 'power2.in' }, 25.2);
+
+  // ================= SCENE 4 (25.5s - 34.0s) =================
+  tl.set('#sceneBadge', { textContent: 'SCENE 04 / 04 · STRATEGIC LOCKUP' }, 25.5)
+    .call(() => { document.getElementById('captionText').textContent = captions[3].text; }, null, 25.8)
+    .to('#scene4', { opacity: 1, duration: 0.4, ease: 'power2.out' }, 25.5)
+    .from('.lockup-card', {
+      y: 40,
+      opacity: 0,
+      stagger: 0.18,
+      duration: 1.0,
+      ease: 'power3.out'
+    }, 25.8)
+    .to('#headerTimer', { textContent: '00:34 / 00:34' }, 33.5);
+
+  // Expose seek function for headless frame-by-frame rendering
+  window.seekFrame = function(sec) {
+    tl.seek(sec);
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    document.getElementById('headerTimer').textContent = 
+      `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} / 00:34`;
+  };
+
+  // Default autoplay for live preview in browser
+  window.onload = () => {
+    tl.play();
+  };
+</script>
+</body>
+</html>

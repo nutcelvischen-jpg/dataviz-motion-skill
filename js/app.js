@@ -768,21 +768,23 @@
     });
 
     const meta = CHART_META[type];
-    el.canvasBadgeNum.textContent = meta.badge;
-    el.canvasChartTitle.textContent = meta.title;
-    el.canvasFormulaText.textContent = meta.formula;
+    if (el.canvasBadgeNum) el.canvasBadgeNum.textContent = meta.badge;
+    if (el.canvasChartTitle) el.canvasChartTitle.textContent = meta.title;
+    if (el.canvasFormulaText) el.canvasFormulaText.textContent = meta.formula;
 
     // 依圖型動態調整欄位名稱與開關顯示
-    el.labelSecondary.textContent = meta.secLabel;
+    if (el.labelSecondary) el.labelSecondary.textContent = meta.secLabel;
     
     // 開關可見性
-    el.rowSortDescending.style.display = meta.supportsSort ? 'flex' : 'none';
-    el.rowShowTrendline.style.display = meta.supportsTrend ? 'flex' : 'none';
+    if (el.rowSortDescending) el.rowSortDescending.style.display = meta.supportsSort ? 'flex' : 'none';
+    if (el.rowShowTrendline) el.rowShowTrendline.style.display = meta.supportsTrend ? 'flex' : 'none';
     
-    if (type === 'scatter') {
-      el.txtTrendlineLabel.textContent = '顯示線性回歸線 (Regression)';
-    } else {
-      el.txtTrendlineLabel.textContent = '顯示移動平均線 (MA)';
+    if (el.txtTrendlineLabel) {
+      if (type === 'scatter') {
+        el.txtTrendlineLabel.textContent = '顯示線性回歸線 (Regression)';
+      } else {
+        el.txtTrendlineLabel.textContent = '顯示移動平均線 (MA)';
+      }
     }
 
     updateKPIs();

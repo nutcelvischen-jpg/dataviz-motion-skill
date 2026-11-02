@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>「一天打造你的 AI 工作流」報名名冊與梯次統計看板</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --batch1-color: #2563eb;
+      --batch1-bg: #eff6ff;
+      --batch1-border: #bfdbfe;
+      --batch2-color: #7c3aed;
+      --batch2-bg: #f5f3ff;
+      --batch2-border: #ddd6fe;
+      --batch3-color: #059669;
+      --batch3-bg: #ecfdf5;
+      --batch3-border: #a7f3d0;
+      --accent: #d97706;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --border: #e2e8f0;
+      --border-dark: #cbd5e1;
+      --danger-bg: #fef2f2;
+      --danger-text: #b91c1c;
+      --danger-border: #fecaca;
+      --success-bg: #f0fdf4;
+      --success-text: #15803d;
+      --warning-bg: #fffbeb;
+      --warning-text: #b45309;
+      --font-sans: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+      --radius-sm: 6px;
+      --radius: 10px;
+      --radius-lg: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-bottom: 80px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e3a8a 100%);
+      color: #ffffff;
+      padding: 38px 0 32px 0;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.15);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .title-area h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .tag-inst {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #93c5fd;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .header-desc {
+      color: #cbd5e1;
+      font-size: 14px;
+      max-width: 700px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .btn-white {
+      background: white;
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+    .btn-white:hover {
+      background: #f1f5f9;
+    }
+
+    /* Control Bar - Deduplication switch */
+    .control-strip {
+      margin: -24px auto 28px auto;
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .control-label {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .segmented-control {
+      display: inline-flex;
+      background: #f1f5f9;
+      padding: 3px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    .segmented-control button {
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .segmented-control button.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid var(--batch1-border);
+    }
+
+    /* KPI Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .kpi-card.b1 { border-top: 4px solid var(--batch1-color); }
+    .kpi-card.b2 { border-top: 4px solid var(--batch2-color); }
+    .kpi-card.b3 { border-top: 4px solid var(--batch3-color); }
+    .kpi-card.total { border-top: 4px solid #0f172a; }
+    .kpi-card.dup { border-top: 4px solid var(--accent); }
+
+    .kpi-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-family: var(--font-mono);
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.1;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .kpi-unit {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+    }
+
+    .kpi-subtext {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Cohort Cards */
+    .cohort-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    @media (max-width: 992px) {
+      .cohort-grid { grid-template-columns: 1fr; }
+    }
+
+    .cohort-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cohort-header {
+      padding: 18px 20px;
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .cohort-card.b1 .cohort-header { background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%); }
+    .cohort-card.b2 .cohort-header { background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%); }
+    .cohort-card.b3 .cohort-header { background: linear-gradient(135deg, #047857 0%, #10b981 100%); }
+
+    .cohort-badge {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: rgba(255,255,255,0.22);
+      padding: 3px 10px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    .cohort-title {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .cohort-date {
+      font-size: 13px;
+      opacity: 0.9;
+      font-family: var(--font-mono);
+    }
+
+    .cohort-count-box {
+      text-align: right;
+    }
+
+    .cohort-count-num {
+      font-family: var(--font-mono);
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .cohort-count-label {
+      font-size: 12px;
+      opacity: 0.85;
+    }
+
+    .cohort-body {
+      padding: 18px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .stat-row-label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .stat-row-val {
+      font-weight: 700;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+    }
+
+    .mini-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .mini-tag {
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    /* Duplicate Alert Card */
+    .audit-section {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .audit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .audit-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .audit-toggle-btn {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      color: #92400e;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .audit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .audit-card {
+      background: #ffffff;
+      border: 1px solid #fef08a;
+      border-radius: var(--radius);
+      padding: 14px;
+      font-size: 13px;
+    }
+
+    .audit-person {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      border-bottom: 1px dashed #fde68a;
+      padding-bottom: 6px;
+    }
+
+    .audit-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #78350f;
+    }
+
+    .audit-meta {
+      font-size: 12px;
+      color: #a16207;
+    }
+
+    .audit-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .timeline-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: #f8fafc;
+    }
+
+    .timeline-item.kept {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+      font-weight: 600;
+    }
+
+    .timeline-item.superseded {
+      background: #fef2f2;
+      color: #991b1b;
+      text-decoration: line-through;
+      opacity: 0.75;
+    }
+
+    /* Main Content Layout */
+    .section-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Department View */
+    .dept-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dept-tab-btn {
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      color: var(--text-secondary);
+      transition: all 0.15s;
+    }
+
+    .dept-tab-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .dept-analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 992px) {
+      .dept-analysis-grid { grid-template-columns: 1fr; }
+    }
+
+    .dept-bar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 520px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+    .dept-bar-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .dept-bar-item:hover {
+      background: #f1f5f9;
+    }
+
+    .dept-bar-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .dept-bar-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dept-tag {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .dept-bar-track {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .dept-bar-segment {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .dept-bar-segment.b1 { background-color: var(--batch1-color); }
+    .dept-bar-segment.b2 { background-color: var(--batch2-color); }
+    .dept-bar-segment.b3 { background-color: var(--batch3-color); }
+
+    /* Cross Matrix Table */
+    .matrix-table-wrap {
+      overflow-x: auto;
+      max-height: 520px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .matrix-table th {
+      background: #f1f5f9;
+      padding: 10px 14px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      border-bottom: 2px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .matrix-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .matrix-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    .matrix-num {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .num-pill {
+      display: inline-block;
+      min-width: 24px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .num-pill.b1 { background: var(--batch1-bg); color: var(--batch1-color); }
+    .num-pill.b2 { background: var(--batch2-bg); color: var(--batch2-color); }
+    .num-pill.b3 { background: var(--batch3-bg); color: var(--batch3-color); }
+    .num-pill.tot { background: #0f172a; color: #ffffff; }
+
+    /* Roster Table & Filters */
+    .filter-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input-wrap {
+      flex: 1;
+      min-width: 260px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-dark);
+      font-size: 14px;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .filter-pills-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 13px;
+    }
+
+    .filter-pill {
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-pill:hover {
+      background: #e2e8f0;
+    }
+
+    .filter-pill.active {
+      background: var(--text-main);
+      color: white;
+      border-color: var(--text-main);
+    }
+
+    .filter-pill.active-b1 {
+      background: var(--batch1-color);
+      color: white;
+      border-color: var(--batch1-color);
+    }
+
+    .filter-pill.active-b2 {
+      background: var(--batch2-color);
+      color: white;
+      border-color: var(--batch2-color);
+    }
+
+    .filter-pill.active-b3 {
+      background: var(--batch3-color);
+      color: white;
+      border-color: var(--batch3-color);
+    }
+
+    /* Data Table */
+    .table-container {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      text-align: left;
+    }
+
+    .data-table th {
+      background: #f8fafc;
+      padding: 12px 14px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .data-table th:hover {
+      background: #f1f5f9;
+      color: var(--text-main);
+    }
+
+    .data-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .data-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    .data-table tr.row-duplicate {
+      background: #fffdf5;
+    }
+
+    .data-table tr.row-duplicate td {
+      opacity: 0.65;
+      text-decoration: line-through;
+    }
+
+    .data-table tr.row-duplicate td:first-child,
+    .data-table tr.row-duplicate td:last-child {
+      text-decoration: none;
+      opacity: 1;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-b1 { background: var(--batch1-bg); color: var(--batch1-color); border: 1px solid var(--batch1-border); }
+    .badge-b2 { background: var(--batch2-bg); color: var(--batch2-color); border: 1px solid var(--batch2-border); }
+    .badge-b3 { background: var(--batch3-bg); color: var(--batch3-color); border: 1px solid var(--batch3-border); }
+
+    .badge-teacher { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .badge-student { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .badge-staff { background: #fdf4ff; color: #a21caf; border: 1px solid #f5d0fe; }
+    .badge-other { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+
+    .badge-meat { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .badge-veg { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+
+    .badge-cert-yes { background: #f0fdf4; color: #166534; }
+    .badge-cert-no { background: #f1f5f9; color: #64748b; }
+
+    .badge-status-valid { background: #dcfce7; color: #15803d; font-weight: 700; }
+    .badge-status-dup { background: #fee2e2; color: #991b1b; font-weight: 700; }
+
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .page-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .page-btn {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: white;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .page-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Print styling */
+    @media print {
+      body { background: white; color: black; padding: 0; }
+      header, .control-strip, .audit-section, .dept-analysis-grid, .filter-panel, .pagination, .header-actions { display: none !important; }
+      .container { max-width: 100%; padding: 0; }
+      .section-card { box-shadow: none; border: none; padding: 0; }
+      .table-container { border: none; box-shadow: none; }
+      .data-table th, .data-table td { padding: 6px 8px; font-size: 11px; border-bottom: 1px solid #ccc; }
+      .print-header { display: block !important; margin-bottom: 16px; }
+    }
+
+    .print-header {
+      display: none;
+      text-align: center;
+      padding: 16px 0;
+      border-bottom: 2px solid #000;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hidden Header for Print -->
+  <div class="print-header">
+    <h2>「一天打造你的 AI 工作流」研習工作坊 · 學員簽到名冊</h2>
+    <p>國立臺中科技大學 · 報名資料整理清冊</p>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <div class="header-top">
+        <div class="title-area">
+          <div class="tag-inst">
+            <span>🏫 國立臺中科技大學</span>
+            <span>·</span>
+            <span>研習工作坊</span>
+          </div>
+          <h1>「一天打造你的 AI 工作流」報名與梯次分析看板</h1>
+          <p class="header-desc">
+            全三梯次報名學員數據整合看板：已完成<strong>姓名重複檢查與去重整理</strong>、<strong>科系所屬與行政單位標準化歸納</strong>、<strong>各梯次人數分佈</strong>及<strong>素食/研習證明便當行政統計</strong>。
+          </p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="exportFilteredCSV()">
+            📥 匯出當前清單 (CSV)
+          </button>
+          <button class="btn btn-white" onclick="window.print()">
+            🖨️ 列印 / 簽到表
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Control Strip: Deduplication selector -->
+    <div class="control-strip">
+      <div class="control-group">
+        <span class="control-label">⚙️ 去重規則判定：</span>
+        <div class="segmented-control">
+          <button id="btn-mode-latest" class="active" onclick="setDedupMode('latest')">
+            🟢 保留最新送出 (推薦)
+          </button>
+          <button id="btn-mode-earliest" onclick="setDedupMode('earliest')">
+            🟡 保留最早送出
+          </button>
+          <button id="btn-mode-all" onclick="setDedupMode('all')">
+            ⚪ 顯示全部 (含重複)
+          </button>
+        </div>
+      </div>
+      <div class="control-group">
+        <span id="dedup-summary-pill" class="status-pill">
+          ✓ 已去除 6 筆重複登記，當前有效人數 107 人
+        </span>
+      </div>
+    </div>
+
+    <!-- Duplicate Alert Card -->
+    <div class="audit-section">
+      <div class="audit-header">
+        <div class="audit-title">
+          <span>⚠️ 重複報名人員深度稽核報告 (共 4 位學員送出多次，重複 6 筆)</span>
+        </div>
+        <button class="audit-toggle-btn" onclick="toggleAuditDetails()" id="audit-toggle-btn">
+          收合詳細說明 ▲
+        </button>
+      </div>
+      <div id="audit-content">
+        <p style="font-size: 13px; color: #92400e; margin-bottom: 12px;">
+          依表單規則「三個梯次課程內容相同，請擇一報名」，以下 4 位同仁/學員有重複送單行為。系統已依時間戳記完整比對電話、信箱與科系：
+        </p>
+        <div class="audit-grid" id="audit-cards-container">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Summary Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card total">
+        <div class="kpi-title">
+          <span>總有效報名人數</span>
+          <span>👥</span>
+        </div>
+        <div class="kpi-value" id="kpi-total-val">
+          107 <span class="kpi-unit">人</span>
+        </div>
+        <div class="kpi-subtext" id="kpi-total-sub">
+          原始登記 113 筆，剔除重複 6 筆
+        </div>
+      </div>
+
+      <div class="kpi-card b1">
+        <div class="kpi-title">
+          <span>第一梯次 (11/05 週四)</span>
+          <span>📅</span>
+        </div>
+        <div class="kpi-value" id="kpi-b1-val" style="color: var(--batch1-color);">
+          30 <span class="kpi-unit">人</span>
+        </div>
+        <div class="kpi-subtext" id="kpi-b1-sub">
+          🍱 葷 25 / 素 5 · 占比 28.0%
+        </div>
+      </div>
+
+      <div class="kpi-card b2">
+        <div class="kpi-title">
+          <span>第二梯次 (11/09 週一)</span>
+          <span>📅</span>
+        </div>
+        <div class="kpi-value" id="kpi-b2-val" style="color: var(--batch2-color);">
+          39 <span class="kpi-unit">人</span>
+        </div>
+        <div class="kpi-subtext" id="kpi-b2-sub">
+          🍱 葷 33 / 素 6 · 占比 36.4%
+        </div>
+      </div>
+
+      <div class="kpi-card b3">
+        <div class="kpi-title">
+          <span>第三梯次 (12/03 週四)</span>
+          <span>📅</span>
+        </div>
+        <div class="kpi-value" id="kpi-b3-val" style="color: var(--batch3-color);">
+          38 <span class="kpi-unit">人</span>
+        </div>
+        <div class="kpi-subtext" id="kpi-b3-sub">
+          🍱 葷 30 / 素 8 · 占比 35.5%
+        </div>
+      </div>
+
+      <div class="kpi-card dup">
+        <div class="kpi-title">
+          <span>研習證明與飲食</span>
+          <span>🍱</span>
+        </div>
+        <div class="kpi-value" id="kpi-diet-val">
+          88 <span class="kpi-unit">葷 / 19 素</span>
+        </div>
+        <div class="kpi-subtext" id="kpi-cert-sub">
+          📜 需要證明 94 人 · 不需要 13 人
+        </div>
+      </div>
+    </div>
+
+    <!-- Cohort 3-Columns Comparison -->
+    <div class="cohort-grid">
+      <!-- Cohort 1 -->
+      <div class="cohort-card b1">
+        <div class="cohort-header">
+          <div>
+            <span class="cohort-badge">第一梯次</span>
+            <div class="cohort-title">11/05 (週四)</div>
+            <div class="cohort-date">09:00 - 16:10 · 中科大</div>
+          </div>
+          <div class="cohort-count-box">
+            <div class="cohort-count-num" id="b1-header-num">30</div>
+            <div class="cohort-count-label">報名學員</div>
+          </div>
+        </div>
+        <div class="cohort-body">
+          <div class="stat-row">
+            <span class="stat-row-label">🍱 便當需求統計</span>
+            <span class="stat-row-val" id="b1-food-stat">葷 25 ｜ 素 5</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-row-label">📜 電子研習證明</span>
+            <span class="stat-row-val" id="b1-cert-stat">需要 24 ｜ 不需要 6</span>
+          </div>
+          <div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
+              👨‍💼 身分別組成：
+            </div>
+            <div class="mini-tags" id="b1-roles-tags">
+              <!-- populated by js -->
+            </div>
+          </div>
+          <div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
+              🏛️ 人數最多科系/單位：
+            </div>
+            <div class="mini-tags" id="b1-top-depts">
+              <!-- populated by js -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cohort 2 -->
+      <div class="cohort-card b2">
+        <div class="cohort-header">
+          <div>
+            <span class="cohort-badge">第二梯次</span>
+            <div class="cohort-title">11/09 (週一)</div>
+            <div class="cohort-date">09:00 - 16:10 · 中科大</div>
+          </div>
+          <div class="cohort-count-box">
+            <div class="cohort-count-num" id="b2-header-num">39</div>
+            <div class="cohort-count-label">報名學員</div>
+          </div>
+        </div>
+        <div class="cohort-body">
+          <div class="stat-row">
+            <span class="stat-row-label">🍱 便當需求統計</span>
+            <span class="stat-row-val" id="b2-food-stat">葷 33 ｜ 素 6</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-row-label">📜 電子研習證明</span>
+            <span class="stat-row-val" id="b2-cert-stat">需要 36 ｜ 不需要 3</span>
+          </div>
+          <div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
+              👨‍💼 身分別組成：
+            </div>
+            <div class="mini-tags" id="b2-roles-tags">
+              <!-- populated by js -->
+            </div>
+          </div>
+          <div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
+              🏛️ 人數最多科系/單位：
+            </div>
+            <div class="mini-tags" id="b2-top-depts">
+              <!-- populated by js -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cohort 3 -->
+      <div class="cohort-card b3">
+        <div class="cohort-header">
+          <div>
+            <span class="cohort-badge">第三梯次</span>
+            <div class="cohort-title">12/03 (週四)</div>
+            <div class="cohort-date">09:00 - 16:10 · 中科大</div>
+          </div>
+          <div class="cohort-count-box">
+            <div class="cohort-count-num" id="b3-header-num">38</div>
+            <div class="cohort-count-label">報名學員</div>
+          </div>
+        </div>
+        <div class="cohort-body">
+          <div class="stat-row">
+            <span class="stat-row-label">🍱 便當需求統計</span>
+            <span class="stat-row-val" id="b3-food-stat">葷 30 ｜ 素 8</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-row-label">📜 電子研習證明</span>
+            <span class="stat-row-val" id="b3-cert-stat">需要 34 ｜ 不需要 4</span>
+          </div>
+          <div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
+              👨‍💼 身分別組成：
+            </div>
+            <div class="mini-tags" id="b3-roles-tags">
+              <!-- populated by js -->
+            </div>
+          </div>
+          <div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
+              🏛️ 人數最多科系/單位：
+            </div>
+            <div class="mini-tags" id="b3-top-depts">
+              <!-- populated by js -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Department Distribution Section -->
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">🏛️ 學員所屬系所與行政單位分佈分析</h2>
+          <p class="section-desc">
+            彙整各科系在三個梯次的報名人數；支援切換「標準化系所」或「填寫原始文字」。點擊科系可直接聯動下方名冊篩選！
+          </p>
+        </div>
+        <div class="dept-tabs">
+          <button class="dept-tab-btn active" id="tab-norm-dept" onclick="setDeptViewMode('norm')">
+            標竿標準化系所 (合併班級/縮寫)
+          </button>
+          <button class="dept-tab-btn" id="tab-raw-dept" onclick="setDeptViewMode('raw')">
+            填寫原始名稱 (75 種字串)
+          </button>
+        </div>
+      </div>
+
+      <div class="dept-analysis-grid">
+        <!-- Horizontal Bar List -->
+        <div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:13px; font-weight:700; color:var(--text-secondary);">
+            <span>科系 / 單位排行 (長條為梯次 1/2/3 組成)</span>
+            <span>報名人數 (佔比)</span>
+          </div>
+          <div class="dept-bar-list" id="dept-bar-container">
+            <!-- populated by js -->
+          </div>
+        </div>
+
+        <!-- Cross Matrix Table -->
+        <div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:13px; font-weight:700; color:var(--text-secondary);">
+            <span>梯次 × 科系 交叉人數矩陣表</span>
+            <span style="font-weight: normal; color: var(--text-muted); font-size:12px;">梯次1(藍) · 梯次2(紫) · 梯次3(綠)</span>
+          </div>
+          <div class="matrix-table-wrap">
+            <table class="matrix-table" id="matrix-table">
+              <thead>
+                <tr>
+                  <th>科系 / 單位</th>
+                  <th>類別</th>
+                  <th style="text-align: center;">第1梯</th>
+                  <th style="text-align: center;">第2梯</th>
+                  <th style="text-align: center;">第3梯</th>
+                  <th style="text-align: center;">合計</th>
+                </tr>
+              </thead>
+              <tbody id="matrix-tbody">
+                <!-- populated by js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full Roster Section -->
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">📋 學員完整名冊檢索與篩選</h2>
+          <p class="section-desc">
+            支援多條件即時搜尋（姓名、系所、手機、信箱），並可一鍵依梯次、身分、飲食習慣快速切換。
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <span style="font-size: 13px; color: var(--text-muted);" id="filtered-count-text">
+            顯示 107 筆資料
+          </span>
+          <button class="btn btn-primary" onclick="exportFilteredCSV()" style="font-size: 13px; padding: 6px 12px;">
+            匯出篩選結果 CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters Panel -->
+      <div class="filter-panel">
+        <div class="search-row">
+          <div class="search-input-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" class="search-input" placeholder="即時搜尋：學員姓名、科系所別、電話、電子郵件..." oninput="handleSearch()">
+          </div>
+          <button class="btn btn-white" onclick="resetFilters()">
+            重置全部篩選
+          </button>
+        </div>
+
+        <!-- Filter Pills Rows -->
+        <div class="filter-pills-row">
+          <span style="font-weight: 700; color: var(--text-secondary); min-width: 60px;">梯次：</span>
+          <button class="filter-pill active" onclick="setBatchFilter(0, this)">全部梯次</button>
+          <button class="filter-pill" onclick="setBatchFilter(1, this)">第一梯次 (11/05)</button>
+          <button class="filter-pill" onclick="setBatchFilter(2, this)">第二梯次 (11/09)</button>
+          <button class="filter-pill" onclick="setBatchFilter(3, this)">第三梯次 (12/03)</button>
+        </div>
+
+        <div class="filter-pills-row">
+          <span style="font-weight: 700; color: var(--text-secondary); min-width: 60px;">身分：</span>
+          <button class="filter-pill active" onclick="setRoleFilter('all', this)">全部身分</button>
+          <button class="filter-pill" onclick="setRoleFilter('中科大教師', this)">教師</button>
+          <button class="filter-pill" onclick="setRoleFilter('中科大學生', this)">學生</button>
+          <button class="filter-pill" onclick="setRoleFilter('中科大職員', this)">職員</button>
+          <button class="filter-pill" onclick="setRoleFilter('其他', this)">校友/研究生</button>
+        </div>
+
+        <div class="filter-pills-row">
+          <span style="font-weight: 700; color: var(--text-secondary); min-width: 60px;">飲食：</span>
+          <button class="filter-pill active" onclick="setFoodFilter('all', this)">全部</button>
+          <button class="filter-pill" onclick="setFoodFilter('葷食', this)">🥩 葷食</button>
+          <button class="filter-pill" onclick="setFoodFilter('素食', this)">🥗 素食</button>
+          
+          <span style="font-weight: 700; color: var(--text-secondary); margin-left: 16px; min-width: 60px;">去重狀態：</span>
+          <button class="filter-pill active" onclick="setStatusFilter('valid', this)">僅顯示有效名單</button>
+          <button class="filter-pill" onclick="setStatusFilter('dup_only', this)">僅顯示被排除重複</button>
+          <button class="filter-pill" onclick="setStatusFilter('all', this)">全部記錄 (含重複)</button>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th onclick="sortTable('id')"># 序號</th>
+              <th onclick="sortTable('name')">學員姓名</th>
+              <th onclick="sortTable('batch_id')">活動梯次</th>
+              <th onclick="sortTable('norm_dept')">科系 / 單位</th>
+              <th onclick="sortTable('role')">身分別</th>
+              <th onclick="sortTable('food')">飲食</th>
+              <th onclick="sortTable('cert')">研習證明</th>
+              <th>連絡電話</th>
+              <th>電子信箱</th>
+              <th onclick="sortTable('iso_time')">報名時間</th>
+              <th>狀態</th>
+            </tr>
+          </thead>
+          <tbody id="roster-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <div>
+          <span>每頁顯示筆數：</span>
+          <select id="page-size-select" onchange="changePageSize(this.value)" style="padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border);">
+            <option value="25">25 筆</option>
+            <option value="50" selected>50 筆</option>
+            <option value="100">100 筆</option>
+            <option value="9999">全部顯示</option>
+          </select>
+        </div>
+        <div class="page-controls" id="page-controls">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Embedded Data
+    const RAW_RECORDS = [{"id": 1, "timestamp": "2026/10/27 9:20:45 上午 GMT+8", "iso_time": "2026-10-27 09:20:45", "name": "李冠樺", "raw_dept": "智慧工程博士班", "norm_dept": "智慧工程博士班", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0955563535", "email": "hue00038@gmail.com", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "不需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 2, "timestamp": "2026/10/27 4:17:04 下午 GMT+8", "iso_time": "2026-10-27 16:17:04", "name": "陳美玲", "raw_dept": "空中學院", "norm_dept": "空中學院", "dept_cat": "學院/教學單位", "role": "中科大職員", "phone": "0960-070365", "email": "amyteacher365@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 3, "timestamp": "2026/10/27 7:50:23 下午 GMT+8", "iso_time": "2026-10-27 19:50:23", "name": "何蕙萍", "raw_dept": "企管系", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0953368966", "email": "huipingho3@gmail.com", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 4, "timestamp": "2026/10/28 9:16:19 上午 GMT+8", "iso_time": "2026-10-28 09:16:19", "name": "張嘉容", "raw_dept": "會計資訊系", "norm_dept": "會計資訊系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "22196011", "email": "adeline@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 5, "timestamp": "2026/10/28 9:28:30 上午 GMT+8", "iso_time": "2026-10-28 09:28:30", "name": "阮氏蕾", "raw_dept": "語言中心", "norm_dept": "語言中心", "dept_cat": "教學/行政支援", "role": "中科大教師", "phone": "0988578657", "email": "jemma@nutc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 6, "timestamp": "2026/10/28 9:29:27 上午 GMT+8", "iso_time": "2026-10-28 09:29:27", "name": "蔡知臻", "raw_dept": "通識教育中心", "norm_dept": "通識教育中心", "dept_cat": "教學/行政支援", "role": "中科大教師", "phone": "0931762200", "email": "j455088@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 7, "timestamp": "2026/10/28 9:37:27 上午 GMT+8", "iso_time": "2026-10-28 09:37:27", "name": "謝心怡", "raw_dept": "職輔中心", "norm_dept": "職涯及諮商輔導中心", "dept_cat": "行政單位", "role": "中科大職員", "phone": "0422196833", "email": "s995650@nutc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 8, "timestamp": "2026/10/28 9:37:33 上午 GMT+8", "iso_time": "2026-10-28 09:37:33", "name": "李振宇", "raw_dept": "財金系", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0931528918", "email": "mosterlee@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 9, "timestamp": "2026/10/28 9:41:03 上午 GMT+8", "iso_time": "2026-10-28 09:41:03", "name": "徐啓維", "raw_dept": "職涯及諮商輔導中心-諮商輔導組", "norm_dept": "職涯及諮商輔導中心", "dept_cat": "行政單位", "role": "中科大職員", "phone": "04-22195438", "email": "kiwihsu017@nutc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 10, "timestamp": "2026/10/28 9:58:38 上午 GMT+8", "iso_time": "2026-10-28 09:58:38", "name": "陳柏延", "raw_dept": "空中學院應用商學", "norm_dept": "空中學院應用商學系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0928-012308", "email": "m2342@maria.org.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 11, "timestamp": "2026/10/28 10:03:17 上午 GMT+8", "iso_time": "2026-10-28 10:03:17", "name": "謝春媛", "raw_dept": "休閒經營管理", "norm_dept": "休閒事業經營系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0985290336", "email": "h290336@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 12, "timestamp": "2026/10/28 10:04:46 上午 GMT+8", "iso_time": "2026-10-28 10:04:46", "name": "張素霞", "raw_dept": "老服系2B", "norm_dept": "老人服務事業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0975711885", "email": "julie571226@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 13, "timestamp": "2026/10/28 10:08:12 上午 GMT+8", "iso_time": "2026-10-28 10:08:12", "name": "陳凱凰", "raw_dept": "室內設計系", "norm_dept": "室內設計系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0918160089", "email": "phoenix0268@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "不需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 14, "timestamp": "2026/10/28 10:09:59 上午 GMT+8", "iso_time": "2026-10-28 10:09:59", "name": "吳應明", "raw_dept": "企業管理", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0980957168", "email": "sunsun957168@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 15, "timestamp": "2026/10/28 10:14:40 上午 GMT+8", "iso_time": "2026-10-28 10:14:40", "name": "黃種州", "raw_dept": "室設所研一", "norm_dept": "室內設計系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0912475189", "email": "TIDUS_scorpion@hotmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "不需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 16, "timestamp": "2026/10/28 10:15:53 上午 GMT+8", "iso_time": "2026-10-28 10:15:53", "name": "廖麗娟", "raw_dept": "老服一A", "norm_dept": "老人服務事業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0973380516", "email": "gigixin@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 17, "timestamp": "2026/10/28 10:21:22 上午 GMT+8", "iso_time": "2026-10-28 10:21:22", "name": "童燕華", "raw_dept": "美容系 研究所", "norm_dept": "美容系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0916-751767", "email": "heidi5757@gmail.com", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 18, "timestamp": "2026/10/28 10:21:58 上午 GMT+8", "iso_time": "2026-10-28 10:21:58", "name": "周佳儀", "raw_dept": "職涯及諮商輔導中心-諮商輔導組", "norm_dept": "職涯及諮商輔導中心", "dept_cat": "行政單位", "role": "中科大職員", "phone": "04-22195439", "email": "soca72@nutc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 19, "timestamp": "2026/10/28 10:25:19 上午 GMT+8", "iso_time": "2026-10-28 10:25:19", "name": "陳玫儒", "raw_dept": "圖書館", "norm_dept": "圖書館", "dept_cat": "行政單位", "role": "中科大職員", "phone": "5481", "email": "meiru@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "不需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 20, "timestamp": "2026/10/28 10:31:33 上午 GMT+8", "iso_time": "2026-10-28 10:31:33", "name": "蔡佩琪", "raw_dept": "商業設計系", "norm_dept": "商業設計系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0932529965", "email": "p850224@gmail.com", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 21, "timestamp": "2026/10/28 10:32:54 上午 GMT+8", "iso_time": "2026-10-28 10:32:54", "name": "游勝宏", "raw_dept": "保金系", "norm_dept": "保險金融管理系", "dept_cat": "學術科系", "role": "中科大職員", "phone": "6148", "email": "if00@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 22, "timestamp": "2026/10/28 10:34:15 上午 GMT+8", "iso_time": "2026-10-28 10:34:15", "name": "王美智", "raw_dept": "保金系", "norm_dept": "保險金融管理系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0923815896", "email": "wangsona@gmail.com", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 23, "timestamp": "2026/10/28 10:41:36 上午 GMT+8", "iso_time": "2026-10-28 10:41:36", "name": "張淑婷", "raw_dept": "企業管理系", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0911697545", "email": "sueting25@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 24, "timestamp": "2026/10/28 10:42:01 上午 GMT+8", "iso_time": "2026-10-28 10:42:01", "name": "紀芷盈", "raw_dept": "財務金融系", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0910211598", "email": "vicky505209988@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 25, "timestamp": "2026/10/28 10:52:43 上午 GMT+8", "iso_time": "2026-10-28 10:52:43", "name": "黃政裕", "raw_dept": "智工博三", "norm_dept": "智慧工程博士班", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0909996686", "email": "hansamu@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 26, "timestamp": "2026/10/28 10:57:34 上午 GMT+8", "iso_time": "2026-10-28 10:57:34", "name": "汪曉琪", "raw_dept": "美容系", "norm_dept": "美容系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "02-22195890", "email": "hcwang@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 27, "timestamp": "2026/10/28 11:07:07 上午 GMT+8", "iso_time": "2026-10-28 11:07:07", "name": "張群", "raw_dept": "應用中文系", "norm_dept": "應用中文系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "6667", "email": "changedison2018@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 28, "timestamp": "2026/10/28 11:08:13 上午 GMT+8", "iso_time": "2026-10-28 11:08:13", "name": "黃建智", "raw_dept": "學士後護理系", "norm_dept": "學士後護理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0937798574", "email": "cj6ru0454g4ek7bp6h96@gmail.com", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "不需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 29, "timestamp": "2026/10/28 11:15:29 上午 GMT+8", "iso_time": "2026-10-28 11:15:29", "name": "謝震武", "raw_dept": "企業管理系", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0921043103", "email": "s1411204042@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 30, "timestamp": "2026/10/28 11:29:39 上午 GMT+8", "iso_time": "2026-10-28 11:29:39", "name": "高秋香", "raw_dept": "通識教育中心", "norm_dept": "通識教育中心", "dept_cat": "教學/行政支援", "role": "中科大教師", "phone": "6680", "email": "k385129@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 31, "timestamp": "2026/10/28 11:29:57 上午 GMT+8", "iso_time": "2026-10-28 11:29:57", "name": "許乃文", "raw_dept": "應日二A", "norm_dept": "應用日語系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0921258561", "email": "s3311442008@ad1.nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 32, "timestamp": "2026/10/28 11:39:15 上午 GMT+8", "iso_time": "2026-10-28 11:39:15", "name": "蘇心怡", "raw_dept": "圖書館讀者服務組", "norm_dept": "圖書館", "dept_cat": "行政單位", "role": "中科大職員", "phone": "22195483", "email": "cookic1106@nutc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "不需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 33, "timestamp": "2026/10/28 11:43:56 上午 GMT+8", "iso_time": "2026-10-28 11:43:56", "name": "陳淑敏", "raw_dept": "事務組", "norm_dept": "總務處事務組", "dept_cat": "行政單位", "role": "中科大職員", "phone": "0926353218", "email": "min0127@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 34, "timestamp": "2026/10/28 11:58:25 上午 GMT+8", "iso_time": "2026-10-28 11:58:25", "name": "陳建銘", "raw_dept": "企業管理系", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "04-22196758", "email": "jchen@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 35, "timestamp": "2026/10/28 12:09:14 下午 GMT+8", "iso_time": "2026-10-28 12:09:14", "name": "簡枝芳", "raw_dept": "圖書館", "norm_dept": "圖書館", "dept_cat": "行政單位", "role": "中科大職員", "phone": "0972078356", "email": "jrfang@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "素食", "cert": "不需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 36, "timestamp": "2026/10/28 12:16:27 下午 GMT+8", "iso_time": "2026-10-28 12:16:27", "name": "葉志權", "raw_dept": "財務金融系", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0987219948", "email": "ccyeh@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 37, "timestamp": "2026/10/28 12:20:58 下午 GMT+8", "iso_time": "2026-10-28 12:20:58", "name": "蘇葆倫", "raw_dept": "進修部空中學院/應用商學系", "norm_dept": "空中學院應用商學系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0939728723", "email": "sylvia723su@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 38, "timestamp": "2026/10/28 12:23:26 下午 GMT+8", "iso_time": "2026-10-28 12:23:26", "name": "陳香如", "raw_dept": "國貿", "norm_dept": "國際貿易系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0953629072", "email": "runtits2022@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 39, "timestamp": "2026/10/28 12:26:19 下午 GMT+8", "iso_time": "2026-10-28 12:26:19", "name": "劉秀兒", "raw_dept": "假企二A", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0932274206", "email": "rataliu2310@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 40, "timestamp": "2026/10/28 12:26:25 下午 GMT+8", "iso_time": "2026-10-28 12:26:25", "name": "陳國榮", "raw_dept": "商業設計系", "norm_dept": "商業設計系", "dept_cat": "學術科系", "role": "中科大碩班", "phone": "0912896377", "email": "56chen56@gmail.com", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 41, "timestamp": "2026/10/28 12:28:31 下午 GMT+8", "iso_time": "2026-10-28 12:28:31", "name": "李建利", "raw_dept": "校務研究中心", "norm_dept": "校務研究中心", "dept_cat": "行政單位", "role": "中科大職員", "phone": "04-22195655", "email": "jianle@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 42, "timestamp": "2026/10/28 12:37:09 下午 GMT+8", "iso_time": "2026-10-28 12:37:09", "name": "黃靜慧", "raw_dept": "圖書館", "norm_dept": "圖書館", "dept_cat": "行政單位", "role": "中科大職員", "phone": "22195472", "email": "huhuang@nutc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 43, "timestamp": "2026/10/28 12:38:17 下午 GMT+8", "iso_time": "2026-10-28 12:38:17", "name": "李建翰", "raw_dept": "秘書室", "norm_dept": "秘書室", "dept_cat": "行政單位", "role": "中科大職員", "phone": "5068", "email": "pippo@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "素食", "cert": "不需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 44, "timestamp": "2026/10/28 12:53:28 下午 GMT+8", "iso_time": "2026-10-28 12:53:28", "name": "楊淑涓", "raw_dept": "休閒系", "norm_dept": "休閒事業經營系", "dept_cat": "學術科系", "role": "中科大職員", "phone": "2219-6513", "email": "scyang@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 45, "timestamp": "2026/10/28 12:59:25 下午 GMT+8", "iso_time": "2026-10-28 12:59:25", "name": "陳奐瑀", "raw_dept": "資訊工程系", "norm_dept": "資訊工程系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0922507121", "email": "hychen@gm.nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 46, "timestamp": "2026/10/28 1:04:38 下午 GMT+8", "iso_time": "2026-10-28 13:04:38", "name": "吳庭茂", "raw_dept": "事務組", "norm_dept": "總務處事務組", "dept_cat": "行政單位", "role": "中科大職員", "phone": "0921376839", "email": "taichungspring@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": false, "is_kept_earliest": true, "is_dup_person": true, "submission_count": 2}, {"id": 47, "timestamp": "2026/10/28 1:08:58 下午 GMT+8", "iso_time": "2026-10-28 13:08:58", "name": "紀月煌", "raw_dept": "企二A", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0923607511", "email": "moon19710103@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "素食", "cert": "不需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 48, "timestamp": "2026/10/28 1:10:27 下午 GMT+8", "iso_time": "2026-10-28 13:10:27", "name": "施雅雯", "raw_dept": "中護健康學院", "norm_dept": "中護健康學院", "dept_cat": "學院/教學單位", "role": "中科大職員", "phone": "0989624556", "email": "far244147@nutc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 49, "timestamp": "2026/10/28 1:41:15 下午 GMT+8", "iso_time": "2026-10-28 13:41:15", "name": "李固遠", "raw_dept": "智慧生產工程系", "norm_dept": "智慧生產工程系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0928726382", "email": "howkaka@hotmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 50, "timestamp": "2026/10/28 1:52:23 下午 GMT+8", "iso_time": "2026-10-28 13:52:23", "name": "陳樂嫙", "raw_dept": "企管系", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0908089908", "email": "lucy@chiang.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 51, "timestamp": "2026/10/28 2:11:05 下午 GMT+8", "iso_time": "2026-10-28 14:11:05", "name": "鄭如孜", "raw_dept": "會計資訊系", "norm_dept": "會計資訊系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0970010311", "email": "jtcheng@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 52, "timestamp": "2026/10/28 2:52:46 下午 GMT+8", "iso_time": "2026-10-28 14:52:46", "name": "張翔鈞", "raw_dept": "財金系", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0975009928", "email": "arieslibra318@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 53, "timestamp": "2026/10/28 2:59:31 下午 GMT+8", "iso_time": "2026-10-28 14:59:31", "name": "林家豪", "raw_dept": "美容系", "norm_dept": "美容系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0916471122", "email": "leye16888@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 54, "timestamp": "2026/10/28 3:01:25 下午 GMT+8", "iso_time": "2026-10-28 15:01:25", "name": "施巧郁", "raw_dept": "企管系", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0963823986", "email": "shihchiaoyu@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 55, "timestamp": "2026/10/28 3:46:42 下午 GMT+8", "iso_time": "2026-10-28 15:46:42", "name": "蘇琬茹", "raw_dept": "會計資訊系", "norm_dept": "會計資訊系", "dept_cat": "學術科系", "role": "校友", "phone": "0934311737", "email": "staringstar30@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 56, "timestamp": "2026/10/28 5:03:05 下午 GMT+8", "iso_time": "2026-10-28 17:03:05", "name": "魏安平", "raw_dept": "商業經營", "norm_dept": "商業經營系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "6275", "email": "anpinwei@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 57, "timestamp": "2026/10/28 5:08:59 下午 GMT+8", "iso_time": "2026-10-28 17:08:59", "name": "王財驛", "raw_dept": "保險金融管理系", "norm_dept": "保險金融管理系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "22196044", "email": "peterw@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 58, "timestamp": "2026/10/28 5:13:04 下午 GMT+8", "iso_time": "2026-10-28 17:13:04", "name": "林文彥", "raw_dept": "國立臺中科技大學 資訊管理系 副教授", "norm_dept": "資訊管理系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0913976255", "email": "qqnice@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 59, "timestamp": "2026/10/28 5:14:58 下午 GMT+8", "iso_time": "2026-10-28 17:14:58", "name": "騰裕言", "raw_dept": "實習與就業輔導組", "norm_dept": "職涯及諮商輔導中心", "dept_cat": "行政單位", "role": "中科大職員", "phone": "0908100760", "email": "steveyao20011024abcd@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 60, "timestamp": "2026/10/28 8:00:30 下午 GMT+8", "iso_time": "2026-10-28 20:00:30", "name": "林季嫻", "raw_dept": "老服1-A", "norm_dept": "老人服務事業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0958708009", "email": "b0958708009@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 61, "timestamp": "2026/10/28 8:21:06 下午 GMT+8", "iso_time": "2026-10-28 20:21:06", "name": "黃鈺晴", "raw_dept": "資工系", "norm_dept": "資訊工程系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0912918338", "email": "s2411232005@nutc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 62, "timestamp": "2026/10/28 9:10:09 下午 GMT+8", "iso_time": "2026-10-28 21:10:09", "name": "陳彤宜", "raw_dept": "國際貿易系", "norm_dept": "國際貿易系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0908629171", "email": "as632148ms@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 63, "timestamp": "2026/10/28 9:55:06 下午 GMT+8", "iso_time": "2026-10-28 21:55:06", "name": "林亭瑜", "raw_dept": "應用日語系", "norm_dept": "應用日語系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0911278263", "email": "tingyu@ms.szmc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 64, "timestamp": "2026/10/28 10:13:11 下午 GMT+8", "iso_time": "2026-10-28 22:13:11", "name": "林乙榛", "raw_dept": "美容系碩二", "norm_dept": "美容系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0987597206", "email": "a0987597206@gmail.com", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 65, "timestamp": "2026/10/29 12:10:28 上午 GMT+8", "iso_time": "2026-10-29 00:10:28", "name": "何雅婷", "raw_dept": "老服事業管理系", "norm_dept": "老人服務事業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0970282027", "email": "amy798455@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 66, "timestamp": "2026/10/29 1:17:34 上午 GMT+8", "iso_time": "2026-10-29 01:17:34", "name": "匡語若", "raw_dept": "資管四1", "norm_dept": "資訊管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0912701303", "email": "sye453922@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 67, "timestamp": "2026/10/29 1:18:55 上午 GMT+8", "iso_time": "2026-10-29 01:18:55", "name": "郭如慧", "raw_dept": "資訊管理系", "norm_dept": "資訊管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0900024707", "email": "a0900024707@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 68, "timestamp": "2026/10/29 1:23:09 上午 GMT+8", "iso_time": "2026-10-29 01:23:09", "name": "陳柏淩", "raw_dept": "智慧生產工程系", "norm_dept": "智慧生產工程系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0422195621", "email": "chenbl@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 69, "timestamp": "2026/10/29 5:24:47 上午 GMT+8", "iso_time": "2026-10-29 05:24:47", "name": "劉嘉雯", "raw_dept": "企業管理系", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "6787", "email": "daisy716@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 70, "timestamp": "2026/10/29 7:48:44 上午 GMT+8", "iso_time": "2026-10-29 07:48:44", "name": "謝居倫", "raw_dept": "會資系", "norm_dept": "會計資訊系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "6022", "email": "hsiehcl@gmail.com", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 71, "timestamp": "2026/10/29 9:17:07 上午 GMT+8", "iso_time": "2026-10-29 09:17:07", "name": "潘宜枚", "raw_dept": "人事室", "norm_dept": "人事室", "dept_cat": "行政單位", "role": "中科大職員", "phone": "04-22195027", "email": "mei14@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 72, "timestamp": "2026/10/29 9:19:14 上午 GMT+8", "iso_time": "2026-10-29 09:19:14", "name": "王雨涵", "raw_dept": "多媒體設計系", "norm_dept": "多媒體設計系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0921505738", "email": "han@gm.nutc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 73, "timestamp": "2026/10/29 10:14:01 上午 GMT+8", "iso_time": "2026-10-29 10:14:01", "name": "李宥琁", "raw_dept": "國貿系", "norm_dept": "國際貿易系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0912623675", "email": "onlywhitepink@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 74, "timestamp": "2026/10/29 10:22:25 上午 GMT+8", "iso_time": "2026-10-29 10:22:25", "name": "洪瑞駿", "raw_dept": "國立臺中科技大學商業設計系", "norm_dept": "商業設計系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0931533665", "email": "jun580512@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 75, "timestamp": "2026/10/29 10:23:36 上午 GMT+8", "iso_time": "2026-10-29 10:23:36", "name": "王宜媚", "raw_dept": "空中學院", "norm_dept": "空中學院", "dept_cat": "學院/教學單位", "role": "中科大職員", "phone": "5823", "email": "xc004@nutc.edu tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 76, "timestamp": "2026/10/29 10:29:47 上午 GMT+8", "iso_time": "2026-10-29 10:29:47", "name": "張耀文", "raw_dept": "推廣部", "norm_dept": "推廣部", "dept_cat": "行政單位", "role": "中科大職員", "phone": "0422195568", "email": "sylvia2326@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 77, "timestamp": "2026/10/29 11:24:34 上午 GMT+8", "iso_time": "2026-10-29 11:24:34", "name": "楊紅鈺", "raw_dept": "資訊管理系", "norm_dept": "資訊管理系", "dept_cat": "學術科系", "role": "中科大職員", "phone": "(04)2219-6314", "email": "hongyu.nutc@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 78, "timestamp": "2026/10/29 12:20:50 下午 GMT+8", "iso_time": "2026-10-29 12:20:50", "name": "黃惠君", "raw_dept": "會計資訊系", "norm_dept": "會計資訊系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0919510843", "email": "hch@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 79, "timestamp": "2026/10/29 1:24:21 下午 GMT+8", "iso_time": "2026-10-29 13:24:21", "name": "林慧宜", "raw_dept": "人事室", "norm_dept": "人事室", "dept_cat": "行政單位", "role": "中科大職員", "phone": "0939681896", "email": "Psnl@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 80, "timestamp": "2026/10/29 1:39:51 下午 GMT+8", "iso_time": "2026-10-29 13:39:51", "name": "柯子郁", "raw_dept": "空院註冊組", "norm_dept": "空中學院 (註冊組)", "dept_cat": "行政單位", "role": "中科大職員", "phone": "04-22105825", "email": "keyu@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 81, "timestamp": "2026/10/29 1:58:12 下午 GMT+8", "iso_time": "2026-10-29 13:58:12", "name": "張家溱", "raw_dept": "空院課務組", "norm_dept": "空中學院 (課務組)", "dept_cat": "行政單位", "role": "中科大職員", "phone": "22195814", "email": "star1226@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "不需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 82, "timestamp": "2026/10/29 2:47:38 下午 GMT+8", "iso_time": "2026-10-29 14:47:38", "name": "楊維娟", "raw_dept": "國貿系", "norm_dept": "國際貿易系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0912362545", "email": "wyangc@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": false, "is_kept_earliest": true, "is_dup_person": true, "submission_count": 2}, {"id": 83, "timestamp": "2026/10/29 2:52:52 下午 GMT+8", "iso_time": "2026-10-29 14:52:52", "name": "莊雅筑", "raw_dept": "教務處課務組", "norm_dept": "教務處課務組", "dept_cat": "行政單位", "role": "中科大職員", "phone": "22195125", "email": "ycc913@nutc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 84, "timestamp": "2026/10/29 3:10:20 下午 GMT+8", "iso_time": "2026-10-29 15:10:20", "name": "何周青", "raw_dept": "進修部資工三一", "norm_dept": "資訊工程系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0953789725", "email": "kiesoholic@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 85, "timestamp": "2026/10/29 3:19:31 下午 GMT+8", "iso_time": "2026-10-29 15:19:31", "name": "范梓洋", "raw_dept": "保金系", "norm_dept": "保險金融管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0932376968", "email": "eclipse690430@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "不需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 86, "timestamp": "2026/10/29 3:19:45 下午 GMT+8", "iso_time": "2026-10-29 15:19:45", "name": "吳哲安", "raw_dept": "企業管理系", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0933407136", "email": "s1411204037@nutc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 87, "timestamp": "2026/10/29 3:52:08 下午 GMT+8", "iso_time": "2026-10-29 15:52:08", "name": "吳庭茂", "raw_dept": "事務組", "norm_dept": "總務處事務組", "dept_cat": "行政單位", "role": "中科大職員", "phone": "0921376839", "email": "taichungspring@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": false, "is_dup_person": true, "submission_count": 2}, {"id": 88, "timestamp": "2026/10/29 4:20:10 下午 GMT+8", "iso_time": "2026-10-29 16:20:10", "name": "杜傳偉", "raw_dept": "會資系", "norm_dept": "會計資訊系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0958080227", "email": "wa632643@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 89, "timestamp": "2026/10/29 4:30:29 下午 GMT+8", "iso_time": "2026-10-29 16:30:29", "name": "李維倫", "raw_dept": "室內設計系", "norm_dept": "室內設計系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0900768272", "email": "nutcleeweilun@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 90, "timestamp": "2026/10/29 5:06:05 下午 GMT+8", "iso_time": "2026-10-29 17:06:05", "name": "張璧薇", "raw_dept": "室內設計系", "norm_dept": "室內設計系", "dept_cat": "學術科系", "role": "研究所一年級", "phone": "0937482142", "email": "fosika1019@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 91, "timestamp": "2026/10/29 6:05:03 下午 GMT+8", "iso_time": "2026-10-29 18:05:03", "name": "陳秀桂", "raw_dept": "財金系", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "22196842", "email": "showguay@nutc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": false, "is_kept_earliest": true, "is_dup_person": true, "submission_count": 4}, {"id": 92, "timestamp": "2026/10/29 6:06:29 下午 GMT+8", "iso_time": "2026-10-29 18:06:29", "name": "陳秀桂", "raw_dept": "財金系", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "22196842", "email": "showguay@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": false, "is_kept_earliest": false, "is_dup_person": true, "submission_count": 4}, {"id": 93, "timestamp": "2026/10/29 6:07:48 下午 GMT+8", "iso_time": "2026-10-29 18:07:48", "name": "陳秀桂", "raw_dept": "財金系", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "22196842", "email": "showguay@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": false, "is_kept_earliest": false, "is_dup_person": true, "submission_count": 4}, {"id": 94, "timestamp": "2026/10/29 6:32:53 下午 GMT+8", "iso_time": "2026-10-29 18:32:53", "name": "趙一萍", "raw_dept": "室內設計研ㄧ", "norm_dept": "室內設計系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0932676350", "email": "luvy1204@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 95, "timestamp": "2026/10/29 6:40:32 下午 GMT+8", "iso_time": "2026-10-29 18:40:32", "name": "陳秀桂", "raw_dept": "財金系", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "22196842", "email": "showguay@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": false, "is_dup_person": true, "submission_count": 4}, {"id": 96, "timestamp": "2026/10/29 7:34:03 下午 GMT+8", "iso_time": "2026-10-29 19:34:03", "name": "張巧宜", "raw_dept": "保金", "norm_dept": "保險金融管理系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "22196848", "email": "cyc@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 97, "timestamp": "2026/10/30 9:00:54 上午 GMT+8", "iso_time": "2026-10-30 09:00:54", "name": "許瑋玲", "raw_dept": "日語系", "norm_dept": "應用日語系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0937764654", "email": "anglewoei@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 98, "timestamp": "2026/10/30 9:08:35 上午 GMT+8", "iso_time": "2026-10-30 09:08:35", "name": "林欣萍", "raw_dept": "日文系", "norm_dept": "應用日語系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0907794119", "email": "kinncyann@yahoo.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 99, "timestamp": "2026/10/30 10:33:25 上午 GMT+8", "iso_time": "2026-10-30 10:33:25", "name": "李靜芠", "raw_dept": "財務金融系", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0422196082", "email": "jeanwen@nutc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "素食", "cert": "不需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 100, "timestamp": "2026/10/30 11:05:06 上午 GMT+8", "iso_time": "2026-10-30 11:05:06", "name": "許明珠", "raw_dept": "通識中心", "norm_dept": "通識教育中心", "dept_cat": "教學/行政支援", "role": "中科大教師", "phone": "5122", "email": "mingchu.tw@gmail.com", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 101, "timestamp": "2026/10/30 12:31:23 下午 GMT+8", "iso_time": "2026-10-30 12:31:23", "name": "何金穎", "raw_dept": "財務金融系", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "校友", "phone": "0955-084049", "email": "jeanhrgoto@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 102, "timestamp": "2026/10/30 1:36:45 下午 GMT+8", "iso_time": "2026-10-30 13:36:45", "name": "張心怡", "raw_dept": "進修部二技/企業管理", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0918599777", "email": "chy651016@yahoo.com.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "素食", "cert": "需要", "is_kept_latest": false, "is_kept_earliest": true, "is_dup_person": true, "submission_count": 2}, {"id": 103, "timestamp": "2026/10/30 1:38:38 下午 GMT+8", "iso_time": "2026-10-30 13:38:38", "name": "張心怡", "raw_dept": "進修部二技/企業管理", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0918599777", "email": "chy651016@yahoo.com.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": false, "is_dup_person": true, "submission_count": 2}, {"id": 104, "timestamp": "2026/10/30 2:04:43 下午 GMT+8", "iso_time": "2026-10-30 14:04:43", "name": "劉桂萍", "raw_dept": "商學院", "norm_dept": "空中學院應用商學系", "dept_cat": "學術科系", "role": "中科大職員", "phone": "6193", "email": "kueiping@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 105, "timestamp": "2026/10/30 2:21:12 下午 GMT+8", "iso_time": "2026-10-30 14:21:12", "name": "周博偉", "raw_dept": "資訊工程系", "norm_dept": "資訊工程系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0967285320", "email": "BrianBob704@gmail.com", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 106, "timestamp": "2026/10/30 4:31:05 下午 GMT+8", "iso_time": "2026-10-30 16:31:05", "name": "楊維娟", "raw_dept": "國貿系", "norm_dept": "國際貿易系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0912362545", "email": "wyangc@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": false, "is_dup_person": true, "submission_count": 2}, {"id": 107, "timestamp": "2026/10/30 7:38:25 下午 GMT+8", "iso_time": "2026-10-30 19:38:25", "name": "吳承霖", "raw_dept": "中科大進修部二技應用日語系", "norm_dept": "應用日語系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0988269006", "email": "c105spr@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 108, "timestamp": "2026/10/30 8:00:39 下午 GMT+8", "iso_time": "2026-10-30 20:00:39", "name": "吳慧珒", "raw_dept": "企管二A", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0989625212", "email": "emmiewu0629@gmail.com", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 109, "timestamp": "2026/10/31 9:24:13 上午 GMT+8", "iso_time": "2026-10-31 09:24:13", "name": "陳俐廷", "raw_dept": "進修部 企業管理一1", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0900791006", "email": "skzmomo2@gmail.com", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 110, "timestamp": "2026/10/31 9:53:06 下午 GMT+8", "iso_time": "2026-10-31 21:53:06", "name": "蔡慧君", "raw_dept": "老人服務事業管理系", "norm_dept": "老人服務事業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0983131407", "email": "a0983131407@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 111, "timestamp": "2026/10/31 11:45:33 下午 GMT+8", "iso_time": "2026-10-31 23:45:33", "name": "詹美真", "raw_dept": "商學二9", "norm_dept": "空中學院應用商學系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0976250083", "email": "JEN.BLUE.QQ@GMAIL.COM", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 112, "timestamp": "2026/11/01 10:32:40 上午 GMT+8", "iso_time": "2026-11-01 10:32:40", "name": "陳映瑾", "raw_dept": "財務金融", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0901314978", "email": "wenying53@gmail.com", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}, {"id": 113, "timestamp": "2026/11/01 10:52:25 上午 GMT+8", "iso_time": "2026-11-01 10:52:25", "name": "楊凱雰", "raw_dept": "商學系", "norm_dept": "空中學院應用商學系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0960210715", "email": "a0960210715@gmail.com", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "不需要", "is_kept_latest": true, "is_kept_earliest": true, "is_dup_person": false, "submission_count": 1}];
+    const DUP_AUDIT = [{"name": "吳庭茂", "count": 2, "submissions": [{"id": 46, "timestamp": "2026/10/28 1:04:38 下午 GMT+8", "iso_time": "2026-10-28 13:04:38", "name": "吳庭茂", "raw_dept": "事務組", "norm_dept": "總務處事務組", "dept_cat": "行政單位", "role": "中科大職員", "phone": "0921376839", "email": "taichungspring@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": false, "is_kept_earliest": true, "is_dup_person": true, "submission_count": 2}, {"id": 87, "timestamp": "2026/10/29 3:52:08 下午 GMT+8", "iso_time": "2026-10-29 15:52:08", "name": "吳庭茂", "raw_dept": "事務組", "norm_dept": "總務處事務組", "dept_cat": "行政單位", "role": "中科大職員", "phone": "0921376839", "email": "taichungspring@gmail.com", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": false, "is_dup_person": true, "submission_count": 2}], "earliest_batch": "第二梯次", "latest_batch": "第二梯次", "dept": "總務處事務組", "role": "中科大職員"}, {"name": "張心怡", "count": 2, "submissions": [{"id": 102, "timestamp": "2026/10/30 1:36:45 下午 GMT+8", "iso_time": "2026-10-30 13:36:45", "name": "張心怡", "raw_dept": "進修部二技/企業管理", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0918599777", "email": "chy651016@yahoo.com.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "素食", "cert": "需要", "is_kept_latest": false, "is_kept_earliest": true, "is_dup_person": true, "submission_count": 2}, {"id": 103, "timestamp": "2026/10/30 1:38:38 下午 GMT+8", "iso_time": "2026-10-30 13:38:38", "name": "張心怡", "raw_dept": "進修部二技/企業管理", "norm_dept": "企業管理系", "dept_cat": "學術科系", "role": "中科大學生", "phone": "0918599777", "email": "chy651016@yahoo.com.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "素食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": false, "is_dup_person": true, "submission_count": 2}], "earliest_batch": "第一梯次", "latest_batch": "第三梯次", "dept": "企業管理系", "role": "中科大學生"}, {"name": "楊維娟", "count": 2, "submissions": [{"id": 82, "timestamp": "2026/10/29 2:47:38 下午 GMT+8", "iso_time": "2026-10-29 14:47:38", "name": "楊維娟", "raw_dept": "國貿系", "norm_dept": "國際貿易系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0912362545", "email": "wyangc@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": false, "is_kept_earliest": true, "is_dup_person": true, "submission_count": 2}, {"id": 106, "timestamp": "2026/10/30 4:31:05 下午 GMT+8", "iso_time": "2026-10-30 16:31:05", "name": "楊維娟", "raw_dept": "國貿系", "norm_dept": "國際貿易系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "0912362545", "email": "wyangc@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": false, "is_dup_person": true, "submission_count": 2}], "earliest_batch": "第二梯次", "latest_batch": "第二梯次", "dept": "國際貿易系", "role": "中科大教師"}, {"name": "陳秀桂", "count": 4, "submissions": [{"id": 91, "timestamp": "2026/10/29 6:05:03 下午 GMT+8", "iso_time": "2026-10-29 18:05:03", "name": "陳秀桂", "raw_dept": "財金系", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "22196842", "email": "showguay@nutc.edu.tw", "batch_id": 3, "batch_name": "第三梯次", "batch_full": "第三梯次 12/03 (四)", "batch_date": "2026/12/03 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": false, "is_kept_earliest": true, "is_dup_person": true, "submission_count": 4}, {"id": 92, "timestamp": "2026/10/29 6:06:29 下午 GMT+8", "iso_time": "2026-10-29 18:06:29", "name": "陳秀桂", "raw_dept": "財金系", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "22196842", "email": "showguay@nutc.edu.tw", "batch_id": 2, "batch_name": "第二梯次", "batch_full": "第二梯次 11/09 (一)", "batch_date": "2026/11/09 (一)", "food": "葷食", "cert": "需要", "is_kept_latest": false, "is_kept_earliest": false, "is_dup_person": true, "submission_count": 4}, {"id": 93, "timestamp": "2026/10/29 6:07:48 下午 GMT+8", "iso_time": "2026-10-29 18:07:48", "name": "陳秀桂", "raw_dept": "財金系", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "22196842", "email": "showguay@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": false, "is_kept_earliest": false, "is_dup_person": true, "submission_count": 4}, {"id": 95, "timestamp": "2026/10/29 6:40:32 下午 GMT+8", "iso_time": "2026-10-29 18:40:32", "name": "陳秀桂", "raw_dept": "財金系", "norm_dept": "財務金融系", "dept_cat": "學術科系", "role": "中科大教師", "phone": "22196842", "email": "showguay@nutc.edu.tw", "batch_id": 1, "batch_name": "第一梯次", "batch_full": "第一梯次 11/05 (四)", "batch_date": "2026/11/05 (四)", "food": "葷食", "cert": "需要", "is_kept_latest": true, "is_kept_earliest": false, "is_dup_person": true, "submission_count": 4}], "earliest_batch": "第三梯次", "latest_batch": "第一梯次", "dept": "財務金融系", "role": "中科大教師"}];
+
+    // State
+    let currentDedupMode = 'latest'; // 'latest' | 'earliest' | 'all'
+    let currentDeptView = 'norm';    // 'norm' | 'raw'
+    let filterBatch = 0;             // 0 = all, 1, 2, 3
+    let filterRole = 'all';
+    let filterFood = 'all';
+    let filterStatus = 'valid';      // 'valid' | 'dup_only' | 'all'
+    let searchQuery = '';
+    let sortField = 'id';
+    let sortAsc = true;
+    let currentPage = 1;
+    let pageSize = 50;
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAuditCards();
+      refreshAll();
+    });
+
+    function setDedupMode(mode) {
+      currentDedupMode = mode;
+      document.getElementById('btn-mode-latest').classList.toggle('active', mode === 'latest');
+      document.getElementById('btn-mode-earliest').classList.toggle('active', mode === 'earliest');
+      document.getElementById('btn-mode-all').classList.toggle('active', mode === 'all');
+      
+      const pill = document.getElementById('dedup-summary-pill');
+      if (mode === 'latest') {
+        pill.innerHTML = '✓ 已去除 6 筆重複登記（採納最新送出），當前有效人數 107 人';
+        pill.style.background = 'var(--primary-light)';
+        pill.style.color = 'var(--primary)';
+      } else if (mode === 'earliest') {
+        pill.innerHTML = '⚡ 已去除 6 筆重複登記（採納最早送出），當前有效人數 107 人';
+        pill.style.background = '#fef3c7';
+        pill.style.color = '#b45309';
+      } else {
+        pill.innerHTML = '⚠️ 顯示全部 113 筆原始紀錄（含 6 筆重複登記）';
+        pill.style.background = '#fee2e2';
+        pill.style.color = '#991b1b';
+      }
+
+      refreshAll();
+    }
+
+    function setDeptViewMode(mode) {
+      currentDeptView = mode;
+      document.getElementById('tab-norm-dept').classList.toggle('active', mode === 'norm');
+      document.getElementById('tab-raw-dept').classList.toggle('active', mode === 'raw');
+      renderDepartmentSection();
+    }
+
+    function toggleAuditDetails() {
+      const content = document.getElementById('audit-content');
+      const btn = document.getElementById('audit-toggle-btn');
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        btn.innerText = '收合詳細說明 ▲';
+      } else {
+        content.style.display = 'none';
+        btn.innerText = '展開詳細說明 ▼';
+      }
+    }
+
+    function renderAuditCards() {
+      const container = document.getElementById('audit-cards-container');
+      container.innerHTML = DUP_AUDIT.map(item => {
+        const itemsHtml = item.submissions.map(s => {
+          const isKept = (currentDedupMode === 'latest' && s.is_kept_latest) ||
+                         (currentDedupMode === 'earliest' && s.is_kept_earliest);
+          return `
+            <div class="timeline-item ${isKept ? 'kept' : 'superseded'}">
+              <span>${isKept ? '✓ 保留' : '✕ 剔除'}</span>
+              <span><strong>${s.batch_name}</strong></span>
+              <span style="font-family: var(--font-mono); margin-left: auto;">${s.timestamp.split(' ')[1]} ${s.timestamp.split(' ')[2]}</span>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="audit-card">
+            <div class="audit-person">
+              <div>
+                <span class="audit-name">${item.name}</span>
+                <span class="badge badge-other" style="margin-left: 6px;">${item.role}</span>
+              </div>
+              <span class="audit-meta">${item.dept} · 登記 ${item.count} 次</span>
+            </div>
+            <div class="audit-timeline">
+              ${itemsHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getProcessedRecords() {
+      return RAW_RECORDS.map(r => {
+        let isValid = false;
+        if (currentDedupMode === 'latest') {
+          isValid = r.is_kept_latest;
+        } else if (currentDedupMode === 'earliest') {
+          isValid = r.is_kept_earliest;
+        } else {
+          isValid = true; // All
+        }
+        return Object.assign({}, r, { is_valid: isValid });
+      });
+    }
+
+    function refreshAll() {
+      renderAuditCards();
+      renderKPIs();
+      renderCohortCards();
+      renderDepartmentSection();
+      renderRosterTable();
+    }
+
+    function renderKPIs() {
+      const records = getProcessedRecords();
+      const validRecords = records.filter(r => r.is_valid);
+      
+      const b1Count = validRecords.filter(r => r.batch_id === 1).length;
+      const b2Count = validRecords.filter(r => r.batch_id === 2).length;
+      const b3Count = validRecords.filter(r => r.batch_id === 3).length;
+
+      const meatCount = validRecords.filter(r => r.food === '葷食').length;
+      const vegCount = validRecords.filter(r => r.food === '素食').length;
+
+      const certYes = validRecords.filter(r => r.cert === '需要').length;
+      const certNo = validRecords.filter(r => r.cert === '不需要').length;
+
+      document.getElementById('kpi-total-val').innerHTML = `${validRecords.length} <span class="kpi-unit">人</span>`;
+      document.getElementById('kpi-total-sub').innerText = `原始登記 113 筆，去重排除 ${RAW_RECORDS.length - validRecords.length} 筆`;
+
+      document.getElementById('kpi-b1-val').innerHTML = `${b1Count} <span class="kpi-unit">人</span>`;
+      document.getElementById('kpi-b2-val').innerHTML = `${b2Count} <span class="kpi-unit">人</span>`;
+      document.getElementById('kpi-b3-val').innerHTML = `${b3Count} <span class="kpi-unit">人</span>`;
+
+      document.getElementById('kpi-diet-val').innerHTML = `${meatCount} <span class="kpi-unit">葷 / ${vegCount} 素</span>`;
+      document.getElementById('kpi-cert-sub').innerText = `📜 需要證明 ${certYes} 人 · 不需要 ${certNo} 人`;
+    }
+
+    function renderCohortCards() {
+      const validRecords = getProcessedRecords().filter(r => r.is_valid);
+
+      [1, 2, 3].forEach(bId => {
+        const bRows = validRecords.filter(r => r.batch_id === bId);
+        const count = bRows.length;
+        const meat = bRows.filter(r => r.food === '葷食').length;
+        const veg = bRows.filter(r => r.food === '素食').length;
+        const certYes = bRows.filter(r => r.cert === '需要').length;
+        const certNo = bRows.filter(r => r.cert === '不需要').length;
+
+        // Roles breakdown
+        const roleMap = {};
+        bRows.forEach(r => {
+          roleMap[r.role] = (roleMap[r.role] || 0) + 1;
+        });
+
+        // Top depts
+        const deptMap = {};
+        bRows.forEach(r => {
+          deptMap[r.norm_dept] = (deptMap[r.norm_dept] || 0) + 1;
+        });
+        const topDepts = Object.entries(deptMap)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 4);
+
+        document.getElementById(`b${bId}-header-num`).innerText = count;
+        document.getElementById(`b${bId}-food-stat`).innerText = `葷 ${meat} ｜ 素 ${veg}`;
+        document.getElementById(`b${bId}-cert-stat`).innerText = `需要 ${certYes} ｜ 不需要 ${certNo}`;
+
+        document.getElementById(`b${bId}-roles-tags`).innerHTML = Object.entries(roleMap)
+          .map(([role, cnt]) => `<span class="mini-tag">${role} ${cnt}</span>`)
+          .join('');
+
+        document.getElementById(`b${bId}-top-depts`).innerHTML = topDepts
+          .map(([dept, cnt]) => `<span class="mini-tag" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;">${dept} ${cnt}</span>`)
+          .join('');
+      });
+    }
+
+    function renderDepartmentSection() {
+      const validRecords = getProcessedRecords().filter(r => r.is_valid);
+      const deptKey = currentDeptView === 'norm' ? 'norm_dept' : 'raw_dept';
+
+      // Aggregate
+      const deptStats = {};
+      validRecords.forEach(r => {
+        const d = r[deptKey];
+        if (!deptStats[d]) {
+          deptStats[d] = {
+            name: d,
+            cat: r.dept_cat || '單位',
+            b1: 0, b2: 0, b3: 0, total: 0
+          };
+        }
+        deptStats[d].total += 1;
+        if (r.batch_id === 1) deptStats[d].b1 += 1;
+        if (r.batch_id === 2) deptStats[d].b2 += 1;
+        if (r.batch_id === 3) deptStats[d].b3 += 1;
+      });
+
+      const sortedDepts = Object.values(deptStats).sort((a, b) => b.total - a.total);
+      const maxTotal = sortedDepts[0] ? sortedDepts[0].total : 1;
+
+      // Render Bar List
+      const barContainer = document.getElementById('dept-bar-container');
+      barContainer.innerHTML = sortedDepts.map(d => {
+        const b1Pct = (d.b1 / d.total) * 100;
+        const b2Pct = (d.b2 / d.total) * 100;
+        const b3Pct = (d.b3 / d.total) * 100;
+        const trackWidthPct = (d.total / maxTotal) * 100;
+
+        return `
+          <div class="dept-bar-item" data-dept="${encodeURIComponent(d.name)}" onclick="filterByDept(decodeURIComponent(this.dataset.dept))">
+            <div class="dept-bar-top">
+              <span class="dept-bar-name">
+                <strong>${d.name}</strong>
+                <span class="dept-tag">${d.cat}</span>
+              </span>
+              <span style="font-family: var(--font-mono); font-weight:700;">
+                ${d.total} 人 <span style="font-size:11px; color:var(--text-muted); font-weight:normal;">(${((d.total / validRecords.length) * 100).toFixed(1)}%)</span>
+              </span>
+            </div>
+            <div class="dept-bar-track" style="width: ${trackWidthPct}%;">
+              <div class="dept-bar-segment b1" style="width: ${b1Pct}%;" title="第1梯次: ${d.b1}人"></div>
+              <div class="dept-bar-segment b2" style="width: ${b2Pct}%;" title="第2梯次: ${d.b2}人"></div>
+              <div class="dept-bar-segment b3" style="width: ${b3Pct}%;" title="第3梯次: ${d.b3}人"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Render Matrix Table
+      const tbody = document.getElementById('matrix-tbody');
+      tbody.innerHTML = sortedDepts.map(d => `
+        <tr>
+          <td><strong style="cursor:pointer; color:var(--primary);" data-dept="${encodeURIComponent(d.name)}" onclick="filterByDept(decodeURIComponent(this.dataset.dept))">${d.name}</strong></td>
+          <td><span class="dept-tag">${d.cat}</span></td>
+          <td class="matrix-num">${d.b1 > 0 ? `<span class="num-pill b1">${d.b1}</span>` : '-'}</td>
+          <td class="matrix-num">${d.b2 > 0 ? `<span class="num-pill b2">${d.b2}</span>` : '-'}</td>
+          <td class="matrix-num">${d.b3 > 0 ? `<span class="num-pill b3">${d.b3}</span>` : '-'}</td>
+          <td class="matrix-num"><span class="num-pill tot">${d.total}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function filterByDept(deptName) {
+      document.getElementById('search-input').value = deptName;
+      searchQuery = deptName.toLowerCase();
+      renderRosterTable();
+      document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Filter Controls
+    function setBatchFilter(bId, btn) {
+      filterBatch = bId;
+      document.querySelectorAll('.filter-pills-row:nth-child(2) .filter-pill').forEach(b => {
+        b.className = 'filter-pill';
+      });
+      if (bId === 0) btn.className = 'filter-pill active';
+      else if (bId === 1) btn.className = 'filter-pill active-b1';
+      else if (bId === 2) btn.className = 'filter-pill active-b2';
+      else if (bId === 3) btn.className = 'filter-pill active-b3';
+      currentPage = 1;
+      renderRosterTable();
+    }
+
+    function setRoleFilter(role, btn) {
+      filterRole = role;
+      document.querySelectorAll('.filter-pills-row:nth-child(3) .filter-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPage = 1;
+      renderRosterTable();
+    }
+
+    function setFoodFilter(food, btn) {
+      filterFood = food;
+      btn.parentElement.querySelectorAll('.filter-pill:nth-child(2), .filter-pill:nth-child(3), .filter-pill:nth-child(4)').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPage = 1;
+      renderRosterTable();
+    }
+
+    function setStatusFilter(status, btn) {
+      filterStatus = status;
+      btn.parentElement.querySelectorAll('.filter-pill:nth-child(6), .filter-pill:nth-child(7), .filter-pill:nth-child(8)').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPage = 1;
+      renderRosterTable();
+    }
+
+    function handleSearch() {
+      searchQuery = document.getElementById('search-input').value.trim().toLowerCase();
+      currentPage = 1;
+      renderRosterTable();
+    }
+
+    function resetFilters() {
+      document.getElementById('search-input').value = '';
+      searchQuery = '';
+      filterBatch = 0;
+      filterRole = 'all';
+      filterFood = 'all';
+      filterStatus = 'valid';
+      
+      document.querySelectorAll('.filter-pills-row').forEach(row => {
+        row.querySelectorAll('.filter-pill').forEach((pill, idx) => {
+          pill.className = 'filter-pill' + (idx === 1 || (row.children[1] === pill) ? ' active' : '');
+        });
+      });
+      currentPage = 1;
+      renderRosterTable();
+    }
+
+    function sortTable(field) {
+      if (sortField === field) {
+        sortAsc = !sortAsc;
+      } else {
+        sortField = field;
+        sortAsc = true;
+      }
+      renderRosterTable();
+    }
+
+    function getFilteredRecords() {
+      const records = getProcessedRecords();
+      return records.filter(r => {
+        // Batch
+        if (filterBatch !== 0 && r.batch_id !== filterBatch) return false;
+
+        // Role
+        if (filterRole !== 'all') {
+          if (filterRole === '其他') {
+            if (['中科大教師', '中科大學生', '中科大職員'].includes(r.role)) return false;
+          } else if (r.role !== filterRole) {
+            return false;
+          }
+        }
+
+        // Food
+        if (filterFood !== 'all' && r.food !== filterFood) return false;
+
+        // Status
+        if (filterStatus === 'valid' && !r.is_valid) return false;
+        if (filterStatus === 'dup_only' && r.is_valid) return false;
+
+        // Search Query
+        if (searchQuery) {
+          const target = `${r.name} ${r.norm_dept} ${r.raw_dept} ${r.role} ${r.phone} ${r.email} ${r.batch_name}`.toLowerCase();
+          if (!target.includes(searchQuery)) return false;
+        }
+
+        return true;
+      }).sort((a, b) => {
+        let vA = a[sortField];
+        let vB = b[sortField];
+        if (typeof vA === 'string') {
+          return sortAsc ? vA.localeCompare(vB, 'zh-Hant') : vB.localeCompare(vA, 'zh-Hant');
+        }
+        return sortAsc ? vA - vB : vB - vA;
+      });
+    }
+
+    function renderRosterTable() {
+      const filtered = getFilteredRecords();
+      document.getElementById('filtered-count-text').innerText = `符合條件共 ${filtered.length} 筆資料`;
+
+      // Pagination
+      const totalPages = Math.ceil(filtered.length / pageSize) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+      const startIdx = (currentPage - 1) * pageSize;
+      const pageItems = filtered.slice(startIdx, startIdx + pageSize);
+
+      const tbody = document.getElementById('roster-tbody');
+      tbody.innerHTML = pageItems.map(r => {
+        const isExcluded = !r.is_valid;
+        const bBadge = r.batch_id === 1 ? 'badge-b1' : (r.batch_id === 2 ? 'badge-b2' : 'badge-b3');
+        const roleBadge = r.role === '中科大教師' ? 'badge-teacher' : (r.role === '中科大學生' ? 'badge-student' : (r.role === '中科大職員' ? 'badge-staff' : 'badge-other'));
+        const foodBadge = r.food === '素食' ? 'badge-veg' : 'badge-meat';
+        const certBadge = r.cert === '需要' ? 'badge-cert-yes' : 'badge-cert-no';
+
+        return `
+          <tr class="${isExcluded ? 'row-duplicate' : ''}">
+            <td style="font-family: var(--font-mono); color: var(--text-muted);">${r.id}</td>
+            <td>
+              <strong>${r.name}</strong>
+              ${r.is_dup_person ? `<span class="badge" style="background:#fef3c7; color:#b45309; margin-left:4px;" title="有 ${r.submission_count} 次重複登記">重複送單 (${r.submission_count})</span>` : ''}
+            </td>
+            <td><span class="badge ${bBadge}">${r.batch_full}</span></td>
+            <td>
+              <div><strong>${r.norm_dept}</strong></div>
+              ${r.raw_dept !== r.norm_dept ? `<div style="font-size:11px; color:var(--text-muted);">原文：${r.raw_dept}</div>` : ''}
+            </td>
+            <td><span class="badge ${roleBadge}">${r.role}</span></td>
+            <td><span class="badge ${foodBadge}">${r.food}</span></td>
+            <td><span class="badge ${certBadge}">${r.cert}</span></td>
+            <td style="font-family: var(--font-mono); font-size: 12.5px;">${r.phone}</td>
+            <td style="font-family: var(--font-mono); font-size: 12.5px;">${r.email}</td>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);">${r.timestamp}</td>
+            <td>
+              ${r.is_valid 
+                ? '<span class="badge badge-status-valid">有效名單</span>' 
+                : '<span class="badge badge-status-dup">重複排除</span>'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Page controls
+      renderPageControls(totalPages);
+    }
+
+    function renderPageControls(totalPages) {
+      const container = document.getElementById('page-controls');
+      let html = `
+        <button class="page-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一頁</button>
+      `;
+
+      for (let p = 1; p <= totalPages; p++) {
+        if (p === 1 || p === totalPages || (p >= currentPage - 2 && p <= currentPage + 2)) {
+          html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="goToPage(${p})">${p}</button>`;
+        } else if (p === currentPage - 3 || p === currentPage + 3) {
+          html += `<span style="padding: 6px 4px;">...</span>`;
+        }
+      }
+
+      html += `
+        <button class="page-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一頁</button>
+      `;
+      container.innerHTML = html;
+    }
+
+    function goToPage(p) {
+      currentPage = p;
+      renderRosterTable();
+    }
+
+    function changePageSize(size) {
+      pageSize = parseInt(size, 10);
+      currentPage = 1;
+      renderRosterTable();
+    }
+
+    function exportFilteredCSV() {
+      const records = getFilteredRecords();
+      if (records.length === 0) {
+        alert('當前篩選條件無資料可匯出');
+        return;
+      }
+
+      const headers = ['序號', '姓名', '梯次', '日期', '標準系所', '原始填寫系所', '身分別', '飲食習慣', '研習證明', '連絡電話', '電子信箱', '送單時間', '狀態'];
+      const rows = records.map(r => [
+        r.id,
+        '"' + r.name + '"',
+        '"' + r.batch_name + '"',
+        '"' + r.batch_date + '"',
+        '"' + r.norm_dept + '"',
+        '"' + r.raw_dept + '"',
+        '"' + r.role + '"',
+        '"' + r.food + '"',
+        '"' + r.cert + '"',
+        '"' + r.phone + '"',
+        '"' + r.email + '"',
+        '"' + r.timestamp + '"',
+        '"' + (r.is_valid ? '有效名單' : '重複已排除') + '"'
+      ]);
+
+      const newline = String.fromCharCode(10);
+      const csvContent = '\uFEFF' + [headers.join(',')].concat(rows.map(e => e.join(','))).join(newline);
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', '一天打造你的AI工作流_學員名冊.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>
