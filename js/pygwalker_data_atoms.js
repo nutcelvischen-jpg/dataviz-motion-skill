@@ -761,7 +761,7 @@
             <span class="filter-group-header">📍 ${escapeHtml(field)}:</span>
             <button type="button" class="filter-quick-action" onclick="window.PyGWalker.setAllFilterValues('${escapeHtml(field)}', true)">全選</button>
             <button type="button" class="filter-quick-action" onclick="window.PyGWalker.setAllFilterValues('${escapeHtml(field)}', false)">全清</button>
-            <div style="display: inline-flex; gap: 4px; flex-wrap: wrap; margin-left: 4px;">
+            <div class="filter-chip-container">
               ${f.allValues.map(val => {
                 const isAct = f.selected.has(val);
                 const c = counts[val] || 0;
@@ -801,6 +801,9 @@
     `;
 
     strip.innerHTML = html;
+    if (echartsInstance) {
+      setTimeout(() => { try { echartsInstance.resize(); } catch(e){} }, 50);
+    }
   }
 
   function renderSingleShelf(elemId, shelfKey, currentField, placeholderText) {
@@ -1097,6 +1100,14 @@
     const xVals = data.map(d => d[xField]);
     const yVals = data.map(d => safeParseNumber(d[yField]));
 
+    // 計算底部邊距與 X 軸旋轉以保證 X 軸標籤與 DataZoom 滑桿絕對不重疊
+    const isSwapped = state.chartType === 'bar' && state.measures.includes(xField) && !state.measures.includes(yField);
+    const hasCategoryX = !isSwapped && ['bar', 'line', 'dual', 'boxplot'].includes(state.chartType);
+    const needSlider = hasCategoryX && xVals.length > 12;
+    const isRotated = hasCategoryX && xVals.length > 12;
+    // 底部留白像素：有滑桿 + 旋轉標籤 = 82px；有滑桿 + 水平標籤 = 68px；無滑桿 + 旋轉 = 54px；無滑桿 + 水平 = 42px
+    const dynamicBottomMargin = isSwapped ? 45 : (needSlider ? (isRotated ? 82 : 68) : (isRotated ? 54 : 42));
+
     let option = {
       backgroundColor: 'transparent',
       tooltip: {
@@ -1104,13 +1115,13 @@
         axisPointer: { type: 'cross' }
       },
       legend: {
-        top: 12,
+        top: 10,
         textStyle: { color: '#334155' }
       },
       grid: {
         left: '5%',
         right: secField ? '7%' : '4%',
-        bottom: '14%',
+        bottom: dynamicBottomMargin,
         top: '12%',
         containLabel: true
       }
@@ -1188,10 +1199,12 @@
           data: xVals,
           axisLabel: {
             interval: 0,
-            rotate: xVals.length > 15 ? 40 : 0,
-            color: '#475569',
-            fontSize: 11
-          }
+            rotate: isRotated ? 35 : 0,
+            color: '#334155',
+            fontSize: 11,
+            margin: 10
+          },
+          axisTick: { alignWithLabel: true }
         };
         option.yAxis = [
           {
@@ -1273,7 +1286,14 @@
         option.series = seriesList;
         option.dataZoom = [
           { type: 'inside' },
-          { type: 'slider', bottom: 10, height: 18 }
+          ...(needSlider ? [{
+            type: 'slider',
+            bottom: 8,
+            height: 16,
+            borderColor: '#cbd5e1',
+            fillerColor: 'rgba(37, 99, 235, 0.15)',
+            handleStyle: { color: '#2563eb' }
+          }] : [])
         ];
       }
 
@@ -1287,9 +1307,10 @@
         boundaryGap: false,
         axisLabel: {
           interval: 0,
-          rotate: xVals.length > 15 ? 40 : 0,
-          color: '#475569',
-          fontSize: 11
+          rotate: isRotated ? 35 : 0,
+          color: '#334155',
+          fontSize: 11,
+          margin: 10
         }
       };
 
@@ -1338,7 +1359,17 @@
       }
 
       option.series = seriesList;
-      option.dataZoom = [{ type: 'inside' }, { type: 'slider', bottom: 10, height: 18 }];
+      option.dataZoom = [
+        { type: 'inside' },
+        ...(needSlider ? [{
+          type: 'slider',
+          bottom: 8,
+          height: 16,
+          borderColor: '#cbd5e1',
+          fillerColor: 'rgba(37, 99, 235, 0.15)',
+          handleStyle: { color: '#2563eb' }
+        }] : [])
+      ];
 
     } else if (state.chartType === 'dual') {
       // 03. 雙軸複合圖 (Dual-Axis Bar + Line) - 體量柱狀與比率折線對比
@@ -1351,10 +1382,12 @@
         data: xVals,
         axisLabel: {
           interval: 0,
-          rotate: xVals.length > 15 ? 40 : 0,
-          color: '#475569',
-          fontSize: 11
-        }
+          rotate: isRotated ? 35 : 0,
+          color: '#334155',
+          fontSize: 11,
+          margin: 10
+        },
+        axisTick: { alignWithLabel: true }
       };
       option.yAxis = [
         {
@@ -1404,7 +1437,14 @@
 
       option.dataZoom = [
         { type: 'inside' },
-        { type: 'slider', bottom: 10, height: 18 }
+        ...(needSlider ? [{
+          type: 'slider',
+          bottom: 8,
+          height: 16,
+          borderColor: '#cbd5e1',
+          fillerColor: 'rgba(37, 99, 235, 0.15)',
+          handleStyle: { color: '#2563eb' }
+        }] : [])
       ];
 
     } else if (state.chartType === 'geo') {
@@ -1542,9 +1582,17 @@
         }
       ];
 
+      option.grid = {
+        left: '6%',
+        right: '6%',
+        bottom: 70,
+        top: '12%',
+        containLabel: true
+      };
+
       option.dataZoom = [
         { type: 'inside' },
-        { type: 'slider', bottom: 10, height: 16 }
+        { type: 'slider', bottom: 6, height: 16, borderColor: '#cbd5e1', fillerColor: 'rgba(37, 99, 235, 0.15)', handleStyle: { color: '#2563eb' } }
       ];
 
     } else if (state.chartType === 'boxplot') {
@@ -1644,15 +1692,28 @@
         }
       };
 
+      const isBoxRotated = groupNames.length > 8;
+      const needBoxSlider = groupNames.length > 12;
+
+      option.grid = {
+        left: '5%',
+        right: '5%',
+        bottom: needBoxSlider ? (isBoxRotated ? 82 : 68) : (isBoxRotated ? 54 : 42),
+        top: '12%',
+        containLabel: true
+      };
+
       option.xAxis = {
         type: 'category',
         data: groupNames,
         axisLabel: {
           interval: 0,
-          rotate: groupNames.length > 8 ? 30 : 0,
+          rotate: isBoxRotated ? 30 : 0,
           color: '#334155',
-          fontSize: 11
-        }
+          fontSize: 11,
+          margin: 10
+        },
+        axisTick: { alignWithLabel: true }
       };
       option.yAxis = {
         type: 'value',
@@ -1684,7 +1745,17 @@
         });
       }
 
-      option.dataZoom = [{ type: 'inside' }, { type: 'slider', bottom: 10, height: 18 }];
+      option.dataZoom = [
+        { type: 'inside' },
+        ...(needBoxSlider ? [{
+          type: 'slider',
+          bottom: 8,
+          height: 16,
+          borderColor: '#cbd5e1',
+          fillerColor: 'rgba(37, 99, 235, 0.15)',
+          handleStyle: { color: '#2563eb' }
+        }] : [])
+      ];
 
     } else if (state.chartType === 'treemap') {
       // 06. 矩形樹圖 (Treemap) - 多維層級結構佔比與面積權重
