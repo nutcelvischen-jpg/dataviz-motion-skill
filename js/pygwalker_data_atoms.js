@@ -940,6 +940,16 @@
     });
   }
 
+  // 安全數值轉換輔助函式 (自動清洗千分位逗號、空白、百分比符號，防止 NaN)
+  function safeParseNumber(val) {
+    if (typeof val === 'number') return isNaN(val) ? 0 : val;
+    if (val === null || val === undefined) return 0;
+    const str = String(val).replace(/[,%]/g, '').trim();
+    if (str === '') return 0;
+    const n = Number(str);
+    return isNaN(n) ? 0 : n;
+  }
+
   // --- 頂部 KPI Ribbon 數值計算 ---
   function renderKPIRibbon() {
     const kpiRows = document.getElementById('kpiRowCount');
@@ -958,9 +968,13 @@
       kpiRows.textContent = data.length.toLocaleString();
     }
 
-    const yField = state.shelf.y;
-    if (yField && state.measures.includes(yField)) {
-      const nums = data.map(d => Number(d[yField])).filter(v => !isNaN(v));
+    // 智慧偵測當前作用中的度量 (支援 Y 軸或對調後的 X 軸)
+    const activeMeasure = (state.shelf.y && state.measures.includes(state.shelf.y))
+      ? state.shelf.y
+      : ((state.shelf.x && state.measures.includes(state.shelf.x)) ? state.shelf.x : null);
+
+    if (activeMeasure) {
+      const nums = data.map(d => safeParseNumber(d[activeMeasure])).filter(v => typeof v === 'number' && !isNaN(v));
       if (nums.length > 0) {
         const sum = nums.reduce((a, b) => a + b, 0);
         const avg = sum / nums.length;
@@ -971,6 +985,10 @@
         kpiMean.textContent = avg >= 1000 ? formatCompactNumber(avg) : avg.toFixed(2);
         if (kpiMaxMinTitle) kpiMaxMinTitle.textContent = 'MAX / MIN';
         if (kpiMaxMin) kpiMaxMin.textContent = `${formatCompactNumber(max)} / ${formatCompactNumber(min)}`;
+      } else {
+        kpiSum.textContent = '0';
+        kpiMean.textContent = '0';
+        if (kpiMaxMin) kpiMaxMin.textContent = '0 / 0';
       }
     } else {
       kpiSum.textContent = '-';
@@ -980,13 +998,20 @@
   }
 
   function formatCompactNumber(num) {
-    if (Math.abs(num) >= 100000000) {
-      return (num / 100000000).toFixed(2) + '億';
+    if (num === null || num === undefined || (typeof num === 'number' && isNaN(num))) return '-';
+    const n = Number(num);
+    if (isNaN(n)) return String(num);
+    const abs = Math.abs(n);
+    if (abs >= 100000000) {
+      return (n / 100000000).toFixed(2) + '億';
     }
-    if (Math.abs(num) >= 10000) {
-      return (num / 10000).toFixed(1) + '萬';
+    if (abs >= 10000) {
+      return (n / 10000).toFixed(1) + '萬';
     }
-    return Math.round(num).toLocaleString();
+    if (Number.isInteger(n)) {
+      return n.toLocaleString();
+    }
+    return Number(n.toFixed(2)).toLocaleString();
   }
 
   // --- 核心視覺化渲染分流 (ECharts vs Native Canvas) ---
@@ -1063,14 +1088,14 @@
     // 排序處理
     if (state.sortDescending && state.chartType === 'bar') {
       if (state.measures.includes(yField)) {
-        data.sort((a, b) => Number(b[yField] || 0) - Number(a[yField] || 0));
+        data.sort((a, b) => safeParseNumber(b[yField]) - safeParseNumber(a[yField]));
       } else if (state.measures.includes(xField)) {
-        data.sort((a, b) => Number(b[xField] || 0) - Number(a[xField] || 0));
+        data.sort((a, b) => safeParseNumber(b[xField]) - safeParseNumber(a[xField]));
       }
     }
 
     const xVals = data.map(d => d[xField]);
-    const yVals = data.map(d => Number(d[yField] || 0));
+    const yVals = data.map(d => safeParseNumber(d[yField]));
 
     let option = {
       backgroundColor: 'transparent',
@@ -1097,7 +1122,7 @@
       if (isSwapped) {
         // 水平長條圖：X 軸為數值 Measure，Y 軸為維度 Dimension
         const catVals = data.map(d => String(d[yField] ?? ''));
-        const numVals = data.map(d => Number(d[xField] || 0));
+        const numVals = data.map(d => safeParseNumber(d[xField]));
 
         option.xAxis = {
           type: 'value',
@@ -1524,13 +1549,22 @@
 
     } else if (state.chartType === 'boxplot') {
       // 05. 盒鬚分佈圖 (Box Plot) - 分組離散度、四分位數與極端值
-      const groupField = (colorField && state.dimensions.includes(colorField)) ? colorField : xField;
+      let groupDim = xField;
+      let measureDim = yField;
+      if (state.measures.includes(xField) && !state.measures.includes(yField)) {
+        groupDim = yField;
+        measureDim = xField;
+      }
+      if (colorField && state.dimensions.includes(colorField)) {
+        groupDim = colorField;
+      }
+
       const groupMap = {};
 
       data.forEach(d => {
-        const grp = String(d[groupField] || '全體');
-        const num = Number(d[yField]);
-        if (!isNaN(num) && d[yField] !== null && d[yField] !== '') {
+        const grp = String(d[groupDim] || '全體');
+        const num = safeParseNumber(d[measureDim]);
+        if (d[measureDim] !== null && d[measureDim] !== '' && !isNaN(num)) {
           if (!groupMap[grp]) groupMap[grp] = [];
           groupMap[grp].push(num);
         }
@@ -1586,13 +1620,13 @@
         trigger: 'item',
         formatter: (params) => {
           if (params.seriesType === 'boxplot') {
-            const raw = params.data.value || params.data;
+            const raw = params.value || (params.data && params.data.value) || params.data;
             const v = Array.isArray(raw) ? (raw.length >= 6 ? raw.slice(raw.length - 5) : raw) : [];
             const grp = groupNames[params.dataIndex];
             const sampleCount = groupMap[grp] ? groupMap[grp].length : 0;
             return `<div style="font-size:12px; line-height:1.6;">
               <strong style="color:#0f172a; font-size:13px;">${escapeHtml(grp)}</strong> (樣本數: ${sampleCount})<br/>
-              指標: <b>${escapeHtml(yField)}</b><br/>
+              指標: <b>${escapeHtml(measureDim)}</b><br/>
               上邊界 (High Whisker): <b>${formatCompactNumber(v[4])}</b><br/>
               第 3 四分位數 (Q3 75%): <b>${formatCompactNumber(v[3])}</b><br/>
               中位數 (Median 50%): <b style="color:#2563eb;">${formatCompactNumber(v[2])}</b><br/>
@@ -1600,7 +1634,12 @@
               下邊界 (Low Whisker): <b>${formatCompactNumber(v[0])}</b>
             </div>`;
           } else {
-            return `離群極值: ${formatCompactNumber(params.data[1])}`;
+            const outlierVal = Array.isArray(params.data) ? params.data[1] : (params.value || params.data);
+            const grpName = Array.isArray(params.data) && groupNames[params.data[0]] ? `${groupNames[params.data[0]]} · ` : '';
+            return `<div style="font-size:12px; line-height:1.6;">
+              <strong style="color:#0f172a;">${escapeHtml(grpName)}離群極值</strong><br/>
+              指標: <b>${escapeHtml(measureDim)}</b>: <b style="color:#ea580c;">${formatCompactNumber(outlierVal)}</b>
+            </div>`;
           }
         }
       };
@@ -1617,14 +1656,14 @@
       };
       option.yAxis = {
         type: 'value',
-        name: yField,
+        name: measureDim,
         axisLabel: { formatter: (v) => formatCompactNumber(v) },
         splitLine: { lineStyle: { color: '#f1f5f9' } }
       };
 
       option.series = [
         {
-          name: yField,
+          name: measureDim,
           type: 'boxplot',
           data: boxData,
           itemStyle: {
@@ -2219,50 +2258,97 @@
         }
       });
     } else {
-      // 預設柱狀圖 (Bar)
+      // 預設柱狀圖 (Bar) - 支援常規垂直與對調後水平長條圖
+      const isSwapped = state.measures.includes(state.shelf.x) && !state.measures.includes(state.shelf.y);
       const data = getActiveRows().slice(0, 24);
-      const xVals = data.map(d => d[state.shelf.x]);
-      const yVals = data.map(d => Number(d[state.shelf.y] || 0));
-      const maxVal = Math.max(...yVals) || 1;
 
-      const barW = (chartW / data.length) * 0.7;
-      const gap = chartW / data.length;
+      if (isSwapped) {
+        // 水平長條圖 (Horizontal Bar in Canvas)
+        const catVals = data.map(d => String(d[state.shelf.y] || ''));
+        const numVals = data.map(d => safeParseNumber(d[state.shelf.x]));
+        const maxVal = Math.max(...numVals) || 1;
+        const gap = chartH / data.length;
+        const barH = gap * 0.65;
+        const barStartX = startX + 130;
+        const barMaxW = chartW - 200;
 
-      // 基線
-      ctx.strokeStyle = '#0f172a';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(startX - 20, startY);
-      ctx.lineTo(startX + chartW + 20, startY);
-      ctx.stroke();
+        // Y 軸基線
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(barStartX, startY - chartH - 10);
+        ctx.lineTo(barStartX, startY + 10);
+        ctx.stroke();
 
-      data.forEach((d, i) => {
-        const val = yVals[i];
-        const barH = (val / maxVal) * chartH;
-        const bx = startX + i * gap;
-        const by = startY - barH;
+        data.forEach((d, i) => {
+          const val = numVals[i];
+          const barW = (val / maxVal) * barMaxW;
+          const by = (startY - chartH) + i * gap + gap * 0.15;
 
-        ctx.fillStyle = '#2563eb';
-        if (state.shelf.color && REGION_COLORS[d[state.shelf.color]]) {
-          ctx.fillStyle = REGION_COLORS[d[state.shelf.color]];
-        }
+          ctx.fillStyle = '#2563eb';
+          if (state.shelf.color && REGION_COLORS[d[state.shelf.color]]) {
+            ctx.fillStyle = REGION_COLORS[d[state.shelf.color]];
+          }
 
-        ctx.fillRect(bx, by, barW, barH);
+          ctx.fillRect(barStartX, by, Math.max(2, barW), barH);
 
-        // 標籤
-        ctx.fillStyle = '#334155';
-        ctx.font = '16px "Noto Sans TC", sans-serif';
-        ctx.save();
-        ctx.translate(bx + barW / 2, startY + 25);
-        ctx.rotate(-Math.PI / 4);
-        ctx.fillText(String(xVals[i]).substring(0, 6), 0, 0);
-        ctx.restore();
+          // 類別標籤 (靠左對齊在 Y 軸前)
+          ctx.fillStyle = '#334155';
+          ctx.font = '16px "Noto Sans TC", sans-serif';
+          ctx.textAlign = 'right';
+          ctx.fillText(catVals[i].substring(0, 8), barStartX - 14, by + barH * 0.72);
+          ctx.textAlign = 'left';
 
-        // 數值
-        ctx.fillStyle = '#0f172a';
-        ctx.font = 'bold 14px "JetBrains Mono", monospace';
-        ctx.fillText(formatCompactNumber(val), bx, by - 8);
-      });
+          // 數值標籤 (在長條右側)
+          ctx.fillStyle = '#0f172a';
+          ctx.font = 'bold 14px "JetBrains Mono", monospace';
+          ctx.fillText(formatCompactNumber(val), barStartX + barW + 10, by + barH * 0.72);
+        });
+      } else {
+        // 常規垂直柱狀圖 (Vertical Bar)
+        const catVals = data.map(d => String(d[state.shelf.x] || ''));
+        const numVals = data.map(d => safeParseNumber(d[state.shelf.y]));
+        const maxVal = Math.max(...numVals) || 1;
+
+        const barW = (chartW / data.length) * 0.7;
+        const gap = chartW / data.length;
+
+        // 基線
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(startX - 20, startY);
+        ctx.lineTo(startX + chartW + 20, startY);
+        ctx.stroke();
+
+        data.forEach((d, i) => {
+          const val = numVals[i];
+          const barH = (val / maxVal) * chartH;
+          const bx = startX + i * gap;
+          const by = startY - barH;
+
+          ctx.fillStyle = '#2563eb';
+          if (state.shelf.color && REGION_COLORS[d[state.shelf.color]]) {
+            ctx.fillStyle = REGION_COLORS[d[state.shelf.color]];
+          }
+
+          ctx.fillRect(bx, by, barW, barH);
+
+          // 標籤
+          ctx.fillStyle = '#334155';
+          ctx.font = '16px "Noto Sans TC", sans-serif';
+          ctx.save();
+          ctx.translate(bx + barW / 2, startY + 25);
+          ctx.rotate(-Math.PI / 4);
+          ctx.fillText(catVals[i].substring(0, 6), 0, 0);
+          ctx.restore();
+
+          // 數值
+          ctx.fillStyle = '#0f172a';
+          ctx.font = 'bold 14px "JetBrains Mono", monospace';
+          ctx.fillText(formatCompactNumber(val), bx, by - 8);
+        });
+      }
     }
   }
 
@@ -2390,6 +2476,7 @@
         state.shelf.y = temp;
         renderShelves();
         renderVisualization();
+        renderKPIRibbon();
         showToast('⇄ 已成功對調 X 軸與 Y 軸！');
       });
     }
@@ -2405,6 +2492,7 @@
         state.shelf.secondary = '';
         renderShelves();
         renderVisualization();
+        renderKPIRibbon();
         showToast('已清除所有視覺編碼槽');
       });
     }
@@ -2914,8 +3002,9 @@
       const obj = {};
       headers.forEach((h, idx) => {
         const val = values[idx];
-        const num = Number(val);
-        obj[h] = !isNaN(num) && val !== '' ? num : val;
+        const cleaned = typeof val === 'string' ? val.replace(/,/g, '').trim() : val;
+        const num = Number(cleaned);
+        obj[h] = !isNaN(num) && cleaned !== '' ? num : val;
       });
       rows.push(obj);
     }
@@ -3529,6 +3618,7 @@
       state.shelf[shelfKey] = '';
       renderShelves();
       renderVisualization();
+      renderKPIRibbon();
     },
     cycleAgg: (e) => {
       e.stopPropagation();
