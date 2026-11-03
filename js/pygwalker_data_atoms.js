@@ -1019,6 +1019,12 @@
       window.addEventListener('resize', () => {
         if (echartsInstance) echartsInstance.resize();
       });
+      if (typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(() => {
+          if (echartsInstance) echartsInstance.resize();
+        });
+        ro.observe(container);
+      }
     }
 
     const xField = state.shelf.x;
@@ -1055,8 +1061,12 @@
     }
 
     // 排序處理
-    if (state.sortDescending && state.measures.includes(yField) && state.chartType === 'bar') {
-      data.sort((a, b) => Number(b[yField] || 0) - Number(a[yField] || 0));
+    if (state.sortDescending && state.chartType === 'bar') {
+      if (state.measures.includes(yField)) {
+        data.sort((a, b) => Number(b[yField] || 0) - Number(a[yField] || 0));
+      } else if (state.measures.includes(xField)) {
+        data.sort((a, b) => Number(b[xField] || 0) - Number(a[xField] || 0));
+      }
     }
 
     const xVals = data.map(d => d[xField]);
@@ -1083,100 +1093,164 @@
 
     // 依 7 大數據原子組織 option
     if (state.chartType === 'bar') {
-      const isMulti = state.shelf.yMulti && state.shelf.yMulti.length > 1;
-      const activeMeasures = isMulti ? state.shelf.yMulti : [yField];
+      const isSwapped = state.measures.includes(xField) && !state.measures.includes(yField);
+      if (isSwapped) {
+        // 水平長條圖：X 軸為數值 Measure，Y 軸為維度 Dimension
+        const catVals = data.map(d => String(d[yField] ?? ''));
+        const numVals = data.map(d => Number(d[xField] || 0));
 
-      option.xAxis = {
-        type: 'category',
-        data: xVals,
-        axisLabel: {
-          rotate: xVals.length > 15 ? 40 : 0,
-          color: '#475569',
-          fontSize: 11
-        }
-      };
-      option.yAxis = [
-        {
+        option.xAxis = {
           type: 'value',
-          name: isMulti ? activeMeasures.join(' / ') : yField,
+          name: xField,
           axisLabel: {
             formatter: (v) => formatCompactNumber(v)
           }
-        }
-      ];
-
-      const seriesList = [];
-      if (isMulti) {
-        activeMeasures.forEach((m, idx) => {
-          const color = PALETTE[idx % PALETTE.length];
-          seriesList.push({
-            name: m,
-            type: 'bar',
-            barGap: '12%',
-            data: data.map(d => Number(d[m] || 0)),
-            itemStyle: {
-              color: color,
-              borderRadius: [4, 4, 0, 0]
+        };
+        option.yAxis = [
+          {
+            type: 'category',
+            data: catVals,
+            inverse: true,
+            axisLabel: {
+              interval: 0,
+              color: '#475569',
+              fontSize: 11
             }
+          }
+        ];
+
+        let seriesData = numVals;
+        if (colorField && state.dimensions.includes(colorField)) {
+          const barColors = data.map(d => {
+            const cat = d[colorField];
+            return REGION_COLORS[cat] || PALETTE[Math.abs(hashCode(cat)) % PALETTE.length];
           });
-        });
-      } else if (colorField && state.dimensions.includes(colorField)) {
-        const barColors = data.map(d => {
-          const cat = d[colorField];
-          return REGION_COLORS[cat] || PALETTE[Math.abs(hashCode(cat)) % PALETTE.length];
-        });
-        seriesList.push({
-          name: yField,
-          type: 'bar',
-          data: yVals.map((v, i) => ({
+          seriesData = numVals.map((v, i) => ({
             value: v,
-            itemStyle: { color: barColors[i], borderRadius: [4, 4, 0, 0] }
-          })),
-          markPoint: state.showLabels ? {
-            data: [{ type: 'max', name: '最大值' }, { type: 'min', name: '最小值' }]
-          } : undefined,
-          markLine: state.showAverage ? {
-            data: [{ type: 'average', name: '平均值' }]
-          } : undefined
-        });
+            itemStyle: { color: barColors[i], borderRadius: [0, 4, 4, 0] }
+          }));
+        }
+
+        const seriesList = [
+          {
+            name: xField,
+            type: 'bar',
+            data: seriesData,
+            itemStyle: {
+              color: '#2563eb',
+              borderRadius: [0, 4, 4, 0]
+            },
+            markPoint: state.showLabels ? {
+              data: [{ type: 'max', name: '最大值' }, { type: 'min', name: '最小值' }]
+            } : undefined,
+            markLine: state.showAverage ? {
+              data: [{ type: 'average', name: '平均線' }]
+            } : undefined
+          }
+        ];
+
+        option.series = seriesList;
+        option.dataZoom = [
+          { type: 'inside', yAxisIndex: 0 },
+          { type: 'slider', yAxisIndex: 0, right: 10, width: 18 }
+        ];
       } else {
-        seriesList.push({
-          name: yField,
-          type: 'bar',
-          data: yVals,
-          itemStyle: {
-            color: '#2563eb',
-            borderRadius: [4, 4, 0, 0]
-          },
-          markLine: state.showAverage ? {
-            data: [{ type: 'average', name: '平均線' }]
-          } : undefined
-        });
-      }
+        const isMulti = state.shelf.yMulti && state.shelf.yMulti.length > 1;
+        const activeMeasures = isMulti ? state.shelf.yMulti : [yField];
 
-      // 次要指標 (雙軸折線)
-      if (!isMulti && secField && state.measures.includes(secField)) {
-        option.yAxis.push({
-          type: 'value',
-          name: secField,
-          position: 'right',
-          axisLabel: { formatter: '{value}' }
-        });
-        seriesList.push({
-          name: secField,
-          type: 'line',
-          yAxisIndex: 1,
-          data: data.map(d => Number(d[secField] || 0)),
-          itemStyle: { color: '#ea580c' },
-          lineStyle: { width: 3 }
-        });
-      }
+        option.xAxis = {
+          type: 'category',
+          data: xVals,
+          axisLabel: {
+            interval: 0,
+            rotate: xVals.length > 15 ? 40 : 0,
+            color: '#475569',
+            fontSize: 11
+          }
+        };
+        option.yAxis = [
+          {
+            type: 'value',
+            name: isMulti ? activeMeasures.join(' / ') : yField,
+            axisLabel: {
+              formatter: (v) => formatCompactNumber(v)
+            }
+          }
+        ];
 
-      option.series = seriesList;
-      option.dataZoom = [
-        { type: 'inside' },
-        { type: 'slider', bottom: 10, height: 18 }
-      ];
+        const seriesList = [];
+        if (isMulti) {
+          activeMeasures.forEach((m, idx) => {
+            const color = PALETTE[idx % PALETTE.length];
+            seriesList.push({
+              name: m,
+              type: 'bar',
+              barGap: '12%',
+              data: data.map(d => Number(d[m] || 0)),
+              itemStyle: {
+                color: color,
+                borderRadius: [4, 4, 0, 0]
+              }
+            });
+          });
+        } else if (colorField && state.dimensions.includes(colorField)) {
+          const barColors = data.map(d => {
+            const cat = d[colorField];
+            return REGION_COLORS[cat] || PALETTE[Math.abs(hashCode(cat)) % PALETTE.length];
+          });
+          seriesList.push({
+            name: yField,
+            type: 'bar',
+            data: yVals.map((v, i) => ({
+              value: v,
+              itemStyle: { color: barColors[i], borderRadius: [4, 4, 0, 0] }
+            })),
+            markPoint: state.showLabels ? {
+              data: [{ type: 'max', name: '最大值' }, { type: 'min', name: '最小值' }]
+            } : undefined,
+            markLine: state.showAverage ? {
+              data: [{ type: 'average', name: '平均值' }]
+            } : undefined
+          });
+        } else {
+          seriesList.push({
+            name: yField,
+            type: 'bar',
+            data: yVals,
+            itemStyle: {
+              color: '#2563eb',
+              borderRadius: [4, 4, 0, 0]
+            },
+            markLine: state.showAverage ? {
+              data: [{ type: 'average', name: '平均線' }]
+            } : undefined
+          });
+        }
+
+        // 次要指標 (雙軸折線)
+        if (!isMulti && secField && state.measures.includes(secField)) {
+          option.yAxis.push({
+            type: 'value',
+            name: secField,
+            position: 'right',
+            axisLabel: { formatter: '{value}' }
+          });
+          seriesList.push({
+            name: secField,
+            type: 'line',
+            yAxisIndex: 1,
+            data: data.map(d => Number(d[secField] || 0)),
+            itemStyle: { color: '#ea580c' },
+            lineStyle: { width: 3 }
+          });
+        }
+
+        option.series = seriesList;
+        option.dataZoom = [
+          { type: 'inside' },
+          { type: 'slider', bottom: 10, height: 18 }
+        ];
+      }
 
     } else if (state.chartType === 'line') {
       const isMulti = state.shelf.yMulti && state.shelf.yMulti.length > 1;
@@ -1186,7 +1260,12 @@
         type: 'category',
         data: xVals,
         boundaryGap: false,
-        axisLabel: { color: '#475569' }
+        axisLabel: {
+          interval: 0,
+          rotate: xVals.length > 15 ? 40 : 0,
+          color: '#475569',
+          fontSize: 11
+        }
       };
 
       const allPercent = activeMeasures.every(m => m.includes('%'));
@@ -1246,6 +1325,7 @@
         type: 'category',
         data: xVals,
         axisLabel: {
+          interval: 0,
           rotate: xVals.length > 15 ? 40 : 0,
           color: '#475569',
           fontSize: 11
@@ -1506,17 +1586,18 @@
         trigger: 'item',
         formatter: (params) => {
           if (params.seriesType === 'boxplot') {
-            const v = params.data.value || params.data;
+            const raw = params.data.value || params.data;
+            const v = Array.isArray(raw) ? (raw.length >= 6 ? raw.slice(raw.length - 5) : raw) : [];
             const grp = groupNames[params.dataIndex];
             const sampleCount = groupMap[grp] ? groupMap[grp].length : 0;
             return `<div style="font-size:12px; line-height:1.6;">
               <strong style="color:#0f172a; font-size:13px;">${escapeHtml(grp)}</strong> (樣本數: ${sampleCount})<br/>
               指標: <b>${escapeHtml(yField)}</b><br/>
-              上邊界 (High Whisker): <b>${formatCompactNumber(v[5])}</b><br/>
-              第 3 四分位數 (Q3 75%): <b>${formatCompactNumber(v[4])}</b><br/>
-              中位數 (Median 50%): <b style="color:#2563eb;">${formatCompactNumber(v[3])}</b><br/>
-              第 1 四分位數 (Q1 25%): <b>${formatCompactNumber(v[2])}</b><br/>
-              下邊界 (Low Whisker): <b>${formatCompactNumber(v[1])}</b>
+              上邊界 (High Whisker): <b>${formatCompactNumber(v[4])}</b><br/>
+              第 3 四分位數 (Q3 75%): <b>${formatCompactNumber(v[3])}</b><br/>
+              中位數 (Median 50%): <b style="color:#2563eb;">${formatCompactNumber(v[2])}</b><br/>
+              第 1 四分位數 (Q1 25%): <b>${formatCompactNumber(v[1])}</b><br/>
+              下邊界 (Low Whisker): <b>${formatCompactNumber(v[0])}</b>
             </div>`;
           } else {
             return `離群極值: ${formatCompactNumber(params.data[1])}`;
@@ -1528,6 +1609,7 @@
         type: 'category',
         data: groupNames,
         axisLabel: {
+          interval: 0,
           rotate: groupNames.length > 8 ? 30 : 0,
           color: '#334155',
           fontSize: 11
@@ -1852,6 +1934,7 @@
 
     echartsInstance.clear();
     echartsInstance.setOption(option, true);
+    echartsInstance.resize();
   }
 
   // --- 原生 1080p Bauhaus Canvas 渲染 (供 1920x1080 匯出與離線畫布) ---
@@ -2362,9 +2445,9 @@
     const drawer = document.getElementById('dataDrawer');
     if (btnDrawer && drawer) {
       btnDrawer.addEventListener('click', () => {
-        drawer.classList.toggle('expanded');
+        const isOpen = drawer.classList.toggle('open');
         const icon = document.getElementById('drawerIcon');
-        if (icon) icon.textContent = drawer.classList.contains('expanded') ? '▼' : '▲';
+        if (icon) icon.textContent = isOpen ? '▼' : '▲';
       });
     }
 

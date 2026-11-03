@@ -5,6 +5,7 @@
 
 /* 頂部官方入口指示條 (Anti-AI-slop: 沉穩純色錨定，取消漸層) */
 .portal-top-bar {
+  flex-shrink: 0;
   background: #0f172a;
   color: #f8fafc;
   padding: 8px 24px;
@@ -317,7 +318,8 @@
 .echarts-viewport-container {
   width: 100%;
   height: 100%;
-  min-height: 480px;
+  min-height: 0;
+  flex: 1;
   position: relative;
 }
 
@@ -1746,14 +1748,16 @@
     min-height: 100% !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
+    display: block !important;
   }
 
   .app-shell {
     height: auto !important;
     min-height: 100% !important;
-    overflow-y: visible !important;
+    overflow-y: auto !important;
     overflow-x: hidden !important;
     display: block !important;
+    flex: none !important;
   }
 
   /* 頂部實戰步驟橫條：左右滑動藥丸列 */
@@ -1918,6 +1922,13 @@
   }
 
   /* 畫布視口 (Canvas Viewport) */
+  .stage-body {
+    height: auto !important;
+    overflow: visible !important;
+    flex: none !important;
+  }
+
+  .echarts-viewport-container,
   .canvas-viewport {
     height: 400px !important;
     min-height: 380px !important;
