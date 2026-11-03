@@ -220,6 +220,82 @@
       border-color: #2ea043;
       color: #ffffff;
     }
+    .diagram-ctrl-btn.bursting {
+      background: #1f3b2b;
+      border-color: #38bdf8;
+      color: #7dd3fc;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+      pointer-events: none;
+      animation: ctrl-pulse 1s infinite alternate;
+    }
+    @keyframes ctrl-pulse {
+      from { box-shadow: 0 0 6px rgba(56, 189, 248, 0.4); border-color: #38bdf8; }
+      to { box-shadow: 0 0 16px rgba(56, 189, 248, 0.85); border-color: #7dd3fc; }
+    }
+
+    /* Simulation HUD Live Banner */
+    .sim-hud-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      background: #0d1527;
+      border: 1px solid #38bdf8;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      margin-bottom: 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.25);
+      animation: hud-slide-down 0.25s ease-out;
+    }
+    @keyframes hud-slide-down {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hud-pill {
+      background: #0284c7;
+      color: #ffffff;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .hud-text {
+      color: #f0f6fc;
+      flex: 1;
+      font-weight: 500;
+    }
+    .hud-timer {
+      color: #38bdf8;
+      font-weight: 700;
+      background: #111e38;
+      border: 1px solid #1e3a8a;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* Node Dynamic Glow Highlights */
+    .node-glow-cyan {
+      filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.95)) !important;
+      transition: filter 0.25s ease;
+    }
+    .node-glow-orange {
+      filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.95)) !important;
+      transition: filter 0.25s ease;
+    }
+    .node-glow-green {
+      filter: drop-shadow(0 0 16px rgba(16, 185, 129, 0.95)) !important;
+      transition: filter 0.25s ease;
+    }
+    .node-glow-purple {
+      filter: drop-shadow(0 0 16px rgba(192, 132, 252, 0.95)) !important;
+      transition: filter 0.25s ease;
+    }
 
     .diagram-scroll-box {
       width: 100%;
@@ -536,13 +612,25 @@
           <button type="button" class="diagram-ctrl-btn active" id="btnToggleAnim" onclick="toggleAnimation()">
             <span id="animIcon">⏸</span> <span id="animLabel">暫停動態小球</span>
           </button>
-          <button type="button" class="diagram-ctrl-btn" onclick="triggerPingBurst()">
-            <span>⚡</span> <span>模擬即時提問封包</span>
+          <button type="button" class="diagram-ctrl-btn" id="btnSimulatePing" onclick="triggerPingBurst()">
+            <span id="pingIcon">⚡</span> <span id="pingLabel">模擬即時提問封包</span>
           </button>
         </div>
         <div class="diagram-ctrl-group">
           <span style="color:#8b949e;">管線狀態：</span>
-          <span style="color:#3fb950; font-weight:600;">● 全鏈路正常 (302 Follow + SSL Keep-Alive)</span>
+          <span id="pipelineStatusText" style="color:#3fb950; font-weight:600;">● 全鏈路正常 (302 Follow + SSL Keep-Alive)</span>
+        </div>
+      </div>
+
+      <!-- Real-Time Interactive Simulation HUD Banner (Appears on click) -->
+      <div id="simHudBanner" class="sim-hud-banner" style="display:none;">
+        <div style="display:flex; align-items:center; gap:8px; flex:1;">
+          <span class="hud-pill" id="hudPillTag">⚡ 實時模擬中</span>
+          <span id="hudMsg" class="hud-text">準備送出模擬封包...</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="hud-timer" id="hudTimer">⏱ 0 ms</span>
+          <span style="font-size:0.75rem; color:#8b949e;">(真機問答請按右下角「請解簽」)</span>
         </div>
       </div>
 
@@ -576,6 +664,17 @@
               <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+
+            <!-- Supercharged Glow Filter for High-Energy Ping Packet -->
+            <filter id="glow-burst" x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="4.5" result="blur1" />
+              <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur2" />
+              <feMerge>
+                <feMergeNode in="blur2" />
+                <feMergeNode in="blur1" />
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
@@ -798,7 +897,7 @@
 
 
           <!-- 3. GAS Web App -> Script Properties: Read Secret Key (Vertical Line inside Zone 2) -->
-          <line id="path-flow-3" x1="612" y1="220" x2="612" y2="235" stroke="#f59e0b" stroke-width="1.6" marker-end="url(#dd-arrow-orange)" />
+          <path id="path-flow-3" d="M 612,220 V 235" stroke="#f59e0b" stroke-width="1.6" marker-end="url(#dd-arrow-orange)" />
           <rect x="567" y="222" width="90" height="14" rx="2" fill="#0d1117" stroke="#f59e0b" stroke-width="0.8" />
           <text x="612" y="232" fill="#fbbf24" font-size="7.5" font-family="'DM Mono', monospace" font-weight="700" text-anchor="middle">3. 讀取 API Key</text>
 
@@ -878,6 +977,78 @@
                 <mpath href="#path-flow-7" />
               </animateMotion>
             </circle>
+          </g>
+
+          <!-- ==================== SUPERCHARGED BURST PACKETS (TRIGGERED ON DEMAND) ==================== -->
+          <g id="burst-packet-layer">
+            <!-- Burst Ball 2: Client -> GAS (Cyan Supercharged with Radar Ring) -->
+            <g id="burst-group-2" opacity="0">
+              <circle r="7.5" fill="#38bdf8" stroke="#ffffff" stroke-width="2.5" filter="url(#glow-burst)">
+                <animateMotion id="anim-burst-2" dur="0.6s" begin="indefinite" fill="freeze">
+                  <mpath href="#path-flow-2" />
+                </animateMotion>
+              </circle>
+              <circle r="15" fill="none" stroke="#38bdf8" stroke-width="1.8" opacity="0.8">
+                <animateMotion dur="0.6s" begin="indefinite" fill="freeze">
+                  <mpath href="#path-flow-2" />
+                </animateMotion>
+              </circle>
+            </g>
+
+            <!-- Burst Ball 3: GAS -> Vault (Amber Key Read) -->
+            <g id="burst-group-3" opacity="0">
+              <circle r="6" fill="#f59e0b" stroke="#ffffff" stroke-width="2" filter="url(#glow-burst)">
+                <animateMotion id="anim-burst-3" dur="0.35s" begin="indefinite" fill="freeze">
+                  <mpath href="#path-flow-3" />
+                </animateMotion>
+              </circle>
+            </g>
+
+            <!-- Burst Ball 4: GAS -> OpenRouter (Green Supercharged with Radar Ring) -->
+            <g id="burst-group-4" opacity="0">
+              <circle r="7.5" fill="#10b981" stroke="#ffffff" stroke-width="2.5" filter="url(#glow-burst)">
+                <animateMotion id="anim-burst-4" dur="0.6s" begin="indefinite" fill="freeze">
+                  <mpath href="#path-flow-4" />
+                </animateMotion>
+              </circle>
+              <circle r="15" fill="none" stroke="#10b981" stroke-width="1.8" opacity="0.8">
+                <animateMotion dur="0.6s" begin="indefinite" fill="freeze">
+                  <mpath href="#path-flow-4" />
+                </animateMotion>
+              </circle>
+            </g>
+
+            <!-- Burst Ball 5: OpenRouter -> GAS (Emerald Inference Return) -->
+            <g id="burst-group-5" opacity="0">
+              <circle r="7" fill="#34d399" stroke="#ffffff" stroke-width="2" filter="url(#glow-burst)">
+                <animateMotion id="anim-burst-5" dur="0.6s" begin="indefinite" fill="freeze">
+                  <mpath href="#path-flow-5" />
+                </animateMotion>
+              </circle>
+            </g>
+
+            <!-- Burst Ball 6: GAS -> Sheets (Purple Storage) -->
+            <g id="burst-group-6" opacity="0">
+              <circle r="6.5" fill="#c084fc" stroke="#ffffff" stroke-width="2" filter="url(#glow-burst)">
+                <animateMotion id="anim-burst-6" dur="0.6s" begin="indefinite" fill="freeze">
+                  <mpath href="#path-flow-6" />
+                </animateMotion>
+              </circle>
+            </g>
+
+            <!-- Burst Ball 7: GAS -> Client (Blue Result Return with Radar Ring) -->
+            <g id="burst-group-7" opacity="0">
+              <circle r="7.5" fill="#60a5fa" stroke="#ffffff" stroke-width="2.5" filter="url(#glow-burst)">
+                <animateMotion id="anim-burst-7" dur="0.6s" begin="indefinite" fill="freeze">
+                  <mpath href="#path-flow-7" />
+                </animateMotion>
+              </circle>
+              <circle r="15" fill="none" stroke="#60a5fa" stroke-width="1.8" opacity="0.8">
+                <animateMotion dur="0.6s" begin="indefinite" fill="freeze">
+                  <mpath href="#path-flow-7" />
+                </animateMotion>
+              </circle>
+            </g>
           </g>
 
         </svg>
@@ -1272,38 +1443,250 @@ function doGet(e) {
       }
     }
 
+    let isBursting = false;
+
     function triggerPingBurst() {
+      if (isBursting) return;
+      isBursting = true;
+
+      const svg = document.getElementById('archSvg');
+      const btn = document.getElementById('btnSimulatePing');
+      const pingIcon = document.getElementById('pingIcon');
+      const pingLabel = document.getElementById('pingLabel');
+      const pipelineStatus = document.getElementById('pipelineStatusText');
+      const hud = document.getElementById('simHudBanner');
+      const hudMsg = document.getElementById('hudMsg');
+      const hudTimer = document.getElementById('hudTimer');
       const logLines = document.querySelector('.terminal-session-log .log-lines');
-      const pill = document.getElementById('logStatusPill');
-      const now = new Date();
-      const timeStr = [now.getHours(), now.getMinutes(), now.getSeconds()]
-        .map(n => String(n).padStart(2, '0')).join(':');
+      const logPill = document.getElementById('logStatusPill');
 
-      if (pill) {
-        pill.textContent = '⚡ LIVE PING BURST DISPATCHED';
-        pill.style.color = '#58a6ff';
-        setTimeout(() => {
-          if (animRunning) {
-            pill.textContent = '● STREAMING ACTIVE (LOOP)';
-            pill.style.color = '#3fb950';
+      const wasPaused = !animRunning;
+      if (wasPaused && svg && svg.unpauseAnimations) {
+        svg.unpauseAnimations();
+      }
+
+      const startTime = performance.now();
+      let timerInterval;
+
+      // Update button state immediately
+      if (btn) btn.classList.add('bursting');
+      if (pingIcon) pingIcon.textContent = '⚡';
+      if (pingLabel) pingLabel.textContent = '1/5 打包截圖...';
+
+      // Show HUD banner above diagram
+      if (hud) hud.style.display = 'flex';
+      timerInterval = setInterval(() => {
+        const elapsed = Math.round(performance.now() - startTime);
+        if (hudTimer) hudTimer.textContent = `⏱ ${elapsed} ms`;
+      }, 30);
+
+      // Node elements for dynamic glowing effect
+      const nodeJitong = document.getElementById('node-jitong');
+      const nodeGasApp = document.getElementById('node-gas-webapp');
+      const nodeGasVault = document.getElementById('node-gas-vault');
+      const nodeGasEngine = document.getElementById('node-gas-engine');
+      const nodeOpenRouter = document.getElementById('node-openrouter');
+      const nodeSheets = document.getElementById('node-sheets');
+
+      function clearGlow() {
+        [nodeJitong, nodeGasApp, nodeGasVault, nodeGasEngine, nodeOpenRouter, nodeSheets].forEach(n => {
+          if (n) {
+            n.classList.remove('node-glow-cyan', 'node-glow-orange', 'node-glow-green', 'node-glow-purple');
           }
-        }, 3000);
+        });
       }
 
-      if (logLines) {
-        const newLine = document.createElement('div');
-        newLine.className = 'log-line';
-        newLine.style.animation = 'pulse-progress 0.6s ease';
-        newLine.innerHTML = `
-          <span class="log-time" style="color:#f59e0b; font-weight:bold;">${timeStr}</span>
-          <span class="log-tag" style="background:#1f3b2b; color:#34d399; border:1px solid #238636;">ping-burst</span>
-          <span style="color:#f0f6fc; font-weight:600;">⚡ 學員手動觸發模擬封包 ───&gt; [Client 截圖] ──(302 Follow)──&gt; [GAS BFF 金鑰注入] ──&gt; [Claude Haiku 5.5] ──&gt; [Sheets 日誌寫入] ──(180ms 完成)</span>
-        `;
-        logLines.appendChild(newLine);
-        while (logLines.children.length > 9) {
-          logLines.removeChild(logLines.children[0]);
-        }
+      // STAGE 1 (0ms): Client packs payload and shoots Path 2
+      clearGlow();
+      if (nodeJitong) nodeJitong.classList.add('node-glow-cyan');
+      if (pipelineStatus) {
+        pipelineStatus.textContent = '📤 [1/5 瀏覽器] 打包問題與圖表截圖 (Base64) ➔ POST 送往 GAS BFF...';
+        pipelineStatus.style.color = '#38bdf8';
       }
+      if (hudMsg) hudMsg.innerHTML = '<span style="color:#38bdf8; font-weight:bold;">[1/5 瀏覽器]</span> 打包問題與圖表截圖 (Base64) ➔ POST 送往 GAS BFF...';
+      if (pingLabel) pingLabel.textContent = '1/5 瀏覽器 ➔ GAS...';
+
+      const bg2 = document.getElementById('burst-group-2');
+      const ab2 = document.getElementById('anim-burst-2');
+      if (bg2) bg2.setAttribute('opacity', '1');
+      if (ab2 && ab2.beginElement) {
+        try {
+          ab2.beginElement();
+          const r2 = bg2.querySelectorAll('animateMotion')[1];
+          if (r2 && r2.beginElement) r2.beginElement();
+        } catch(e) {}
+      }
+
+      // STAGE 2 (550ms): GAS Gateway receives POST, reads ScriptProperties
+      setTimeout(() => {
+        if (bg2) bg2.setAttribute('opacity', '0');
+        clearGlow();
+        if (nodeGasApp) nodeGasApp.classList.add('node-glow-orange');
+        if (nodeGasVault) nodeGasVault.classList.add('node-glow-orange');
+
+        if (pipelineStatus) {
+          pipelineStatus.textContent = '🔒 [2/5 GAS BFF] 接收 302 跳轉，讀取金鑰保險箱 ScriptProperties...';
+          pipelineStatus.style.color = '#f59e0b';
+        }
+        if (hudMsg) hudMsg.innerHTML = '<span style="color:#f59e0b; font-weight:bold;">[2/5 GAS BFF]</span> 接收 302 跳轉，從金鑰保險箱安全載入 OPENROUTER_API_KEY...';
+        if (pingLabel) pingLabel.textContent = '2/5 GAS 讀取金鑰...';
+
+        const bg3 = document.getElementById('burst-group-3');
+        const ab3 = document.getElementById('anim-burst-3');
+        if (bg3) bg3.setAttribute('opacity', '1');
+        if (ab3 && ab3.beginElement) {
+          try { ab3.beginElement(); } catch(e) {}
+        }
+      }, 550);
+
+      // STAGE 3 (950ms): UrlFetchApp forwards HTTPS Request to OpenRouter
+      setTimeout(() => {
+        const bg3 = document.getElementById('burst-group-3');
+        if (bg3) bg3.setAttribute('opacity', '0');
+        clearGlow();
+        if (nodeGasEngine) nodeGasEngine.classList.add('node-glow-green');
+        if (nodeOpenRouter) nodeOpenRouter.classList.add('node-glow-green');
+
+        if (pipelineStatus) {
+          pipelineStatus.textContent = '🧠 [3/5 OpenRouter] 呼叫 Claude Haiku 3.5 進行多模態視覺推論...';
+          pipelineStatus.style.color = '#10b981';
+        }
+        if (hudMsg) hudMsg.innerHTML = '<span style="color:#10b981; font-weight:bold;">[3/5 OpenRouter]</span> 呼叫 Claude Haiku 進行多模態圖表辨識與邏輯解簽...';
+        if (pingLabel) pingLabel.textContent = '3/5 Claude 推論中...';
+
+        const bg4 = document.getElementById('burst-group-4');
+        const ab4 = document.getElementById('anim-burst-4');
+        if (bg4) bg4.setAttribute('opacity', '1');
+        if (ab4 && ab4.beginElement) {
+          try {
+            ab4.beginElement();
+            const r4 = bg4.querySelectorAll('animateMotion')[1];
+            if (r4 && r4.beginElement) r4.beginElement();
+          } catch(e) {}
+        }
+      }, 950);
+
+      // STAGE 4 (1550ms): OpenRouter returns reply to GAS; GAS logs to Sheets
+      setTimeout(() => {
+        const bg4 = document.getElementById('burst-group-4');
+        if (bg4) bg4.setAttribute('opacity', '0');
+        clearGlow();
+        if (nodeGasEngine) nodeGasEngine.classList.add('node-glow-green');
+        if (nodeSheets) nodeSheets.classList.add('node-glow-purple');
+
+        if (pipelineStatus) {
+          pipelineStatus.textContent = '📊 [4/5 Sheets 日誌] appendRow() 非同步持久化寫入提問紀錄...';
+          pipelineStatus.style.color = '#c084fc';
+        }
+        if (hudMsg) hudMsg.innerHTML = '<span style="color:#c084fc; font-weight:bold;">[4/5 儲存日誌]</span> OpenRouter 回傳推論，GAS 呼叫 SpreadsheetApp.appendRow()...';
+        if (pingLabel) pingLabel.textContent = '4/5 試算表存檔...';
+
+        const bg5 = document.getElementById('burst-group-5');
+        const ab5 = document.getElementById('anim-burst-5');
+        const bg6 = document.getElementById('burst-group-6');
+        const ab6 = document.getElementById('anim-burst-6');
+        if (bg5) bg5.setAttribute('opacity', '1');
+        if (bg6) bg6.setAttribute('opacity', '1');
+        if (ab5 && ab5.beginElement) { try { ab5.beginElement(); } catch(e) {} }
+        if (ab6 && ab6.beginElement) { try { ab6.beginElement(); } catch(e) {} }
+      }, 1550);
+
+      // STAGE 5 (2150ms): GAS returns JSON response to Client Jitong UI
+      setTimeout(() => {
+        const bg5 = document.getElementById('burst-group-5');
+        const bg6 = document.getElementById('burst-group-6');
+        if (bg5) bg5.setAttribute('opacity', '0');
+        if (bg6) bg6.setAttribute('opacity', '0');
+        clearGlow();
+        if (nodeJitong) nodeJitong.classList.add('node-glow-cyan');
+
+        if (pipelineStatus) {
+          pipelineStatus.textContent = '📥 [5/5 瀏覽器回覆] 接收 JSON 答覆，數位乩童開示完成！';
+          pipelineStatus.style.color = '#38bdf8';
+        }
+        if (hudMsg) hudMsg.innerHTML = '<span style="color:#38bdf8; font-weight:bold;">[5/5 接收開示]</span> 接收 JSON 答覆，DOM 視圖更新，解簽完成！';
+        if (pingLabel) pingLabel.textContent = '5/5 答覆完成！';
+
+        const bg7 = document.getElementById('burst-group-7');
+        const ab7 = document.getElementById('anim-burst-7');
+        if (bg7) bg7.setAttribute('opacity', '1');
+        if (ab7 && ab7.beginElement) {
+          try {
+            ab7.beginElement();
+            const r7 = bg7.querySelectorAll('animateMotion')[1];
+            if (r7 && r7.beginElement) r7.beginElement();
+          } catch(e) {}
+        }
+      }, 2150);
+
+      // COMPLETE (2750ms): Wrap up, append log, restore state
+      setTimeout(() => {
+        const bg7 = document.getElementById('burst-group-7');
+        if (bg7) bg7.setAttribute('opacity', '0');
+        clearGlow();
+        clearInterval(timerInterval);
+
+        const totalElapsed = Math.round(performance.now() - startTime);
+
+        if (pipelineStatus) {
+          pipelineStatus.textContent = `● 全鏈路正常 · 封包測試成功 (RTT: ${totalElapsed}ms · 零金鑰外洩)`;
+          pipelineStatus.style.color = '#3fb950';
+        }
+        if (hudMsg) hudMsg.innerHTML = `✅ <span style="color:#3fb950; font-weight:bold;">封包往返圓滿完成！</span> 歷時 ${totalElapsed}ms · 狀態 200 OK · 零金鑰洩漏`;
+        if (hudTimer) hudTimer.textContent = `✓ ${totalElapsed} ms`;
+
+        if (btn) {
+          btn.classList.remove('bursting');
+          btn.classList.add('active');
+        }
+        if (pingIcon) pingIcon.textContent = '✅';
+        if (pingLabel) pingLabel.textContent = `傳輸成功 (${totalElapsed}ms)`;
+
+        // Restore animation pause state if it was paused before
+        if (wasPaused && svg && svg.pauseAnimations) {
+          svg.pauseAnimations();
+        }
+
+        // Update Terminal Telemetry Log
+        const now = new Date();
+        const timeStr = [now.getHours(), now.getMinutes(), now.getSeconds()]
+          .map(n => String(n).padStart(2, '0')).join(':');
+
+        if (logPill) {
+          logPill.textContent = '⚡ LIVE PING BURST DISPATCHED (200 OK)';
+          logPill.style.color = '#58a6ff';
+          setTimeout(() => {
+            if (animRunning) {
+              logPill.textContent = '● STREAMING ACTIVE (LOOP)';
+              logPill.style.color = '#3fb950';
+            }
+          }, 3500);
+        }
+
+        if (logLines) {
+          const newLine = document.createElement('div');
+          newLine.className = 'log-line';
+          newLine.style.animation = 'pulse-progress 0.6s ease';
+          newLine.innerHTML = `
+            <span class="log-time" style="color:#f59e0b; font-weight:bold;">${timeStr}</span>
+            <span class="log-tag" style="background:#1f3b2b; color:#34d399; border:1px solid #238636;">ping-burst</span>
+            <span style="color:#f0f6fc; font-weight:600;">⚡ 學員手動觸發模擬封包 ───&gt; [Client 截圖] ──(302 Follow)──&gt; [GAS BFF 金鑰注入] ──&gt; [Claude Haiku 5.5] ──&gt; [Sheets 日誌寫入] ──(${totalElapsed}ms 完成)</span>
+          `;
+          logLines.appendChild(newLine);
+          while (logLines.children.length > 9) {
+            logLines.removeChild(logLines.children[0]);
+          }
+        }
+
+        // Reset button after 2.5 seconds
+        setTimeout(() => {
+          if (btn) btn.classList.remove('active');
+          if (pingIcon) pingIcon.textContent = '⚡';
+          if (pingLabel) pingLabel.textContent = '模擬即時提問封包';
+          isBursting = false;
+        }, 2500);
+
+      }, 2750);
     }
 
     // Initialize Telemetry Timestamps with Real Time
