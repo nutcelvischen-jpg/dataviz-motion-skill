@@ -743,8 +743,7 @@ html, body {
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   background: var(--bg-main);
 }
 
@@ -794,11 +793,11 @@ html, body {
 /* Stage Body Layout */
 .stage-body {
   flex: 1;
-  min-height: 420px;
+  min-height: 200px;
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
 }
 
 /* 1. Canvas Viewport (Dynamic Aspect Ratio Scaled, ZERO SCROLL) */
