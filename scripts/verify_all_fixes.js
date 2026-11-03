@@ -139,6 +139,8 @@ server.listen(8089, async () => {
     const swappedChart = await page.evaluate(() => {
       const inst = window.echarts.getInstanceByDom(document.getElementById('echartsViewport'));
       const opt = inst ? inst.getOption() : null;
+      const kpiSum = document.getElementById('kpiTotalSum')?.textContent;
+      const kpiMean = document.getElementById('kpiMeanVal')?.textContent;
       return {
         xAxisType: opt?.xAxis?.[0]?.type,
         xAxisName: opt?.xAxis?.[0]?.name,
@@ -149,13 +151,37 @@ server.listen(8089, async () => {
         seriesHasNaN: opt?.series?.[0]?.data?.some(d => {
           const v = (typeof d === 'object' && d !== null) ? d.value : d;
           return isNaN(v);
-        })
+        }),
+        kpiSum,
+        kpiMean,
+        kpiIsBlank: kpiSum === '-' || kpiMean === '-'
       };
     });
     console.log('Swapped Bar Chart evaluation:', JSON.stringify(swappedChart, null, 2));
 
     await page.screenshot({ path: path.join(__dirname, '../preview_frames/verify_swapped_bar.png') });
     console.log('Saved preview_frames/verify_swapped_bar.png');
+
+    // Also test Native 1080p Canvas in swapped mode
+    console.log('Testing Swapped Native 1080p Canvas...');
+    await page.click('#btnToggleEngine');
+    await new Promise(r => setTimeout(r, 500));
+    const canvasEval = await page.evaluate(() => {
+      const canvas = document.getElementById('mainChartCanvas');
+      const ctx = canvas.getContext('2d');
+      const pixel = ctx.getImageData(300, 300, 1, 1).data;
+      return {
+        canvasWidth: canvas.width,
+        canvasHeight: canvas.height,
+        hasContent: pixel[3] > 0
+      };
+    });
+    console.log('Swapped Canvas evaluation:', canvasEval);
+    await page.screenshot({ path: path.join(__dirname, '../preview_frames/verify_swapped_canvas.png') });
+
+    // Switch back to ECharts engine
+    await page.click('#btnToggleEngine');
+    await new Promise(r => setTimeout(r, 500));
 
     console.log('\n--- 4. Testing Boxplot Tooltip Formatting & No NaN ---');
     // Swap back
