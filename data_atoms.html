@@ -1257,7 +1257,7 @@
       <div class="modal-head" style="background: #0f172a; color: #ffffff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0;">
         <div class="modal-head-title" style="display: flex; align-items: center; gap: 10px;">
           <span style="background: #2563eb; color: #ffffff; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.05em;">ANTIGRAVITY SKILLS</span>
-          <span style="font-size: 17px; font-weight: 700;">Data Atoms 視覺化所封裝之核心 Skill 與開源架構</span>
+          <span style="font-size: 17px; font-weight: 700;">Data Atoms 視覺化所封裝之核心 15 大 Skill 全集與開源架構 (4 大領域)</span>
         </div>
         <button type="button" class="modal-close-btn" id="btnCloseSkillsModal" onclick="document.getElementById('skillsModal').classList.remove('open')" style="background: transparent; border: none; color: #ffffff; font-size: 24px; cursor: pointer; line-height: 1;">×</button>
       </div>
@@ -1266,125 +1266,176 @@
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;">
           <p style="margin: 0; color: #334155; font-size: 13.5px; line-height: 1.6;">
             <strong>🎯 獨立檔案定位說明：</strong>本檔案（<code>data_atoms.html</code>）是數據視覺化與實戰分析的<strong>單一獨立檔案</strong>，與大語言模型學習地圖嚴格分開。<br>
-            在 Antigravity 代理人架構中，本工作台是由以下 <strong>6 大模組化 Skill</strong> 共同驅動，所有 Skill 皆已附上開源倉庫連結供學員參考與延伸學習：
+            在 Antigravity 代理人架構中，本專案整合了以下 <strong>4 大實戰領域、共 15 款開源 Skill</strong>，所有 Skill 皆附上 GitHub 原生倉庫連結供學員參考、收藏與自訂技能擴充：
           </p>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr; gap: 16px;">
-          
-          <!-- Skill: data-analyst (輕量級資料分析師技能包) -->
-          <div style="background: #ffffff; border: 1.5px solid #059669; border-radius: 8px; padding: 16px 20px; box-shadow: 0 2px 6px rgba(5,150,105,0.08);">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 18px;">💡</span>
-                <span style="font-weight: 800; font-size: 16px; color: #047857;">data-analyst</span>
-                <span style="background: #d1fae5; color: #065f46; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">分析師 Prompt + 清洗腳本</span>
-              </div>
-              <span style="font-size: 12px; color: #64748b; font-family: monospace;">.agents/skills/data-analyst</span>
+        <!-- 領域一：前端品味與介面工藝 -->
+        <div style="margin-top: 16px; margin-bottom: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+          <strong style="color: #0f172a; font-size: 15px;">🎨 領域一：前端品味與介面工藝 (Anti-Slop UI & Design Craft)</strong>
+          <span style="font-size: 11px; color: #64748b; font-weight: 700;">3 skills</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 20px;">
+          <!-- taste-skill -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">taste-skill</span>
+              <a href="https://github.com/leonxlnx/taste-skill" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
             </div>
-            <p style="margin: 0 0 10px 0; color: #334155; font-size: 13px;">
-              <strong>放了什麼進去：</strong>專為學員與 Agent 設計的輕量標準技能。內建 4 大標準 Prompt 樣板（需求界定、資料體檢、EDA 探索、三段論報告）、<code>clean_data.py</code> 自動化資料清洗腳本（處理千分位逗號、百分比、空白修剪與缺失值）與速查表。
-            </p>
-            <div style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 6px;">
-              <strong>開源獨立倉庫：</strong>
-              <a href="https://github.com/nutcelvischen-jpg/data-analyst-skill" target="_blank" style="color: #059669; font-weight: 700; text-decoration: underline;">https://github.com/nutcelvischen-jpg/data-analyst-skill ↗</a>
-            </div>
+            <div style="font-size: 11px; color: #0284c7; font-weight: 700; margin-bottom: 6px;">品味框架 / 防 AI 塑料感</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">專門解決 AI 程式碼千篇一律塑料感的前端品味約束系統。注入嚴格排版規範與藝術總監階層比例，拒絕無聊三卡片。</p>
           </div>
-          
-          <!-- Skill 1: data-atoms-dashboard -->
-          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 18px;">⚛️</span>
-                <span style="font-weight: 800; font-size: 16px; color: #1e293b;">data-atoms-dashboard</span>
-                <span style="background: #eff6ff; color: #1d4ed8; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">本工作台核心</span>
-              </div>
-              <span style="font-size: 12px; color: #64748b; font-family: monospace;">.agents/skills/data-atoms-dashboard</span>
+          <!-- impeccable -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">impeccable</span>
+              <a href="https://github.com/pbakaus/impeccable" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
             </div>
-            <p style="margin: 0 0 10px 0; color: #334155; font-size: 13px;">
-              <strong>放了什麼進去：</strong>Tableau-like 視覺編碼槽（Columns、Rows、Color、Size、Secondary、Filters）、Tableau Prep 智慧資料分類判定引擎、跨國地理座標自適應引擎，與 10 大 Data Atoms 渲染。
-            </p>
-            <div style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 6px;">
-              <strong>開源獨立倉庫：</strong>
-              <a href="https://github.com/nutcelvischen-jpg/data-atoms-dashboard" target="_blank" style="color: #2563eb; font-weight: 700; text-decoration: underline;">https://github.com/nutcelvischen-jpg/data-atoms-dashboard ↗</a>
-            </div>
+            <div style="font-size: 11px; color: #0284c7; font-weight: 700; margin-bottom: 6px;">介面工藝 / 前端極致打磨</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">全方位介面健壯度走查。涵蓋 UX 層級、排版間距、色彩無障礙（WCAG）、微動效與 Design Tokens 封裝。</p>
           </div>
+          <!-- hallmark -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">hallmark</span>
+              <a href="https://github.com/Nutlope/hallmark" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #64748b; font-weight: 700; margin-bottom: 6px;">現代極簡 / 藥盤磨砂風格</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">現代極簡網頁設計體系，提供 dose 磨砂托盤主題與嚴格 sloplint 語法檢驗，驅動工作流頁面骨架。</p>
+          </div>
+        </div>
 
-          <!-- Skill 2: dataviz -->
-          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 18px;">🎨</span>
-                <span style="font-weight: 800; font-size: 16px; color: #1e293b;">dataviz</span>
-                <span style="background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">工業級設計法規</span>
-              </div>
-              <span style="font-size: 12px; color: #64748b; font-family: monospace;">.gemini/config/skills/dataviz</span>
+        <!-- 領域二：動態視覺與知識短影音 -->
+        <div style="margin-top: 16px; margin-bottom: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+          <strong style="color: #0f172a; font-size: 15px;">🎬 領域二：動態視覺與知識短影音 (Code-Driven Motion & Video)</strong>
+          <span style="font-size: 11px; color: #64748b; font-weight: 700;">4 skills</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 20px;">
+          <!-- video-shotcraft -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">video-shotcraft</span>
+              <a href="https://github.com/Vincentwei1021/video-shotcraft" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
             </div>
-            <p style="margin: 0 0 10px 0; color: #334155; font-size: 13px;">
-              <strong>放了什麼進去：</strong>去除 AI 生硬味的工業級圖表設計法規。規範 0 基準線、雙軸刻度對齊、WCAG AA 色彩對比度、冷灰/藏青/暖琥珀色盤。
-            </p>
-            <div style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 6px;">
-              <strong>開源規範倉庫：</strong>
-              <a href="https://github.com/nutcelvischen-jpg/dataviz-rules" target="_blank" style="color: #2563eb; font-weight: 700; text-decoration: underline;">https://github.com/nutcelvischen-jpg/dataviz-rules ↗</a>
-            </div>
+            <div style="font-size: 11px; color: #ea580c; font-weight: 700; margin-bottom: 6px;">運鏡配方 / 電影感展示片</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">鏡頭配方卡與電影感短片製作。支援 Ink Press 運鏡系統、真實網頁截圖、2.5D 鏡頭推拉與 Remotion 程式碼渲染。</p>
           </div>
+          <!-- mg-styles-15 -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">mg-styles-15</span>
+              <a href="https://github.com/Vincentwei1021/mg-styles-15" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #ea580c; font-weight: 700; margin-bottom: 6px;">15 種商業動態 / 純代碼生成</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">由 AI 全純代碼生成（Canvas/Three.js/WebGL）的 15 種商業級 MG 動畫風格庫與完整 Prompt。</p>
+          </div>
+          <!-- vibe-knowledge-film -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">vibe-knowledge-film</span>
+              <a href="https://github.com/HeyChengC/vibe-knowledge-film" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #ea580c; font-weight: 700; margin-bottom: 6px;">爆款 Vibe / 知識短片引擎</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">爆款知識短影片生成工作流。涵蓋主題企劃、分鏡腳本結構、動態視覺轉場、TTS 旁白與音效節奏卡點合成。</p>
+          </div>
+          <!-- dataviz-motion / huashu-motion -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">dataviz-motion</span>
+              <a href="https://github.com/alchaincyf/huashu-motion" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #be185d; font-weight: 700; margin-bottom: 6px;">數據短片 / 1080p 60FPS Bauhaus</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">全自動將分析圖表輸出為 1080p 60FPS 幾何形變簡報，合成 120BPM 聲音引擎與語音旁白。</p>
+          </div>
+        </div>
 
-          <!-- Skill 3: dataviz-motion -->
-          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 18px;">🎬</span>
-                <span style="font-weight: 800; font-size: 16px; color: #1e293b;">dataviz-motion</span>
-                <span style="background: #fdf2f8; color: #be185d; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">動態影音生成</span>
-              </div>
-              <span style="font-size: 12px; color: #64748b; font-family: monospace;">.gemini/config/skills/dataviz-motion</span>
+        <!-- 領域三：數據視覺化與架構圖解 -->
+        <div style="margin-top: 16px; margin-bottom: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+          <strong style="color: #0f172a; font-size: 15px;">📊 領域三：數據視覺化與架構圖解 (Data Visualization & Architecture)</strong>
+          <span style="font-size: 11px; color: #64748b; font-weight: 700;">4 skills</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 20px;">
+          <!-- diagram-design -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">diagram-design</span>
+              <a href="https://github.com/cathrynlavery/diagram-design" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
             </div>
-            <p style="margin: 0 0 10px 0; color: #334155; font-size: 13px;">
-              <strong>放了什麼進去：</strong>全自動程式碼控制影格，將數據分析圖表輸出為 1080p 60FPS Bauhaus 風格動態簡報，合成 120BPM 卡點音效與 Google TTS 語音旁白。
-            </p>
-            <div style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 6px;">
-              <strong>開源底層引擎：</strong>
-              <a href="https://github.com/remotion-dev/remotion" target="_blank" style="color: #2563eb; font-weight: 700; text-decoration: underline;">https://github.com/remotion-dev/remotion ↗</a>
-            </div>
+            <div style="font-size: 11px; color: #854d0e; font-weight: 700; margin-bottom: 6px;">系統架構 / 時序拓撲 SVG</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">企業級系統架構圖、時序圖、正交走線與零重疊向量 SVG 拓撲引擎，驅動全日流程圖與系統架構圖。</p>
           </div>
+          <!-- dataviz (baoyu-design) -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">dataviz (baoyu-design)</span>
+              <a href="https://github.com/jimliu/baoyu-design" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #475569; font-weight: 700; margin-bottom: 6px;">圖表法規 / 工業美學</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">基於 Edward Tufte 設計哲學與 WCAG AA 規範。約束 0 基準線、雙軸刻度對齊與防欺騙刻度。</p>
+          </div>
+          <!-- anatomy -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">anatomy</span>
+              <a href="https://github.com/wheresryan22/anatomy" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #475569; font-weight: 700; margin-bottom: 6px;">立體等角 / 物理圖解</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">生成具備實體質感的 Isometric 等角立體技術插畫，適用於管線機關與物理層解剖展示。</p>
+          </div>
+          <!-- data-atoms-dashboard -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">data-atoms-dashboard</span>
+              <a href="https://github.com/Kanaries/graphic-walker" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #2563eb; font-weight: 700; margin-bottom: 6px;">互動工作台 / Tableau 引擎</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">整合拖曳編碼槽、Tableau Prep 智慧資料分類判定引擎、跨國地理引擎與 10 大原子圖表。</p>
+          </div>
+        </div>
 
-          <!-- Skill 4: diagram-design -->
-          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 18px;">📐</span>
-                <span style="font-weight: 800; font-size: 16px; color: #1e293b;">diagram-design</span>
-                <span style="background: #fefce8; color: #854d0e; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">架構流程圖</span>
-              </div>
-              <span style="font-size: 12px; color: #64748b; font-family: monospace;">.agents/skills/diagram-design</span>
+        <!-- 領域四：代理人工程、行為守則與導師 -->
+        <div style="margin-top: 16px; margin-bottom: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+          <strong style="color: #0f172a; font-size: 15px;">🤖 領域四：代理人工程、行為守則與導師 (Agentic Engineering, Disciplines & Mentorship)</strong>
+          <span style="font-size: 11px; color: #64748b; font-weight: 700;">4 skills</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 16px;">
+          <!-- superpowers -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">superpowers</span>
+              <a href="https://github.com/obra/superpowers" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
             </div>
-            <p style="margin: 0 0 10px 0; color: #334155; font-size: 13px;">
-              <strong>放了什麼進去：</strong>產出資料分析師 5 階段工程流程圖（取得 ➔ 清洗 ➔ 探索 ➔ 儀表板 ➔ 洞察決策）與 11/05 實戰營流程時序圖。
-            </p>
-            <div style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 6px;">
-              <strong>開源依據：</strong>
-              <a href="https://github.com/mermaid-js/mermaid" target="_blank" style="color: #2563eb; font-weight: 700; text-decoration: underline;">https://github.com/mermaid-js/mermaid ↗</a>
-            </div>
+            <div style="font-size: 11px; color: #7c3aed; font-weight: 700; margin-bottom: 6px;">工程框架 / TDD 規格先行</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">Jesse Vincent 打造的代理人頂級工程方法論。強制執行 Spec-First 規格制定、TDD 測試先行、Git Worktree 安全分支隔離與 Code Review。</p>
           </div>
-
-          <!-- Skill 5: deeptutor-mentor -->
-          <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 18px;">🎓</span>
-                <span style="font-weight: 800; font-size: 16px; color: #1e293b;">deeptutor-mentor</span>
-                <span style="background: #f0fdf4; color: #15803d; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">自主學習 AI 導師</span>
-              </div>
-              <span style="font-size: 12px; color: #64748b; font-family: monospace;">.agents/skills/deeptutor-mentor</span>
+          <!-- andrej-karpathy-skills -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">andrej-karpathy-skills</span>
+              <a href="https://github.com/multica-ai/andrej-karpathy-skills" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
             </div>
-            <p style="margin: 0 0 10px 0; color: #334155; font-size: 13px;">
-              <strong>放了什麼進去：</strong>蘇格拉底式引導教學系統。學員即使身邊沒有老師，也能透過 3 階漸進提示（不直接給代碼，先拆解思維與欄位架構）和 Error Doctor 自學搞定 Data Atoms。
-            </p>
-            <div style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 6px;">
-              <strong>開源依據：</strong>
-              <a href="https://github.com/HKUDS/DeepTutor" target="_blank" style="color: #2563eb; font-weight: 700; text-decoration: underline;">HKUDS/DeepTutor (香港大學) ↗</a>
-            </div>
+            <div style="font-size: 11px; color: #7c3aed; font-weight: 700; margin-bottom: 6px;">行為守則 / 卡帕西四箴言</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">Andrej Karpathy 代理人行為契約。編程前停下發問（Think Before Coding）、極簡無過度設計（Simplicity First）與外科手術式精確修訂（Surgical Changes）。</p>
           </div>
+          <!-- data-analyst -->
+          <div style="background: #ffffff; border: 1.5px solid #059669; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #047857; font-size: 14px;">data-analyst</span>
+              <a href="https://github.com/nutcelvischen-jpg/data-analyst-skill" target="_blank" style="font-size: 11px; color: #059669; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #059669; font-weight: 700; margin-bottom: 6px;">分析師 Prompt + 清洗腳本</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">示範如何封裝 Skill。內建 4 大 Prompt 樣板、<code>clean_data.py</code> 自動化千分位與百分比清洗腳本與速查表。</p>
+          </div>
+          <!-- deeptutor-mentor -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">deeptutor-mentor</span>
+              <a href="https://github.com/HKUDS/DeepTutor" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #15803d; font-weight: 700; margin-bottom: 6px;">自主學習 / 蘇格拉底導師</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">港大 HKUDS 架構。提供三階漸進提示（不直接給代碼，先理清思維架構）與無痛錯誤醫生，讓學員無老師也能自學。</p>
+          </div>
+        </div>
 
         </div>
       </div>
