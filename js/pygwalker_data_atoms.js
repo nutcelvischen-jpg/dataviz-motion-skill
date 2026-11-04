@@ -11,6 +11,7 @@
   const state = {
     currentDatasetId: 'jp_prefectures',
     datasetName: '',
+    customDatasets: {}, // 自訂資料集註冊表，避免切換後資料遺失
     rawRows: [],
     columns: [],
     dimensions: [],  // 文字 / 類別
@@ -31,7 +32,7 @@
       size: '65歲以上高齡人口(人)',
       secondary: '高齡化率(%)',
       facet: '',  // 小多圖分面維度 (Small Multiples Facet Dimension)
-      agg: 'RAW'      // 'RAW' | 'SUM' | 'MEAN' | 'MAX' | 'MIN'
+      agg: 'RAW'      // 'RAW' | 'SUM' | 'MEAN' | 'MAX' | 'MIN' | 'COUNT'
     },
     facetScaleMode: 'fixed', // 'fixed': 統一 Y 軸比例尺, 'free': 各子圖自適應
     
@@ -66,6 +67,147 @@
     '#06b6d4', '#f59e0b', '#6366f1', '#14b8a6', '#f43f5e',
     '#84cc16', '#a855f7', '#3b82f6', '#d97706', '#059669'
   ];
+
+  const PALETTE_BAUHAUS = ['#1d4ed8', '#0284c7', '#0f766e', '#16a34a', '#eab308', '#ea580c', '#e11d48', '#7c3aed', '#475569'];
+
+  // --- 數值與統計安全輔助函式 (防溢位、防 NaN、防髒資料) ---
+  function safeParseNumber(val) {
+    if (typeof val === 'number') return isNaN(val) ? 0 : val;
+    if (val === null || val === undefined) return 0;
+    const str = String(val).replace(/[,%]/g, '').trim();
+    if (str === '') return 0;
+    const n = Number(str);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function safeMin(arr, defaultVal = 0) {
+    if (!arr || !arr.length) return defaultVal;
+    let min = Infinity;
+    for (let i = 0; i < arr.length; i++) {
+      const v = Number(arr[i]);
+      if (!isNaN(v) && v < min) min = v;
+    }
+    return min === Infinity ? defaultVal : min;
+  }
+
+  function safeMax(arr, defaultVal = 0) {
+    if (!arr || !arr.length) return defaultVal;
+    let max = -Infinity;
+    for (let i = 0; i < arr.length; i++) {
+      const v = Number(arr[i]);
+      if (!isNaN(v) && v > max) max = v;
+    }
+    return max === -Infinity ? defaultVal : max;
+  }
+
+  function safeExtent(arr, defaultMin = 0, defaultMax = 0) {
+    if (!arr || !arr.length) return [defaultMin, defaultMax];
+    let min = Infinity;
+    let max = -Infinity;
+    for (let i = 0; i < arr.length; i++) {
+      const v = Number(arr[i]);
+      if (!isNaN(v)) {
+        if (v < min) min = v;
+        if (v > max) max = v;
+      }
+    }
+    return [
+      min === Infinity ? defaultMin : min,
+      max === -Infinity ? defaultMax : max
+    ];
+  }
+
+  function debounce(fn, wait = 100) {
+    let timer = null;
+    return function (...args) {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        fn.apply(this, args);
+      }, wait);
+    };
+  }
+
+  // --- 真正的 Group-By 聚合計算引擎 ---
+  function aggregateRows(rows, groupKeys, measureKeys, aggType) {
+    if (!aggType || aggType === 'RAW' || !rows || rows.length === 0) {
+      return rows;
+    }
+    const validGroupKeys = (groupKeys || []).filter(k => k && typeof k === 'string');
+    if (validGroupKeys.length === 0) return rows;
+
+    const validMeasures = (measureKeys || []).filter(m => m && typeof m === 'string');
+
+    const groups = new Map();
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      const keyParts = validGroupKeys.map(k => String(r[k] !== undefined && r[k] !== null ? r[k] : ''));
+      const groupKey = keyParts.join('___|||___');
+
+      let entry = groups.get(groupKey);
+      if (!entry) {
+        entry = {
+          protoRow: { ...r },
+          count: 0,
+          sum: {},
+          min: {},
+          max: {},
+          values: {}
+        };
+        validMeasures.forEach(m => {
+          entry.sum[m] = 0;
+          entry.min[m] = Infinity;
+          entry.max[m] = -Infinity;
+          entry.values[m] = [];
+        });
+        groups.set(groupKey, entry);
+      }
+      entry.count++;
+      validMeasures.forEach(m => {
+        const val = safeParseNumber(r[m]);
+        if (!isNaN(val)) {
+          entry.sum[m] += val;
+          if (val < entry.min[m]) entry.min[m] = val;
+          if (val > entry.max[m]) entry.max[m] = val;
+          entry.values[m].push(val);
+        }
+      });
+    }
+
+    const aggregated = [];
+    groups.forEach((entry) => {
+      const row = { ...entry.protoRow };
+      validMeasures.forEach(m => {
+        const hasValues = entry.values[m].length > 0;
+        if (aggType === 'SUM') {
+          row[m] = hasValues ? entry.sum[m] : 0;
+        } else if (aggType === 'MEAN') {
+          row[m] = hasValues ? entry.sum[m] / entry.values[m].length : 0;
+        } else if (aggType === 'MAX') {
+          row[m] = hasValues && entry.max[m] !== -Infinity ? entry.max[m] : 0;
+        } else if (aggType === 'MIN') {
+          row[m] = hasValues && entry.min[m] !== Infinity ? entry.min[m] : 0;
+        } else if (aggType === 'COUNT') {
+          row[m] = entry.count;
+        }
+        if (typeof row[m] === 'number' && row[m] % 1 !== 0) {
+          row[m] = parseFloat(row[m].toFixed(2));
+        }
+      });
+      aggregated.push(row);
+    });
+
+    return aggregated;
+  }
+
+  function getVisualData(customRows = null) {
+    const raw = customRows || getActiveRows();
+    if (!state.shelf.agg || state.shelf.agg === 'RAW' || raw.length === 0) {
+      return raw;
+    }
+    const groupKeys = [state.shelf.x, state.shelf.color, state.shelf.facet].filter(Boolean);
+    const measureKeys = [state.shelf.y, state.shelf.secondary, state.shelf.size, ...(state.shelf.yMulti || [])].filter(Boolean);
+    return aggregateRows(raw, groupKeys, measureKeys, state.shelf.agg);
+  }
 
   const REGION_COLORS = {
     '關東地方': '#2563eb',
@@ -186,6 +328,10 @@
     let target = null;
     if (customObj) {
       target = customObj;
+      if (!state.customDatasets) state.customDatasets = {};
+      state.customDatasets[target.id || datasetKey] = target;
+    } else if (state.customDatasets && state.customDatasets[datasetKey]) {
+      target = state.customDatasets[datasetKey];
     } else if (window.ESTAT_JP_DATASETS) {
       target = window.ESTAT_JP_DATASETS[datasetKey] || 
                Object.values(window.ESTAT_JP_DATASETS).find(d => d.id === datasetKey);
@@ -202,6 +348,7 @@
     state.currentDatasetId = target.id || datasetKey;
     state.datasetName = target.name || '自訂數據集';
     state.rawRows = JSON.parse(JSON.stringify(target.data));
+    state.shelf.yMulti = []; // 徹底清空多指標殘留
     
     // 自動補齊標準化人口結構比率 (確保 47都道府縣 與 50年時序 皆可直接對比 幼年 vs 勞動人口占比)
     state.rawRows.forEach(r => {
@@ -290,13 +437,18 @@
       if (val !== null && val !== undefined && val !== '') {
         nonNullCount++;
         distinctSet.add(val);
-        if (sampleValues.length < 5 && !sampleValues.includes(String(val))) {
+        if (sampleValues.length < 10 && !sampleValues.includes(String(val))) {
           sampleValues.push(String(val));
         }
 
-        const num = Number(val);
-        if (!isNaN(num) && typeof num === 'number') {
+        const isActuallyNumeric = typeof val === 'number' || (
+          typeof val === 'string' &&
+          val.trim() !== '' &&
+          !isNaN(Number(val.replace(/[,%]/g, '').trim()))
+        );
+        if (isActuallyNumeric) {
           numericCount++;
+          const num = safeParseNumber(val);
           if (num % 1 !== 0 || String(val).includes('.')) {
             decimalCount++;
           }
@@ -393,8 +545,14 @@
   // --- 分析欄位綱要 (Tableau-like Schema Profiler) ---
   function analyzeSchema(rows) {
     if (!rows || rows.length === 0) return;
-    const sample = rows[0];
-    state.columns = Object.keys(sample);
+    const colSet = new Set();
+    const scanRows = Math.min(rows.length, 10);
+    for (let i = 0; i < scanRows; i++) {
+      if (rows[i] && typeof rows[i] === 'object') {
+        Object.keys(rows[i]).forEach(k => colSet.add(k));
+      }
+    }
+    state.columns = Array.from(colSet);
     state.schemaConfig = {};
     state.autoInferredSchema = {};
 
@@ -464,16 +622,17 @@
     const displayName = cfg.alias && cfg.alias !== fieldName ? `${cfg.alias} (${fieldName})` : fieldName;
     const tooltipText = `${displayName} · ${cfg.nature === 'continuous' ? '連續度量' : '離散維度'} · 預設聚合: ${(cfg.agg || 'RAW').toUpperCase()}`;
 
+    const safeJsField = String(fieldName).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     div.innerHTML = `
       <span class="field-drag-handle">⋮⋮</span>
       <span class="field-type-badge" title="${cfg.type || fieldType}">${iconBadge}</span>
-      <span class="field-name-text" title="${tooltipText}">${cfg.alias || fieldName}</span>
+      <span class="field-name-text" title="${tooltipText}">${escapeHtml(cfg.alias || fieldName)}</span>
       <div class="field-quick-actions">
-        <button type="button" class="field-quick-btn" title="指派至 X 軸 (Columns)" onclick="window.PyGWalker.assignToShelf('x', '${escapeHtml(fieldName)}')">+X</button>
-        <button type="button" class="field-quick-btn" title="指派至 Y 軸 (Rows)" onclick="window.PyGWalker.assignToShelf('y', '${escapeHtml(fieldName)}')">+Y</button>
-        <button type="button" class="field-quick-btn" title="指派至 顏色/大小" onclick="window.PyGWalker.assignToShelf('${fieldType === 'dimension' ? 'color' : 'size'}', '${escapeHtml(fieldName)}')">${fieldType === 'dimension' ? '+色' : '+大'}</button>
-        ${fieldType === 'dimension' ? `<button type="button" class="field-quick-btn facet-btn" title="指派至 分面小多圖 (Facet Small Multiples)" onclick="window.PyGWalker.assignToShelf('facet', '${escapeHtml(fieldName)}')">+面</button>` : ''}
-        <button type="button" class="field-quick-btn filter-btn" title="加入至篩選器 (Filters)" onclick="window.PyGWalker.addFilter('${escapeHtml(fieldName)}')">+濾</button>
+        <button type="button" class="field-quick-btn" title="指派至 X 軸 (Columns)" onclick="window.PyGWalker.assignToShelf('x', '${safeJsField}')">+X</button>
+        <button type="button" class="field-quick-btn" title="指派至 Y 軸 (Rows)" onclick="window.PyGWalker.assignToShelf('y', '${safeJsField}')">+Y</button>
+        <button type="button" class="field-quick-btn" title="指派至 顏色/大小" onclick="window.PyGWalker.assignToShelf('${fieldType === 'dimension' ? 'color' : 'size'}', '${safeJsField}')">${fieldType === 'dimension' ? '+色' : '+大'}</button>
+        ${fieldType === 'dimension' ? `<button type="button" class="field-quick-btn facet-btn" title="指派至 分面小多圖 (Facet Small Multiples)" onclick="window.PyGWalker.assignToShelf('facet', '${safeJsField}')">+面</button>` : ''}
+        <button type="button" class="field-quick-btn filter-btn" title="加入至篩選器 (Filters)" onclick="window.PyGWalker.addFilter('${safeJsField}')">+濾</button>
       </div>
     `;
 
@@ -526,8 +685,7 @@
     if (yearField) {
       const nums = state.rawRows.map(r => parseInt(String(r[yearField]), 10)).filter(v => !isNaN(v) && v >= 1800 && v <= 2100);
       if (nums.length > 1) {
-        const minY = Math.min(...nums);
-        const maxY = Math.max(...nums);
+        const [minY, maxY] = safeExtent(nums);
         if (minY !== maxY) {
           state.filters[yearField] = {
             field: yearField,
@@ -585,8 +743,7 @@
     if (isNumeric) {
       const nums = state.rawRows.map(r => isYear ? parseInt(String(r[fieldName]), 10) : Number(r[fieldName])).filter(v => !isNaN(v));
       if (nums.length > 0) {
-        const minVal = Math.min(...nums);
-        const maxVal = Math.max(...nums);
+        const [minVal, maxVal] = safeExtent(nums);
         state.filters[fieldName] = {
           field: fieldName,
           type: 'range',
@@ -861,7 +1018,7 @@
       
       let aggHtml = '';
       if (isMeasure && shelfKey === 'y') {
-        aggHtml = `<span class="shelf-agg-badge" onclick="window.PyGWalker.cycleAgg(event)" title="點擊切換聚合方式 (RAW ➔ SUM ➔ MEAN ➔ MAX ➔ MIN)">[${state.shelf.agg}]</span>`;
+        aggHtml = `<span class="shelf-agg-badge" onclick="window.PyGWalker.cycleAgg(event)" title="點擊切換聚合方式 (RAW ➔ SUM ➔ MEAN ➔ MAX ➔ MIN ➔ COUNT)">[${state.shelf.agg}]</span>`;
       }
 
       let extraCompareBtn = '';
@@ -986,6 +1143,9 @@
   // --- 設定指定槽位欄位 ---
   function setShelfField(shelfKey, fieldName) {
     state.shelf[shelfKey] = fieldName;
+    if (shelfKey === 'y') {
+      state.shelf.yMulti = [];
+    }
     
     // 智慧偵測：若 X 與 Y 皆為連續數值，自動建議散點矩陣
     if (shelfKey === 'x' || shelfKey === 'y') {
@@ -1023,16 +1183,6 @@
     });
   }
 
-  // 安全數值轉換輔助函式 (自動清洗千分位逗號、空白、百分比符號，防止 NaN)
-  function safeParseNumber(val) {
-    if (typeof val === 'number') return isNaN(val) ? 0 : val;
-    if (val === null || val === undefined) return 0;
-    const str = String(val).replace(/[,%]/g, '').trim();
-    if (str === '') return 0;
-    const n = Number(str);
-    return isNaN(n) ? 0 : n;
-  }
-
   // --- 頂部 KPI Ribbon 數值計算 ---
   function renderKPIRibbon() {
     const kpiRows = document.getElementById('kpiRowCount');
@@ -1061,8 +1211,7 @@
       if (nums.length > 0) {
         const sum = nums.reduce((a, b) => a + b, 0);
         const avg = sum / nums.length;
-        const max = Math.max(...nums);
-        const min = Math.min(...nums);
+        const [min, max] = safeExtent(nums);
 
         kpiSum.textContent = formatCompactNumber(sum);
         kpiMean.textContent = avg >= 1000 ? formatCompactNumber(avg) : avg.toFixed(2);
@@ -1140,7 +1289,7 @@
     // 視圖自適應高度計算：確保多列 (2~3列) 小多圖具備充裕縱向空間，徹底杜絕上下標籤與刻度互相擠壓
     const container = document.getElementById('echartsViewport');
     if (container) {
-      const neededHeight = numRows === 1 ? '100%' : (numRows === 2 ? '680px' : '920px');
+      const neededHeight = numRows === 1 ? '100%' : (numRows === 2 ? '680px' : `${Math.max(920, numRows * 310)}px`);
       if (container.style.height !== neededHeight) {
         container.style.height = neededHeight;
         container.style.minHeight = neededHeight;
@@ -1164,7 +1313,7 @@
 
     // 計算全局 Y 軸最大值 (用於統一量表 Fixed Scale，預留 28% 頂部空間避免標籤與圖頂干涉)
     const allNums = data.map(d => safeParseNumber(d[yField])).filter(v => typeof v === 'number' && !isNaN(v));
-    const globalMaxY = allNums.length > 0 ? Math.max(...allNums) : 100;
+    const globalMaxY = allNums.length > 0 ? safeMax(allNums, 100) : 100;
     const paddedMaxY = Math.ceil(globalMaxY * 1.28);
 
     // 次要指標雙軸支援 (預留 25% 空間)
@@ -1172,7 +1321,7 @@
     let globalMaxSec = 100;
     if (hasSec) {
       const secNums = data.map(d => safeParseNumber(d[secField])).filter(v => typeof v === 'number' && !isNaN(v));
-      if (secNums.length > 0) globalMaxSec = Math.ceil(Math.max(...secNums) * 1.25);
+      if (secNums.length > 0) globalMaxSec = Math.ceil(safeMax(secNums, 100) * 1.25);
     }
 
     // 計算子面板座標留白比例
@@ -1275,7 +1424,7 @@
           fontWeight: 600,
           color: '#64748b'
         },
-        max: state.facetScaleMode === 'fixed' ? paddedMaxY : undefined,
+        max: state.facetScaleMode === 'fixed' ? paddedMaxY : (val) => Math.ceil(val.max * 1.28),
         axisLabel: {
           formatter: (v) => formatCompactNumber(v),
           fontSize: numCols >= 4 ? 9 : 10,
@@ -1290,7 +1439,7 @@
       let secYAxisIndex = null;
       if (hasSec) {
         secYAxisIndex = yAxes.length;
-        const isRightEdge = (c === numCols - 1) || (idx === K - 1);
+        const isRightEdge = c === numCols - 1;
         yAxes.push({
           gridIndex: idx,
           type: 'value',
@@ -1304,7 +1453,7 @@
             fontWeight: 600,
             color: '#ea580c'
           },
-          max: state.facetScaleMode === 'fixed' ? globalMaxSec : undefined,
+          max: state.facetScaleMode === 'fixed' ? globalMaxSec : (val) => Math.ceil(val.max * 1.25),
           axisLabel: {
             formatter: (v) => formatCompactNumber(v),
             fontSize: numCols >= 4 ? 9 : 10,
@@ -1434,13 +1583,12 @@
 
     if (!echartsInstance) {
       echartsInstance = echarts.init(container);
-      window.addEventListener('resize', () => {
+      const debouncedResize = debounce(() => {
         if (echartsInstance) echartsInstance.resize();
-      });
+      }, 100);
+      window.addEventListener('resize', debouncedResize);
       if (typeof ResizeObserver !== 'undefined') {
-        const ro = new ResizeObserver(() => {
-          if (echartsInstance) echartsInstance.resize();
-        });
+        const ro = new ResizeObserver(debouncedResize);
         ro.observe(container);
       }
     }
@@ -1451,7 +1599,7 @@
     const sizeField = state.shelf.size;
     const secField = state.shelf.secondary;
     const facetField = state.shelf.facet;
-    let data = [...getActiveRows()];
+    let data = getVisualData();
 
     if (data.length === 0) {
       echartsInstance.clear();
@@ -2000,6 +2148,10 @@
         {
           type: 'value',
           name: yField,
+          nameLocation: 'middle',
+          nameRotate: 90,
+          nameGap: 42,
+          nameTextStyle: { color: '#64748b', fontSize: 11, fontWeight: 600 },
           axisLabel: { formatter: (v) => formatCompactNumber(v) },
           splitLine: { lineStyle: { color: '#f1f5f9' } }
         },
@@ -2007,6 +2159,10 @@
           type: 'value',
           name: activeSecField,
           position: 'right',
+          nameLocation: 'middle',
+          nameRotate: -90,
+          nameGap: 42,
+          nameTextStyle: { color: '#ea580c', fontSize: 11, fontWeight: 600 },
           axisLabel: { formatter: (v) => formatCompactNumber(v) },
           splitLine: { show: false }
         }
@@ -2037,7 +2193,16 @@
           itemStyle: { color: '#ea580c' },
           lineStyle: { width: 3, shadowColor: 'rgba(234, 88, 12, 0.25)', shadowBlur: 6 },
           markPoint: {
-            data: [{ type: 'max', name: '次軸最高點' }, { type: 'min', name: '次軸最低點' }]
+            symbol: 'roundRect',
+            symbolSize: [44, 20],
+            symbolOffset: [0, -10],
+            itemStyle: {
+              color: '#ea580c',
+              shadowBlur: 3,
+              shadowColor: 'rgba(0,0,0,0.12)'
+            },
+            label: { fontSize: 10, fontWeight: 700, color: '#ffffff' },
+            data: [{ type: 'max', name: '次軸最高' }, { type: 'min', name: '次軸最低' }]
           }
         }
       ];
@@ -2141,7 +2306,7 @@
         textStyle: { color: '#475569', fontSize: 11 }
       };
 
-      const maxS = Math.max(...geoPoints.map(p => p.value[3])) || 1;
+      const maxS = safeMax(geoPoints.map(p => p.value[3]), 1) || 1;
       const getRadius = (s) => Math.max(8, Math.min(36, 8 + (s / maxS) * 28));
 
       option.tooltip = {
@@ -2489,7 +2654,7 @@
       // 計算氣泡大小基準
       let maxVal = 1;
       if (sizeField && state.measures.includes(sizeField)) {
-        maxVal = Math.max(...data.map(d => Number(d[sizeField] || 0))) || 1;
+        maxVal = safeMax(data.map(d => Number(d[sizeField] || 0)), 1) || 1;
       }
 
       const colorCategories = (colorField && state.dimensions.includes(colorField))
@@ -2601,7 +2766,7 @@
       const topItems = data.slice(0, 5);
       const metricFields = state.measures.slice(0, 6);
       const indicator = metricFields.map(m => {
-        const max = Math.max(...data.map(d => Number(d[m] || 0))) || 100;
+        const max = safeMax(data.map(d => Number(d[m] || 0)), 100) || 100;
         return { name: m, max: max * 1.1 };
       });
 
@@ -2752,11 +2917,11 @@
 
     // 依圖表類型原生分派繪製
     if (state.chartType === 'line') {
-      const data = getActiveRows().slice(0, 30);
+      const data = getVisualData().slice(0, 30);
       const xVals = data.map(d => d[state.shelf.x]);
       const yVals = data.map(d => Number(d[state.shelf.y] || 0));
-      const maxVal = Math.max(...yVals, 1);
-      const minVal = Math.min(0, ...yVals);
+      const maxVal = Math.max(1, safeMax(yVals, 1));
+      const minVal = Math.min(0, safeMin(yVals, 0));
       const range = maxVal - minVal || 1;
       const step = chartW / Math.max(1, data.length - 1);
 
@@ -2798,14 +2963,14 @@
       });
     } else if (state.chartType === 'dual') {
       // 雙軸複合圖 (柱狀 + 次軸折線)
-      const data = getActiveRows().slice(0, 20);
+      const data = getVisualData().slice(0, 20);
       const xVals = data.map(d => d[state.shelf.x]);
       const y1Vals = data.map(d => Number(d[state.shelf.y] || 0));
       const secField = state.shelf.secondary || state.measures.find(m => m !== state.shelf.y);
       const y2Vals = secField ? data.map(d => Number(d[secField] || 0)) : [];
 
-      const max1 = Math.max(...y1Vals, 1);
-      const max2 = y2Vals.length ? Math.max(...y2Vals, 1) : 100;
+      const max1 = Math.max(1, safeMax(y1Vals, 1));
+      const max2 = y2Vals.length ? Math.max(1, safeMax(y2Vals, 1)) : 100;
       const gap = chartW / data.length;
       const barW = gap * 0.55;
 
@@ -2861,10 +3026,8 @@
       if (geoData.length > 0) {
         const lngs = geoData.map(d => d.value[0]);
         const lats = geoData.map(d => d.value[1]);
-        const minLng = Math.min(...lngs);
-        const maxLng = Math.max(...lngs);
-        const minLat = Math.min(...lats);
-        const maxLat = Math.max(...lats);
+        const [minLng, maxLng] = safeExtent(lngs);
+        const [minLat, maxLat] = safeExtent(lats);
         const padLng = (maxLng - minLng) * 0.1 || 2;
         const padLat = (maxLat - minLat) * 0.1 || 2;
 
@@ -2908,8 +3071,8 @@
 
       const groupKeys = Object.keys(groups).slice(0, 10);
       const allVals = [].concat(...Object.values(groups));
-      const minV = Math.min(...allVals, 0);
-      const maxV = Math.max(...allVals, 1);
+      const minV = Math.min(0, safeMin(allVals, 0));
+      const maxV = Math.max(1, safeMax(allVals, 1));
       const range = maxV - minV || 1;
       const gap = chartW / groupKeys.length;
       const boxW = gap * 0.45;
@@ -2956,7 +3119,7 @@
       });
     } else if (state.chartType === 'treemap') {
       // 矩形樹圖 (階層體量)
-      const data = getActiveRows().slice(0, 16);
+      const data = getVisualData().slice(0, 16);
       const totalVal = data.reduce((acc, r) => acc + (Number(r[state.shelf.y]) || 1), 0);
       let currX = startX;
       let currY = startY - chartH;
@@ -2992,13 +3155,13 @@
     } else {
       // 預設柱狀圖 (Bar) - 支援常規垂直與對調後水平長條圖
       const isSwapped = state.measures.includes(state.shelf.x) && !state.measures.includes(state.shelf.y);
-      const data = getActiveRows().slice(0, 24);
+      const data = getVisualData().slice(0, 24);
 
       if (isSwapped) {
         // 水平長條圖 (Horizontal Bar in Canvas)
         const catVals = data.map(d => String(d[state.shelf.y] || ''));
         const numVals = data.map(d => safeParseNumber(d[state.shelf.x]));
-        const maxVal = Math.max(...numVals) || 1;
+        const maxVal = safeMax(numVals, 1) || 1;
         const gap = chartH / data.length;
         const barH = gap * 0.65;
         const barStartX = startX + 130;
@@ -3040,7 +3203,7 @@
         // 常規垂直柱狀圖 (Vertical Bar)
         const catVals = data.map(d => String(d[state.shelf.x] || ''));
         const numVals = data.map(d => safeParseNumber(d[state.shelf.y]));
-        const maxVal = Math.max(...numVals) || 1;
+        const maxVal = safeMax(numVals, 1) || 1;
 
         const barW = (chartW / data.length) * 0.7;
         const gap = chartW / data.length;
@@ -3130,8 +3293,10 @@
           const isSorted = state.sortColumn === col;
           const arrow = isSorted ? (state.sortOrder === 'desc' ? ' ▼' : ' ▲') : '';
           const typeBadge = state.measures.includes(col) ? '#' : 'T';
-          return `<th onclick="window.PyGWalker.sortTable('${col}')" style="cursor: pointer;" title="點擊依此欄位排序">
-            <span style="opacity: 0.6; font-size: 10px;">${typeBadge}</span> ${col}${arrow}
+          const escCol = escapeHtml(col);
+          const safeColArg = String(col).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+          return `<th onclick="window.PyGWalker.sortTable('${safeColArg}')" style="cursor: pointer;" title="點擊依此欄位排序">
+            <span style="opacity: 0.6; font-size: 10px;">${typeBadge}</span> ${escCol}${arrow}
           </th>`;
         }).join('')}
       </tr>
@@ -3150,8 +3315,9 @@
           ${state.columns.map(col => {
             const val = row[col];
             const isNum = typeof val === 'number' || (state.measures.includes(col) && !isNaN(Number(val)));
-            const displayVal = isNum ? Number(val).toLocaleString() : (val !== null && val !== undefined ? val : '-');
-            return `<td style="${isNum ? 'text-align: right; font-family: monospace;' : ''}">${displayVal}</td>`;
+            const displayVal = isNum ? Number(val).toLocaleString() : (val !== null && val !== undefined ? String(val) : '-');
+            const safeDisplayVal = escapeHtml(displayVal);
+            return `<td style="${isNum ? 'text-align: right; font-family: monospace;' : ''}">${safeDisplayVal}</td>`;
           }).join('')}
         </tr>
       `;
@@ -3219,6 +3385,7 @@
       btnClear.addEventListener('click', () => {
         state.shelf.x = '';
         state.shelf.y = '';
+        state.shelf.yMulti = [];
         state.shelf.color = '';
         state.shelf.size = '';
         state.shelf.secondary = '';
@@ -3702,14 +3869,20 @@
       data: rows
     };
 
+    if (!state.customDatasets) state.customDatasets = {};
+    state.customDatasets[customObj.id] = customObj;
+
     // 加入選單
     const dsSelect = document.getElementById('datasetQuickSelect');
     if (dsSelect) {
-      const opt = document.createElement('option');
-      opt.value = customObj.id;
-      opt.textContent = customObj.name;
-      opt.selected = true;
-      dsSelect.insertBefore(opt, dsSelect.firstChild);
+      let existingOpt = dsSelect.querySelector(`option[value="${customObj.id}"]`);
+      if (!existingOpt) {
+        const opt = document.createElement('option');
+        opt.value = customObj.id;
+        opt.textContent = customObj.name;
+        dsSelect.insertBefore(opt, dsSelect.firstChild);
+      }
+      dsSelect.value = customObj.id;
     }
 
     loadDataset(customObj.id, customObj);
@@ -3721,36 +3894,80 @@
     }, 200);
   }
 
-  // --- 簡易 CSV 文字解析器 ---
+  // --- 強健 CSV 文字解析器 (優先使用 SheetJS，相容 RFC 4180 標準) ---
   function parseCSVText(text) {
-    const lines = text.trim().split(/\r\n|\n|\r/);
-    if (lines.length < 2) return [];
-    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-    const rows = [];
+    if (!text || typeof text !== 'string') return [];
+    if (typeof XLSX !== 'undefined') {
+      try {
+        const workbook = XLSX.read(text, { type: 'string' });
+        const sheetName = workbook.SheetNames[0];
+        if (sheetName) {
+          const worksheet = workbook.Sheets[sheetName];
+          const rows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+          if (rows && rows.length > 0) {
+            return rows;
+          }
+        }
+      } catch (err) {
+        console.warn('XLSX.read CSV error, falling back to RFC parser:', err);
+      }
+    }
 
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
-      const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+    // RFC 4180 備援解析器 (支援含引號、引號內逗號與換行)
+    const lines = [];
+    let row = [''];
+    let inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      const next = text[i + 1];
+      if (c === '"') {
+        if (inQuotes && next === '"') {
+          row[row.length - 1] += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (c === ',' && !inQuotes) {
+        row.push('');
+      } else if ((c === '\r' || c === '\n') && !inQuotes) {
+        if (c === '\r' && next === '\n') i++;
+        if (row.length > 1 || row[0] !== '') lines.push(row);
+        row = [''];
+      } else {
+        row[row.length - 1] += c;
+      }
+    }
+    if (row.length > 1 || row[0] !== '') lines.push(row);
+
+    if (lines.length < 2) return [];
+    const headers = lines[0].map(h => h.trim().replace(/^"|"$/g, ''));
+    const rows = [];
+    for (let r = 1; r < lines.length; r++) {
+      const vals = lines[r];
+      if (vals.length === 0 || (vals.length === 1 && vals[0] === '')) continue;
       const obj = {};
       headers.forEach((h, idx) => {
-        const val = values[idx];
+        const val = vals[idx] !== undefined ? vals[idx].trim().replace(/^"|"$/g, '') : '';
         const cleaned = typeof val === 'string' ? val.replace(/,/g, '').trim() : val;
         const num = Number(cleaned);
-        obj[h] = !isNaN(num) && cleaned !== '' ? num : val;
+        obj[h] = (!isNaN(num) && cleaned !== '') ? num : val;
       });
       rows.push(obj);
     }
     return rows;
   }
 
-  // --- 匯出 CSV ---
+  // --- 匯出 CSV (以 getActiveRows() 當前有效篩選列為準) ---
   function exportCurrentTableToCSV() {
-    if (state.rawRows.length === 0) return;
+    const activeRows = getActiveRows();
+    if (!activeRows || activeRows.length === 0) {
+      showToast('⚠️ 目前無符合條件之資料可供匯出');
+      return;
+    }
     const headers = state.columns;
     const csvLines = [headers.join(',')];
 
-    state.rawRows.forEach(row => {
+    activeRows.forEach(row => {
       const line = headers.map(h => {
         let val = row[h];
         if (val === null || val === undefined) val = '';
@@ -3763,7 +3980,7 @@
     const blob = new Blob(['\uFEFF' + csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     downloadDataUrl(url, `${state.currentDatasetId}_export.csv`);
-    showToast('已匯出 CSV 檔案！');
+    showToast(`已匯出 CSV 檔案！共 ${activeRows.length} 筆已篩選資料。`);
   }
 
   function downloadDataUrl(url, filename) {
@@ -3773,6 +3990,9 @@
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    if (typeof url === 'string' && url.startsWith('blob:')) {
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
   }
 
   function hashCode(str) {
@@ -4355,13 +4575,16 @@
     },
     clearShelf: (shelfKey) => {
       state.shelf[shelfKey] = '';
+      if (shelfKey === 'y') {
+        state.shelf.yMulti = [];
+      }
       renderShelves();
       renderVisualization();
       renderKPIRibbon();
     },
     cycleAgg: (e) => {
       e.stopPropagation();
-      const aggs = ['RAW', 'SUM', 'MEAN', 'MAX', 'MIN'];
+      const aggs = ['RAW', 'SUM', 'MEAN', 'MAX', 'MIN', 'COUNT'];
       const nextIdx = (aggs.indexOf(state.shelf.agg) + 1) % aggs.length;
       state.shelf.agg = aggs[nextIdx];
       renderShelves();
@@ -4426,8 +4649,28 @@
     },
     resetAllFilters: () => {
       resetAllFilters();
+    },
+    getVisualData: (customRows) => {
+      return getVisualData(customRows);
+    },
+    aggregateRows: (rows, groupKeys, measureKeys, aggType) => {
+      return aggregateRows(rows, groupKeys, measureKeys, aggType);
+    },
+    renderVisualization: () => {
+      renderVisualization();
     }
   };
+
+  // 暴露至全域供測試與進階模組調用
+  window.PALETTE_BAUHAUS = PALETTE_BAUHAUS;
+  window.safeParseNumber = safeParseNumber;
+  window.safeMin = safeMin;
+  window.safeMax = safeMax;
+  window.safeExtent = safeExtent;
+  window.aggregateRows = aggregateRows;
+  window.getVisualData = getVisualData;
+  window.renderVisualization = renderVisualization;
+  window.loadDataset = loadDataset;
 
   // 當 DOM 與資源就緒時初始化
   if (document.readyState === 'loading') {

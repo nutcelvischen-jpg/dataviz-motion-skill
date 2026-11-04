@@ -348,6 +348,7 @@
 
 .field-name-text {
   flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -356,8 +357,9 @@
 
 .field-quick-actions {
   display: flex;
-  gap: 3px;
-  opacity: 0.3;
+  gap: 2px;
+  flex-shrink: 0;
+  opacity: 0.35;
   transition: opacity 0.15s;
 }
 
@@ -371,9 +373,10 @@
   color: #475569;
   font-size: 10px;
   font-weight: 700;
-  padding: 2px 5px;
+  padding: 2px 4px;
   border-radius: 3px;
   cursor: pointer;
+  flex-shrink: 0;
   transition: background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease;
 }
 
