@@ -2099,7 +2099,10 @@
     // 數值 Y 軸頂部 15% Headroom 緩衝保底，防止頂部刻度與 MarkPoint 徽章撞車
     const yAxisHeadroomMax = (val) => {
       if (val && typeof val.max === 'number' && !isNaN(val.max)) {
-        return val.max > 0 ? Math.ceil(val.max * 1.15) : (val.max === 0 ? 1 : Math.ceil(val.max * 0.85));
+        if (val.max > 10) return Math.ceil(val.max * 1.15);
+        if (val.max > 0) return parseFloat((val.max * 1.15).toFixed(4));
+        if (val.max === 0) return 1;
+        return val.max > -10 ? parseFloat((val.max * 0.85).toFixed(4)) : Math.ceil(val.max * 0.85);
       }
       return undefined;
     };
@@ -2960,6 +2963,33 @@
         const violinMetaList = groupNames.map((grp) => {
           return computeKDE(groupMap[grp] || [], 35, globalRange);
         });
+
+        // 全域小提琴輪廓極值 (涵蓋所有分組 KDE 頂底採樣與實際數據點，防止 ECharts custom 僅讀取 median 導致頂部截斷)
+        let violinAllMin = Infinity;
+        let violinAllMax = -Infinity;
+        violinMetaList.forEach((m) => {
+          if (m.kde && m.kde.length > 0) {
+            const kMin = m.kde[0].y;
+            const kMax = m.kde[m.kde.length - 1].y;
+            if (kMin < violinAllMin) violinAllMin = kMin;
+            if (kMax > violinAllMax) violinAllMax = kMax;
+          }
+          if (m.max > violinAllMax) violinAllMax = m.max;
+          if (m.min < violinAllMin) violinAllMin = m.min;
+        });
+        if (violinAllMin === Infinity) violinAllMin = 0;
+        if (violinAllMax === -Infinity) violinAllMax = 100;
+
+        // 明確為小提琴圖配置充足 Headroom 的 Y 軸刻度範圍，徹底根治頂部輪廓被削平截斷問題
+        const violinHeadroomMax = violinAllMax > 0
+          ? (violinAllMax > 10 ? Math.ceil(violinAllMax * 1.15) : parseFloat((violinAllMax * 1.15).toFixed(4)))
+          : (violinAllMax === 0 ? 1 : Math.ceil(violinAllMax * 0.85));
+        option.yAxis.max = violinHeadroomMax;
+        if (violinAllMin < 0) {
+          option.yAxis.min = Math.floor(violinAllMin * 1.15);
+        } else if (violinAllMin > 0) {
+          option.yAxis.min = 0;
+        }
 
         option.tooltip = {
           trigger: 'item',
@@ -4231,6 +4261,17 @@
     const btnImportSheets = document.getElementById('btnImportAllSheets');
     if (btnImportSheets) btnImportSheets.addEventListener('click', importAllSheetsToDashboard);
 
+    // 工作表分頁容器滑鼠滾輪水平滾動支援
+    const tabsScrollContainer = document.querySelector('.workbook-tabs-scroll-container');
+    if (tabsScrollContainer) {
+      tabsScrollContainer.addEventListener('wheel', (e) => {
+        if (e.deltaY !== 0 && e.deltaX === 0) {
+          e.preventDefault();
+          tabsScrollContainer.scrollLeft += e.deltaY;
+        }
+      }, { passive: false });
+    }
+
     // 頂部進階工具與設定下拉選單控制 (Topbar Tools & Settings Dropdown)
     const toolsWrapper = document.getElementById('dropdownToolsWrapper');
     const btnToolsToggle = document.getElementById('btnToolsToggle');
@@ -5444,8 +5485,10 @@
   function getNextSheetNumber() {
     let maxNum = 0;
     (state.sheets || []).forEach(s => {
-      const match = s.name && s.name.match(/(?:工作表|Sheet)\s*(\d+)/i);
-      if (match) {
+      if (!s.name) return;
+      const re = /(?:工作表|Sheet|副本)\s*(\d+)/gi;
+      let match;
+      while ((match = re.exec(s.name)) !== null) {
         const num = parseInt(match[1], 10);
         if (!isNaN(num) && num > maxNum) maxNum = num;
       }
