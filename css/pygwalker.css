@@ -2657,13 +2657,21 @@
 
 .workbook-tab.active {
   background: #ffffff;
-  color: #2563eb;
+  color: #1d4ed8;
   font-weight: 700;
-  border-color: #93c5fd #cbd5e1 #ffffff #cbd5e1;
-  box-shadow: 0 -2px 5px rgba(37, 99, 235, 0.08);
+  border-top: 3px solid #2563eb;
+  border-left: 1px solid #cbd5e1;
+  border-right: 1px solid #cbd5e1;
+  border-bottom: 1px solid #ffffff;
+  box-shadow: 0 -2px 8px rgba(37, 99, 235, 0.12);
   margin-bottom: -1px;
   padding-bottom: 7px;
   z-index: 2;
+}
+
+.workbook-tab.active .tab-title {
+  color: #1d4ed8;
+  font-weight: 700;
 }
 
 .tab-chart-icon {
@@ -2704,8 +2712,8 @@
 }
 
 .btn-add-sheet {
-  background: transparent;
-  border: 1px dashed #94a3b8;
+  background: #eff6ff;
+  border: 1px dashed #3b82f6;
   color: #2563eb;
   padding: 5px 10px;
   border-radius: 5px;
@@ -2721,9 +2729,33 @@
 }
 
 .btn-add-sheet:hover {
-  background: #eff6ff;
-  border-color: #2563eb;
-  color: #1d4ed8;
+  background: #dbeafe;
+  border-color: #1d4ed8;
+  color: #1e40af;
+  transform: translateY(-1px);
+}
+
+.btn-duplicate-sheet {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 5px 9px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  margin-bottom: 2px;
+}
+
+.btn-duplicate-sheet:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
   transform: translateY(-1px);
 }
 

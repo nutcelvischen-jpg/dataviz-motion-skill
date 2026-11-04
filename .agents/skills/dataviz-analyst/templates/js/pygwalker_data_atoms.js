@@ -4102,6 +4102,9 @@
     const btnAddSheet = document.getElementById('btnAddSheet');
     if (btnAddSheet) btnAddSheet.addEventListener('click', addNewSheet);
 
+    const btnDupSheet = document.getElementById('btnDuplicateSheet');
+    if (btnDupSheet) btnDupSheet.addEventListener('click', duplicateCurrentSheet);
+
     const btnPinSheet = document.getElementById('btnPinCurrentSheet');
     if (btnPinSheet) btnPinSheet.addEventListener('click', pinCurrentChart);
 
@@ -5223,19 +5226,39 @@
     renderVisualization();
     renderDataTable();
     renderWorkbookTabs();
+    showToast(`📑 已切換至「${target.name}」(${getChartIcon(target.chartType)} ${target.chartType})`);
   }
 
   function addNewSheet() {
     saveCurrentSheetState();
     const count = state.sheets.length + 1;
     const newId = 'sheet_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+
+    // 依序推薦不同的 Data Atoms 讓每個新分頁有鮮明獨立的探索視角
+    const timeField = state.columns.find(c => /年份|年度|year|時序/i.test(c)) || state.dimensions[0] || '';
+    const mainDim = state.dimensions[0] || state.columns[0] || '';
+    const mainMeasure = state.measures[0] || '';
+    const secMeasure = state.measures[1] || mainMeasure;
+
+    const typePresets = [
+      { type: 'line', x: timeField, y: mainMeasure, name: `工作表 ${count} (時序折線)` },
+      { type: 'violin', x: mainDim, y: mainMeasure, name: `工作表 ${count} (小提琴密度)` },
+      { type: 'donut', x: mainDim, y: mainMeasure, name: `工作表 ${count} (結構甜甜圈)` },
+      { type: 'treemap', x: mainDim, y: mainMeasure, name: `工作表 ${count} (矩形樹圖)` },
+      { type: 'scatter', x: mainMeasure, y: secMeasure, name: `工作表 ${count} (散佈關聯)` },
+      { type: 'bar', x: mainDim, y: mainMeasure, name: `工作表 ${count} (體量柱狀)` }
+    ];
+
+    const presetIdx = (count - 2 + typePresets.length) % typePresets.length;
+    const preset = typePresets[presetIdx];
+
     const newSheet = {
       id: newId,
-      name: `工作表 ${count}`,
-      chartType: 'bar',
+      name: preset.name,
+      chartType: preset.type,
       shelf: {
-        x: state.dimensions[0] || state.columns[0] || '',
-        y: state.measures[0] || state.columns[1] || '',
+        x: preset.x,
+        y: preset.y,
         yMulti: [],
         color: '',
         size: '',
@@ -5252,6 +5275,9 @@
     state.activeSheetId = newId;
     state.chartType = newSheet.chartType;
     state.shelf = JSON.parse(JSON.stringify(newSheet.shelf));
+    state.filters = {};
+    state.barStackMode = false;
+    state.facetScaleMode = 'fixed';
 
     renderChartTypeSelector();
     renderShelves();
@@ -5259,7 +5285,40 @@
     renderVisualization();
     renderDataTable();
     renderWorkbookTabs();
-    showToast(`✨ 已新增「${newSheet.name}」分頁，可自由探索新視角！`);
+    showToast(`✨ 已新增「${newSheet.name}」分頁 (${getChartIcon(newSheet.chartType)})，可自由探索新視角！`);
+  }
+
+  function duplicateCurrentSheet() {
+    saveCurrentSheetState();
+    const current = state.sheets.find(s => s.id === state.activeSheetId);
+    if (!current) return;
+    const count = state.sheets.length + 1;
+    const newId = 'sheet_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+    const newSheet = {
+      id: newId,
+      name: `${current.name.replace(/ \(副本.*?\)$/, '')} (副本${count})`,
+      chartType: current.chartType,
+      shelf: JSON.parse(JSON.stringify(current.shelf)),
+      datasetId: current.datasetId || state.currentDatasetId,
+      filters: cloneFilters(current.filters),
+      barStackMode: !!current.barStackMode,
+      facetScaleMode: current.facetScaleMode || 'fixed'
+    };
+    state.sheets.push(newSheet);
+    state.activeSheetId = newId;
+    state.chartType = newSheet.chartType;
+    state.shelf = JSON.parse(JSON.stringify(newSheet.shelf));
+    state.filters = cloneFilters(newSheet.filters);
+    state.barStackMode = newSheet.barStackMode;
+    state.facetScaleMode = newSheet.facetScaleMode;
+
+    renderChartTypeSelector();
+    renderShelves();
+    renderKPIRibbon();
+    renderVisualization();
+    renderDataTable();
+    renderWorkbookTabs();
+    showToast(`📋 已建立「${newSheet.name}」分頁副本！可自由修改或切換圖表。`);
   }
 
   function promptRenameSheet(id) {
@@ -5744,6 +5803,9 @@
     addNewSheet: () => {
       addNewSheet();
     },
+    duplicateCurrentSheet: () => {
+      duplicateCurrentSheet();
+    },
     promptRenameSheet: (id) => {
       promptRenameSheet(id);
     },
@@ -5771,6 +5833,7 @@
   window.removePinnedChart = removePinnedChart;
   window.switchSheet = switchSheet;
   window.addNewSheet = addNewSheet;
+  window.duplicateCurrentSheet = duplicateCurrentSheet;
   window.promptRenameSheet = promptRenameSheet;
   window.deleteSheet = deleteSheet;
   window.importAllSheetsToDashboard = importAllSheetsToDashboard;
