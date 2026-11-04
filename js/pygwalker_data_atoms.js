@@ -472,7 +472,7 @@
         <button type="button" class="field-quick-btn" title="指派至 X 軸 (Columns)" onclick="window.PyGWalker.assignToShelf('x', '${escapeHtml(fieldName)}')">+X</button>
         <button type="button" class="field-quick-btn" title="指派至 Y 軸 (Rows)" onclick="window.PyGWalker.assignToShelf('y', '${escapeHtml(fieldName)}')">+Y</button>
         <button type="button" class="field-quick-btn" title="指派至 顏色/大小" onclick="window.PyGWalker.assignToShelf('${fieldType === 'dimension' ? 'color' : 'size'}', '${escapeHtml(fieldName)}')">${fieldType === 'dimension' ? '+色' : '+大'}</button>
-        ${fieldType === 'dimension' ? `<button type="button" class="field-quick-btn" title="指派至 分面小多圖 (Facet)" onclick="window.PyGWalker.assignToShelf('facet', '${escapeHtml(fieldName)}')">+面</button>` : ''}
+        ${fieldType === 'dimension' ? `<button type="button" class="field-quick-btn facet-btn" title="指派至 分面小多圖 (Facet Small Multiples)" onclick="window.PyGWalker.assignToShelf('facet', '${escapeHtml(fieldName)}')">+面</button>` : ''}
         <button type="button" class="field-quick-btn filter-btn" title="加入至篩選器 (Filters)" onclick="window.PyGWalker.addFilter('${escapeHtml(fieldName)}')">+濾</button>
       </div>
     `;
@@ -897,7 +897,8 @@
       }
 
       container.innerHTML = `
-        <div class="shelf-pill ${pillClass}">
+        <div class="shelf-pill ${pillClass}" draggable="true" data-field="${escapeHtml(currentField)}" data-shelf="${shelfKey}" title="可拖曳移動至其他編碼槽">
+          <span class="field-drag-handle" style="font-size: 10px; cursor: grab; opacity: 0.6; margin-right: 2px;">⋮⋮</span>
           <span class="field-type-badge">${badge}</span>
           ${aggHtml}
           <span class="shelf-pill-name">${escapeHtml(currentField)}</span>
@@ -905,6 +906,19 @@
         </div>
         ${extraCompareBtn}
       `;
+
+      // 支援槽位間膠囊互相拖曳
+      const pillEl = container.querySelector('.shelf-pill');
+      if (pillEl) {
+        pillEl.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', JSON.stringify({ field: currentField, type: isMeasure ? 'measure' : 'dimension', fromShelf: shelfKey }));
+          e.dataTransfer.effectAllowed = 'copyMove';
+          pillEl.classList.add('dragging');
+        });
+        pillEl.addEventListener('dragend', () => {
+          pillEl.classList.remove('dragging');
+        });
+      }
     }
   }
 
@@ -924,18 +938,25 @@
       const el = document.getElementById(id);
       if (!el) return;
 
-      el.addEventListener('dragover', (e) => {
+      const parentGroup = el.closest('.shelf-group') || el;
+
+      const handleDragOver = (e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'copy';
+        parentGroup.classList.add('drag-over');
         el.classList.add('drag-over');
-      });
+      };
 
-      el.addEventListener('dragleave', () => {
+      const handleDragLeave = (e) => {
+        if (parentGroup.contains(e.relatedTarget)) return;
+        parentGroup.classList.remove('drag-over');
         el.classList.remove('drag-over');
-      });
+      };
 
-      el.addEventListener('drop', (e) => {
+      const handleDrop = (e) => {
         e.preventDefault();
+        e.stopPropagation();
+        parentGroup.classList.remove('drag-over');
         el.classList.remove('drag-over');
         try {
           const raw = e.dataTransfer.getData('text/plain');
@@ -944,12 +965,21 @@
           if (key === 'filters') {
             addFilter(info.field);
           } else {
+            // 若從另一個視覺槽位拖曳過來，先清空原槽位，達成搬移效果
+            if (info.fromShelf && info.fromShelf !== key && info.fromShelf !== 'filters') {
+              state.shelf[info.fromShelf] = '';
+            }
             setShelfField(key, info.field);
           }
         } catch (err) {
           console.error('Drop error:', err);
         }
-      });
+      };
+
+      // 綁定至外層卡片與內層放置區，極大化點擊與放置熱區
+      parentGroup.addEventListener('dragover', handleDragOver);
+      parentGroup.addEventListener('dragleave', handleDragLeave);
+      parentGroup.addEventListener('drop', handleDrop);
     });
   }
 
@@ -970,7 +1000,15 @@
     renderShelves();
     renderVisualization();
     renderKPIRibbon();
-    showToast(`已將「${fieldName}」套用至 ${shelfKey.toUpperCase()} 編碼槽`);
+    const shelfDescMap = {
+      x: 'Columns (X 軸)',
+      y: 'Rows (Y 軸)',
+      color: 'Color (顏色分組)',
+      size: 'Size (大小指標)',
+      secondary: 'Secondary (雙軸次指標)',
+      facet: 'Facet (分面小多圖)'
+    };
+    showToast(`已將「${fieldName}」套用至 ${shelfDescMap[shelfKey] || shelfKey.toUpperCase()} 編碼槽`);
   }
 
   // --- 圖表選擇器更新 ---
@@ -4231,6 +4269,12 @@
     },
     assignToShelf: (shelfKey, fieldName) => {
       setShelfField(shelfKey, fieldName);
+    },
+    getEChartsInstance: () => {
+      return echartsInstance;
+    },
+    getState: () => {
+      return state;
     },
     clearShelf: (shelfKey) => {
       state.shelf[shelfKey] = '';
