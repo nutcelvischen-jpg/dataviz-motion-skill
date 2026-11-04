@@ -1137,6 +1137,17 @@
       numRows = Math.ceil(K / numCols);
     }
 
+    // 視圖自適應高度計算：確保多列 (2~3列) 小多圖具備充裕縱向空間，徹底杜絕上下標籤與刻度互相擠壓
+    const container = document.getElementById('echartsViewport');
+    if (container) {
+      const neededHeight = numRows === 1 ? '100%' : (numRows === 2 ? '680px' : '920px');
+      if (container.style.height !== neededHeight) {
+        container.style.height = neededHeight;
+        container.style.minHeight = neededHeight;
+        if (echartsInstance) echartsInstance.resize();
+      }
+    }
+
     // 計算 X 軸唯一分類 (保持一致排列順序)
     const xCategories = [...new Set(data.map(d => String(d[xField] != null ? d[xField] : '')).filter(Boolean))];
     if (state.sortDescending) {
@@ -1151,26 +1162,26 @@
       xCategories.sort((a, b) => xTotals[b] - xTotals[a]);
     }
 
-    // 計算全局 Y 軸最大值 (用於統一量表 Fixed Scale)
+    // 計算全局 Y 軸最大值 (用於統一量表 Fixed Scale，預留 28% 頂部空間避免標籤與圖頂干涉)
     const allNums = data.map(d => safeParseNumber(d[yField])).filter(v => typeof v === 'number' && !isNaN(v));
     const globalMaxY = allNums.length > 0 ? Math.max(...allNums) : 100;
-    const paddedMaxY = Math.ceil(globalMaxY * 1.15);
+    const paddedMaxY = Math.ceil(globalMaxY * 1.28);
 
-    // 次要指標雙軸支援
+    // 次要指標雙軸支援 (預留 25% 空間)
     const hasSec = secField && state.measures.includes(secField);
     let globalMaxSec = 100;
     if (hasSec) {
       const secNums = data.map(d => safeParseNumber(d[secField])).filter(v => typeof v === 'number' && !isNaN(v));
-      if (secNums.length > 0) globalMaxSec = Math.ceil(Math.max(...secNums) * 1.15);
+      if (secNums.length > 0) globalMaxSec = Math.ceil(Math.max(...secNums) * 1.25);
     }
 
     // 計算子面板座標留白比例
-    const totalLeft = 6;
-    const totalRight = hasSec ? 6 : 4;
-    const totalTop = 15;
-    const totalBottom = (xCategories.length > 8 || numCols >= 3) ? 14 : 10;
-    const colGap = numCols > 2 ? 3 : 5;
-    const rowGap = numRows > 1 ? 11 : 0;
+    const totalLeft = 7.5;
+    const totalRight = hasSec ? 7.5 : 4.5;
+    const totalTop = numRows === 1 ? 14 : 12;
+    const totalBottom = (xCategories.length > 6 || numCols >= 3) ? (numRows === 1 ? 15 : 17) : 11;
+    const colGap = numCols > 2 ? 3.5 : 5.5;
+    const rowGap = numRows > 1 ? 12 : 0;
 
     const availW = 100 - totalLeft - totalRight - (numCols - 1) * colGap;
     const panelW = availW / numCols;
@@ -1184,8 +1195,6 @@
     const yAxes = [];
     const series = [];
 
-    const isRotated = xCategories.length > 8 || numCols >= 3;
-
     facetCategories.forEach((cat, idx) => {
       const r = Math.floor(idx / numCols);
       const c = idx % numCols;
@@ -1195,20 +1204,22 @@
       const catRows = data.filter(d => String(d[facetField]) === cat);
       const catSum = catRows.reduce((sum, d) => sum + safeParseNumber(d[yField]), 0);
 
-      // 1. 子圖標題卡
+      // 1. 子圖標題卡 (Tableau 簡潔面板標籤風格，去除冗長欄位前綴以防橫向超寬重疊)
+      const titleTopOffset = numRows === 1 ? 6.5 : (numRows === 2 ? 5.5 : 4.6);
       titles.push({
-        text: `${facetField}: ${cat}`,
+        text: cat,
         left: `${pLeft + panelW / 2}%`,
-        top: `${pTop - (numRows > 1 ? 5.2 : 5.8)}%`,
+        top: `${pTop - titleTopOffset}%`,
         textAlign: 'center',
+        itemGap: 3,
         textStyle: {
-          fontSize: 13,
+          fontSize: numCols >= 4 ? 12 : 13.5,
           fontWeight: 700,
           color: catColor
         },
-        subtext: `樣本: ${catRows.length} 列 · 總計: ${formatCompactNumber(catSum)}`,
+        subtext: `${facetField} · 樣本: ${catRows.length} 列 · 總計: ${formatCompactNumber(catSum)}`,
         subtextStyle: {
-          fontSize: 10.5,
+          fontSize: numCols >= 4 ? 9.5 : 10.5,
           color: '#64748b'
         }
       });
@@ -1239,33 +1250,43 @@
         data: panelXCategories,
         axisLabel: {
           interval: 0,
-          rotate: isPanelRotated ? 35 : 0,
-          color: '#334155',
-          fontSize: 10,
-          margin: 8
+          rotate: isPanelRotated ? 32 : 0,
+          color: '#475569',
+          fontSize: numCols >= 4 ? 9.5 : 10.5,
+          margin: 8,
+          overflow: 'truncate',
+          ellipsis: '...'
         },
         axisTick: { alignWithLabel: true }
       });
 
-      // 4. Y 軸 (主軸)
+      // 4. Y 軸 (主軸 - 垂直居中放置名稱，徹底解決與上方標題重疊)
       const isLeftEdge = c === 0;
       const yAxisIndex = yAxes.length;
       yAxes.push({
         gridIndex: idx,
         type: 'value',
         name: isLeftEdge ? yField : '',
-        nameTextStyle: { fontSize: 11, color: '#475569' },
+        nameLocation: 'middle',
+        nameRotate: 90,
+        nameGap: 38,
+        nameTextStyle: {
+          fontSize: 10.5,
+          fontWeight: 600,
+          color: '#64748b'
+        },
         max: state.facetScaleMode === 'fixed' ? paddedMaxY : undefined,
         axisLabel: {
           formatter: (v) => formatCompactNumber(v),
-          fontSize: 10
+          fontSize: numCols >= 4 ? 9 : 10,
+          color: '#64748b'
         },
         splitLine: {
           lineStyle: { color: '#f1f5f9' }
         }
       });
 
-      // 5. 次軸 (若有)
+      // 5. 次軸 (若有 - 垂直居中放置名稱，徹底解決與右側上方標題重疊)
       let secYAxisIndex = null;
       if (hasSec) {
         secYAxisIndex = yAxes.length;
@@ -1275,11 +1296,19 @@
           type: 'value',
           position: 'right',
           name: isRightEdge ? secField : '',
-          nameTextStyle: { fontSize: 11, color: '#ea580c' },
+          nameLocation: 'middle',
+          nameRotate: -90,
+          nameGap: 38,
+          nameTextStyle: {
+            fontSize: 10.5,
+            fontWeight: 600,
+            color: '#ea580c'
+          },
           max: state.facetScaleMode === 'fixed' ? globalMaxSec : undefined,
           axisLabel: {
             formatter: (v) => formatCompactNumber(v),
-            fontSize: 10
+            fontSize: numCols >= 4 ? 9 : 10,
+            color: '#ea580c'
           },
           splitLine: { show: false }
         });
@@ -1323,7 +1352,21 @@
           borderRadius: chartType === 'bar' ? [4, 4, 0, 0] : undefined
         },
         lineStyle: chartType === 'line' ? { width: 3 } : undefined,
+        // 精緻圓角膠囊式標註，永遠保留 28% 頭部空間，杜絕刺出網格與標題重疊
         markPoint: state.showLabels ? {
+          symbol: 'roundRect',
+          symbolSize: [40, 18],
+          symbolOffset: [0, -10],
+          itemStyle: {
+            color: catColor,
+            shadowBlur: 3,
+            shadowColor: 'rgba(0,0,0,0.12)'
+          },
+          label: {
+            fontSize: 9.5,
+            fontWeight: 700,
+            color: '#ffffff'
+          },
           data: [{ type: 'max', name: '最高' }]
         } : undefined,
         markLine: state.showAverage ? {
@@ -1446,6 +1489,11 @@
     if (hasSmallMultiples) {
       renderSmallMultiplesECharts(data, xField, yField, secField, facetField, facetCategories);
       return;
+    }
+
+    if (container && container.style.height !== '100%') {
+      container.style.height = '100%';
+      container.style.minHeight = '200px';
     }
 
     // 排序處理
