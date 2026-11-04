@@ -2711,6 +2711,7 @@
 
       delete option.xAxis;
       delete option.yAxis;
+      option.legend = { show: false };
 
       option.tooltip = {
         trigger: 'item',
@@ -2735,9 +2736,18 @@
           roam: false,
           left: '4%',
           right: '4%',
-          top: 30,
-          bottom: 30,
-          breadcrumb: { show: true, top: 4, height: 22 },
+          top: 36,
+          bottom: 24,
+          breadcrumb: {
+            show: true,
+            top: 4,
+            height: 22,
+            emptyItemWidth: 25,
+            itemStyle: {
+              color: 'rgba(15, 23, 42, 0.75)',
+              textStyle: { color: '#ffffff', fontSize: 11 }
+            }
+          },
           label: {
             show: true,
             formatter: '{b}\n{c}',
@@ -2971,6 +2981,7 @@
 
       delete option.xAxis;
       delete option.yAxis;
+      option.legend = { show: false };
 
       option.series = [
         {
