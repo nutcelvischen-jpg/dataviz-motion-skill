@@ -392,7 +392,8 @@ a:focus-visible, button:focus-visible {
       <div class="hero-cta-row">
         <a href="data_atoms.html" class="btn btn--primary">開啟 Data Atoms 儀表板 ↗</a>
         <a href="#workflow" class="btn btn--clear">檢視 5 階段完整 SOP ↓</a>
-        <a href="#skills-catalog" class="btn btn--clear" style="white-space: nowrap;">實戰 21 大 Skill 全集 (4 大領域) ↓</a>
+        <a href="#skills-catalog" class="btn btn--clear" style="white-space: nowrap;">實戰 25 大 Skill 全集 (4 大領域) ↓</a>
+        <a href="#mcp-catalog" class="btn btn--clear" style="white-space: nowrap;">實戰推薦 MCP 專區 ↓</a>
       </div>
     </section>
 
@@ -644,7 +645,7 @@ a:focus-visible, button:focus-visible {
         <span class="mono-label">19 skills · 4 domains curated</span>
       </div>
       <p style="font-size: 14px; color: var(--color-muted); line-height: 1.6; max-width: 860px; margin-bottom: 24px;">
-        在 Antigravity 代理人環境中，我們不再是從零手寫樣板程式碼，而是調用專業封裝的 Skill。以下是本專案在<strong>「前端品味工藝、動態短影音、數據視覺化與代理人工程」</strong>4 大核心實戰領域所嚴選整合的 21 款開源 Skill 清單，皆附上 GitHub 原生倉庫連結供學員收藏、進階探索與自訂技能擴充：
+        在 Antigravity 代理人環境中，我們不再是從零手寫樣板程式碼，而是調用專業封裝的 Skill。以下是本專案在<strong>「前端品味工藝、動態短影音、數據視覺化與代理人工程」</strong>4 大核心實戰領域所嚴選整合的 25 款開源 Skill 清單，皆附上 GitHub 原生倉庫連結供學員收藏、進階探索與自訂技能擴充：
       </p>
 
       <!-- Category 1: 前端品味與介面工藝 (Anti-Slop UI & Design Craft) -->
@@ -715,7 +716,7 @@ a:focus-visible, button:focus-visible {
           <span style="font-size: 18px;">🎬</span>
           <h3 style="font-size: 16px; margin: 0; font-weight: 800; color: var(--color-ink);">領域二：動態視覺與知識短影音 (Code-Driven Motion & Video)</h3>
         </div>
-        <span class="mono-label" style="font-size: 11px;">6 skills</span>
+        <span class="mono-label" style="font-size: 11px;">9 skills</span>
       </div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 28px;">
         <!-- video-shotcraft -->
@@ -794,6 +795,45 @@ a:focus-visible, button:focus-visible {
             一行指令生成單頁 3D 物理仿真與機構動態短影音（Three.js + WebGL 2）。內建熱力學與流體方程動態求解（Brayton 循環、噴管膨脹、泵浦定律），支援即時金屬實體剖切、爆炸圖與逐幀確定性 1080p 錄影。
           </p>
           <div style="font-size: 11px; color: var(--color-muted);">核心產出：單頁 3D 物理互動模擬、機械剖面切削與工業科普短片</div>
+        </div>
+
+        <!-- procedural-character-craft -->
+        <div class="pharmacy-label" style="border-color: var(--color-accent);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div class="mono-label" style="color: var(--color-accent-deep); font-weight: 700;">自研核心 / 向量角色與動畫</div>
+            <a href="https://github.com/nutcelvischen-jpg/procedural-character-craft" target="_blank" style="font-size: 12px; color: var(--color-accent); font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+          </div>
+          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">procedural-character-craft</div>
+          <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 12px; line-height: 1.5;">
+            純程式碼向量卡通角色設計與動畫製作套件。100% Code、零外部圖片資產依賴，支援唇形同步 (Lip-sync)、骨骼關節連動與即時物理擺動動畫，全自研封裝。
+          </p>
+          <div style="font-size: 11px; color: var(--color-muted);">核心產出：純代碼向量動態角色、嘴型唇動同步與動畫組件</div>
+        </div>
+
+        <!-- motion-video-skill -->
+        <div class="pharmacy-label" style="border-color: var(--color-accent);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div class="mono-label" style="color: var(--color-accent-deep); font-weight: 700;">自研核心 / GSAP 短影音與 TTS</div>
+            <a href="https://github.com/nutcelvischen-jpg/motion-video-skill" target="_blank" style="font-size: 12px; color: var(--color-accent); font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+          </div>
+          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">motion-video-skill</div>
+          <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 12px; line-height: 1.5;">
+            AI 代理人專用：HTML + GSAP 動態向量短影音與語音渲染引擎。整合 Gemini TTS 多音色語音生成、逐幀確定性渲染與自動化影音合成。
+          </p>
+          <div style="font-size: 11px; color: var(--color-muted);">核心產出：GSAP 代碼短影音、Gemini 語音配音與影音混流輸出</div>
+        </div>
+
+        <!-- motion-prompt -->
+        <div class="pharmacy-label">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div class="mono-label" style="color: var(--color-accent-deep); font-weight: 700;">動效辭典 / 192 款提示詞庫</div>
+            <a href="https://github.com/showheyohtaki/motion-prompt" target="_blank" style="font-size: 12px; color: var(--color-accent); font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+          </div>
+          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">motion-prompt</div>
+          <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 12px; line-height: 1.5;">
+            Shohei Ohtaki 打造的 192 款動效與運鏡提示詞庫（附動態 GIF 與中英日多語詞典）。涵蓋 Motion Moves、Camera Moves、UI 元件與網頁動效。
+          </p>
+          <div style="font-size: 11px; color: var(--color-muted);">核心產出：多語動態提示詞、分鏡運鏡名詞與動態 GIF 樣片庫</div>
         </div>
       </div>
 
@@ -891,7 +931,7 @@ a:focus-visible, button:focus-visible {
           <span style="font-size: 18px;">🤖</span>
           <h3 style="font-size: 16px; margin: 0; font-weight: 800; color: var(--color-ink);">領域四：代理人工程、行為守則與導師 (Agentic Engineering, Disciplines & Mentorship)</h3>
         </div>
-        <span class="mono-label" style="font-size: 11px;">5 skills</span>
+        <span class="mono-label" style="font-size: 11px;">6 skills</span>
       </div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">
         <!-- superpowers -->
@@ -933,6 +973,19 @@ a:focus-visible, button:focus-visible {
           <div style="font-size: 11px; color: var(--color-muted);">核心產出：生產級工程架構約束、自動化測試與代碼簡化守則</div>
         </div>
 
+        <!-- googleworkspaceskill -->
+        <div class="pharmacy-label" style="border-color: var(--color-accent);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div class="mono-label" style="color: var(--color-accent-deep); font-weight: 700;">自研核心 / Workspace 自動化</div>
+            <a href="https://github.com/nutcelvischen-jpg/googleworkspaceskill" target="_blank" style="font-size: 12px; color: var(--color-accent); font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+          </div>
+          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">googleworkspaceskill</div>
+          <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 12px; line-height: 1.5;">
+            Google Workspace 與 Apps Script 整合自動化 Agent 技能包。支援 Google Sheets 試算表即時讀寫、Docs 報告生成、Drive 檔案管理與 GAS Webhook 伺服端中繼。
+          </p>
+          <div style="font-size: 11px; color: var(--color-muted);">核心產出：Google 雲端全套自動化管線、Sheets 資料管道與 GAS 整合腳本</div>
+        </div>
+
         <!-- data-analyst -->
         <div class="pharmacy-label" style="border-color: var(--color-accent);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
@@ -962,15 +1015,82 @@ a:focus-visible, button:focus-visible {
 
       <div class="tear-stub" style="margin-top: 24px;">
         <div class="mono-label">
-          ecosystem: 21 skills across 4 domains / agentic pair programming
+          ecosystem: 25 skills across 4 domains / agentic pair programming
         </div>
         <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
           <a href="https://github.com/nutcelvischen-jpg/dataviz-analyst-skill" target="_blank" style="font-size: 13px; color: var(--color-accent-deep); font-weight: 700; text-decoration: underline;">
             瀏覽 Data Atoms & 分析師 Skill 倉庫 ↗
           </a>
+          <a href="https://github.com/nutcelvischen-jpg/googleworkspaceskill" target="_blank" style="font-size: 13px; color: var(--color-accent-deep); font-weight: 700; text-decoration: underline;">
+            Workspace 自動化 Skill ↗
+          </a>
           <a href="https://github.com/nutcelvischen-jpg/data-analyst-skill" target="_blank" style="font-size: 13px; color: var(--color-accent-deep); font-weight: 700; text-decoration: underline;">
             示範 Skill 倉庫 ↗
           </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Curated MCP Servers & Hubs Section -->
+    <section id="mcp-catalog" class="plastic-tray" style="--t: var(--p-wed); margin-top: 40px;">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 24px;">🔌</span>
+          <h2 style="font-size: 22px; margin: 0;">實戰嚴選 Model Context Protocol (MCP) 工具庫與端點</h2>
+        </div>
+        <span class="mono-label">3 curated mcp servers</span>
+      </div>
+      <p style="font-size: 14px; color: var(--color-muted); line-height: 1.6; max-width: 860px; margin-bottom: 24px;">
+        Model Context Protocol (MCP) 是連接 AI 代理人與外部世界（跨國開放資料、3D 建模軟體、即時新聞源）的標準協議。以下精選 3 款在資料分析、3D 渲染與新聞事實查核極度好用的實戰 MCP 服務與開源端點，可直接配接至 Claude Desktop、Cursor、Codex 與 Antigravity 代理人：
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-bottom: 20px;">
+        <!-- Twinkle Hub MCP -->
+        <div class="pharmacy-label" style="border-color: var(--color-accent);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div class="mono-label" style="color: var(--color-accent-deep); font-weight: 700;">跨國政府開放資料 / 單一 MCP 端點</div>
+            <a href="https://hub.twinkleai.tw/zh-TW" target="_blank" style="font-size: 12px; color: var(--color-accent); font-weight: 700; text-decoration: underline;">官方網站 ↗</a>
+          </div>
+          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">Twinkle Hub MCP</div>
+          <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 12px; line-height: 1.5;">
+            將 7 個國家與地區（台灣、香港、日本、韓國、美國、新加坡、英國）的政府開放資料統一封裝為 MCP 服務。單一 API Key、收錄超過 769,422+ 筆資料集，代理人可隨時秒級調取全球官方數據進行分析。
+          </p>
+          <div style="font-size: 11px; color: var(--color-muted);">端點類型：全託管雲端 MCP 伺服器 (<code>https://api.twinkleai.tw/mcp/</code>)</div>
+        </div>
+
+        <!-- mcp-for-blender -->
+        <div class="pharmacy-label">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div class="mono-label" style="color: var(--color-accent-deep); font-weight: 700;">3D 軟體控制 / Blender 自動化</div>
+            <a href="https://github.com/ahujasid/mcp-for-blender" target="_blank" style="font-size: 12px; color: var(--color-accent); font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+          </div>
+          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">mcp-for-blender</div>
+          <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 12px; line-height: 1.5;">
+            讓任何 LLM 代理人直接控制 Blender 3D 的開源社群外掛。代理人可藉由自然語言直接生成幾何模型、調節材質著色器、設定攝影機燈光軌跡，並全自動調用 Cycles/EEVEE 渲染引擎輸出算圖。
+          </p>
+          <div style="font-size: 11px; color: var(--color-muted);">端點類型：本地 Blender Python MCP Socket 外掛</div>
+        </div>
+
+        <!-- CNA AskCNA MCP -->
+        <div class="pharmacy-label">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div class="mono-label" style="color: var(--color-accent-deep); font-weight: 700;">國家通訊社 / 即時事實查核與新聞源</div>
+            <a href="https://ask.cna.com.tw/ask/index" target="_blank" style="font-size: 12px; color: var(--color-accent); font-weight: 700; text-decoration: underline;">官方服務 ↗</a>
+          </div>
+          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">中央社 AskCNA MCP</div>
+          <p style="font-size: 13px; color: var(--color-muted); margin-bottom: 12px; line-height: 1.5;">
+            台灣中央通訊社官方 AI 新聞與查核服務。提供 CNA MCP Server 把最可信的國家級新聞源接進 AI 工具，支援跨語言即時時事問答、歷史報導大數據檢索與深度事實比對。
+          </p>
+          <div style="font-size: 11px; color: var(--color-muted);">端點類型：官方授權新聞數據檢索 MCP 服務</div>
+        </div>
+      </div>
+
+      <div class="tear-stub" style="margin-top: 20px;">
+        <div class="mono-label">
+          protocol: model context protocol (mcp) / enterprise agentic toolchain
+        </div>
+        <div style="font-size: 12px; color: var(--color-muted);">
+          支援 Client：Antigravity IDE · Claude Desktop · Cursor · Codex · Windsurf
         </div>
       </div>
     </section>

@@ -365,7 +365,7 @@
     <!-- 右側：官方網站直連與技能彈窗 -->
     <div style="display: flex; gap: 10px; align-items: center; font-size: 12px;">
       <button type="button" class="btn btn-sm" id="btnOpenSkillsModalTop" onclick="document.getElementById('skillsModal').classList.add('open')" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #fff; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
-        <span>💡 Skills 技能庫</span>
+        <span>💡 Skills (25) & MCP (3)</span>
       </button>
 
       <span style="color: #94a3b8;">官方直連：</span>
@@ -1257,7 +1257,7 @@
       <div class="modal-head" style="background: #0f172a; color: #ffffff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0;">
         <div class="modal-head-title" style="display: flex; align-items: center; gap: 10px;">
           <span style="background: #2563eb; color: #ffffff; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.05em;">ANTIGRAVITY SKILLS</span>
-          <span style="font-size: 17px; font-weight: 700;">Data Atoms 視覺化所封裝之核心 21 大 Skill 全集與開源架構 (4 大領域)</span>
+          <span style="font-size: 17px; font-weight: 700;">Data Atoms 視覺化所封裝之核心 25 大 Skill 全集與實戰 MCP 工具庫</span>
         </div>
         <button type="button" class="modal-close-btn" id="btnCloseSkillsModal" onclick="document.getElementById('skillsModal').classList.remove('open')" style="background: transparent; border: none; color: #ffffff; font-size: 24px; cursor: pointer; line-height: 1;">×</button>
       </div>
@@ -1317,7 +1317,7 @@
         <!-- 領域二：動態視覺與知識短影音 -->
         <div style="margin-top: 16px; margin-bottom: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
           <strong style="color: #0f172a; font-size: 15px;">🎬 領域二：動態視覺與知識短影音 (Code-Driven Motion & Video)</strong>
-          <span style="font-size: 11px; color: #64748b; font-weight: 700;">6 skills</span>
+          <span style="font-size: 11px; color: #64748b; font-weight: 700;">9 skills</span>
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 20px;">
           <!-- video-shotcraft -->
@@ -1373,6 +1373,33 @@
             </div>
             <div style="font-size: 11px; color: #ea580c; font-weight: 700; margin-bottom: 6px;">3D 物理仿真 / 機構剖切短影音</div>
             <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">一行指令生成單頁 3D 物理仿真與機構動態短影音（Three.js）。具備真實熱力與流體方程即時求解、即時金屬實體剖切與逐幀確定性 1080p 錄影。</p>
+          </div>
+          <!-- procedural-character-craft -->
+          <div style="background: #ffffff; border: 1.5px solid #2563eb; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #1d4ed8; font-size: 14px;">procedural-character-craft</span>
+              <a href="https://github.com/nutcelvischen-jpg/procedural-character-craft" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #2563eb; font-weight: 700; margin-bottom: 6px;">自研核心 / 向量角色與動畫</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">純程式碼向量卡通角色設計。100% Code 零圖片依賴，支援唇形同步、關節連動與即時物理擺動。</p>
+          </div>
+          <!-- motion-video-skill -->
+          <div style="background: #ffffff; border: 1.5px solid #2563eb; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #1d4ed8; font-size: 14px;">motion-video-skill</span>
+              <a href="https://github.com/nutcelvischen-jpg/motion-video-skill" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #2563eb; font-weight: 700; margin-bottom: 6px;">自研核心 / GSAP 短影音與 TTS</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">AI 代理人專用：HTML + GSAP 動態向量短影音與 Gemini TTS 多音色語音渲染合成引擎。</p>
+          </div>
+          <!-- motion-prompt -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">motion-prompt</span>
+              <a href="https://github.com/showheyohtaki/motion-prompt" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #ea580c; font-weight: 700; margin-bottom: 6px;">動效辭典 / 192 款提示詞庫</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">Shohei Ohtaki 的 192 款動效與運鏡提示詞庫（附動態 GIF 與中英日詞典），涵蓋運鏡與 UI 動態。</p>
           </div>
         </div>
 
@@ -1441,7 +1468,7 @@
         <!-- 領域四：代理人工程、行為守則與導師 -->
         <div style="margin-top: 16px; margin-bottom: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
           <strong style="color: #0f172a; font-size: 15px;">🤖 領域四：代理人工程、行為守則與導師 (Agentic Engineering, Disciplines & Mentorship)</strong>
-          <span style="font-size: 11px; color: #64748b; font-weight: 700;">5 skills</span>
+          <span style="font-size: 11px; color: #64748b; font-weight: 700;">6 skills</span>
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 16px;">
           <!-- superpowers -->
@@ -1471,6 +1498,15 @@
             <div style="font-size: 11px; color: #7c3aed; font-weight: 700; margin-bottom: 6px;">工程規範 / 產線級高標準</div>
             <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">Google Chrome 工程總監 Addy Osmani 出品。涵蓋 API 規格、DevTools 測試、約束開發 (CDD) 與代碼簡化。</p>
           </div>
+          <!-- googleworkspaceskill -->
+          <div style="background: #ffffff; border: 1.5px solid #2563eb; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #1d4ed8; font-size: 14px;">googleworkspaceskill</span>
+              <a href="https://github.com/nutcelvischen-jpg/googleworkspaceskill" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #2563eb; font-weight: 700; margin-bottom: 6px;">自研核心 / Workspace 自動化</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">Google Workspace 與 Apps Script 整合自動化技能。支援 Sheets 讀寫、Docs 報告、Drive 管理與 GAS Webhook。</p>
+          </div>
           <!-- data-analyst -->
           <div style="background: #ffffff; border: 1.5px solid #059669; border-radius: 8px; padding: 14px 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
@@ -1488,6 +1524,41 @@
             </div>
             <div style="font-size: 11px; color: #15803d; font-weight: 700; margin-bottom: 6px;">自主學習 / 蘇格拉底導師</div>
             <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">港大 HKUDS 架構。提供三階漸進提示（不直接給代碼，先理清思維架構）與無痛錯誤醫生，讓學員無老師也能自學。</p>
+          </div>
+        </div>
+
+        <!-- 實戰推薦 Model Context Protocol (MCP) 專區 -->
+        <div style="margin-top: 24px; margin-bottom: 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+          <strong style="color: #0f172a; font-size: 15px;">🔌 實戰嚴選 Model Context Protocol (MCP) 工具庫與端點</strong>
+          <span style="font-size: 11px; color: #64748b; font-weight: 700;">3 curated mcp servers</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 16px;">
+          <!-- Twinkle Hub MCP -->
+          <div style="background: #ffffff; border: 1.5px solid #2563eb; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #1d4ed8; font-size: 14px;">Twinkle Hub MCP</span>
+              <a href="https://hub.twinkleai.tw/zh-TW" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">官方網站 ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #2563eb; font-weight: 700; margin-bottom: 6px;">7國政府開放資料 / 單一端點</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">將台/港/日/韓/英/美/星 7 國政府開放資料統一封裝為 MCP 服務，收錄 769,422+ 筆資料集。</p>
+          </div>
+          <!-- mcp-for-blender -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">mcp-for-blender</span>
+              <a href="https://github.com/ahujasid/mcp-for-blender" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #ea580c; font-weight: 700; margin-bottom: 6px;">3D 軟體控制 / Blender 自動化</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">開源 Blender 3D 控制外掛，讓 AI 代理人透過 MCP 自動化生成幾何模型、調材質與 Cycles 算圖。</p>
+          </div>
+          <!-- CNA AskCNA MCP -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-weight: 800; color: #0f172a; font-size: 14px;">中央社 AskCNA MCP</span>
+              <a href="https://ask.cna.com.tw/ask/index" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">官方服務 ↗</a>
+            </div>
+            <div style="font-size: 11px; color: #059669; font-weight: 700; margin-bottom: 6px;">可信國家新聞 / 即時事實查核</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">台灣中央通訊社官方 AI 新聞服務，提供 CNA MCP Server 把最可信的國家級新聞源接進 AI 工具。</p>
           </div>
         </div>
 
