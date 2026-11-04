@@ -2102,7 +2102,23 @@ const _jpAgeStructureDataset = {
   ]
 };
 
+const _jpGenderFacetDataset = {
+  id: "jp_gender_facet",
+  name: "👥 日本 12 大城市「性別 × 城市」小多圖分面 (男性/女性 兩面板並列)",
+  source: "日本總務省統計局 住民基本台帳人口推計 + 賃金構造基本統計 (2024 e-Stat 官方)",
+  description: "雙維度小多圖（Small Multiples）：橫向切分為男性面板與女性面板，在同一 1080p 畫布並排呈現 12 大城市人口與所得結構對比，比例尺同步聯動。",
+  defaultX: "城市",
+  defaultY: "總人口(萬人)",
+  defaultColor: "性別",
+  defaultFacet: "性別",
+  defaultSize: "勞動人口(萬人)",
+  defaultSecondary: "高齡化率(%)",
+  defaultChart: "bar",
+  data: _jpGenderCitiesDataset.data
+};
+
 window.ESTAT_JP_DATASETS = {
+  jp_gender_facet: _jpGenderFacetDataset,
   jp_gender_cities: _jpGenderCitiesDataset,
   jp_age_structure: _jpAgeStructureDataset,
   jp_housing: _jpHousingDataset,

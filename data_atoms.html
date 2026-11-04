@@ -409,7 +409,8 @@
         <select id="datasetQuickSelect" class="app-select-sm sample-select" style="font-weight: 600;">
           <optgroup label="日本官方統計 e-Stat 數據庫 (性別 / 年齡 / 房價 / 人口)">
             <option value="open_17_domains">自選 17 大領域指標變數與歷年區間...</option>
-            <option value="jp_gender_cities">👥 日本 12 大城市「性別・人口・所得」對比表 (兩組類別對比)</option>
+            <option value="jp_gender_facet">👥 日本 12 大城市「性別 × 城市」小多圖分面 (兩面板並列對比)</option>
+            <option value="jp_gender_cities">👥 日本 12 大城市「性別・人口・所得」對比表 (單圖顏色分組對比)</option>
             <option value="jp_age_structure">👶 日本 12 大城市「幼年・勞動・高齡」三代結構表 (三組結構對比)</option>
             <option value="jp_housing">日本 47 都道府縣「房價地價・租金・空屋率・所得」綜合表 (2024)</option>
             <option value="jp_prefectures" selected>日本 47 都道府縣人口與高齡化全量表 (2024 e-Stat 官方)</option>
@@ -765,28 +766,42 @@
             </button>
           </div>
 
-          <!-- Row 2: Color, Size, Secondary, and Filters (Tableau-like 篩選器架) -->
+          <!-- Row 2: Color, Size, Secondary, Facet, and Filters (Tableau-like 視覺編碼槽) -->
           <div class="shelves-row" style="font-size: 11px;">
             <!-- Color Shelf -->
-            <div class="shelf-group" style="flex: 0.9;">
+            <div class="shelf-group" style="flex: 0.85;">
               <span class="shelf-label">Color (顏色):</span>
               <div class="shelf-drop-target" id="shelfColor"></div>
             </div>
 
             <!-- Size Shelf -->
-            <div class="shelf-group" style="flex: 0.9;">
+            <div class="shelf-group" style="flex: 0.85;">
               <span class="shelf-label">Size (氣泡大小):</span>
               <div class="shelf-drop-target" id="shelfSize"></div>
             </div>
 
             <!-- Secondary Y Shelf -->
-            <div class="shelf-group" style="flex: 1;">
+            <div class="shelf-group" style="flex: 0.95;">
               <span class="shelf-label">Secondary (次軸折線):</span>
               <div class="shelf-drop-target" id="shelfSecondary"></div>
             </div>
 
+            <!-- Facet Shelf (小多圖分面槽) -->
+            <div class="shelf-group" style="flex: 1.15; border-color: rgba(124, 58, 237, 0.35); background: #faf5ff;">
+              <span class="shelf-label" style="color: #7c3aed;">
+                <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                Facet (分面小多圖):
+              </span>
+              <div class="shelf-drop-target" id="shelfFacet"></div>
+            </div>
+
             <!-- Filters Shelf (Tableau 篩選槽) -->
-            <div class="shelf-group" style="flex: 1.4; border-color: rgba(37,99,235,0.3); background: #f8fbff;">
+            <div class="shelf-group" style="flex: 1.25; border-color: rgba(37,99,235,0.3); background: #f8fbff;">
               <span class="shelf-label" style="color: #2563eb;">
                 <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
