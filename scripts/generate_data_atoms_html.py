@@ -10,6 +10,12 @@ Assemble upgraded data_atoms.html with:
 - Retained Bauhaus video briefing modal and scripts
 """
 import re
+import sys
+
+# 已過時：此腳本產生的是舊版 (7 種圖表) data_atoms.html，且寫入固定的本機路徑。
+# 直接執行會覆蓋目前線上的版本，因此預設停用。確定要使用請加 --force。
+if "--force" not in sys.argv:
+    sys.exit("generate_data_atoms_html.py is outdated and would overwrite the current data_atoms.html. Re-run with --force if you really mean it.")
 
 html_template = """<!DOCTYPE html>
 <html lang="zh-TW">
