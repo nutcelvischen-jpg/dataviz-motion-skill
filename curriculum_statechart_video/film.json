@@ -1,0 +1,511 @@
+{
+ "title": "從大模型認知到打造 Tableau-like 儀表板",
+ "series": "11/05 Antigravity 實戰工作坊",
+ "language": "zh",
+ "aspect": "3:4",
+ "voice": "crayon-sister",
+ "duration": "3分钟",
+ "music": "focused",
+ "sfx": true,
+ "watermark": "Antigravity 數據視覺化工作坊",
+ "chapters": [
+  {
+   "title": "大語言模型學習地圖",
+   "sub": "從單純提問，到自主 Agent 循環",
+   "tagline": "token · context · rag · tool calling · agent",
+   "states": {
+    "prompt": {
+     "label": "提出需求",
+     "tag": "user prompt",
+     "pin": "pink"
+    },
+    "token": {
+     "label": "Token 推理",
+     "tag": "next token",
+     "pin": "straw"
+    },
+    "rag": {
+     "label": "RAG 向量知識庫",
+     "tag": "vector search",
+     "pin": "orange"
+    },
+    "tool": {
+     "label": "Tool Calling",
+     "tag": "function call",
+     "pin": "blue"
+    },
+    "agent": {
+     "label": "Agent 自主循環",
+     "tag": "agentic loop",
+     "pin": "green"
+    },
+    "limit": {
+     "label": "單純對話極限",
+     "tag": "chat boundary",
+     "pin": "red"
+    }
+   },
+   "start": "prompt",
+   "edges": [
+    {
+     "from": "prompt",
+     "to": "token",
+     "label": "機率預測"
+    },
+    {
+     "from": "token",
+     "to": "rag",
+     "label": "檢索私有知識",
+     "if": "需要事實"
+    },
+    {
+     "from": "rag",
+     "to": "tool",
+     "label": "決定調用工具",
+     "if": "要調 API"
+    },
+    {
+     "from": "tool",
+     "to": "agent",
+     "label": "執行感知循環"
+    },
+    {
+     "from": "agent",
+     "to": "limit",
+     "label": "缺乏真實環境",
+     "if": "只靠對話框"
+    }
+   ],
+   "exit": {
+    "from": "limit",
+    "label": "進入工程實作 ↓"
+   },
+   "steps": [
+    {
+     "go": "start",
+     "note": "歡迎來到全日實戰，我們先看大模型地圖"
+    },
+    {
+     "go": "prompt>token",
+     "note": "當你提出需求，底層模型按機率預測下一個字"
+    },
+    {
+     "go": "token>rag",
+     "note": "面對專業領域，RAG 向量庫能即時檢索事實"
+    },
+    {
+     "go": "rag>tool",
+     "note": "遇到複雜任務，模型觸發 Tool 函數呼叫"
+    },
+    {
+     "go": "tool>agent",
+     "note": "進入 Agent 自主循環，它能邊做邊修正動作"
+    },
+    {
+     "go": "agent>limit",
+     "note": "但單純在對話框聊天，無法交付真實軟體"
+    },
+    {
+     "go": "limit>exit",
+     "note": "接下來，進入 Antigravity 實戰環境"
+    }
+   ]
+  },
+  {
+   "title": "日本官方真實數據源",
+   "sub": "串接 e-Stat API 獲取半世紀實績",
+   "tagline": "portal · appId · 17 fields · 47 prefectures",
+   "states": {
+    "portal": {
+     "label": "統計局官網",
+     "tag": "e-stat portal",
+     "pin": "pink"
+    },
+    "appid": {
+     "label": "取得金鑰",
+     "tag": "appId ready",
+     "pin": "straw"
+    },
+    "list_api": {
+     "label": "檢索17大領域",
+     "tag": "getStatsList",
+     "pin": "blue"
+    },
+    "data_api": {
+     "label": "拉取面板數據",
+     "tag": "getStatsData",
+     "pin": "orange"
+    },
+    "cache": {
+     "label": "本地數據快取",
+     "tag": "local dataset",
+     "pin": "green"
+    }
+   },
+   "start": "portal",
+   "edges": [
+    {
+     "from": "portal",
+     "to": "appid",
+     "label": "註冊避坑",
+     "if": "填 localhost"
+    },
+    {
+     "from": "appid",
+     "to": "list_api",
+     "label": "查詢目錄"
+    },
+    {
+     "from": "list_api",
+     "to": "data_api",
+     "label": "指定人口指標"
+    },
+    {
+     "from": "data_api",
+     "to": "cache",
+     "label": "下載 47 縣數據"
+    },
+    {
+     "from": "cache",
+     "to": "data_api",
+     "label": "批次分頁抓取",
+     "if": "超過十萬筆"
+    }
+   ],
+   "exit": {
+    "from": "cache",
+    "label": "數據怎麼清洗？ ↓"
+   },
+   "steps": [
+    {
+     "go": "entry",
+     "note": "告別假數據，第二階段直接串接日本統計局"
+    },
+    {
+     "go": "portal>appid",
+     "note": "開發者網址填 localhost，順利拿到金鑰"
+    },
+    {
+     "go": "appid>list_api",
+     "note": "呼叫 getStatsList，檢索十七大領域"
+    },
+    {
+     "go": "list_api>data_api",
+     "note": "鎖定核心指標，透過 API 獲取面板數據"
+    },
+    {
+     "go": "data_api>cache",
+     "note": "下載並快取四十七個都道府縣半世紀數據"
+    },
+    {
+     "go": "cache>data_api",
+     "note": "超過十萬筆大型資料，腳本自動分頁抓取"
+    },
+    {
+     "go": "cache>exit",
+     "note": "拿到真實數據後，分析師如何清洗與驗算？"
+    }
+   ]
+  },
+  {
+   "title": "分析師 5 階段生產線",
+   "sub": "從原始髒資料，到決策洞察報告",
+   "tagline": "clean · eda · cross check · tufte viz · report",
+   "states": {
+    "raw": {
+     "label": "原始髒資料",
+     "tag": "raw messy data",
+     "pin": "straw"
+    },
+    "cleaned": {
+     "label": "自動化清洗",
+     "tag": "clean_data.py",
+     "pin": "blue"
+    },
+    "eda": {
+     "label": "探索分析 EDA",
+     "tag": "eda insights",
+     "pin": "orange"
+    },
+    "verified": {
+     "label": "零誤差驗算",
+     "tag": "cross-checked",
+     "pin": "green"
+    },
+    "tufte": {
+     "label": "工業級圖表",
+     "tag": "tufte dataviz",
+     "pin": "pink"
+    },
+    "report": {
+     "label": "決策洞察報告",
+     "tag": "executive report",
+     "pin": "violet"
+    }
+   },
+   "start": "raw",
+   "edges": [
+    {
+     "from": "raw",
+     "to": "cleaned",
+     "label": "剔除千分位",
+     "if": "帶逗號空白"
+    },
+    {
+     "from": "cleaned",
+     "to": "eda",
+     "label": "計算分佈特徵"
+    },
+    {
+     "from": "eda",
+     "to": "verified",
+     "label": "核對行加總",
+     "if": "杜絕 NaN"
+    },
+    {
+     "from": "verified",
+     "to": "tufte",
+     "label": "套用高對比色彩"
+    },
+    {
+     "from": "tufte",
+     "to": "report",
+     "label": "提煉商業洞察"
+    }
+   ],
+   "exit": {
+    "from": "report",
+    "label": "做成互動產品 ↓"
+   },
+   "steps": [
+    {
+     "go": "entry",
+     "note": "第三階段，啟動專業分析師的五階段流程"
+    },
+    {
+     "go": "raw>cleaned",
+     "note": "原始資料充斥逗號與缺失值，先跑清洗腳本"
+    },
+    {
+     "go": "cleaned>eda",
+     "note": "進入探索性分析，摸清各區域分佈與特徵"
+    },
+    {
+     "go": "eda>verified",
+     "note": "關鍵一步是交叉驗算，核對各區加總杜絕錯誤"
+    },
+    {
+     "go": "verified>tufte",
+     "note": "圖表套用 Tufte 工業美學與對比度規範"
+    },
+    {
+     "go": "tufte>report",
+     "note": "提煉結構性洞察，產出具備戰略價值的報告"
+    },
+    {
+     "go": "report>exit",
+     "note": "接下來，我們要將分析模型封裝為互動產品"
+    }
+   ]
+  },
+  {
+   "title": "Data Atoms 互動儀表板",
+   "sub": "零安裝純前端，媲美 Tableau 的工作台",
+   "tagline": "prep classifier · 10 data atoms · encoding shelves · multi filters",
+   "states": {
+    "prep": {
+     "label": "Tableau Prep 分類",
+     "tag": "dim vs measure",
+     "pin": "straw"
+    },
+    "shelves": {
+     "label": "四維編碼槽",
+     "tag": "x y color size",
+     "pin": "orange"
+    },
+    "atoms": {
+     "label": "10 大數據原子",
+     "tag": "10 data atoms",
+     "pin": "green"
+    },
+    "filter": {
+     "label": "區域年份聯動",
+     "tag": "bi-level filter",
+     "pin": "blue"
+    },
+    "export": {
+     "label": "影音圖表匯出",
+     "tag": "1080p export",
+     "pin": "pink"
+    }
+   },
+   "start": "prep",
+   "edges": [
+    {
+     "from": "prep",
+     "to": "shelves",
+     "label": "維度度量分類"
+    },
+    {
+     "from": "shelves",
+     "to": "atoms",
+     "label": "拖曳即時渲染"
+    },
+    {
+     "from": "atoms",
+     "to": "filter",
+     "label": "點選縣市地圖"
+    },
+    {
+     "from": "filter",
+     "to": "atoms",
+     "label": "即時全域切換"
+    },
+    {
+     "from": "atoms",
+     "to": "export",
+     "label": "一鍵生成影音",
+     "if": "匯出高畫質"
+    }
+   ],
+   "exit": {
+    "from": "export",
+    "label": "自學遇到問題呢 ↓"
+   },
+   "steps": [
+    {
+     "go": "entry",
+     "note": "第四階段核心：打造 Data Atoms 儀表板"
+    },
+    {
+     "go": "prep>shelves",
+     "note": "借鏡 Prep 概念，判定離散維度與度量"
+    },
+    {
+     "go": "shelves>atoms",
+     "note": "自由拖曳欄位至 X軸、Y軸、顏色大小編碼槽"
+    },
+    {
+     "go": "atoms>filter",
+     "note": "內建柱狀、折線、雙軸、地圖、盒鬚圖等原子"
+    },
+    {
+     "go": "filter>atoms",
+     "note": "支援區域年份雙層篩選，點選縣市即時聯動"
+    },
+    {
+     "go": "atoms>export",
+     "note": "還能一鍵匯出高畫質圖表與動態短影音"
+    },
+    {
+     "go": "export>exit",
+     "note": "課後如果身邊沒有老師，學員如何繼續精進？"
+    }
+   ]
+  },
+  {
+   "title": "自學導師與避坑守則",
+   "sub": "檢查器攔截壞路，DeepTutor 隨身陪跑",
+   "tagline": "never hallucinate · error doctor · socratic tutoring",
+   "states": {
+    "dirty": {
+     "label": "異常缺失數據",
+     "tag": "dirty anomalies",
+     "pin": "straw"
+    },
+    "blind": {
+     "label": "跳過驗算製圖",
+     "tag": "skip cross-check",
+     "pin": "orange"
+    },
+    "nan_bug": {
+     "label": "破圖與崩潰",
+     "tag": "rendering broken",
+     "pin": "red"
+    },
+    "hallucinate": {
+     "label": "虛假決策外洩",
+     "tag": "hallucination leak",
+     "pin": "red"
+    },
+    "deeptutor": {
+     "label": "DeepTutor 導師",
+     "tag": "socratic mentor",
+     "pin": "green"
+    },
+    "mastery": {
+     "label": "獨立自主通關",
+     "tag": "autonomous mastery",
+     "pin": "pink"
+    }
+   },
+   "start": "dirty",
+   "rule": {
+    "never": "hallucinate",
+    "stamp": "嚴禁髒數據上線"
+   },
+   "edges": [
+    {
+     "from": "dirty",
+     "to": "blind",
+     "label": "趕時間不清洗"
+    },
+    {
+     "from": "blind",
+     "to": "nan_bug",
+     "label": "計算產生 NaN"
+    },
+    {
+     "from": "nan_bug",
+     "to": "hallucinate",
+     "label": "流入高層決策",
+     "if": "無防護網"
+    },
+    {
+     "from": "nan_bug",
+     "to": "deeptutor",
+     "label": "啟動三階提示",
+     "if": "觸發防護"
+    },
+    {
+     "from": "deeptutor",
+     "to": "mastery",
+     "label": "掌握心智模型"
+    }
+   ],
+   "steps": [
+    {
+     "go": "entry",
+     "note": "最後一章，我們來看看最危險的一條壞路"
+    },
+    {
+     "go": "dirty>blind",
+     "note": "拿到異常數據，為了趕時間跳過資料清洗驗算"
+    },
+    {
+     "go": "blind>nan_bug",
+     "note": "儀表板就會產生 NaN 破圖與坐標計算崩潰"
+    },
+    {
+     "go": "nan_bug>hallucinate",
+     "note": "甚至導致錯誤的虛假結論直接流入高層決策"
+    },
+    {
+     "trace": true,
+     "note": "檢查器順著紅線抓出違規路徑，蓋上紅印警告！"
+    },
+    {
+     "go": "nan_bug>deeptutor",
+     "note": "為此導入港大架構的 DeepTutor 導師"
+    },
+    {
+     "go": "deeptutor>mastery",
+     "note": "用蘇格拉底提問引導，先理清思考架構"
+    },
+    {
+     "note": "掌握這套全流程，隨時都能獨立做出頂尖成果！"
+    }
+   ]
+  }
+ ]
+}
