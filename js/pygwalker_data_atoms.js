@@ -165,7 +165,7 @@
     setupEventListeners();
     setupDragAndDrop();
     init17DomainModal();
-    loadDataset('jp_prefectures');
+    loadDataset('jp_gender_facet');
 
     // 檢查 URL 參數是否指定了圖表 (如 ?chart=line, ?chart=geo)
     try {
@@ -1288,7 +1288,26 @@
       // 6. 主系列 Series
       const rowMap = new Map();
       catRows.forEach(d => rowMap.set(String(d[xField]), safeParseNumber(d[yField])));
-      const seriesVals = panelXCategories.map(x => rowMap.has(x) ? rowMap.get(x) : '-');
+
+      const colorField = state.shelf.color;
+      const colorMap = new Map();
+      if (colorField && colorField !== facetField) {
+        catRows.forEach(d => colorMap.set(String(d[xField]), String(d[colorField])));
+      }
+
+      const seriesVals = panelXCategories.map(x => {
+        if (!rowMap.has(x)) return '-';
+        const val = rowMap.get(x);
+        if (colorField && colorField !== facetField && colorMap.has(x)) {
+          const cVal = colorMap.get(x);
+          const barColor = REGION_COLORS[cVal] || PALETTE[xCategories.indexOf(x) % PALETTE.length];
+          return {
+            value: val,
+            itemStyle: { color: barColor }
+          };
+        }
+        return val;
+      });
 
       const chartType = state.chartType === 'line' ? 'line' : 'bar';
       series.push({
