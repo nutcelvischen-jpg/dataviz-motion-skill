@@ -242,10 +242,52 @@
     return [pseudoLng, pseudoLat];
   }
 
+  /**
+   * 根據資料列與指定經緯度/行政區欄位，構建地理圖表所需之 Series 資料
+   * 支援經緯度直接讀取或地名坐標轉譯，相容 ECharts 與 Canvas 地理原子
+   */
+  function buildGeoSeriesData(activeRows, geoDimField, meaField, sizeField, colorField) {
+    if (!activeRows || !Array.isArray(activeRows) || activeRows.length === 0 || !geoDimField) {
+      return [];
+    }
+
+    const geoNames = activeRows.map(r => r[geoDimField]);
+    const scope = detectGeoScope(geoNames);
+
+    // 檢查是否有經緯度欄位
+    const firstRow = activeRows[0] || {};
+    const keys = Object.keys(firstRow);
+    const latCol = keys.find(c => /lat|緯度/i.test(c));
+    const lngCol = keys.find(c => /lng|lon|經度/i.test(c));
+
+    const result = [];
+    activeRows.forEach(r => {
+      let coords = null;
+      if (latCol && lngCol && r[lngCol] !== undefined && r[latCol] !== undefined && !isNaN(Number(r[lngCol])) && !isNaN(Number(r[latCol]))) {
+        coords = [Number(r[lngCol]), Number(r[latCol])];
+      } else {
+        coords = getCoordinatesForName(r[geoDimField], scope);
+      }
+
+      if (coords && coords[0] != null && coords[1] != null) {
+        const val = meaField && r[meaField] !== undefined ? (Number(r[meaField]) || 0) : 0;
+        const sVal = sizeField && r[sizeField] !== undefined ? (Number(r[sizeField]) || 0) : val;
+        result.push({
+          name: String(r[geoDimField] != null ? r[geoDimField] : ''),
+          value: [coords[0], coords[1], val, sVal],
+          raw: r
+        });
+      }
+    });
+
+    return result;
+  }
+
   // 匯出至全域
   window.UniversalGeoEngine = {
     detectGeoScope,
     getCoordinatesForName,
+    buildGeoSeriesData,
     JAPAN_PREFECTURES_GEO,
     TAIWAN_COUNTIES_GEO,
     WORLD_COUNTRIES_GEO,
