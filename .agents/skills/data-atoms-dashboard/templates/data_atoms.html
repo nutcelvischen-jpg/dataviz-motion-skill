@@ -14,8 +14,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=20261104_facet_v6">
-  <link rel="stylesheet" href="css/pygwalker.css?v=20261104_facet_v6">
+  <link rel="stylesheet" href="css/style.css?v=20261104_workbook_v9">
+  <link rel="stylesheet" href="css/pygwalker.css?v=20261104_workbook_v9">
   <style>
     /* New Briefing Action Button */
     .btn-briefing {
@@ -482,7 +482,7 @@
           </button>
 
           <!-- 釘選至看板按鈕 (Pin Chart) -->
-          <button type="button" class="btn btn-sm btn-outline" id="btnPinChart" title="將當前圖表配置與狀態釘選至自訂看板">
+          <button type="button" class="btn btn-sm btn-outline" id="btnPinChart" onclick="window.PyGWalker.pinCurrentChart()" title="將當前圖表配置與狀態釘選至自訂看板">
             <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 17v5M9 2h6l2 7H7l2-7zM7 9l-2 5h14l-2-5"></path>
             </svg>
@@ -490,7 +490,7 @@
           </button>
 
           <!-- 開啟自訂看板按鈕 (Custom Dashboard) -->
-          <button type="button" class="btn btn-sm" id="btnOpenDashboardModal" style="background:#4f46e5; color:#ffffff; border:1px solid #4338ca; font-weight:700;" title="開啟已釘選的多宮格自訂看板">
+          <button type="button" class="btn btn-sm" id="btnOpenDashboardModal" onclick="window.PyGWalker.openCustomDashboard()" style="background:#4f46e5; color:#ffffff; border:1px solid #4338ca; font-weight:700;" title="開啟已釘選的多宮格自訂看板">
             <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="8" height="8" rx="1"></rect>
               <rect x="13" y="3" width="8" height="8" rx="1"></rect>
@@ -904,16 +904,20 @@
             <div class="workbook-tabs-list" id="workbookTabsList">
               <!-- Dynamically populated sheet tabs -->
             </div>
-            <button type="button" class="btn-add-sheet" id="btnAddSheet" title="新增空白探索工作表分頁 (+ New Sheet)">
+            <button type="button" class="btn-add-sheet" id="btnAddSheet" onclick="window.PyGWalker.addNewSheet()" title="新增探索工作表分頁 (+ New Sheet)">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              <span>新增工作表</span>
+              <span>+ 新增分頁</span>
+            </button>
+            <button type="button" class="btn-duplicate-sheet" id="btnDuplicateSheet" onclick="window.PyGWalker.duplicateCurrentSheet()" title="複製當前工作表為新分頁 (Duplicate Sheet)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>📋 複製當前</span>
             </button>
           </div>
           <div class="workbook-tabs-right">
-            <button type="button" class="btn-sheet-quick-pin" id="btnPinCurrentSheet" title="將當前工作表釘選至自訂看板">
+            <button type="button" class="btn-sheet-quick-pin" id="btnPinCurrentSheet" onclick="window.PyGWalker.pinCurrentChart()" title="將當前工作表釘選至自訂看板">
               <span>📌 釘選當前</span>
             </button>
-            <button type="button" class="btn-sheet-dashboard" id="btnOpenDashboardFromTabs" title="開啟自訂多宮格看板">
+            <button type="button" class="btn-sheet-dashboard" id="btnOpenDashboardFromTabs" onclick="window.PyGWalker.openCustomDashboard()" title="開啟自訂多宮格看板">
               <span>🧩 組合看板</span>
             </button>
           </div>
@@ -1337,16 +1341,16 @@
         </div>
 
         <div class="dashboard-header-actions">
-          <button type="button" class="btn btn-sm" id="btnImportAllSheets" style="background:#0284c7; color:#fff; border:none; padding:5px 12px; font-weight:600; font-size:12px; border-radius:6px; cursor:pointer;" title="將工作簿中所有分頁圖表一次載入自訂看板">
+          <button type="button" class="btn btn-sm" id="btnImportAllSheets" onclick="window.PyGWalker.importAllSheetsToDashboard()" style="background:#0284c7; color:#fff; border:none; padding:5px 12px; font-weight:600; font-size:12px; border-radius:6px; cursor:pointer;" title="將工作簿中所有分頁圖表一次載入自訂看板">
             📥 載入工作簿所有分頁
           </button>
-          <button type="button" class="btn btn-sm" id="btnPinFromDashboard" style="background:#2563eb; color:#fff; border:none; padding:5px 12px; font-weight:600; font-size:12px; border-radius:6px; cursor:pointer;" title="釘選當前探索圖表">
+          <button type="button" class="btn btn-sm" id="btnPinFromDashboard" onclick="window.PyGWalker.pinCurrentChart()" style="background:#2563eb; color:#fff; border:none; padding:5px 12px; font-weight:600; font-size:12px; border-radius:6px; cursor:pointer;" title="釘選當前探索圖表">
             ＋ 釘選當前圖表
           </button>
-          <button type="button" class="btn btn-sm btn-outline" id="btnClearDashboard" style="color:#ef4444; border-color:#fca5a5; padding:5px 10px; font-size:11px;" title="清空所有釘選圖表">
+          <button type="button" class="btn btn-sm btn-outline" id="btnClearDashboard" onclick="window.PyGWalker.clearDashboard()" style="color:#ef4444; border-color:#fca5a5; padding:5px 10px; font-size:11px;" title="清空所有釘選圖表">
             🗑️ 清空看板
           </button>
-          <button type="button" class="modal-close-btn" id="btnCloseDashboardModal" title="關閉看板" style="margin-left: 8px;">✕</button>
+          <button type="button" class="modal-close-btn" id="btnCloseDashboardModal" onclick="window.PyGWalker.closeCustomDashboard()" title="關閉看板" style="margin-left: 8px;">✕</button>
         </div>
       </div>
 
@@ -1361,10 +1365,10 @@
   <!-- Local Script Dependencies (100% Offline) -->
   <script src="js/xlsx.full.min.js"></script>
   <script src="js/echarts.min.js"></script>
-  <script src="js/data_atoms_jp_dataset.js?v=20261104_facet_v6"></script>
-  <script src="js/estat_17_domains_metadata.js?v=20261104_facet_v6"></script>
-  <script src="js/universal_geo_engine.js?v=20261104_facet_v6"></script>
-  <script src="js/pygwalker_data_atoms.js?v=20261104_facet_v6"></script>
+  <script src="js/data_atoms_jp_dataset.js?v=20261104_workbook_v9"></script>
+  <script src="js/estat_17_domains_metadata.js?v=20261104_workbook_v9"></script>
+  <script src="js/universal_geo_engine.js?v=20261104_workbook_v9"></script>
+  <script src="js/pygwalker_data_atoms.js?v=20261104_workbook_v9"></script>
   <script>
     // Briefing Modal Controller (包豪斯動態影音簡報導演層互動控制器)
     (function() {
