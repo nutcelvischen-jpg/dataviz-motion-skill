@@ -14,8 +14,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=20261104_zoom_sidebar_v11">
-  <link rel="stylesheet" href="css/pygwalker.css?v=20261104_zoom_sidebar_v11">
+  <link rel="stylesheet" href="css/style.css?v=20261105_v3">
+  <link rel="stylesheet" href="css/pygwalker.css?v=20261105_v3">
   <style>
     /* New Briefing Action Button */
     .btn-briefing {
@@ -494,7 +494,7 @@
                 </span>
                 <div class="item-content">
                   <span class="item-title">視覺編碼操作手冊 ↗</span>
-                  <span class="item-subtitle">X、Y、色、面、濾原理與 10 大原子規格</span>
+                  <span class="item-subtitle">X、Y、色、面、濾原理與 11 大原子規格</span>
                 </div>
               </a>
               <button type="button" class="dropdown-menu-item" id="btnOpenBriefingModal" role="menuitem">
@@ -637,7 +637,7 @@
           <div class="dock-card">
             <div class="dock-card-header">
               <span class="dock-title">圖表類型</span>
-              <span class="count-badge">10 大原子</span>
+              <span class="count-badge">11 大原子</span>
             </div>
 
             <div class="chart-type-dock-grid" id="chartTypeGrid">
@@ -1081,7 +1081,7 @@
 
       <div class="modal-body-grid">
         <div class="modal-video-wrap">
-          <video class="modal-video-player" id="briefingVideoPlayer" controls playsinline poster="preview_frames/bauhaus_scene_01.png">
+          <video class="modal-video-player" id="briefingVideoPlayer" controls playsinline preload="none" poster="preview_frames/bauhaus_scene_01.png">
             <source src="videos/data_briefing_bauhaus_34s.mp4" type="video/mp4" id="briefingVideoSrc">
           </video>
         </div>
@@ -1421,12 +1421,12 @@
   </div>
 
   <!-- Local Script Dependencies (100% Offline) -->
-  <script src="js/xlsx.full.min.js"></script>
+  <!-- SheetJS 改為上傳 Excel 時才動態載入 (見 ensureXLSX)，首頁少下載約 860KB -->
   <script src="js/echarts.min.js"></script>
-  <script src="js/data_atoms_jp_dataset.js?v=20261104_zoom_sidebar_v11"></script>
-  <script src="js/estat_17_domains_metadata.js?v=20261104_zoom_sidebar_v11"></script>
-  <script src="js/universal_geo_engine.js?v=20261104_zoom_sidebar_v11"></script>
-  <script src="js/pygwalker_data_atoms.js?v=20261104_zoom_sidebar_v11"></script>
+  <script src="js/data_atoms_jp_dataset.js?v=20261105_v3"></script>
+  <script src="js/estat_17_domains_metadata.js?v=20261105_v3"></script>
+  <script src="js/universal_geo_engine.js?v=20261105_v3"></script>
+  <script src="js/pygwalker_data_atoms.js?v=20261105_v3"></script>
   <script>
     // Briefing Modal Controller (包豪斯動態影音簡報導演層互動控制器)
     (function() {
@@ -1754,7 +1754,7 @@
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;">
           <p style="margin: 0; color: #334155; font-size: 13.5px; line-height: 1.6;">
             <strong>🎯 獨立檔案定位說明：</strong>本檔案（<code>data_atoms.html</code>）是數據視覺化與實戰分析的<strong>單一獨立檔案</strong>，與大語言模型學習地圖嚴格分開。<br>
-            在 Antigravity 代理人架構中，本專案整合了以下 <strong>4 大實戰領域、共 19 款開源 Skill</strong>，所有 Skill 皆附上 GitHub 原生倉庫連結供學員參考、收藏與自訂技能擴充：
+            在 Antigravity 代理人架構中，本專案整合了以下 <strong>4 大實戰領域、共 26 款開源 Skill</strong>，所有 Skill 皆附上 GitHub 原生倉庫連結供學員參考、收藏與自訂技能擴充：
           </p>
         </div>
 
@@ -1958,8 +1958,8 @@
               <span style="font-weight: 800; color: #1d4ed8; font-size: 14px;">data-atoms-dashboard</span>
               <a href="https://github.com/nutcelvischen-jpg/dataviz-analyst-skill" target="_blank" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: underline;">GitHub ↗</a>
             </div>
-            <div style="font-size: 11px; color: #2563eb; font-weight: 700; margin-bottom: 6px;">自研核心 / 10大原子引擎</div>
-            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">自研封裝的 Data Atoms 互動儀表板核心技能包。整合 10 大數據原子、Tableau Prep 智慧分類判定、跨國地理引擎與拖曳編碼槽。</p>
+            <div style="font-size: 11px; color: #2563eb; font-weight: 700; margin-bottom: 6px;">自研核心 / 11大原子引擎</div>
+            <p style="margin: 0; font-size: 12.5px; color: #475569; line-height: 1.45;">自研封裝的 Data Atoms 互動儀表板核心技能包。整合 11 大數據原子（含小提琴密度圖）、Tableau Prep 智慧分類判定、跨國地理引擎與拖曳編碼槽。</p>
           </div>
         </div>
 
