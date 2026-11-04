@@ -12,6 +12,14 @@
   ];
   const groups = ['理解模型的回答','用工具核對結果','管理指令與權限'];
   const lessonLabels = {'01':'認識模型','02':'理解上下文','03':'看見限制','04':'學會查證','05':'掌握使用條件','06':'完成工作'};
+  const sanitizeApiKey = function (k) {
+    if (!k) return '';
+    k = String(k).replace(/[\u200B-\u200D\uFEFF\u2028\u2029]/g, '').trim();
+    const match = k.match(/sk-or-v1-[a-zA-Z0-9_-]+/);
+    if (match) return match[0];
+    if (k.toLowerCase().startsWith('bearer ')) k = k.slice(7).trim();
+    return k.split(/\s+/)[0];
+  };
   const readStore = function (key) { try { return localStorage.getItem(key) || ''; } catch (_) { return ''; } };
   const writeStore = function (key,value) { try { localStorage.setItem(key,value); return true; } catch (_) { return false; } };
   const params = new URLSearchParams(location.search);
@@ -20,7 +28,9 @@
   let current = definitions.find(x => x.id === params.get('experiment')) || definitions[0];
   let provider = sourceLesson ? 'simulation' : (readStore('llm_lab_provider') || 'simulation');
   if (!['simulation','openrouter','gemini'].includes(provider)) provider = 'simulation';
-  let model = readStore('llm_lab_openrouter_model') || 'google/gemma-3-12b-it';
+  const validModels = ['openai/gpt-3.5-turbo-16k', 'anthropic/claude-haiku-4.5', 'google/gemini-2.5-flash'];
+  let model = readStore('llm_lab_openrouter_model') || validModels[0];
+  if (!validModels.includes(model)) model = validModels[0];
   const states = Object.fromEntries(definitions.map(x => [x.id,{prediction:'',ran:false,choice:'',text:'大語言模型如何回答問題？',prompt:'',response:'',advanced:false,archive:false,include:false}]));
   if(params.get('mode')==='free')states[current.id].advanced=true;
   let pending = null;
@@ -78,7 +88,7 @@
     const newsLink = news && /^https:\/\//i.test(news.url || '') ? '<a href="'+esc(news.url)+'" target="_blank" rel="noopener noreferrer">查看原教材引用的來源 ↗</a>' : '';
     const legacyNews = news ? '<h3>原教材引用與摘要</h3><p>'+esc(news.tag || '')+'：'+esc(news.title || '')+'</p><p>'+esc(news.summary || '')+'</p>'+newsLink : '';
     const legacyTakeaway = old && old.takeaway ? '<h3>原教材結語</h3><div class="legacy-material">'+old.takeaway+'</div>' : '';
-    return '<details class="deep-dive" id="advanced" '+(s.advanced?'open':'')+'><summary>進階：自由測試與原有預設</summary><p>以下預設沿用舊教材，內容與事實待核對；選取只會填入文字，不會自動送出。</p><div class="button-row">'+buttons+'</div>'+systemBox+'<label class="field-label" for="free-prompt">自訂提示詞</label><textarea id="free-prompt">'+esc(s.prompt)+'</textarea><label class="field-label" for="provider">模型模式</label><p class="quiet" id="api-setup-note">選擇 OpenRouter 或 Google Gemini API 後，即可輸入 API Key。</p><select id="provider" aria-describedby="api-setup-note"><option value="simulation">教學模擬</option><option value="openrouter">OpenRouter</option><option value="gemini">Google Gemini API</option></select><div id="api-settings" hidden><p class="quiet" id="gemini-model-note" hidden>Google Gemini 模型：gemini-3.6-flash</p><label class="field-label" for="api-model">OpenRouter 模型</label><select id="api-model"><option value="google/gemma-3-12b-it">google/gemma-3-12b-it</option><option value="deepseek/deepseek-chat">deepseek/deepseek-chat</option><option value="meta-llama/llama-3.3-70b-instruct">meta-llama/llama-3.3-70b-instruct</option><option value="openai/gpt-4o">openai/gpt-4o</option><option value="openai/gpt-4o-mini">openai/gpt-4o-mini</option><option value="anthropic/claude-3.5-sonnet">anthropic/claude-3.5-sonnet</option></select><label class="field-label" for="api-key">API Key</label><input id="api-key" type="password" autocomplete="off"><button type="button" class="action-button" data-action="save-key">儲存設定</button><p class="quiet" id="key-status"></p></div><div class="button-row"><button type="button" class="button-secondary" data-action="send">執行自由測試 →</button></div><div class="message-box" id="free-response" role="status" aria-live="polite">'+esc(s.response || '選擇或輸入文字後，按下執行查看結果。')+'</div><p class="quiet">真實 API 可能有費用；只有按下執行才會送出。模擬結果會清楚標示。</p><details class="deep-dive" id="old-analysis" '+(s.archive?'open':'')+'><summary>舊教材：原有實驗解析與來源</summary><p class="notice">既有教材資料，待核對。舊內容中的模型、數字與案例並非本次驗證的事實。</p><div class="legacy-analysis">'+(old && old.analysis || '')+legacyTakeaway+legacyNews+'</div></details></details>';
+    return '<details class="deep-dive" id="advanced" '+(s.advanced?'open':'')+'><summary>進階：自由測試與原有預設</summary><p>以下預設沿用舊教材，內容與事實待核對；選取只會填入文字，不會自動送出。</p><div class="button-row">'+buttons+'</div>'+systemBox+'<label class="field-label" for="free-prompt">自訂提示詞</label><textarea id="free-prompt">'+esc(s.prompt)+'</textarea><label class="field-label" for="provider">模型模式</label><p class="quiet" id="api-setup-note">選擇 OpenRouter 或 Google Gemini API 後，即可輸入 API Key。</p><select id="provider" aria-describedby="api-setup-note"><option value="simulation">教學模擬</option><option value="openrouter">OpenRouter</option><option value="gemini">Google Gemini API</option></select><div id="api-settings" hidden><p class="quiet" id="gemini-model-note" hidden>Google Gemini 模型：gemini-3.6-flash</p><label class="field-label" for="api-model">OpenRouter 模型</label><select id="api-model"><option value="openai/gpt-3.5-turbo-16k">openai/gpt-3.5-turbo-16k (GPT-3.5 Turbo · 純文字對話)</option><option value="anthropic/claude-haiku-4.5">anthropic/claude-haiku-4.5 (Claude Haiku 4.5 · 視覺理解)</option><option value="google/gemini-2.5-flash">google/gemini-2.5-flash (Gemini 2.5 Flash · 全模態旗艦)</option></select><label class="field-label" for="api-key">API Key</label><input id="api-key" type="password" autocomplete="off"><button type="button" class="action-button" data-action="save-key">儲存設定</button><p class="quiet" id="key-status"></p></div><div class="button-row"><button type="button" class="button-secondary" data-action="send">執行自由測試 →</button></div><div class="message-box" id="free-response" role="status" aria-live="polite">'+esc(s.response || '選擇或輸入文字後，按下執行查看結果。')+'</div><p class="quiet">真實 API 可能有費用；只有按下執行才會送出。模擬結果會清楚標示。</p><details class="deep-dive" id="old-analysis" '+(s.archive?'open':'')+'><summary>舊教材：原有實驗解析與來源</summary><p class="notice">既有教材資料，待核對。舊內容中的模型、數字與案例並非本次驗證的事實。</p><div class="legacy-analysis">'+(old && old.analysis || '')+legacyTakeaway+legacyNews+'</div></details></details>';
   }
   function renderIndex() {
     document.title='做實驗｜大語言模型學習地圖';
@@ -101,7 +111,7 @@
     document.getElementById('return-to-lesson').innerHTML=sourceLesson ? '<p><a href="learn.html?lesson='+sourceLesson+'">← 返回第 '+sourceLesson+' 站：'+esc(lessonLabels[sourceLesson])+'</a></p>' : '';
     root.innerHTML='<header class="page-intro"><h1>'+esc(d.title)+'</h1><p>'+esc(d.goal)+'</p><p class="api-entry-note">教學示範免金鑰 · <button type="button" class="api-entry" data-action="open-api-settings" aria-controls="advanced">API Key／自由測試 →</button></p></header><section class="reading-section" id="experiment-demo"><h2>動手比較</h2><details class="prediction-optional"><summary>先猜看看（選填）</summary><fieldset><legend>'+esc(d.prediction)+'</legend><div class="stage-choice">'+['是','否','不確定'].map(function (v) { return '<label><input type="radio" name="prediction" value="'+v+'" '+(s.prediction===v?'checked':'')+'> '+v+'</label>'; }).join('')+'</div></fieldset><p class="quiet">預測不計分，也可以直接操作下方示範。</p></details><div class="lab-controls">'+controls(d.id,s)+'</div><div id="observation"><h3>'+esc(resultHeading(d.id))+'</h3><div id="result" role="status" aria-live="polite">'+(resultContent(d.id,s) || (d.id==='tokens'?'切分會隨上方輸入更新。':'操作後，這裡會顯示比較結果。'))+'</div></div></section><nav class="lab-next" aria-label="實驗下一步">'+(sourceLesson?'<a class="button-primary" href="learn.html?lesson='+sourceLesson+'">返回第 '+sourceLesson+' 站，繼續學習 →</a>':'<a class="button-primary" href="'+esc(d.link)+'">'+esc(d.linkText)+' →</a>')+'<a href="lab.html">查看全部實驗</a><button class="api-entry" data-action="reset">重設本次實驗</button></nav>'+advancedMarkup(d,s);
     const field=root.querySelector('#provider'); field.value=provider;
-    const sel=root.querySelector('#api-model'); if (![...sel.options].some(o=>o.value===model)) { let opt=document.createElement('option');opt.value=model;opt.textContent=model;sel.append(opt); } sel.value=model;
+    const sel=root.querySelector('#api-model'); if (!validModels.includes(model)) model=validModels[0]; sel.value=model;
     syncProvider(); if(d.id==='tokens') updateTokens();
     root.querySelector('#advanced').addEventListener('toggle',e=>{s.advanced=e.target.open;});
     root.querySelector('#old-analysis').addEventListener('toggle',e=>{s.archive=e.target.open;});
@@ -143,7 +153,7 @@
     if(action.dataset.action==='open-api-settings'){const advanced=root.querySelector('#advanced');advanced.open=true;states[current.id].advanced=true;const field=root.querySelector('#provider');field.focus({preventScroll:true});field.scrollIntoView({behavior:'instant',block:'center'});return;}
     if(action.dataset.action==='run'){states[current.id].ran=true;updateResult();}
     if(action.dataset.action==='reset'){if(pending)pending.abort();pending=null;requestVersion++;const id=current.id;states[id]={prediction:'',ran:false,choice:'',text:'大語言模型如何回答問題？',prompt:'',response:'',advanced:false,archive:false,include:false};render();}
-    if(action.dataset.action==='save-key'){const key=root.querySelector('#api-key').value.trim();const saved=writeStore(provider==='openrouter'?'llm_lab_openrouter_key':'llm_lab_gemini_key',key);root.querySelector('#key-status').textContent=saved?'設定已保存在此瀏覽器。':'目前無法儲存設定，可先使用教學模擬。';}
+    if(action.dataset.action==='save-key'){const key=sanitizeApiKey(root.querySelector('#api-key').value);root.querySelector('#api-key').value=key;const saved=writeStore(provider==='openrouter'?'llm_lab_openrouter_key':'llm_lab_gemini_key',key);root.querySelector('#key-status').textContent=saved?'設定已保存在此瀏覽器。':'目前無法儲存設定，可先使用教學模擬。';}
     if(action.dataset.action==='send') send();
   });
   root.addEventListener('input',function(e) {
@@ -167,7 +177,7 @@
       s.response='教學模擬，非即時模型回覆。\n'+(match ? match.simulated : '此自由輸入沒有預先編寫的示範回覆。請選擇舊教材預設，或回到上方的核心比較。');
       output.textContent=s.response;return;
     }
-    const key=root.querySelector('#api-key').value.trim();
+    const key=sanitizeApiKey(root.querySelector('#api-key').value);
     if(!key){output.textContent='尚未設定 API Key。請輸入金鑰，或選擇「教學模擬」。';return;}
     if(pending)pending.abort(); const controller=new AbortController();pending=controller;const seq=++requestVersion;output.textContent='正在請求模型回覆……';
     try {
@@ -179,7 +189,14 @@
       const body=isOpen?{model:model,messages:messages}:{contents:[{role:'user',parts:[{text:prompt}]}]};
       if(!isOpen && system)body.systemInstruction={parts:[{text:system}]};
       const response=await fetch(url,{method:'POST',headers:headers,body:JSON.stringify(body),signal:controller.signal});
-      if(!response.ok)throw new Error('HTTP '+response.status);
+      if(!response.ok) {
+        let detail = '';
+        try {
+          const errData = await response.json();
+          detail = (errData && errData.error && errData.error.message) ? ': ' + errData.error.message : '';
+        } catch (_) {}
+        throw new Error('HTTP ' + response.status + detail);
+      }
       const data=await response.json();
       const parts=data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts;
       const answer=isOpen ? data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content : (Array.isArray(parts) ? parts.filter(part=>!part.thought && typeof part.text==='string').map(part=>part.text).join('') : '');
