@@ -30,8 +30,10 @@
       color: '地方分區',
       size: '65歲以上高齡人口(人)',
       secondary: '高齡化率(%)',
+      facet: '',  // 小多圖分面維度 (Small Multiples Facet Dimension)
       agg: 'RAW'      // 'RAW' | 'SUM' | 'MEAN' | 'MAX' | 'MIN'
     },
+    facetScaleMode: 'fixed', // 'fixed': 統一 Y 軸比例尺, 'free': 各子圖自適應
     
     // 篩選器字典 (Tableau-like Filters Shelf)
     // 支援類別篩選 (Categorical) 與 數值/年份區間 (Range)
@@ -234,6 +236,7 @@
     state.shelf.color = target.defaultColor || '';
     state.shelf.size = target.defaultSize || '';
     state.shelf.secondary = target.defaultSecondary || '';
+    state.shelf.facet = target.defaultFacet || '';
     if (target.defaultChart) {
       state.chartType = target.defaultChart;
     }
@@ -469,6 +472,7 @@
         <button type="button" class="field-quick-btn" title="指派至 X 軸 (Columns)" onclick="window.PyGWalker.assignToShelf('x', '${escapeHtml(fieldName)}')">+X</button>
         <button type="button" class="field-quick-btn" title="指派至 Y 軸 (Rows)" onclick="window.PyGWalker.assignToShelf('y', '${escapeHtml(fieldName)}')">+Y</button>
         <button type="button" class="field-quick-btn" title="指派至 顏色/大小" onclick="window.PyGWalker.assignToShelf('${fieldType === 'dimension' ? 'color' : 'size'}', '${escapeHtml(fieldName)}')">${fieldType === 'dimension' ? '+色' : '+大'}</button>
+        ${fieldType === 'dimension' ? `<button type="button" class="field-quick-btn" title="指派至 分面小多圖 (Facet)" onclick="window.PyGWalker.assignToShelf('facet', '${escapeHtml(fieldName)}')">+面</button>` : ''}
         <button type="button" class="field-quick-btn filter-btn" title="加入至篩選器 (Filters)" onclick="window.PyGWalker.addFilter('${escapeHtml(fieldName)}')">+濾</button>
       </div>
     `;
@@ -494,6 +498,7 @@
     renderSingleShelf('shelfColor', 'color', state.shelf.color, 'Color (顏色分組維度)');
     renderSingleShelf('shelfSize', 'size', state.shelf.size, 'Size (氣泡半徑大小指標)');
     renderSingleShelf('shelfSecondary', 'secondary', state.shelf.secondary, 'Secondary (次要指標 / 雙軸)');
+    renderSingleShelf('shelfFacet', 'facet', state.shelf.facet, 'Facet (分面小多圖維度)');
     renderFiltersShelf();
     renderFilterControls();
   }
@@ -880,6 +885,15 @@
             </div>
           `;
         }
+      } else if (shelfKey === 'facet') {
+        const hasFacet = state.dimensions.includes(currentField);
+        if (hasFacet) {
+          extraCompareBtn = `
+            <button type="button" class="btn-facet-scale ${state.facetScaleMode === 'free' ? 'scale-free' : ''}" onclick="window.PyGWalker.toggleFacetScale()" title="切換 Y 軸比例尺：統一量表 (Fixed) 或 獨立自適應 (Free)">
+              ${state.facetScaleMode === 'fixed' ? '🔒 統一量表' : '🔓 獨立量表'}
+            </button>
+          `;
+        }
       }
 
       container.innerHTML = `
@@ -902,6 +916,7 @@
       { id: 'shelfColor', key: 'color' },
       { id: 'shelfSize', key: 'size' },
       { id: 'shelfSecondary', key: 'secondary' },
+      { id: 'shelfFacet', key: 'facet' },
       { id: 'shelfFilters', key: 'filters' }
     ];
 
@@ -1064,6 +1079,244 @@
     }
   }
 
+  // --- 雙維度分面小多圖渲染引擎 (Small Multiples / Multi-Grid Facet Engine) ---
+  function renderSmallMultiplesECharts(data, xField, yField, secField, facetField, facetCategories) {
+    const K = facetCategories.length;
+    let numCols = 2;
+    let numRows = 1;
+    if (K === 2) {
+      numCols = 2; numRows = 1;
+    } else if (K === 3) {
+      numCols = 3; numRows = 1;
+    } else if (K === 4) {
+      numCols = 2; numRows = 2;
+    } else if (K <= 6) {
+      numCols = 3; numRows = 2;
+    } else if (K <= 8) {
+      numCols = 4; numRows = 2;
+    } else {
+      numCols = Math.min(4, Math.ceil(Math.sqrt(K)));
+      numRows = Math.ceil(K / numCols);
+    }
+
+    // 計算 X 軸唯一分類 (保持一致排列順序)
+    const xCategories = [...new Set(data.map(d => String(d[xField] != null ? d[xField] : '')).filter(Boolean))];
+    if (state.sortDescending) {
+      const xTotals = {};
+      xCategories.forEach(x => { xTotals[x] = 0; });
+      data.forEach(d => {
+        const x = String(d[xField] != null ? d[xField] : '');
+        if (xTotals[x] !== undefined) {
+          xTotals[x] += safeParseNumber(d[yField]);
+        }
+      });
+      xCategories.sort((a, b) => xTotals[b] - xTotals[a]);
+    }
+
+    // 計算全局 Y 軸最大值 (用於統一量表 Fixed Scale)
+    const allNums = data.map(d => safeParseNumber(d[yField])).filter(v => typeof v === 'number' && !isNaN(v));
+    const globalMaxY = allNums.length > 0 ? Math.max(...allNums) : 100;
+    const paddedMaxY = Math.ceil(globalMaxY * 1.15);
+
+    // 次要指標雙軸支援
+    const hasSec = secField && state.measures.includes(secField);
+    let globalMaxSec = 100;
+    if (hasSec) {
+      const secNums = data.map(d => safeParseNumber(d[secField])).filter(v => typeof v === 'number' && !isNaN(v));
+      if (secNums.length > 0) globalMaxSec = Math.ceil(Math.max(...secNums) * 1.15);
+    }
+
+    // 計算子面板座標留白比例
+    const totalLeft = 6;
+    const totalRight = hasSec ? 6 : 4;
+    const totalTop = 15;
+    const totalBottom = (xCategories.length > 8 || numCols >= 3) ? 14 : 10;
+    const colGap = numCols > 2 ? 3 : 5;
+    const rowGap = numRows > 1 ? 11 : 0;
+
+    const availW = 100 - totalLeft - totalRight - (numCols - 1) * colGap;
+    const panelW = availW / numCols;
+
+    const availH = 100 - totalTop - totalBottom - (numRows - 1) * rowGap;
+    const panelH = availH / numRows;
+
+    const titles = [];
+    const grids = [];
+    const xAxes = [];
+    const yAxes = [];
+    const series = [];
+
+    const isRotated = xCategories.length > 8 || numCols >= 3;
+
+    facetCategories.forEach((cat, idx) => {
+      const r = Math.floor(idx / numCols);
+      const c = idx % numCols;
+      const pLeft = totalLeft + c * (panelW + colGap);
+      const pTop = totalTop + r * (panelH + rowGap);
+      const catColor = REGION_COLORS[cat] || PALETTE[idx % PALETTE.length];
+      const catRows = data.filter(d => String(d[facetField]) === cat);
+      const catSum = catRows.reduce((sum, d) => sum + safeParseNumber(d[yField]), 0);
+
+      // 1. 子圖標題卡
+      titles.push({
+        text: `${facetField}: ${cat}`,
+        left: `${pLeft + panelW / 2}%`,
+        top: `${pTop - (numRows > 1 ? 5.2 : 5.8)}%`,
+        textAlign: 'center',
+        textStyle: {
+          fontSize: 13,
+          fontWeight: 700,
+          color: catColor
+        },
+        subtext: `樣本: ${catRows.length} 列 · 總計: ${formatCompactNumber(catSum)}`,
+        subtextStyle: {
+          fontSize: 10.5,
+          color: '#64748b'
+        }
+      });
+
+      // 2. 網格容器
+      grids.push({
+        left: `${pLeft}%`,
+        top: `${pTop}%`,
+        width: `${panelW}%`,
+        height: `${panelH}%`,
+        containLabel: true
+      });
+
+      // 3. X 軸
+      xAxes.push({
+        gridIndex: idx,
+        type: 'category',
+        data: xCategories,
+        axisLabel: {
+          interval: 0,
+          rotate: isRotated ? 35 : 0,
+          color: '#334155',
+          fontSize: 10,
+          margin: 8
+        },
+        axisTick: { alignWithLabel: true }
+      });
+
+      // 4. Y 軸 (主軸)
+      const isLeftEdge = c === 0;
+      const yAxisIndex = yAxes.length;
+      yAxes.push({
+        gridIndex: idx,
+        type: 'value',
+        name: isLeftEdge ? yField : '',
+        nameTextStyle: { fontSize: 11, color: '#475569' },
+        max: state.facetScaleMode === 'fixed' ? paddedMaxY : undefined,
+        axisLabel: {
+          formatter: (v) => formatCompactNumber(v),
+          fontSize: 10
+        },
+        splitLine: {
+          lineStyle: { color: '#f1f5f9' }
+        }
+      });
+
+      // 5. 次軸 (若有)
+      let secYAxisIndex = null;
+      if (hasSec) {
+        secYAxisIndex = yAxes.length;
+        const isRightEdge = (c === numCols - 1) || (idx === K - 1);
+        yAxes.push({
+          gridIndex: idx,
+          type: 'value',
+          position: 'right',
+          name: isRightEdge ? secField : '',
+          nameTextStyle: { fontSize: 11, color: '#ea580c' },
+          max: state.facetScaleMode === 'fixed' ? globalMaxSec : undefined,
+          axisLabel: {
+            formatter: (v) => formatCompactNumber(v),
+            fontSize: 10
+          },
+          splitLine: { show: false }
+        });
+      }
+
+      // 6. 主系列 Series
+      const rowMap = new Map();
+      catRows.forEach(d => rowMap.set(String(d[xField]), safeParseNumber(d[yField])));
+      const seriesVals = xCategories.map(x => rowMap.has(x) ? rowMap.get(x) : 0);
+
+      const chartType = state.chartType === 'line' ? 'line' : 'bar';
+      series.push({
+        name: cat,
+        type: chartType,
+        xAxisIndex: idx,
+        yAxisIndex: yAxisIndex,
+        data: seriesVals,
+        smooth: chartType === 'line',
+        symbolSize: 6,
+        itemStyle: {
+          color: catColor,
+          borderRadius: chartType === 'bar' ? [4, 4, 0, 0] : undefined
+        },
+        lineStyle: chartType === 'line' ? { width: 3 } : undefined,
+        markPoint: state.showLabels ? {
+          data: [{ type: 'max', name: '最高' }]
+        } : undefined,
+        markLine: state.showAverage ? {
+          data: [{ type: 'average', name: '平均線' }]
+        } : undefined
+      });
+
+      // 7. 次指標 Series (若有)
+      if (hasSec && secYAxisIndex !== null) {
+        const secMap = new Map();
+        catRows.forEach(d => secMap.set(String(d[xField]), safeParseNumber(d[secField])));
+        const secVals = xCategories.map(x => secMap.has(x) ? secMap.get(x) : 0);
+
+        series.push({
+          name: `${cat} · ${secField}`,
+          type: 'line',
+          xAxisIndex: idx,
+          yAxisIndex: secYAxisIndex,
+          data: secVals,
+          smooth: true,
+          symbolSize: 5,
+          itemStyle: { color: '#ea580c' },
+          lineStyle: { width: 2, type: 'dashed' }
+        });
+      }
+    });
+
+    const smallMultiplesOption = {
+      backgroundColor: 'transparent',
+      title: titles,
+      grid: grids,
+      xAxis: xAxes,
+      yAxis: yAxes,
+      series: series,
+      axisPointer: {
+        link: [{ xAxisIndex: 'all' }]
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'cross' },
+        formatter: (params) => {
+          if (!Array.isArray(params) || params.length === 0) return '';
+          let tip = `<div style="font-size:12px; line-height:1.6;"><strong style="font-size:13px; color:#0f172a;">${escapeHtml(params[0].axisValueLabel || params[0].name)}</strong><br/>`;
+          params.forEach(p => {
+            const val = (p.data && typeof p.data === 'object' && p.data.value !== undefined) ? p.data.value : p.value;
+            if (val !== '-' && val !== null && val !== undefined) {
+              const colorDot = `<span style="display:inline-block;margin-right:5px;border-radius:50%;width:8px;height:8px;background-color:${p.color};"></span>`;
+              tip += `${colorDot} ${escapeHtml(p.seriesName)}: <b>${formatCompactNumber(val)}</b><br/>`;
+            }
+          });
+          tip += `</div>`;
+          return tip;
+        }
+      }
+    };
+
+    echartsInstance.clear();
+    echartsInstance.setOption(smallMultiplesOption);
+  }
+
   // --- 渲染 Apache ECharts 圖表 (超流暢現代探索) ---
   function renderECharts() {
     const container = document.getElementById('echartsViewport');
@@ -1087,6 +1340,7 @@
     const colorField = state.shelf.color;
     const sizeField = state.shelf.size;
     const secField = state.shelf.secondary;
+    const facetField = state.shelf.facet;
     let data = [...getActiveRows()];
 
     if (data.length === 0) {
@@ -1112,6 +1366,18 @@
           textStyle: { color: '#94a3b8', fontSize: 16 }
         }
       });
+      return;
+    }
+
+    // 判斷是否啟用 Small Multiples (雙維度分面小多圖)
+    const isFacetActive = facetField && state.dimensions.includes(facetField);
+    const facetCategories = isFacetActive
+      ? [...new Set(data.map(d => String(d[facetField] != null ? d[facetField] : '')).filter(Boolean))]
+      : [];
+    const hasSmallMultiples = facetCategories.length > 1;
+
+    if (hasSmallMultiples) {
+      renderSmallMultiplesECharts(data, xField, yField, secField, facetField, facetCategories);
       return;
     }
 
@@ -2841,6 +3107,7 @@
         state.shelf.color = '';
         state.shelf.size = '';
         state.shelf.secondary = '';
+        state.shelf.facet = '';
         renderShelves();
         renderVisualization();
         renderKPIRibbon();
@@ -3991,6 +4258,17 @@
       renderShelves();
       renderVisualization();
       showToast(state.barStackMode ? '🥞 已切換為「堆疊累計柱狀圖」' : '📊 已切換為「併排對比柱狀圖」');
+    },
+    toggleFacetScale: () => {
+      state.facetScaleMode = state.facetScaleMode === 'fixed' ? 'free' : 'fixed';
+      renderShelves();
+      renderVisualization();
+      showToast(state.facetScaleMode === 'fixed' ? '🔒 已切換為「統一量表 (Fixed Scale)」' : '🔓 已切換為「獨立自適應量表 (Free Scale)」');
+    },
+    setFacetScaleMode: (mode) => {
+      state.facetScaleMode = mode;
+      renderShelves();
+      renderVisualization();
     },
     sortTable: (col) => {
       if (state.sortColumn === col) {
