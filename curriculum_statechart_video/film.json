@@ -1,350 +1,230 @@
 {
- "title": "從大模型認知到打造 Tableau-like 儀表板",
- "series": "11/05 Antigravity 實戰工作坊",
+ "title": "Antigravity 實作工作坊：從大模型到動態數據影音",
+ "series": "Antigravity 實戰工作坊",
  "language": "zh",
  "aspect": "3:4",
  "voice": "crayon-sister",
- "duration": "3分钟",
+ "duration": "2分钟",
  "music": "focused",
  "sfx": true,
- "watermark": "Antigravity 數據視覺化工作坊",
+ "watermark": "Antigravity 實作工作坊",
  "chapters": [
   {
-   "title": "大語言模型學習地圖",
-   "sub": "從單純提問，到自主 Agent 循環",
-   "tagline": "token · context · rag · tool calling · agent",
+   "title": "大語言模型與 Agent AI",
+   "sub": "從單純聊天對話，到自主行動循環",
+   "tagline": "llm boundary · perception · decision · agentic loop",
    "states": {
     "prompt": {
      "label": "提出需求",
      "tag": "user prompt",
      "pin": "pink"
     },
-    "token": {
-     "label": "Token 推理",
-     "tag": "next token",
+    "chat": {
+     "label": "聊天機器人",
+     "tag": "chat box",
      "pin": "straw"
     },
-    "rag": {
-     "label": "RAG 向量知識庫",
-     "tag": "vector search",
-     "pin": "orange"
-    },
-    "tool": {
-     "label": "Tool Calling",
-     "tag": "function call",
-     "pin": "blue"
+    "limit": {
+     "label": "真實世界瓶頸",
+     "tag": "boundary",
+     "pin": "red"
     },
     "agent": {
-     "label": "Agent 自主循環",
-     "tag": "agentic loop",
-     "pin": "green"
+     "label": "Agent 自主感知",
+     "tag": "agentic ai",
+     "pin": "blue"
     },
-    "limit": {
-     "label": "單純對話極限",
-     "tag": "chat boundary",
-     "pin": "red"
+    "loop": {
+     "label": "數位結對搭檔",
+     "tag": "pair programming",
+     "pin": "green"
     }
    },
    "start": "prompt",
    "edges": [
     {
      "from": "prompt",
-     "to": "token",
-     "label": "機率預測"
+     "to": "chat",
+     "label": "輸入問題"
     },
     {
-     "from": "token",
-     "to": "rag",
-     "label": "檢索私有知識",
-     "if": "需要事實"
+     "from": "chat",
+     "to": "limit",
+     "label": "無法交付軟體",
+     "if": "只會說話"
     },
     {
-     "from": "rag",
-     "to": "tool",
-     "label": "決定調用工具",
-     "if": "要調 API"
-    },
-    {
-     "from": "tool",
+     "from": "limit",
      "to": "agent",
-     "label": "執行感知循環"
+     "label": "賦予雙手雙腳"
     },
     {
      "from": "agent",
-     "to": "limit",
-     "label": "缺乏真實環境",
-     "if": "只靠對話框"
+     "to": "loop",
+     "label": "感知決策行動",
+     "if": "調用工具"
     }
    ],
    "exit": {
-    "from": "limit",
-    "label": "進入工程實作 ↓"
+    "from": "loop",
+    "label": "核心武器是什麼？ ↓"
    },
    "steps": [
     {
      "go": "start",
-     "note": "歡迎來到全日實戰，我們先看大模型地圖"
+     "note": "歡迎來到 Antigravity 實作工作坊！"
     },
     {
-     "go": "prompt>token",
-     "note": "當你提出需求，底層模型按機率預測下一個字"
+     "go": "prompt>chat",
+     "note": "傳統大語言模型，就像困在網頁裡的聊天機器人"
     },
     {
-     "go": "token>rag",
-     "note": "面對專業領域，RAG 向量庫能即時檢索事實"
+     "go": "chat>limit",
+     "note": "它能出口成章，卻無法幫你完成真實世界交付"
     },
     {
-     "go": "rag>tool",
-     "note": "遇到複雜任務，模型觸發 Tool 函數呼叫"
+     "go": "limit>agent",
+     "note": "於是需要 Agent：它擁有感知決策與行動能力"
     },
     {
-     "go": "tool>agent",
-     "note": "進入 Agent 自主循環，它能邊做邊修正動作"
+     "go": "agent>loop",
+     "note": "邊做邊看邊修正，成為最強大的數位結對搭檔！"
     },
     {
-     "go": "agent>limit",
-     "note": "但單純在對話框聊天，無法交付真實軟體"
-    },
-    {
-     "go": "limit>exit",
-     "note": "接下來，進入 Antigravity 實戰環境"
+     "go": "loop>exit",
+     "note": "要讓 Agent 大顯身手，我們需要什麼武器？"
     }
    ]
   },
   {
-   "title": "日本官方真實數據源",
-   "sub": "串接 e-Stat API 獲取半世紀實績",
-   "tagline": "portal · appId · 17 fields · 47 prefectures",
+   "title": "認識 Antigravity 與 Harness",
+   "sub": "AI 專屬飛行座艙與模組化技能體系",
+   "tagline": "cockpit · terminal · skills · pairing",
    "states": {
-    "portal": {
-     "label": "統計局官網",
-     "tag": "e-stat portal",
+    "tool": {
+     "label": "Antigravity",
+     "tag": "agentic ide",
      "pin": "pink"
     },
-    "appid": {
-     "label": "取得金鑰",
-     "tag": "appId ready",
+    "harness": {
+     "label": "Harness 飛行座艙",
+     "tag": "execution harness",
      "pin": "straw"
     },
-    "list_api": {
-     "label": "檢索17大領域",
-     "tag": "getStatsList",
+    "terminal": {
+     "label": "安全執行終端",
+     "tag": "sandbox terminal",
      "pin": "blue"
     },
-    "data_api": {
-     "label": "拉取面板數據",
-     "tag": "getStatsData",
+    "skills": {
+     "label": "模組化 Skill 體系",
+     "tag": "agent skills",
      "pin": "orange"
     },
-    "cache": {
-     "label": "本地數據快取",
-     "tag": "local dataset",
+    "pairing": {
+     "label": "極致人機結對",
+     "tag": "extreme pairing",
      "pin": "green"
     }
    },
-   "start": "portal",
+   "start": "tool",
    "edges": [
     {
-     "from": "portal",
-     "to": "appid",
-     "label": "註冊避坑",
-     "if": "填 localhost"
+     "from": "tool",
+     "to": "harness",
+     "label": "核心架構"
     },
     {
-     "from": "appid",
-     "to": "list_api",
-     "label": "查詢目錄"
+     "from": "harness",
+     "to": "terminal",
+     "label": "跑程式測網頁"
     },
     {
-     "from": "list_api",
-     "to": "data_api",
-     "label": "指定人口指標"
+     "from": "terminal",
+     "to": "skills",
+     "label": "隨插隨用規範",
+     "if": "專業技能包"
     },
     {
-     "from": "data_api",
-     "to": "cache",
-     "label": "下載 47 縣數據"
-    },
-    {
-     "from": "cache",
-     "to": "data_api",
-     "label": "批次分頁抓取",
-     "if": "超過十萬筆"
+     "from": "skills",
+     "to": "pairing",
+     "label": "你出策略它實作"
     }
    ],
    "exit": {
-    "from": "cache",
-    "label": "數據怎麼清洗？ ↓"
+    "from": "pairing",
+    "label": "走一次真實實戰 ↓"
    },
    "steps": [
     {
      "go": "entry",
-     "note": "告別假數據，第二階段直接串接日本統計局"
+     "note": "要讓 Agent 大顯身手，主角登場"
     },
     {
-     "go": "portal>appid",
-     "note": "開發者網址填 localhost，順利拿到金鑰"
+     "go": "tool>harness",
+     "note": "核心是 Harness，好比 AI 飛行座艙"
     },
     {
-     "go": "appid>list_api",
-     "note": "呼叫 getStatsList，檢索十七大領域"
+     "go": "harness>terminal",
+     "note": "內建安全終端，直接調 API 寫程式"
     },
     {
-     "go": "list_api>data_api",
-     "note": "鎖定核心指標，透過 API 獲取面板數據"
+     "go": "terminal>skills",
+     "note": "搭配模組化 Skill 體系，隨插隨用工程規範"
     },
     {
-     "go": "data_api>cache",
-     "note": "下載並快取四十七個都道府縣半世紀數據"
+     "go": "skills>pairing",
+     "note": "你出策略它實作，人機結對釋放前所未有生產力！"
     },
     {
-     "go": "cache>data_api",
-     "note": "超過十萬筆大型資料，腳本自動分頁抓取"
-    },
-    {
-     "go": "cache>exit",
-     "note": "拿到真實數據後，分析師如何清洗與驗算？"
+     "go": "pairing>exit",
+     "note": "接下來，我們親手走過一次完整的工程實戰！"
     }
    ]
   },
   {
-   "title": "分析師 5 階段生產線",
-   "sub": "從原始髒資料，到決策洞察報告",
-   "tagline": "clean · eda · cross check · tufte viz · report",
+   "title": "打造 Tableau-like 儀表板",
+   "sub": "從抓資料、寫程式清洗到互動探索工作台",
+   "tagline": "api fetch · clean code · shelves · interactive atoms",
    "states": {
-    "raw": {
-     "label": "原始髒資料",
-     "tag": "raw messy data",
-     "pin": "straw"
-    },
-    "cleaned": {
-     "label": "自動化清洗",
-     "tag": "clean_data.py",
-     "pin": "blue"
-    },
-    "eda": {
-     "label": "探索分析 EDA",
-     "tag": "eda insights",
-     "pin": "orange"
-    },
-    "verified": {
-     "label": "零誤差驗算",
-     "tag": "cross-checked",
-     "pin": "green"
-    },
-    "tufte": {
-     "label": "工業級圖表",
-     "tag": "tufte dataviz",
+    "fetch": {
+     "label": "串接真實 API",
+     "tag": "api fetch",
      "pin": "pink"
     },
-    "report": {
-     "label": "決策洞察報告",
-     "tag": "executive report",
-     "pin": "violet"
-    }
-   },
-   "start": "raw",
-   "edges": [
-    {
-     "from": "raw",
-     "to": "cleaned",
-     "label": "剔除千分位",
-     "if": "帶逗號空白"
-    },
-    {
-     "from": "cleaned",
-     "to": "eda",
-     "label": "計算分佈特徵"
-    },
-    {
-     "from": "eda",
-     "to": "verified",
-     "label": "核對行加總",
-     "if": "杜絕 NaN"
-    },
-    {
-     "from": "verified",
-     "to": "tufte",
-     "label": "套用高對比色彩"
-    },
-    {
-     "from": "tufte",
-     "to": "report",
-     "label": "提煉商業洞察"
-    }
-   ],
-   "exit": {
-    "from": "report",
-    "label": "做成互動產品 ↓"
-   },
-   "steps": [
-    {
-     "go": "entry",
-     "note": "第三階段，啟動專業分析師的五階段流程"
-    },
-    {
-     "go": "raw>cleaned",
-     "note": "原始資料充斥逗號與缺失值，先跑清洗腳本"
-    },
-    {
-     "go": "cleaned>eda",
-     "note": "進入探索性分析，摸清各區域分佈與特徵"
-    },
-    {
-     "go": "eda>verified",
-     "note": "關鍵一步是交叉驗算，核對各區加總杜絕錯誤"
-    },
-    {
-     "go": "verified>tufte",
-     "note": "圖表套用 Tufte 工業美學與對比度規範"
-    },
-    {
-     "go": "tufte>report",
-     "note": "提煉結構性洞察，產出具備戰略價值的報告"
-    },
-    {
-     "go": "report>exit",
-     "note": "接下來，我們要將分析模型封裝為互動產品"
-    }
-   ]
-  },
-  {
-   "title": "Data Atoms 互動儀表板",
-   "sub": "零安裝純前端，媲美 Tableau 的工作台",
-   "tagline": "prep classifier · 10 data atoms · encoding shelves · multi filters",
-   "states": {
-    "prep": {
-     "label": "Tableau Prep 分類",
-     "tag": "dim vs measure",
+    "clean": {
+     "label": "程式自動清洗",
+     "tag": "clean & verify",
      "pin": "straw"
     },
     "shelves": {
-     "label": "四維編碼槽",
+     "label": "四維視覺編碼槽",
      "tag": "x y color size",
      "pin": "orange"
     },
     "atoms": {
-     "label": "10 大數據原子",
-     "tag": "10 data atoms",
-     "pin": "green"
-    },
-    "filter": {
-     "label": "區域年份聯動",
-     "tag": "bi-level filter",
+     "label": "Tableau-like 工具",
+     "tag": "data atoms",
      "pin": "blue"
     },
-    "export": {
-     "label": "影音圖表匯出",
-     "tag": "1080p export",
-     "pin": "pink"
+    "explore": {
+     "label": "全域聯動探索",
+     "tag": "bi-level link",
+     "pin": "green"
     }
    },
-   "start": "prep",
+   "start": "fetch",
    "edges": [
     {
-     "from": "prep",
+     "from": "fetch",
+     "to": "clean",
+     "label": "批次拉取實績"
+    },
+    {
+     "from": "clean",
      "to": "shelves",
-     "label": "維度度量分類"
+     "label": "判定維度度量",
+     "if": "無逗號 NaN"
     },
     {
      "from": "shelves",
@@ -353,157 +233,118 @@
     },
     {
      "from": "atoms",
-     "to": "filter",
-     "label": "點選縣市地圖"
-    },
-    {
-     "from": "filter",
-     "to": "atoms",
-     "label": "即時全域切換"
-    },
-    {
-     "from": "atoms",
-     "to": "export",
-     "label": "一鍵生成影音",
-     "if": "匯出高畫質"
+     "to": "explore",
+     "label": "地圖年份篩選",
+     "if": "點擊聯動"
     }
    ],
    "exit": {
-    "from": "export",
-    "label": "自學遇到問題呢 ↓"
+    "from": "explore",
+    "label": "做完工具怎麼發表？ ↓"
    },
    "steps": [
     {
      "go": "entry",
-     "note": "第四階段核心：打造 Data Atoms 儀表板"
+     "note": "首先串接官方真實 API，把海量業務數據抓進本地"
     },
     {
-     "go": "prep>shelves",
-     "note": "借鏡 Prep 概念，判定離散維度與度量"
+     "go": "fetch>clean",
+     "note": "讓 Agent 寫程式自動清洗，剔除逗號與缺失值"
+    },
+    {
+     "go": "clean>shelves",
+     "note": "判定離散維度與度量，自由拖曳至四維視覺編碼槽"
     },
     {
      "go": "shelves>atoms",
-     "note": "自由拖曳欄位至 X軸、Y軸、顏色大小編碼槽"
+     "note": "親手做出媲美 Tableau 的互動工具！"
     },
     {
-     "go": "atoms>filter",
-     "note": "內建柱狀、折線、雙軸、地圖、盒鬚圖等原子"
+     "go": "atoms>explore",
+     "note": "點選地圖與年份，全域圖表即時聯動隨心探索"
     },
     {
-     "go": "filter>atoms",
-     "note": "支援區域年份雙層篩選，點選縣市即時聯動"
-    },
-    {
-     "go": "atoms>export",
-     "note": "還能一鍵匯出高畫質圖表與動態短影音"
-    },
-    {
-     "go": "export>exit",
-     "note": "課後如果身邊沒有老師，學員如何繼續精進？"
+     "go": "explore>exit",
+     "note": "做出了好工具，接下來正是最重要的發表環節！"
     }
    ]
   },
   {
-   "title": "自學導師與避坑守則",
-   "sub": "檢查器攔截壞路，DeepTutor 隨身陪跑",
-   "tagline": "never hallucinate · error doctor · socratic tutoring",
+   "title": "Presentation 與動態影音輸出",
+   "sub": "調用 Motion Skills，將分析結論做成高畫質影片",
+   "tagline": "presentation · motion skills · story beats · 1080p export",
    "states": {
-    "dirty": {
-     "label": "異常缺失數據",
-     "tag": "dirty anomalies",
+    "present": {
+     "label": "成果匯報需求",
+     "tag": "executive brief",
      "pin": "straw"
     },
-    "blind": {
-     "label": "跳過驗算製圖",
-     "tag": "skip cross-check",
+    "story": {
+     "label": "數據故事脈絡",
+     "tag": "storytelling",
      "pin": "orange"
     },
-    "nan_bug": {
-     "label": "破圖與崩潰",
-     "tag": "rendering broken",
-     "pin": "red"
+    "motion": {
+     "label": "調用 Motion Skills",
+     "tag": "dataviz motion",
+     "pin": "blue"
     },
-    "hallucinate": {
-     "label": "虛假決策外洩",
-     "tag": "hallucination leak",
-     "pin": "red"
-    },
-    "deeptutor": {
-     "label": "DeepTutor 導師",
-     "tag": "socratic mentor",
-     "pin": "green"
-    },
-    "mastery": {
-     "label": "獨立自主通關",
-     "tag": "autonomous mastery",
+    "video": {
+     "label": "超高清動態影片",
+     "tag": "motion export",
      "pin": "pink"
+    },
+    "success": {
+     "label": "工作坊全員通關",
+     "tag": "workshop success",
+     "pin": "green"
     }
    },
-   "start": "dirty",
-   "rule": {
-    "never": "hallucinate",
-    "stamp": "嚴禁髒數據上線"
-   },
+   "start": "present",
    "edges": [
     {
-     "from": "dirty",
-     "to": "blind",
-     "label": "趕時間不清洗"
+     "from": "present",
+     "to": "story",
+     "label": "光看靜態圖不夠"
     },
     {
-     "from": "blind",
-     "to": "nan_bug",
-     "label": "計算產生 NaN"
+     "from": "story",
+     "to": "motion",
+     "label": "載入動態技能包"
     },
     {
-     "from": "nan_bug",
-     "to": "hallucinate",
-     "label": "流入高層決策",
-     "if": "無防護網"
+     "from": "motion",
+     "to": "video",
+     "label": "幾何形變與卡點",
+     "if": "AI 旁白混音"
     },
     {
-     "from": "nan_bug",
-     "to": "deeptutor",
-     "label": "啟動三階提示",
-     "if": "觸發防護"
-    },
-    {
-     "from": "deeptutor",
-     "to": "mastery",
-     "label": "掌握心智模型"
+     "from": "video",
+     "to": "success",
+     "label": "一鍵震撼輸出"
     }
    ],
    "steps": [
     {
      "go": "entry",
-     "note": "最後一章，我們來看看最危險的一條壞路"
+     "note": "面對主管與客戶，光看靜態圖表不夠，要講好故事"
     },
     {
-     "go": "dirty>blind",
-     "note": "拿到異常數據，為了趕時間跳過資料清洗驗算"
+     "go": "present>story",
+     "note": "這時直接調用 Motion 動態影音技能"
     },
     {
-     "go": "blind>nan_bug",
-     "note": "儀表板就會產生 NaN 破圖與坐標計算崩潰"
+     "go": "story>motion",
+     "note": "將分析結論轉化為動態鏡頭，搭配 AI 旁白語音"
     },
     {
-     "go": "nan_bug>hallucinate",
-     "note": "甚至導致錯誤的虛假結論直接流入高層決策"
+     "go": "motion>video",
+     "note": "一鍵匯出超高清動態影片，讓成果更具震撼！",
+     "say": "一鍵匯出一零八零P動態影片，讓成果更具震撼！"
     },
     {
-     "trace": true,
-     "note": "檢查器順著紅線抓出違規路徑，蓋上紅印警告！"
-    },
-    {
-     "go": "nan_bug>deeptutor",
-     "note": "為此導入港大架構的 DeepTutor 導師"
-    },
-    {
-     "go": "deeptutor>mastery",
-     "note": "用蘇格拉底提問引導，先理清思考架構"
-    },
-    {
-     "note": "掌握這套全流程，隨時都能獨立做出頂尖成果！"
+     "go": "video>success",
+     "note": "從大模型到打造工具與影音發表，今天全員通關！"
     }
    ]
   }
