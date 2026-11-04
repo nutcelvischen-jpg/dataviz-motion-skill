@@ -14,7 +14,7 @@ async function checkProvider(provider) {
     if (!elements.has(name)) {
       elements.set(name, {
         value: '', textContent: '', innerHTML: '', hidden: false, open: false,
-        options: name === '#api-model' ? [{ value: 'google/gemma-3-12b-it' }] : [],
+        options: name === '#api-model' ? [{ value: 'openai/gpt-3.5-turbo-16k' }] : [],
         addEventListener() {}, setAttribute() {}, append() {},
       });
     }
@@ -26,7 +26,7 @@ async function checkProvider(provider) {
     llm_lab_provider: provider,
     llm_lab_gemini_key: 'synthetic-gemini-key',
     llm_lab_openrouter_key: 'synthetic-openrouter-key',
-    llm_lab_openrouter_model: 'google/gemma-3-12b-it',
+    llm_lab_openrouter_model: 'openai/gpt-3.5-turbo-16k',
   };
   const document = {
     getElementById: element,
