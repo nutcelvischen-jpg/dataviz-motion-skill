@@ -611,7 +611,8 @@ int main() {
     <div style="font-weight: 600; color: #c2410c; margin-bottom: 2px;">🎨 攻防架構圖：單一流混淆 vs 三層邊界防禦流水線</div>
     <div style="font-size: 12px; color: var(--ink-secondary);">依據 diagram-design 規範繪製之 Compensating Security Layers 流程圖</div>
   </div>
-  <div style="display: flex; gap: 8px;">
+  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+    <a href="openrouter_architecture.html" target="_blank" style="padding: 6px 12px; background: #0284c7; color: #fff; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap;">🪐 OpenRouter 三階資料流動態圖 ↗</a>
     <a href="01_Module1_Agent思維與資料分析/diagram_prompt_injection_defense.html" target="_blank" style="padding: 6px 12px; background: #c2410c; color: #fff; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap;">開啟高解析攻防圖 ↗</a>
     <a href="metro.html" target="_blank" style="padding: 6px 12px; background: var(--paper-2); color: var(--ink-primary); border: 1px solid var(--rule-solid); text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap;">北捷專題分析 ↗</a>
   </div>
