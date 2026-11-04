@@ -383,6 +383,19 @@
   border-color: #2563eb;
 }
 
+.field-quick-btn.facet-btn {
+  background: #faf5ff;
+  color: #7c3aed;
+  border-color: #ddd6fe;
+  font-weight: 800;
+}
+
+.field-quick-btn.facet-btn:hover {
+  background: #7c3aed;
+  color: #ffffff;
+  border-color: #7c3aed;
+}
+
 /* ECharts Viewport 容器 */
 .echarts-viewport-container {
   width: 100%;
