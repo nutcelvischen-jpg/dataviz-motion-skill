@@ -61,31 +61,52 @@
 
       // 提取編碼槽欄位：優先讀取 pwState.shelf，其次查詢各 shelf DOM 容器
       const getPillTexts = (selector) => Array.from(document.querySelectorAll(selector))
-        .map(el => el.innerText.replace('×', '').trim())
-        .filter(Boolean);
+        .filter(el => !el.classList.contains('shelf-placeholder') && !el.closest('.shelf-placeholder'))
+        .map(el => (el.querySelector('.shelf-pill-name') || el).innerText.replace(/[×✕▼\n\r]/g, ' ').trim().replace(/\s+/g, ' '))
+        .filter(t => Boolean(t) && !t.includes('(X 軸') && !t.includes('(Y 軸') && !t.includes('(顏色') && !t.includes('(氣泡') && !t.includes('(次要') && !t.includes('(分面') && !t.includes('拖曳') && !t.includes('暫無'));
 
-      const xFields = pwState?.shelf?.x ? [pwState.shelf.x] : getPillTexts('#shelfX .shelf-pill, #shelfX span, #slotColumns .col-chip, #slotColumns span');
-      const yFields = (pwState?.shelf?.yMulti && pwState.shelf.yMulti.length) 
+      const xFields = (pwState && pwState.shelf && pwState.shelf.x) 
+        ? [pwState.shelf.x] 
+        : getPillTexts('#shelfX .shelf-pill-name, #shelfX .shelf-pill:not(.shelf-placeholder), #slotColumns .col-chip');
+      const yFields = (pwState && pwState.shelf && pwState.shelf.yMulti && pwState.shelf.yMulti.length) 
         ? pwState.shelf.yMulti 
-        : (pwState?.shelf?.y ? [pwState.shelf.y] : getPillTexts('#shelfY .shelf-pill, #shelfY span, #slotRows .col-chip, #slotRows span'));
-      const secFields = pwState?.shelf?.secondary ? [pwState.shelf.secondary] : getPillTexts('#shelfSecondary .shelf-pill, #shelfSecondary span, #slotSecondary .col-chip, #slotSecondary span');
-      const colorFields = pwState?.shelf?.color ? [pwState.shelf.color] : getPillTexts('#shelfColor .shelf-pill, #shelfColor span, #slotColor .col-chip, #slotColor span');
-      const facetFields = pwState?.shelf?.facet ? [pwState.shelf.facet] : getPillTexts('#shelfFacet .shelf-pill, #shelfFacet span');
-      const sizeFields = pwState?.shelf?.size ? [pwState.shelf.size] : getPillTexts('#shelfSize .shelf-pill, #shelfSize span');
+        : ((pwState && pwState.shelf && pwState.shelf.y) 
+            ? [pwState.shelf.y] 
+            : getPillTexts('#shelfY .shelf-pill-name, #shelfY .shelf-pill:not(.shelf-placeholder), #slotRows .col-chip'));
+      const secFields = (pwState && pwState.shelf && pwState.shelf.secondary) 
+        ? [pwState.shelf.secondary] 
+        : getPillTexts('#shelfSecondary .shelf-pill-name, #shelfSecondary .shelf-pill:not(.shelf-placeholder), #slotSecondary .col-chip');
+      const colorFields = (pwState && pwState.shelf && pwState.shelf.color) 
+        ? [pwState.shelf.color] 
+        : getPillTexts('#shelfColor .shelf-pill-name, #shelfColor .shelf-pill:not(.shelf-placeholder), #slotColor .col-chip');
+      const facetFields = (pwState && pwState.shelf && pwState.shelf.facet) 
+        ? [pwState.shelf.facet] 
+        : getPillTexts('#shelfFacet .shelf-pill-name, #shelfFacet .shelf-pill:not(.shelf-placeholder)');
+      const sizeFields = (pwState && pwState.shelf && pwState.shelf.size) 
+        ? [pwState.shelf.size] 
+        : getPillTexts('#shelfSize .shelf-pill-name, #shelfSize .shelf-pill:not(.shelf-placeholder)');
 
       // 篩選條件
       let filterDesc = [];
       if (pwState?.filters && Object.keys(pwState.filters).length > 0) {
         for (const [col, f] of Object.entries(pwState.filters)) {
           if (f.type === 'range') {
-            filterDesc.push(`${col}: ${f.min} ~ ${f.max}`);
-          } else if (f.selected && f.allValues && f.selected.size < f.allValues.length) {
-            filterDesc.push(`${col}: 選中 ${f.selected.size}/${f.allValues.length} 項`);
+            const curMin = f.currentMin != null ? f.currentMin : f.min;
+            const curMax = f.currentMax != null ? f.currentMax : f.max;
+            filterDesc.push(`${col}: ${curMin} ~ ${curMax}`);
+          } else if (f.selected && f.allValues) {
+            if (f.selected.size < f.allValues.length) {
+              const sample = [...f.selected].slice(0, 3).join(', ');
+              const more = f.selected.size > 3 ? '...' : '';
+              filterDesc.push(`${col}: 選中 ${f.selected.size}/${f.allValues.length} 項 (${sample}${more})`);
+            } else {
+              filterDesc.push(`${col}: 全選 (${f.selected.size}/${f.allValues.length})`);
+            }
           }
         }
       }
       if (filterDesc.length === 0) {
-        const domFilters = getPillTexts('#shelfFilters .shelf-pill, #slotFilter .col-chip, #filterBadges .filter-badge, .filter-chip.active');
+        const domFilters = getPillTexts('#shelfFilters .shelf-pill-name, #shelfFilters .shelf-pill:not(.shelf-placeholder), #slotFilter .col-chip, #filterBadges .filter-badge, .filter-chip.active');
         if (domFilters.length) filterDesc = domFilters;
       }
 
@@ -902,6 +923,8 @@
 
         const payload = {
           message: messagePayload,
+          context: pageContext,
+          pageContext: pageContext,
           sessionId: state.sessionId,
           history: [...personaContext, ...state.history]
         };
@@ -943,7 +966,12 @@
         }
 
         if (!matched) {
-          reply = `🔮 **數位乩童已感應問題**：「${message}」\n\n您可點擊下方快捷膠囊，我能為您開示今日課程、e-Stat API 避坑、Data Atoms 多指標對比，或探索陳俊智博士（Elvis Chen）的自研系統與產學成果！`;
+          if (lower.includes('圖表') || lower.includes('目前') || lower.includes('狀態') || lower.includes('kpi') || lower.includes('維度') || lower.includes('度量') || lower.includes('欄位') || lower.includes('情境')) {
+            const pageCtx = getPageContextSummary();
+            reply = `🔮 **數位乩童即時感應工作台情境**：\n\n${pageCtx}\n\n如需深入探索或對比數據指標，可點擊上方編碼槽或繼續發問！`;
+          } else {
+            reply = `🔮 **數位乩童已感應問題**：「${message}」\n\n您可點擊下方快捷膠囊，我能為您開示今日課程、e-Stat API 避坑、Data Atoms 多指標對比，或探索陳俊智博士（Elvis Chen）的自研系統與產學成果！`;
+          }
         }
 
         appendBotMessage(reply);

@@ -206,13 +206,30 @@ function startStaticServer() {
       throw new Error(`時間軸跳轉失敗！currentTime=${seekCheck.currentTime}, scene3Active=${seekCheck.scene3Active}`);
     }
 
-    // 測試套用劇本更新按鈕反饋
-    console.log('測試套用劇本更新按鈕...');
+    // 測試自訂編輯分鏡腳本並套用持久化
+    console.log('測試編輯分鏡腳本並套用持久化...');
+    const customTestScript = '【測試主管速報】主力雲端運算貢獻持續擴大，目標下季增長20%。';
+    await page.evaluate((text) => {
+      const input = document.getElementById('s1_script');
+      input.value = text;
+    }, customTestScript);
+
     await page.click('#btnApplyScriptChanges');
     const applyFeedback = await page.$eval('#btnApplyScriptChanges', el => el.innerHTML);
     console.log('按鈕反饋文字:', applyFeedback);
     if (!applyFeedback.includes('已套用腳本並重新合成預覽')) {
       throw new Error(`按鈕反饋文字未正確顯示！Got: ${applyFeedback}`);
+    }
+
+    // 切換 Tone (Exec) 再切回 Team，驗證剛剛套用的自訂腳本是否有成功保存
+    await page.click('#btnToneExec');
+    await new Promise(r => setTimeout(r, 200));
+    await page.click('#btnToneTeam');
+    await new Promise(r => setTimeout(r, 200));
+    const persistedScript = await page.$eval('#s1_script', el => el.value);
+    console.log('持久化腳本驗證:', persistedScript);
+    if (persistedScript !== customTestScript) {
+      throw new Error(`自訂腳本未能成功持久化！Expected: "${customTestScript}", Got: "${persistedScript}"`);
     }
 
     // 關閉彈窗
@@ -226,11 +243,10 @@ function startStaticServer() {
     // 測試 [#6] 數位乩童 getPageContextSummary 與純文字傳遞
     // ==========================================
     console.log('\n--- 3. 測試 [#6] 數位乩童 Context 萃取與純文字情境 ---');
+    
+    // 3.1 測試預設工作台狀態
     const jitongContextCheck = await page.evaluate(() => {
-      // 呼叫匯出的 getPageContextSummary
       const summary = window.DigitalJiTong.getPageContextSummary();
-
-      // 檢查當前 shelf 與 KPI 在 context 中的包含情況
       const state = window.PyGWalker.getState();
       const kpiRow = document.getElementById('kpiRowCount')?.innerText?.trim();
       const kpiSum = document.getElementById('kpiTotalSum')?.innerText?.trim();
@@ -242,12 +258,38 @@ function startStaticServer() {
         hasColumns: summary.includes(state.shelf.x) || summary.includes('Columns'),
         hasRows: summary.includes(state.shelf.y) || summary.includes('Rows'),
         hasAgg: summary.includes('RAW') || summary.includes('聚合'),
-        hasKpi: summary.includes('即時 KPI 監控') || summary.includes('Rows=')
+        hasKpi: summary.includes('即時 KPI 監控') || summary.includes('Rows='),
+        noPlaceholderLeak: !summary.includes('Secondary (次要指標') && !summary.includes('Facet (分面小多圖')
       };
     });
     console.log('數位乩童 Context 檢查結果:\n', jitongContextCheck.summary);
     if (!jitongContextCheck.hasColumns || !jitongContextCheck.hasRows || !jitongContextCheck.hasDataset || !jitongContextCheck.hasKpi) {
       throw new Error('數位乩童未能正確讀取 PyGWalker 狀態、DOM 欄位或 KPI 數值！');
+    }
+
+    // 3.2 深度測試：清空 Secondary 軸與 Facet 軸，確認絕不外洩 placeholder 文字
+    console.log('測試清空次軸與分面槽，防範 placeholder 污染...');
+    const cleanCheck = await page.evaluate(() => {
+      window.PyGWalker.assignToShelf('secondary', null);
+      window.PyGWalker.assignToShelf('facet', null);
+      const summary = window.DigitalJiTong.getPageContextSummary();
+      return {
+        summary,
+        hasPlaceholderSecondary: summary.includes('Secondary (次要指標'),
+        hasPlaceholderFacet: summary.includes('Facet (分面小多圖'),
+        noUglyFilterGlyphs: !summary.includes('▼') && !summary.includes('✕')
+      };
+    });
+    console.log('防 placeholder 污染檢查結果:', {
+      hasPlaceholderSecondary: cleanCheck.hasPlaceholderSecondary,
+      hasPlaceholderFacet: cleanCheck.hasPlaceholderFacet,
+      noUglyFilterGlyphs: cleanCheck.noUglyFilterGlyphs
+    });
+    if (cleanCheck.hasPlaceholderSecondary || cleanCheck.hasPlaceholderFacet) {
+      throw new Error('數位乩童 getPageContextSummary 發生 placeholder 佔位字元洩漏！');
+    }
+    if (!cleanCheck.noUglyFilterGlyphs) {
+      throw new Error('篩選條件字串包含未清理之 UI 符號 (▼ 或 ✕)！');
     }
 
     // ==========================================
