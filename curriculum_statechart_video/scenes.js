@@ -1,9 +1,9 @@
-// scenes.js — 《從大模型認知到打造 Tableau-like 儀表板》
+// scenes.js — 《Antigravity 實作工作坊：從大模型到動態數據影音》
 // SCENES[n] = { bg($) static, fg($, S) every frame }. Units: poster is 1000 x 1333.
 const after = (S, k) => S.step > k || (S.step === k && S.t > .9);
 const grow = (S, k, d = 1.2) => S.step > k ? 1 : S.step === k ? Math.max(0, Math.min(1, (S.t - .6) / d)) : 0;
 
-/* ------------------------------------------------------------------ I 大語言模型認知篇 */
+/* ------------------------------------------------------------------ I 大語言模型與 Agent AI */
 SCENES[1] = {
   bg($) {
     $.ground(20, 360, 560, 8, 'g1');
@@ -19,113 +19,95 @@ SCENES[1] = {
     // Coder at desk asking LLM
     const coder = $.pose.stand(160, 560, .82, 1, { t: T, arms: S.on('prompt') ? 'wave' : 'type' });
     $.person(coder, { ...$.K.outfits.coder, glasses: true, t: T, talk: S.on('prompt') ? T : 0 });
-    $.laptop(280, 500, .75, { t: T, typing: S.on('token') || S.on('agent') });
-    $.bulb(160, 320, .8, T, S.on('rag') || S.on('tool'));
+    $.laptop(280, 500, .75, { t: T, typing: S.on('chat') || S.on('loop') });
+    $.bulb(160, 320, .8, T, S.on('agent') || S.on('loop'));
 
-    // Server & Agent
-    $.server(920, 1280, .75, { t: T, busy: S.on('tool') || S.on('agent'), units: 3 });
-    $.who('student', 'stand', 780, 1280, .78, -1, { t: T, arms: S.on('agent') ? 'wave' : 'hold' });
+    // Server & Agent buddy
+    $.server(920, 1280, .75, { t: T, busy: S.on('agent') || S.on('loop'), units: 3 });
+    $.who('student', 'stand', 780, 1280, .78, -1, { t: T, arms: S.on('loop') ? 'wave' : 'hold' });
+    if (S.on('limit')) {
+      $.cross(480, 500, 32, 'red');
+    }
   }
 };
 
-/* ------------------------------------------------------------------ II 日本官方真實數據源 */
+/* ------------------------------------------------------------------ II 認識 Antigravity 與 Harness */
 SCENES[2] = {
   bg($) {
-    $.building(900, 1280, 160, 520, { color: 'sky', sign: 'e-Stat 統計局' });
-    $.ground(30, 780, 1280, 8, 'g2');
-    $.shelf(40, 520, 150, 3, { rowH: 45 });
+    $.ground(30, 950, 1280, 8, 'g2');
+    $.table(260, 950, 180, 65, 'tan');
+    $.building(880, 1280, 180, 480, { color: 'sky', sign: 'Harness 座艙' });
   },
   fg($, S) {
     const T = S.T;
     $.sun(890, 90, 32, T);
-    $.tower(120, 320, .75, T, S.on('list_api') || S.on('data_api'));
+    $.tower(120, 320, .75, T, S.on('terminal') || S.on('skills'));
 
-    // Officer / Engineer retrieving data
-    const dev = $.pose.stand(240, 1280, .82, 1, { t: T, arms: 'phone' });
-    $.person(dev, { ...$.K.outfits.office, t: T });
-    $.phone(dev.haF[0] + 6, dev.haF[1] + 2, .42, { screen: 'order', text: 'e-Stat API', t: T, badge: '47', pop: 1 });
+    // Professional developer in cockpit
+    const dev = $.pose.stand(180, 950, .84, 1, { t: T, arms: S.on('pairing') ? 'wave' : 'type' });
+    $.person(dev, { ...$.K.outfits.coder, glasses: true, t: T, talk: S.on('pairing') ? T : 0 });
+    $.laptop(320, 950, .85, { t: T, typing: true });
 
-    // Database cache storage
-    $.server(680, 1280, .8, { t: T, busy: S.on('cache'), units: 4 });
+    // Modular skills server rack
+    $.server(680, 1280, .85, { t: T, busy: S.on('skills') || S.on('pairing'), units: 4 });
+    $.gear(820, 1280, .8, T);
+    if (S.on('pairing')) {
+      $.sparkle(320, 780, 32, T);
+    }
   }
 };
 
-/* ------------------------------------------------------------------ III 分析師 5 階段生產線 */
+/* ------------------------------------------------------------------ III 打造 Tableau-like 儀表板 */
 SCENES[3] = {
   bg($) {
     $.ground(20, 950, 1280, 8, 'g3');
-    $.counter(40, 480, 960, 65, { sign: 'SOP 產線' });
-    $.ground(520, 920, 960, 6, 'g3b');
+    $.counter(40, 480, 960, 65, { sign: 'Data Atoms' });
+    $.shelf(820, 560, 140, 2, { rowH: 50 });
   },
   fg($, S) {
     const T = S.T;
     $.sun(910, 90, 32, T);
 
-    // Analyst conducting clean & verification
-    const analyst = $.pose.stand(200, 960, .82, 1, { t: T, arms: S.on('cleaned') ? 'stir' : 'point' });
+    // Analyst exploring Tableau-like dashboard
+    const analyst = $.pose.stand(200, 960, .82, 1, { t: T, arms: S.on('shelves') ? 'stir' : 'point' });
     $.person(analyst, { ...$.K.outfits.student, glasses: true, t: T });
 
-    // Senior reviewer checking cross-check
-    const reviewer = $.pose.stand(750, 960, .82, -1, { t: T, arms: S.on('verified') ? 'up' : 'hold' });
-    $.person(reviewer, { ...$.K.outfits.office, t: T, talk: S.on('report') ? T : 0 });
+    // Reviewer verifying interactive links
+    const reviewer = $.pose.stand(750, 960, .82, -1, { t: T, arms: S.on('explore') ? 'up' : 'hold' });
+    $.person(reviewer, { ...$.K.outfits.office, t: T, talk: S.on('explore') ? T : 0 });
 
-    // Certificate / Report star
-    if (S.on('report')) {
+    $.magnifier(340, 940, .8, T);
+    if (S.on('atoms') || S.on('explore')) {
       $.sparkle(750, 680, 28, T);
     }
-    $.magnifier(340, 940, .8, T);
   }
 };
 
-/* ------------------------------------------------------------------ IV Data Atoms 互動儀表板 */
+/* ------------------------------------------------------------------ IV Presentation 與動態影音輸出 */
 SCENES[4] = {
   bg($) {
     $.ground(30, 950, 1280, 8, 'g4');
     $.table(280, 950, 180, 65, 'tan');
-    $.shelf(820, 560, 140, 2, { rowH: 50 });
+    $.building(880, 1280, 180, 480, { color: 'mint', sign: '成果發表' });
   },
   fg($, S) {
     const T = S.T;
     $.sun(910, 92, 34, T);
 
-    // Big interactive display board
+    // Presenter pitching to audience
+    const presenter = $.pose.stand(180, 950, .85, 1, { t: T, arms: S.on('video') ? 'up' : 'point' });
+    $.person(presenter, { ...$.K.outfits.office, t: T, talk: T });
+
+    // Video display and gears
     $.laptop(360, 950, .85, { t: T, typing: true });
-
-    // Joyful user exploring dashboard
-    const user = $.pose.stand(180, 1280, .82, 1, { t: T, arms: S.on('filter') ? 'wave' : 'point' });
-    $.person(user, { ...$.K.outfits.customer, t: T });
-
     $.gear(820, 1280, .8, T);
-    if (S.on('export')) {
-      $.sparkle(820, 1100, 26, T);
-    }
-  }
-};
 
-/* ------------------------------------------------------------------ V 自學導師與避坑守則 */
-SCENES[5] = {
-  bg($) {
-    $.ground(30, 950, 1280, 8, 'g5');
-    $.building(880, 1280, 180, 480, { color: 'mint', sign: 'DeepTutor' });
-  },
-  fg($, S) {
-    const T = S.T;
-    $.sun(910, 90, 32, T);
+    const audience = $.pose.stand(680, 1280, .82, -1, { t: T, arms: S.on('success') ? 'up' : 'hold' });
+    $.person(audience, { ...$.K.outfits.customer, t: T });
 
-    // Warning barrier on the bad path
-    if (S.on('blind') || S.on('nan_bug') || S.on('hallucinate')) {
-      $.trafficLight(260, 1280, .8, 'red');
-    }
-
-    // DeepTutor mentor guiding student
-    const mentor = $.pose.stand(680, 1280, .84, -1, { t: T, arms: 'point' });
-    $.person(mentor, { ...$.K.outfits.doctor, glasses: true, t: T, talk: S.on('deeptutor') ? T : 0 });
-
-    const student = $.pose.stand(520, 1280, .8, 1, { t: T, arms: S.on('mastery') ? 'up' : 'hold' });
-    $.person(student, { ...$.K.outfits.student, t: T });
-
-    if (S.on('mastery')) {
-      $.sparkle(520, 980, 32, T);
+    if (S.on('video') || S.on('success')) {
+      $.sparkle(520, 980, 36, T);
+      $.sparkle(820, 1100, 30, T);
     }
   }
 };
