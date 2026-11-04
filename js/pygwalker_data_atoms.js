@@ -68,7 +68,7 @@
     '#84cc16', '#a855f7', '#3b82f6', '#d97706', '#059669'
   ];
 
-  const PALETTE_BAUHAUS = ['#1d4ed8', '#0284c7', '#0f766e', '#16a34a', '#eab308', '#ea580c', '#e11d48', '#7c3aed', '#475569'];
+  const PALETTE_BAUHAUS = ['#1d4ed8', '#0284c7', '#0f766e', '#16a34a', '#eab308', '#ea580c', '#e11d48', '#7c3aed', '#db2777', '#475569'];
 
   // --- 數值與統計安全輔助函式 (防溢位、防 NaN、防髒資料) ---
   function safeParseNumber(val) {
@@ -207,7 +207,12 @@
 
   function getVisualData(customRows = null) {
     const raw = customRows || getActiveRows();
-    if (!state.shelf.agg || state.shelf.agg === 'RAW' || raw.length === 0) {
+    if (raw.length === 0) return raw;
+    const isFacetSupported = ['bar', 'line'].includes(state.chartType);
+    const effectiveAgg = (!state.shelf.agg || state.shelf.agg === 'RAW')
+      ? (state.shelf.facet && !isFacetSupported && !['scatter', 'boxplot'].includes(state.chartType) ? 'SUM' : 'RAW')
+      : state.shelf.agg;
+    if (effectiveAgg === 'RAW') {
       return raw;
     }
     // 散點圖在無維度分組時保留原始數據點
@@ -216,15 +221,18 @@
     }
     // 判斷是否為對調長條圖 (X 軸為度量，Y 軸為維度)
     const isSwapped = state.chartType === 'bar' && state.measures.includes(state.shelf.x) && !state.measures.includes(state.shelf.y);
-    let groupKeys, measureKeys;
-    if (isSwapped) {
-      groupKeys = [state.shelf.y, state.shelf.color, state.shelf.facet].filter(Boolean);
-      measureKeys = [state.shelf.x, state.shelf.secondary, state.shelf.size, ...(state.shelf.yMulti || [])].filter(Boolean);
-    } else {
-      groupKeys = [state.shelf.x, state.shelf.color, state.shelf.facet].filter(Boolean);
-      measureKeys = [state.shelf.y, state.shelf.secondary, state.shelf.size, ...(state.shelf.yMulti || [])].filter(Boolean);
-    }
-    return aggregateRows(raw, groupKeys, measureKeys, state.shelf.agg);
+    const facetKey = isFacetSupported ? state.shelf.facet : null;
+    const allMeasures = [...new Set([
+      isSwapped ? state.shelf.x : state.shelf.y,
+      state.shelf.secondary,
+      state.shelf.size,
+      ...(state.shelf.yMulti || []),
+      ...(state.measures || [])
+    ].filter(Boolean))];
+    const groupKeys = isSwapped
+      ? [state.shelf.y, state.shelf.color, facetKey].filter(Boolean)
+      : [state.shelf.x, state.shelf.color, facetKey].filter(Boolean);
+    return aggregateRows(raw, groupKeys, allMeasures, effectiveAgg);
   }
 
   const REGION_COLORS = {
@@ -428,7 +436,7 @@
     showToast(`⚡ 已載入「${state.datasetName}」！已對齊欄位與圖表。`);
   }
 
-  // --- HTML 跳脫安全輔助函式 ---
+  // --- HTML 與 JS 跳脫安全輔助函式 ---
   function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     return String(str)
@@ -437,6 +445,19 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+
+  function escapeJsStr(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/\r/g, '\\r')
+      .replace(/\n/g, '\\n')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 
   // --- 單一欄位智慧語意深度判定 (Tableau Auto-Inference Engine) ---
@@ -640,11 +661,11 @@
     const displayName = cfg.alias && cfg.alias !== fieldName ? `${cfg.alias} (${fieldName})` : fieldName;
     const tooltipText = `${displayName} · ${cfg.nature === 'continuous' ? '連續度量' : '離散維度'} · 預設聚合: ${(cfg.agg || 'RAW').toUpperCase()}`;
 
-    const safeJsField = String(fieldName).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const safeJsField = escapeJsStr(fieldName);
     div.innerHTML = `
       <span class="field-drag-handle">⋮⋮</span>
-      <span class="field-type-badge" title="${cfg.type || fieldType}">${iconBadge}</span>
-      <span class="field-name-text" title="${tooltipText}">${escapeHtml(cfg.alias || fieldName)}</span>
+      <span class="field-type-badge" title="${escapeHtml(cfg.type || fieldType)}">${iconBadge}</span>
+      <span class="field-name-text" title="${escapeHtml(tooltipText)}">${escapeHtml(cfg.alias || fieldName)}</span>
       <div class="field-quick-actions">
         <button type="button" class="field-quick-btn" title="指派至 X 軸 (Columns)" onclick="window.PyGWalker.assignToShelf('x', '${safeJsField}')">+X</button>
         <button type="button" class="field-quick-btn" title="指派至 Y 軸 (Rows)" onclick="window.PyGWalker.assignToShelf('y', '${safeJsField}')">+Y</button>
@@ -734,7 +755,7 @@
             return false;
           }
         } else if (f.type === 'range') {
-          let num = Number(row[field]);
+          let num = f.isYear ? parseInt(String(row[field]), 10) : safeParseNumber(row[field]);
           if (isNaN(num)) {
             num = parseInt(String(row[field]), 10);
           }
@@ -759,7 +780,7 @@
     const isYear = /年份|年度|year|時序/i.test(fieldName);
     const isNumeric = state.measures.includes(fieldName) || isYear;
     if (isNumeric) {
-      const nums = state.rawRows.map(r => isYear ? parseInt(String(r[fieldName]), 10) : Number(r[fieldName])).filter(v => !isNaN(v));
+      const nums = state.rawRows.map(r => isYear ? parseInt(String(r[fieldName]), 10) : safeParseNumber(r[fieldName])).filter(v => !isNaN(v));
       if (nums.length > 0) {
         const [minVal, maxVal] = safeExtent(nums);
         state.filters[fieldName] = {
@@ -840,8 +861,10 @@
   function applyRangeFilter(fieldName) {
     const f = state.filters[fieldName];
     if (!f || f.type !== 'range') return;
-    const minInput = document.getElementById(`rangeMin_${fieldName}`);
-    const maxInput = document.getElementById(`rangeMax_${fieldName}`);
+    const minInput = document.getElementById(`rangeMin_${fieldName}`) ||
+                     Array.from(document.querySelectorAll('[data-range-min]')).find(el => el.dataset.rangeMin === fieldName);
+    const maxInput = document.getElementById(`rangeMax_${fieldName}`) ||
+                     Array.from(document.querySelectorAll('[data-range-max]')).find(el => el.dataset.rangeMax === fieldName);
     if (minInput && maxInput) {
       const minV = Number(minInput.value);
       const maxV = Number(maxInput.value);
@@ -901,7 +924,7 @@
           <div class="shelf-pill dimension" style="margin: 2px 0;">
             <span class="field-type-badge" style="color: #2563eb;">▼</span>
             <span class="shelf-pill-name" title="${escapeHtml(field)} (${summary})">${escapeHtml(field)}: ${summary}</span>
-            <button type="button" class="shelf-pill-remove" onclick="window.PyGWalker.removeFilter('${escapeHtml(field)}')" title="移除此篩選條件">✕</button>
+            <button type="button" class="shelf-pill-remove" onclick="window.PyGWalker.removeFilter('${escapeJsStr(field)}')" title="移除此篩選條件">✕</button>
           </div>
         `;
       }).join('');
@@ -952,13 +975,13 @@
         html += `
           <div class="filter-group-card">
             <span class="filter-group-header">📍 ${escapeHtml(field)}:</span>
-            <button type="button" class="filter-quick-action" onclick="window.PyGWalker.setAllFilterValues('${escapeHtml(field)}', true)">全選</button>
-            <button type="button" class="filter-quick-action" onclick="window.PyGWalker.setAllFilterValues('${escapeHtml(field)}', false)">全清</button>
+            <button type="button" class="filter-quick-action" onclick="window.PyGWalker.setAllFilterValues('${escapeJsStr(field)}', true)">全選</button>
+            <button type="button" class="filter-quick-action" onclick="window.PyGWalker.setAllFilterValues('${escapeJsStr(field)}', false)">全清</button>
             <div class="filter-chip-container">
               ${f.allValues.map(val => {
                 const isAct = f.selected.has(val);
                 const c = counts[val] || 0;
-                return `<button type="button" class="filter-chip-btn ${isAct ? 'active' : ''}" onclick="window.PyGWalker.toggleFilterValue('${escapeHtml(field)}', '${escapeHtml(val)}')">
+                return `<button type="button" class="filter-chip-btn ${isAct ? 'active' : ''}" onclick="window.PyGWalker.toggleFilterValue('${escapeJsStr(field)}', '${escapeJsStr(val)}')">
                   ${escapeHtml(val)} <span class="filter-count">(${c})</span>
                 </button>`;
               }).join('')}
@@ -966,24 +989,40 @@
           </div>
         `;
       } else if (f.type === 'range') {
-        html += `
-          <div class="filter-group-card">
-            <span class="filter-group-header">📅 ${escapeHtml(field)}:</span>
-            <div class="filter-range-wrap">
-              <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeHtml(field)}', 'all')">全部 (${f.min}–${f.max})</button>
-              <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeHtml(field)}', 30)">近30年</button>
-              <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeHtml(field)}', 20)">近20年</button>
-              <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeHtml(field)}', 10)">近10年</button>
-              <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeHtml(field)}', 'latest')">最新 (${f.max})</button>
-              <span>｜ 從</span>
-              <input type="number" class="filter-range-input" id="rangeMin_${escapeHtml(field)}" value="${f.currentMin}" min="${f.min}" max="${f.max}">
-              <span>至</span>
-              <input type="number" class="filter-range-input" id="rangeMax_${escapeHtml(field)}" value="${f.currentMax}" min="${f.min}" max="${f.max}">
-              <span>年</span>
-              <button type="button" class="filter-range-btn" onclick="window.PyGWalker.applyRangeFilter('${escapeHtml(field)}')">套用</button>
+        if (f.isYear) {
+          html += `
+            <div class="filter-group-card">
+              <span class="filter-group-header">📅 ${escapeHtml(field)}:</span>
+              <div class="filter-range-wrap">
+                <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeJsStr(field)}', 'all')">全部 (${f.min}–${f.max})</button>
+                <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeJsStr(field)}', 30)">近30年</button>
+                <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeJsStr(field)}', 20)">近20年</button>
+                <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeJsStr(field)}', 10)">近10年</button>
+                <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeJsStr(field)}', 'latest')">最新 (${f.max})</button>
+                <span>｜ 從</span>
+                <input type="number" class="filter-range-input" id="rangeMin_${escapeHtml(field)}" data-range-min="${escapeHtml(field)}" value="${f.currentMin}" min="${f.min}" max="${f.max}">
+                <span>至</span>
+                <input type="number" class="filter-range-input" id="rangeMax_${escapeHtml(field)}" data-range-max="${escapeHtml(field)}" value="${f.currentMax}" min="${f.min}" max="${f.max}">
+                <span>年</span>
+                <button type="button" class="filter-range-btn" onclick="window.PyGWalker.applyRangeFilter('${escapeJsStr(field)}')">套用</button>
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          html += `
+            <div class="filter-group-card">
+              <span class="filter-group-header">🔢 ${escapeHtml(field)}:</span>
+              <div class="filter-range-wrap">
+                <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeJsStr(field)}', 'all')">全部 (${f.min}–${f.max})</button>
+                <span>｜ 從</span>
+                <input type="number" step="any" class="filter-range-input" id="rangeMin_${escapeHtml(field)}" data-range-min="${escapeHtml(field)}" value="${f.currentMin}" min="${f.min}" max="${f.max}">
+                <span>至</span>
+                <input type="number" step="any" class="filter-range-input" id="rangeMax_${escapeHtml(field)}" data-range-max="${escapeHtml(field)}" value="${f.currentMax}" min="${f.min}" max="${f.max}">
+                <button type="button" class="filter-range-btn" onclick="window.PyGWalker.applyRangeFilter('${escapeJsStr(field)}')">套用</button>
+              </div>
+            </div>
+          `;
+        }
       }
     });
 
@@ -1011,7 +1050,7 @@
           <div class="shelf-pill measure" style="border-left: 3px solid ${color};">
             <span class="field-type-badge">#</span>
             <span class="shelf-pill-name" style="font-weight: 600;">${escapeHtml(f)}</span>
-            <button type="button" class="shelf-pill-remove" onclick="window.PyGWalker.removeMultiMeasure('${escapeHtml(f)}')" title="移除此對比指標">✕</button>
+            <button type="button" class="shelf-pill-remove" onclick="window.PyGWalker.removeMultiMeasure('${escapeJsStr(f)}')" title="移除此對比指標">✕</button>
           </div>
         `;
       }).join('');
@@ -1272,6 +1311,14 @@
     const canvasWrap = document.getElementById('canvasViewport');
     const echartsWrap = document.getElementById('echartsViewport');
 
+    if (state.engine === 'echarts' && typeof echarts === 'undefined') {
+      state.engine = 'canvas';
+      const btnToggleEngine = document.getElementById('btnToggleEngine');
+      if (btnToggleEngine) {
+        btnToggleEngine.innerHTML = '<span>📐 原生 1080p Canvas</span>';
+      }
+    }
+
     if (state.engine === 'echarts') {
       if (canvasWrap) canvasWrap.style.display = 'none';
       if (echartsWrap) {
@@ -1332,8 +1379,16 @@
       xCategories.sort((a, b) => xTotals[b] - xTotals[a]);
     }
 
+    const activeYFields = (state.shelf.yMulti && state.shelf.yMulti.length > 1) ? state.shelf.yMulti : [yField];
+
     // 計算全局 Y 軸最大值 (用於統一量表 Fixed Scale，預留 28% 頂部空間避免標籤與圖頂干涉)
-    const allNums = data.map(d => safeParseNumber(d[yField])).filter(v => typeof v === 'number' && !isNaN(v));
+    const allNums = [];
+    data.forEach(d => {
+      activeYFields.forEach(mf => {
+        const v = safeParseNumber(d[mf]);
+        if (typeof v === 'number' && !isNaN(v)) allNums.push(v);
+      });
+    });
     const globalMaxY = allNums.length > 0 ? safeMax(allNums, 100) : 100;
     const paddedMaxY = Math.ceil(globalMaxY * 1.28);
 
@@ -1436,7 +1491,7 @@
       yAxes.push({
         gridIndex: idx,
         type: 'value',
-        name: isLeftEdge ? yField : '',
+        name: isLeftEdge ? (activeYFields.length > 1 ? activeYFields.join(' / ').slice(0, 18) : yField) : '',
         nameLocation: 'middle',
         nameRotate: 90,
         nameGap: 38,
@@ -1484,65 +1539,107 @@
         });
       }
 
-      // 6. 主系列 Series
-      const rowMap = new Map();
-      catRows.forEach(d => rowMap.set(String(d[xField]), safeParseNumber(d[yField])));
-
-      const colorField = state.shelf.color;
-      const colorMap = new Map();
-      if (colorField && colorField !== facetField) {
-        catRows.forEach(d => colorMap.set(String(d[xField]), String(d[colorField])));
-      }
-
-      const seriesVals = panelXCategories.map(x => {
-        if (!rowMap.has(x)) return '-';
-        const val = rowMap.get(x);
-        if (colorField && colorField !== facetField && colorMap.has(x)) {
-          const cVal = colorMap.get(x);
-          const barColor = REGION_COLORS[cVal] || PALETTE[xCategories.indexOf(x) % PALETTE.length];
-          return {
-            value: val,
-            itemStyle: { color: barColor }
-          };
-        }
-        return val;
-      });
-
+      // 6. 主系列 Series (支援單一指標與多指標 yMulti 並列對比)
       const chartType = state.chartType === 'line' ? 'line' : 'bar';
-      series.push({
-        name: cat,
-        type: chartType,
-        xAxisIndex: idx,
-        yAxisIndex: yAxisIndex,
-        data: seriesVals,
-        smooth: chartType === 'line',
-        symbolSize: 6,
-        itemStyle: {
-          color: catColor,
-          borderRadius: chartType === 'bar' ? [4, 4, 0, 0] : undefined
-        },
-        lineStyle: chartType === 'line' ? { width: 3 } : undefined,
-        // 精緻圓角膠囊式標註，永遠保留 28% 頭部空間，杜絕刺出網格與標題重疊
-        markPoint: state.showLabels ? {
-          symbol: 'roundRect',
-          symbolSize: [40, 18],
-          symbolOffset: [0, -10],
+      if (activeYFields.length > 1) {
+        activeYFields.forEach((mField, mIdx) => {
+          const mColor = PALETTE[mIdx % PALETTE.length];
+          const mMap = new Map();
+          catRows.forEach(d => mMap.set(String(d[xField]), safeParseNumber(d[mField])));
+          const mVals = panelXCategories.map(x => mMap.has(x) ? mMap.get(x) : '-');
+          series.push({
+            name: mField,
+            type: chartType,
+            xAxisIndex: idx,
+            yAxisIndex: yAxisIndex,
+            data: mVals,
+            smooth: chartType === 'line',
+            symbolSize: 5,
+            itemStyle: {
+              color: mColor,
+              borderRadius: chartType === 'bar' ? [3, 3, 0, 0] : undefined
+            },
+            lineStyle: chartType === 'line' ? { width: 2.5 } : undefined,
+            markPoint: (state.showLabels && mIdx === 0) ? {
+              symbol: 'roundRect',
+              symbolSize: [40, 18],
+              symbolOffset: [0, -10],
+              itemStyle: {
+                color: mColor,
+                shadowBlur: 3,
+                shadowColor: 'rgba(0,0,0,0.12)'
+              },
+              label: {
+                fontSize: 9.5,
+                fontWeight: 700,
+                color: '#ffffff'
+              },
+              data: [{ type: 'max', name: '最高' }]
+            } : undefined,
+            markLine: (state.showAverage && mIdx === 0) ? {
+              data: [{ type: 'average', name: '平均線' }]
+            } : undefined
+          });
+        });
+      } else {
+        const rowMap = new Map();
+        catRows.forEach(d => rowMap.set(String(d[xField]), safeParseNumber(d[yField])));
+
+        const colorField = state.shelf.color;
+        const colorMap = new Map();
+        if (colorField && colorField !== facetField) {
+          catRows.forEach(d => colorMap.set(String(d[xField]), String(d[colorField])));
+        }
+
+        const seriesVals = panelXCategories.map(x => {
+          if (!rowMap.has(x)) return '-';
+          const val = rowMap.get(x);
+          if (colorField && colorField !== facetField && colorMap.has(x)) {
+            const cVal = colorMap.get(x);
+            const barColor = REGION_COLORS[cVal] || PALETTE[xCategories.indexOf(x) % PALETTE.length];
+            return {
+              value: val,
+              itemStyle: { color: barColor }
+            };
+          }
+          return val;
+        });
+
+        series.push({
+          name: cat,
+          type: chartType,
+          xAxisIndex: idx,
+          yAxisIndex: yAxisIndex,
+          data: seriesVals,
+          smooth: chartType === 'line',
+          symbolSize: 6,
           itemStyle: {
             color: catColor,
-            shadowBlur: 3,
-            shadowColor: 'rgba(0,0,0,0.12)'
+            borderRadius: chartType === 'bar' ? [4, 4, 0, 0] : undefined
           },
-          label: {
-            fontSize: 9.5,
-            fontWeight: 700,
-            color: '#ffffff'
-          },
-          data: [{ type: 'max', name: '最高' }]
-        } : undefined,
-        markLine: state.showAverage ? {
-          data: [{ type: 'average', name: '平均線' }]
-        } : undefined
-      });
+          lineStyle: chartType === 'line' ? { width: 3 } : undefined,
+          // 精緻圓角膠囊式標註，永遠保留 28% 頭部空間，杜絕刺出網格與標題重疊
+          markPoint: state.showLabels ? {
+            symbol: 'roundRect',
+            symbolSize: [40, 18],
+            symbolOffset: [0, -10],
+            itemStyle: {
+              color: catColor,
+              shadowBlur: 3,
+              shadowColor: 'rgba(0,0,0,0.12)'
+            },
+            label: {
+              fontSize: 9.5,
+              fontWeight: 700,
+              color: '#ffffff'
+            },
+            data: [{ type: 'max', name: '最高' }]
+          } : undefined,
+          markLine: state.showAverage ? {
+            data: [{ type: 'average', name: '平均線' }]
+          } : undefined
+        });
+      }
 
       // 7. 次指標 Series (若有)
       if (hasSec && secYAxisIndex !== null) {
@@ -1602,6 +1699,16 @@
     const container = document.getElementById('echartsViewport');
     if (!container) return;
 
+    if (typeof echarts === 'undefined') {
+      state.engine = 'canvas';
+      const btnToggleEngine = document.getElementById('btnToggleEngine');
+      if (btnToggleEngine) {
+        btnToggleEngine.innerHTML = '<span>📐 原生 1080p Canvas</span>';
+      }
+      renderVisualization();
+      return;
+    }
+
     if (!echartsInstance) {
       echartsInstance = echarts.init(container);
       const debouncedResize = debounce(() => {
@@ -1648,12 +1755,12 @@
       return;
     }
 
-    // 判斷是否啟用 Small Multiples (雙維度分面小多圖)
+    // 判斷是否啟用 Small Multiples (雙維度分面小多圖，僅限柱狀圖與折線圖支援多網格分面)
     const isFacetActive = facetField && state.dimensions.includes(facetField);
     const facetCategories = isFacetActive
       ? [...new Set(data.map(d => String(d[facetField] != null ? d[facetField] : '')).filter(Boolean))]
       : [];
-    const hasSmallMultiples = facetCategories.length > 1;
+    const hasSmallMultiples = facetCategories.length > 1 && ['bar', 'line'].includes(state.chartType);
 
     if (hasSmallMultiples) {
       renderSmallMultiplesECharts(data, xField, yField, secField, facetField, facetCategories);
