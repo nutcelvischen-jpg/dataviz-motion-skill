@@ -132,10 +132,10 @@
     if (!aggType || aggType === 'RAW' || !rows || rows.length === 0) {
       return rows;
     }
-    const validGroupKeys = (groupKeys || []).filter(k => k && typeof k === 'string');
+    const validGroupKeys = [...new Set((groupKeys || []).filter(k => k && typeof k === 'string'))];
     if (validGroupKeys.length === 0) return rows;
 
-    const validMeasures = (measureKeys || []).filter(m => m && typeof m === 'string');
+    const validMeasures = [...new Set((measureKeys || []).filter(m => m && typeof m === 'string'))];
 
     const groups = new Map();
     for (let i = 0; i < rows.length; i++) {
@@ -163,12 +163,15 @@
       }
       entry.count++;
       validMeasures.forEach(m => {
-        const val = safeParseNumber(r[m]);
-        if (!isNaN(val)) {
-          entry.sum[m] += val;
-          if (val < entry.min[m]) entry.min[m] = val;
-          if (val > entry.max[m]) entry.max[m] = val;
-          entry.values[m].push(val);
+        const rawVal = r[m];
+        if (rawVal !== null && rawVal !== undefined && String(rawVal).trim() !== '') {
+          const val = safeParseNumber(rawVal);
+          if (!isNaN(val)) {
+            entry.sum[m] += val;
+            if (val < entry.min[m]) entry.min[m] = val;
+            if (val > entry.max[m]) entry.max[m] = val;
+            entry.values[m].push(val);
+          }
         }
       });
     }
@@ -193,6 +196,9 @@
           row[m] = parseFloat(row[m].toFixed(2));
         }
       });
+      if (aggType === 'COUNT' && validMeasures.length === 0) {
+        row['計數'] = entry.count;
+      }
       aggregated.push(row);
     });
 
@@ -204,8 +210,20 @@
     if (!state.shelf.agg || state.shelf.agg === 'RAW' || raw.length === 0) {
       return raw;
     }
-    const groupKeys = [state.shelf.x, state.shelf.color, state.shelf.facet].filter(Boolean);
-    const measureKeys = [state.shelf.y, state.shelf.secondary, state.shelf.size, ...(state.shelf.yMulti || [])].filter(Boolean);
+    // 散點圖在無維度分組時保留原始數據點
+    if (state.chartType === 'scatter' && !state.shelf.color && !state.shelf.facet) {
+      return raw;
+    }
+    // 判斷是否為對調長條圖 (X 軸為度量，Y 軸為維度)
+    const isSwapped = state.chartType === 'bar' && state.measures.includes(state.shelf.x) && !state.measures.includes(state.shelf.y);
+    let groupKeys, measureKeys;
+    if (isSwapped) {
+      groupKeys = [state.shelf.y, state.shelf.color, state.shelf.facet].filter(Boolean);
+      measureKeys = [state.shelf.x, state.shelf.secondary, state.shelf.size, ...(state.shelf.yMulti || [])].filter(Boolean);
+    } else {
+      groupKeys = [state.shelf.x, state.shelf.color, state.shelf.facet].filter(Boolean);
+      measureKeys = [state.shelf.y, state.shelf.secondary, state.shelf.size, ...(state.shelf.yMulti || [])].filter(Boolean);
+    }
     return aggregateRows(raw, groupKeys, measureKeys, state.shelf.agg);
   }
 
@@ -1125,6 +1143,9 @@
             // 若從另一個視覺槽位拖曳過來，先清空原槽位，達成搬移效果
             if (info.fromShelf && info.fromShelf !== key && info.fromShelf !== 'filters') {
               state.shelf[info.fromShelf] = '';
+              if (info.fromShelf === 'y') {
+                state.shelf.yMulti = [];
+              }
             }
             setShelfField(key, info.field);
           }
@@ -1289,7 +1310,7 @@
     // 視圖自適應高度計算：確保多列 (2~3列) 小多圖具備充裕縱向空間，徹底杜絕上下標籤與刻度互相擠壓
     const container = document.getElementById('echartsViewport');
     if (container) {
-      const neededHeight = numRows === 1 ? '100%' : (numRows === 2 ? '680px' : `${Math.max(920, numRows * 310)}px`);
+      const neededHeight = numRows === 1 ? '100%' : (numRows === 2 ? '680px' : (numRows === 3 ? '920px' : `${Math.max(920, numRows * 300)}px`));
       if (container.style.height !== neededHeight) {
         container.style.height = neededHeight;
         container.style.minHeight = neededHeight;
@@ -1901,19 +1922,11 @@
           const isSubPartition = data.length > xCategories.length;
           colorCategories.forEach((cat, catIdx) => {
             const color = REGION_COLORS[cat] || PALETTE[catIdx % PALETTE.length];
-            let catVals;
-            if (isSubPartition) {
-              const rowMap = new Map();
-              data.filter(d => String(d[colorField]) === cat).forEach(d => {
-                rowMap.set(String(d[xField]), safeParseNumber(d[yField]));
-              });
-              catVals = xCategories.map(x => rowMap.has(x) ? rowMap.get(x) : 0);
-            } else {
-              catVals = xCategories.map(x => {
-                const row = data.find(d => String(d[xField]) === x);
-                return (row && String(row[colorField]) === cat) ? safeParseNumber(row[yField]) : '-';
-              });
-            }
+            const rowMap = new Map();
+            data.filter(d => String(d[colorField]) === cat).forEach(d => {
+              rowMap.set(String(d[xField]), safeParseNumber(d[yField]));
+            });
+            const catVals = xCategories.map(x => rowMap.has(x) ? rowMap.get(x) : '-');
 
             seriesList.push({
               name: cat,
@@ -1975,7 +1988,11 @@
             type: 'value',
             name: secField,
             position: 'right',
-            axisLabel: { formatter: '{value}' }
+            nameLocation: 'middle',
+            nameRotate: -90,
+            nameGap: 42,
+            nameTextStyle: { color: '#ea580c', fontSize: 11, fontWeight: 600 },
+            axisLabel: { formatter: (v) => formatCompactNumber(v) }
           });
           seriesList.push({
             name: secField,
@@ -2100,7 +2117,12 @@
         option.yAxis.push({
           type: 'value',
           name: secField,
-          position: 'right'
+          position: 'right',
+          nameLocation: 'middle',
+          nameRotate: -90,
+          nameGap: 42,
+          nameTextStyle: { color: '#ea580c', fontSize: 11, fontWeight: 600 },
+          axisLabel: { formatter: (v) => formatCompactNumber(v) }
         });
         seriesList.push({
           name: secField,
@@ -2265,6 +2287,18 @@
 
       if (minVal === Infinity) { minVal = 0; maxVal = 100; }
       if (minVal === maxVal) maxVal = minVal + 1;
+      if (minLng === Infinity || maxLng === -Infinity) {
+        minLng = 128; maxLng = 145; minLat = 30; maxLat = 45;
+      }
+
+      if (geoPoints.length === 0) {
+        option.title = {
+          text: '未偵測到相應地理空間坐標，請於 X 軸指派都道府縣、城市、或包含經緯度的欄位',
+          left: 'center',
+          top: 'middle',
+          textStyle: { color: '#94a3b8', fontSize: 14 }
+        };
+      }
 
       // 坐標邊界 padding
       const padLng = Math.max(1.0, (maxLng - minLng) * 0.12);
@@ -3016,7 +3050,7 @@
     } else if (state.chartType === 'geo') {
       // 通用地理投影地圖
       const geoData = (window.UniversalGeoEngine ? window.UniversalGeoEngine.buildGeoSeriesData(
-        getActiveRows(),
+        getVisualData(),
         state.shelf.x,
         state.shelf.y,
         state.shelf.size,
@@ -3372,6 +3406,7 @@
         const temp = state.shelf.x;
         state.shelf.x = state.shelf.y;
         state.shelf.y = temp;
+        state.shelf.yMulti = [];
         renderShelves();
         renderVisualization();
         renderKPIRibbon();
@@ -3957,17 +3992,23 @@
     return rows;
   }
 
-  // --- 匯出 CSV (以 getActiveRows() 當前有效篩選列為準) ---
+  // --- 匯出 CSV (以 getActiveRows() 結合搜尋之當前有效列為準) ---
   function exportCurrentTableToCSV() {
-    const activeRows = getActiveRows();
-    if (!activeRows || activeRows.length === 0) {
+    let rowsToExport = [...getActiveRows()];
+    if (state.searchQuery && state.searchQuery.trim()) {
+      const q = state.searchQuery.toLowerCase();
+      rowsToExport = rowsToExport.filter(row => {
+        return Object.values(row).some(v => String(v).toLowerCase().includes(q));
+      });
+    }
+    if (!rowsToExport || rowsToExport.length === 0) {
       showToast('⚠️ 目前無符合條件之資料可供匯出');
       return;
     }
     const headers = state.columns;
-    const csvLines = [headers.join(',')];
+    const csvLines = [headers.map(h => `"${String(h).replace(/"/g, '""')}"`).join(',')];
 
-    activeRows.forEach(row => {
+    rowsToExport.forEach(row => {
       const line = headers.map(h => {
         let val = row[h];
         if (val === null || val === undefined) val = '';
@@ -3980,7 +4021,7 @@
     const blob = new Blob(['\uFEFF' + csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     downloadDataUrl(url, `${state.currentDatasetId}_export.csv`);
-    showToast(`已匯出 CSV 檔案！共 ${activeRows.length} 筆已篩選資料。`);
+    showToast(`已匯出 CSV 檔案！共 ${rowsToExport.length} 筆已篩選與搜尋資料。`);
   }
 
   function downloadDataUrl(url, filename) {

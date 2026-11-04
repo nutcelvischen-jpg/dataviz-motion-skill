@@ -242,6 +242,29 @@ function startStaticServer() {
       state.shelf.agg = 'COUNT';
       const countData = getVisualData();
 
+      // 測試 NULL/缺失值不應被誤判為 0 算入 MEAN 或拉低 MIN
+      const testNullRows = [
+        { cat: 'A', val: 10 },
+        { cat: 'A', val: null },
+        { cat: 'A', val: 20 },
+        { cat: 'A', val: '' }
+      ];
+      const meanNullTest = window.aggregateRows(testNullRows, ['cat'], ['val'], 'MEAN');
+      const minNullTest = window.aggregateRows(testNullRows, ['cat'], ['val'], 'MIN');
+
+      // 測試對調水平長條圖聚合 (X=度量, Y=維度)
+      state.chartType = 'bar';
+      state.shelf.x = '總人口(人)';
+      state.shelf.y = '地方分區';
+      state.shelf.agg = 'SUM';
+      const swappedSumData = getVisualData();
+
+      // 重設為標準直式柱狀圖
+      state.chartType = 'bar';
+      state.shelf.x = '地方分區';
+      state.shelf.y = '總人口(人)';
+      state.shelf.agg = 'RAW';
+
       return {
         yMultiAfterSingle,
         yMultiAfterClear,
@@ -249,7 +272,11 @@ function startStaticServer() {
         sumCount: sumData.length,
         firstSumItem: sumData[0],
         firstMeanItem: meanData[0],
-        firstCountItem: countData[0]
+        firstCountItem: countData[0],
+        meanNullVal: meanNullTest[0]?.val,
+        minNullVal: minNullTest[0]?.val,
+        swappedSumCount: swappedSumData.length,
+        swappedSumField: swappedSumData[0]?.['總人口(人)']
       };
     });
     console.log('多度量清除與 Group-By 聚合測試結果:', aggEngineTest);
@@ -258,6 +285,15 @@ function startStaticServer() {
     }
     if (aggEngineTest.sumCount >= aggEngineTest.rawCount) {
       throw new Error('Group-By SUM 聚合未能彙整維度！SUM 分組數應小於 RAW 數');
+    }
+    if (aggEngineTest.meanNullVal !== 15) {
+      throw new Error(`聚合 MEAN 遇到 NULL/空值計算錯誤！預期 15，實際得 ${aggEngineTest.meanNullVal}`);
+    }
+    if (aggEngineTest.minNullVal !== 10) {
+      throw new Error(`聚合 MIN 遇到 NULL/空值計算錯誤！預期 10，實際得 ${aggEngineTest.minNullVal}`);
+    }
+    if (aggEngineTest.swappedSumCount !== 7 || !aggEngineTest.swappedSumField) {
+      throw new Error(`對調水平長條圖 Group-By 聚合失敗！分組數預期 7，實際 ${aggEngineTest.swappedSumCount}`);
     }
 
     console.log('\n--- 步驟 5: 測試小多圖 3 面板與 12 面板 (0 標籤重疊，0 console 錯誤) ---');
