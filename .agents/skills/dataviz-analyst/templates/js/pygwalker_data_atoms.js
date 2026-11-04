@@ -56,7 +56,11 @@
     pageSize: 10,
     searchQuery: '',
     sortColumn: '',
-    sortOrder: 'desc'
+    sortOrder: 'desc',
+
+    // 自訂多宮格儀表板 (Pin to Dashboard)
+    pinnedCharts: [],
+    dashboardLayout: 2
   };
 
   let echartsInstance = null;
@@ -1304,6 +1308,122 @@
       return n.toLocaleString();
     }
     return Number(n.toFixed(2)).toLocaleString();
+  }
+
+  // --- PyGWalker 數據特徵畫像 (Data Table Profiling Sparklines) ---
+  function buildColumnProfilingHTML(col, rows) {
+    if (!rows || rows.length === 0 || !col) return '';
+
+    const cfg = state.schemaConfig && state.schemaConfig[col];
+    const isMeasure = state.measures.includes(col) || (cfg && cfg.role === 'measure');
+
+    if (isMeasure) {
+      // 連續度量：10-bin 直方圖分佈
+      const nums = [];
+      for (let i = 0; i < rows.length; i++) {
+        const v = rows[i][col];
+        if (v !== null && v !== undefined && v !== '') {
+          const n = Number(String(v).replace(/[,%]/g, '').trim());
+          if (!isNaN(n)) nums.push(n);
+        }
+      }
+
+      if (nums.length === 0) {
+        return '<div class="col-profiling-box" style="color:#94a3b8; font-size:8px;">無數值樣本</div>';
+      }
+
+      let min = nums[0];
+      let max = nums[0];
+      for (let i = 1; i < nums.length; i++) {
+        if (nums[i] < min) min = nums[i];
+        if (nums[i] > max) max = nums[i];
+      }
+
+      const bins = new Array(10).fill(0);
+      const range = max - min;
+      if (range === 0) {
+        bins[0] = nums.length;
+      } else {
+        const binSize = range / 10;
+        for (let i = 0; i < nums.length; i++) {
+          let b = Math.floor((nums[i] - min) / binSize);
+          if (b >= 10) b = 9;
+          if (b < 0) b = 0;
+          bins[b]++;
+        }
+      }
+
+      const maxCount = Math.max(...bins, 1);
+      const barW = 7.5;
+      const barGap = 2.5;
+      let svgBars = '';
+      for (let i = 0; i < 10; i++) {
+        const h = Math.max(1.5, (bins[i] / maxCount) * 16);
+        const x = i * (barW + barGap);
+        const y = 18 - h;
+        const isPeak = bins[i] === maxCount && bins[i] > 0;
+        const fill = isPeak ? '#2563eb' : '#93c5fd';
+        svgBars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW}" height="${h.toFixed(1)}" rx="1" fill="${fill}"><title>區間 ${i + 1}: ${bins[i]} 筆</title></rect>`;
+      }
+
+      return `
+        <div class="col-profiling-box measure-profile" onclick="event.stopPropagation()" title="連續度量直方圖分佈：${min.toLocaleString()} ~ ${max.toLocaleString()} (有效樣本: ${nums.length} 筆)">
+          <svg class="profiling-svg" viewBox="0 0 100 18" preserveAspectRatio="none">
+            ${svgBars}
+          </svg>
+          <div class="profiling-range-labels">
+            <span>${formatCompactNumber(min)}</span>
+            <span>${formatCompactNumber(max)}</span>
+          </div>
+        </div>
+      `;
+    } else {
+      // 離散維度：Top 3 類別佔比條
+      const counts = {};
+      let total = 0;
+      for (let i = 0; i < rows.length; i++) {
+        const raw = rows[i][col];
+        const k = (raw === null || raw === undefined || String(raw).trim() === '') ? '(空值)' : String(raw).trim();
+        counts[k] = (counts[k] || 0) + 1;
+        total++;
+      }
+
+      if (total === 0) {
+        return '<div class="col-profiling-box" style="color:#94a3b8; font-size:8px;">無維度樣本</div>';
+      }
+
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      const uniqueCount = sorted.length;
+      const top3 = sorted.slice(0, 3);
+      const colors = ['#2563eb', '#10b981', '#f59e0b'];
+
+      let barSegments = '';
+      let topPctSum = 0;
+      top3.forEach((t, idx) => {
+        const pct = (t[1] / total) * 100;
+        topPctSum += pct;
+        barSegments += `<div class="cat-bar-segment" style="width:${pct.toFixed(1)}%; background:${colors[idx]};" title="${escapeHtml(t[0])}: ${t[1]} 筆 (${pct.toFixed(1)}%)"></div>`;
+      });
+
+      if (topPctSum < 100) {
+        barSegments += `<div class="cat-bar-segment" style="width:${(100 - topPctSum).toFixed(1)}%; background:#cbd5e1;" title="其餘類別: ${(100 - topPctSum).toFixed(1)}%"></div>`;
+      }
+
+      const top1Name = top3[0] ? top3[0][0] : '-';
+      const top1Pct = top3[0] ? Math.round((top3[0][1] / total) * 100) : 0;
+
+      return `
+        <div class="col-profiling-box dimension-profile" onclick="event.stopPropagation()" title="離散維度類別佔比 (共 ${uniqueCount} 種不同值)：\n${top3.map(t => `${t[0]}: ${t[1]} 筆 (${Math.round(t[1]/total*100)}%)`).join('\n')}">
+          <div class="profiling-category-bar">
+            ${barSegments}
+          </div>
+          <div class="profiling-cat-labels">
+            <span class="cat-label-chip" title="${escapeHtml(top1Name)}">${escapeHtml(top1Name)}: ${top1Pct}%</span>
+            <span class="cat-unique-chip">${uniqueCount}類</span>
+          </div>
+        </div>
+      `;
+    }
   }
 
   // --- 核心視覺化渲染分流 (ECharts vs Native Canvas) ---
@@ -3437,18 +3557,21 @@
       rowCountBadge.textContent = `${filtered.length} 列資料${filtered.length < state.rawRows.length ? ` (已篩選 / 原 ${state.rawRows.length} 列)` : ''}`;
     }
 
-    // 構建表頭
+    // 構建表頭 (含 PyGWalker 微型特徵畫像 Sparklines)
     thead.innerHTML = `
       <tr>
-        <th style="width: 46px;">#</th>
+        <th style="width: 46px; vertical-align: top;">#</th>
         ${state.columns.map(col => {
           const isSorted = state.sortColumn === col;
           const arrow = isSorted ? (state.sortOrder === 'desc' ? ' ▼' : ' ▲') : '';
           const typeBadge = state.measures.includes(col) ? '#' : 'T';
           const escCol = escapeHtml(col);
           const safeColArg = String(col).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-          return `<th onclick="window.PyGWalker.sortTable('${safeColArg}')" style="cursor: pointer;" title="點擊依此欄位排序">
-            <span style="opacity: 0.6; font-size: 10px;">${typeBadge}</span> ${escCol}${arrow}
+          return `<th onclick="window.PyGWalker.sortTable('${safeColArg}')" style="cursor: pointer; vertical-align: top;" title="點擊依此欄位排序">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 2px;">
+              <span><span style="opacity: 0.6; font-size: 10px;">${typeBadge}</span> <b>${escCol}</b>${arrow}</span>
+            </div>
+            ${buildColumnProfilingHTML(col, getActiveRows())}
           </th>`;
         }).join('')}
       </tr>
@@ -3699,6 +3822,37 @@
         renderSchemaClassifierModal();
       });
     });
+
+    // 自訂看板按鈕綁定 (Custom Pinned Dashboard)
+    const btnPin = document.getElementById('btnPinChart');
+    if (btnPin) btnPin.addEventListener('click', pinCurrentChart);
+
+    const btnOpenDash = document.getElementById('btnOpenDashboardModal');
+    if (btnOpenDash) btnOpenDash.addEventListener('click', openCustomDashboard);
+
+    const btnCloseDash = document.getElementById('btnCloseDashboardModal');
+    if (btnCloseDash) btnCloseDash.addEventListener('click', closeCustomDashboard);
+
+    const btnPinFromDash = document.getElementById('btnPinFromDashboard');
+    if (btnPinFromDash) btnPinFromDash.addEventListener('click', pinCurrentChart);
+
+    const btnClearDash = document.getElementById('btnClearDashboard');
+    if (btnClearDash) btnClearDash.addEventListener('click', clearDashboard);
+
+    const dashOverlay = document.getElementById('customDashboardModal');
+    if (dashOverlay) {
+      dashOverlay.addEventListener('click', (e) => {
+        if (e.target === dashOverlay) closeCustomDashboard();
+      });
+    }
+
+    // 看板多宮格欄數切換 (1, 2, 3 欄)
+    const btnLayoutCols1 = document.getElementById('btnLayoutCols1');
+    const btnLayoutCols2 = document.getElementById('btnLayoutCols2');
+    const btnLayoutCols3 = document.getElementById('btnLayoutCols3');
+    if (btnLayoutCols1) btnLayoutCols1.addEventListener('click', () => setDashboardLayout(1));
+    if (btnLayoutCols2) btnLayoutCols2.addEventListener('click', () => setDashboardLayout(2));
+    if (btnLayoutCols3) btnLayoutCols3.addEventListener('click', () => setDashboardLayout(3));
   }
 
   // --- Tableau 語意綱要分類精靈 (Schema Classifier Modal) ---
@@ -3826,8 +3980,11 @@
           <td>
             <div class="schema-profile-box">
               <span class="schema-cardinality-text">${cfg.distinctCount || 0} 個唯一下標 · ${cfg.nullCount === 0 ? '無缺失' : cfg.nullCount + ' 筆空值'}</span>
-              <div class="schema-samples-pills">
-                ${(cfg.sampleValues || []).map(s => `<span class="schema-sample-pill" title="${escapeHtml(s)}">${escapeHtml(s)}</span>`).join('')}
+              <div style="margin-top: 4px; max-width: 170px;">
+                ${buildColumnProfilingHTML(col, state.rawRows)}
+              </div>
+              <div class="schema-samples-pills" style="margin-top: 4px;">
+                ${(cfg.sampleValues || []).slice(0, 4).map(s => `<span class="schema-sample-pill" title="${escapeHtml(s)}">${escapeHtml(s)}</span>`).join('')}
               </div>
             </div>
           </td>
@@ -4706,8 +4863,245 @@
     renderVisualization();
   }
 
+  // =========================================================================
+  // 自訂多宮格看板功能模組 (Custom Pinned Dashboard)
+  // =========================================================================
+
+  let dashboardChartInstances = {};
+
+  function updatePinnedBadge() {
+    const badge = document.getElementById('pinnedCountBadge');
+    if (badge) {
+      badge.textContent = state.pinnedCharts.length;
+    }
+  }
+
+  function pinCurrentChart() {
+    if (!echartsInstance) {
+      showToast('⚠️ 目前尚未生成圖表，請先排入維度或度量！');
+      return;
+    }
+    const currentOption = echartsInstance.getOption();
+    if (!currentOption) {
+      showToast('⚠️ 無法擷取當前圖表配置！');
+      return;
+    }
+
+    const chartId = 'pinned_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+    const typeMap = {
+      bar: '📊 柱狀圖',
+      line: '📈 折線圖',
+      dual: '📉 雙軸複合圖',
+      geo: '🗺️ 地理地圖',
+      boxplot: '📦 盒鬚圖',
+      treemap: '🗂️ 矩形樹圖',
+      scatter: '🟣 散佈圖',
+      donut: '🍩 甜甜圈圖',
+      radar: '🕸️ 雷達圖',
+      funnel: '🔻 漏斗圖',
+      overview: '🌐 複合全景'
+    };
+    const typeName = typeMap[state.chartType] || state.chartType;
+    const xDesc = state.shelf.x ? state.shelf.x : (state.shelf.yMulti && state.shelf.yMulti.length ? '多度量' : '預設維度');
+    const yDesc = state.shelf.y ? state.shelf.y : (state.shelf.yMulti && state.shelf.yMulti.length ? state.shelf.yMulti.join(', ') : '預設度量');
+
+    const pinnedItem = {
+      id: chartId,
+      title: `${typeName} · ${state.shelf.y || state.shelf.x || state.datasetName}`,
+      chartType: state.chartType,
+      chartTypeName: typeName,
+      datasetName: state.datasetName,
+      createdAt: new Date().toLocaleTimeString(),
+      shelvesSummary: `X: ${xDesc} | Y: ${yDesc}${state.shelf.color ? ` | 色: ${state.shelf.color}` : ''}`,
+      option: JSON.parse(JSON.stringify(currentOption))
+    };
+
+    state.pinnedCharts.push(pinnedItem);
+    updatePinnedBadge();
+    showToast(`📌 已將「${pinnedItem.title}」釘選至自訂看板！(現有 ${state.pinnedCharts.length} 張圖表)`);
+
+    const modal = document.getElementById('customDashboardModal');
+    if (modal && modal.classList.contains('open')) {
+      renderCustomDashboard();
+    }
+  }
+
+  function openCustomDashboard() {
+    const modal = document.getElementById('customDashboardModal');
+    if (!modal) return;
+    renderCustomDashboard();
+    modal.classList.add('open');
+  }
+
+  function closeCustomDashboard() {
+    const modal = document.getElementById('customDashboardModal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function setDashboardLayout(cols) {
+    state.dashboardLayout = cols;
+    const container = document.getElementById('dashboardGridContainer');
+    if (container) {
+      container.className = `dashboard-grid-container cols-${cols}`;
+    }
+    const btns = [
+      { el: document.getElementById('btnLayoutCols1'), col: 1 },
+      { el: document.getElementById('btnLayoutCols2'), col: 2 },
+      { el: document.getElementById('btnLayoutCols3'), col: 3 }
+    ];
+    btns.forEach(b => {
+      if (b.el) {
+        if (b.col === cols) b.el.classList.add('active');
+        else b.el.classList.remove('active');
+      }
+    });
+
+    // 觸發圖表自適應重繪
+    setTimeout(() => {
+      Object.values(dashboardChartInstances).forEach(inst => {
+        if (inst && typeof inst.resize === 'function') inst.resize();
+      });
+    }, 120);
+  }
+
+  function removePinnedChart(id) {
+    state.pinnedCharts = state.pinnedCharts.filter(c => c.id !== id);
+    if (dashboardChartInstances[id]) {
+      try { dashboardChartInstances[id].dispose(); } catch (e) {}
+      delete dashboardChartInstances[id];
+    }
+    updatePinnedBadge();
+    renderCustomDashboard();
+    showToast('🗑️ 已從看板移除該圖表');
+  }
+
+  function clearDashboard() {
+    if (state.pinnedCharts.length === 0) {
+      showToast('ℹ️ 目前看板為空');
+      return;
+    }
+    if (confirm('確定要清空看板中所有已釘選的圖表嗎？')) {
+      Object.values(dashboardChartInstances).forEach(inst => {
+        try { inst.dispose(); } catch (e) {}
+      });
+      dashboardChartInstances = {};
+      state.pinnedCharts = [];
+      updatePinnedBadge();
+      renderCustomDashboard();
+      showToast('🗑️ 看板已清空');
+    }
+  }
+
+  function renderCustomDashboard() {
+    const container = document.getElementById('dashboardGridContainer');
+    if (!container) return;
+
+    // 清理舊實例
+    Object.values(dashboardChartInstances).forEach(inst => {
+      try { inst.dispose(); } catch (e) {}
+    });
+    dashboardChartInstances = {};
+
+    container.className = `dashboard-grid-container cols-${state.dashboardLayout || 2}`;
+
+    if (state.pinnedCharts.length === 0) {
+      container.innerHTML = `
+        <div class="dashboard-empty-state" style="grid-column: 1 / -1;">
+          <div class="dashboard-empty-icon">📌</div>
+          <div class="dashboard-empty-title">目前尚未釘選任何圖表</div>
+          <div class="dashboard-empty-desc">
+            在視覺化探索工作台中，調整好維度、度量與圖表樣式後，點擊頂部「📌 釘選圖表」按鈕，即可將圖表收藏並拼裝成您的專屬多宮格看板！
+          </div>
+          <button type="button" class="btn btn-primary" onclick="window.PyGWalker.closeCustomDashboard()">
+            ← 返回工作台釘選圖表
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = state.pinnedCharts.map(item => {
+      const escId = escapeHtml(item.id);
+      const safeId = String(item.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      return `
+        <div class="dashboard-card" id="card_${escId}">
+          <div class="dashboard-card-header">
+            <div class="dashboard-card-title-wrap">
+              <span class="dashboard-card-badge">${escapeHtml(item.chartTypeName)}</span>
+              <span class="dashboard-card-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
+              <span class="dashboard-card-dataset" title="資料集: ${escapeHtml(item.datasetName)}">${escapeHtml(item.datasetName)}</span>
+            </div>
+            <div class="dashboard-card-tools">
+              <button type="button" class="dashboard-card-tool-btn btn-remove" onclick="window.PyGWalker.removePinnedChart('${safeId}')" title="移除此圖表">
+                ✕
+              </button>
+            </div>
+          </div>
+          <div class="dashboard-card-body">
+            <div id="canvas_${escId}" class="dashboard-card-chart"></div>
+          </div>
+          <div class="dashboard-card-footer">
+            <span class="dashboard-card-shelves-info" title="${escapeHtml(item.shelvesSummary)}">
+              ⚙️ ${escapeHtml(item.shelvesSummary)}
+            </span>
+            <span class="dashboard-card-time">釘選於 ${escapeHtml(item.createdAt)}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // DOM 節點掛載後，批量初始化各卡片之獨立 ECharts 實例
+    requestAnimationFrame(() => {
+      state.pinnedCharts.forEach(item => {
+        const dom = document.getElementById(`canvas_${item.id}`);
+        if (!dom) return;
+        try {
+          const inst = echarts.init(dom);
+          const opt = JSON.parse(JSON.stringify(item.option));
+          if (opt.grid) {
+            if (Array.isArray(opt.grid)) {
+              opt.grid.forEach(g => { g.containLabel = true; });
+            } else {
+              opt.grid.containLabel = true;
+            }
+          }
+          inst.setOption(opt);
+          dashboardChartInstances[item.id] = inst;
+        } catch (err) {
+          console.error('Failed to init dashboard chart card:', item.id, err);
+          dom.innerHTML = '<div style="padding:20px; color:#ef4444; font-size:12px;">圖表渲染異常</div>';
+        }
+      });
+    });
+  }
+
+  // 監聽視窗縮放以自適應看板內所有圖表
+  window.addEventListener('resize', debounce(() => {
+    Object.values(dashboardChartInstances).forEach(inst => {
+      if (inst && typeof inst.resize === 'function') inst.resize();
+    });
+  }, 120));
+
   // --- 暴露給全域供點擊調用 ---
   window.PyGWalker = {
+    pinCurrentChart: () => {
+      pinCurrentChart();
+    },
+    openCustomDashboard: () => {
+      openCustomDashboard();
+    },
+    closeCustomDashboard: () => {
+      closeCustomDashboard();
+    },
+    removePinnedChart: (id) => {
+      removePinnedChart(id);
+    },
+    clearDashboard: () => {
+      clearDashboard();
+    },
+    setDashboardLayout: (cols) => {
+      setDashboardLayout(cols);
+    },
     openMultiMeasureModal: () => {
       openMultiMeasureModal();
     },
@@ -4830,6 +5224,10 @@
   window.getVisualData = getVisualData;
   window.renderVisualization = renderVisualization;
   window.loadDataset = loadDataset;
+  window.pinCurrentChart = pinCurrentChart;
+  window.openCustomDashboard = openCustomDashboard;
+  window.closeCustomDashboard = closeCustomDashboard;
+  window.removePinnedChart = removePinnedChart;
 
   // 當 DOM 與資源就緒時初始化
   if (document.readyState === 'loading') {

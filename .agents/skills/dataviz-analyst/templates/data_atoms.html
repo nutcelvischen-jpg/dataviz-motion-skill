@@ -481,6 +481,26 @@
             <span>數據動態簡報</span>
           </button>
 
+          <!-- 釘選至看板按鈕 (Pin Chart) -->
+          <button type="button" class="btn btn-sm btn-outline" id="btnPinChart" title="將當前圖表配置與狀態釘選至自訂看板">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 17v5M9 2h6l2 7H7l2-7zM7 9l-2 5h14l-2-5"></path>
+            </svg>
+            <span>釘選圖表</span>
+          </button>
+
+          <!-- 開啟自訂看板按鈕 (Custom Dashboard) -->
+          <button type="button" class="btn btn-sm" id="btnOpenDashboardModal" style="background:#4f46e5; color:#ffffff; border:1px solid #4338ca; font-weight:700;" title="開啟已釘選的多宮格自訂看板">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="8" height="8" rx="1"></rect>
+              <rect x="13" y="3" width="8" height="8" rx="1"></rect>
+              <rect x="3" y="13" width="8" height="8" rx="1"></rect>
+              <rect x="13" y="13" width="8" height="8" rx="1"></rect>
+            </svg>
+            <span>自訂看板</span>
+            <span id="pinnedCountBadge" class="pinned-count-badge">0</span>
+          </button>
+
           <!-- Export Image -->
           <button type="button" class="btn btn-primary" id="btnExportImage" title="匯出 1080p 高清圖表">
             <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1238,6 +1258,53 @@
             </svg>
             <span>載入至視覺化工作台 (進入 Tableau 欄位分類與繪圖) ➔</span>
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 自訂多宮格看板彈窗 (Custom Pinned Dashboard Modal) -->
+  <div class="dashboard-modal-overlay" id="customDashboardModal">
+    <div class="dashboard-modal-card">
+      <div class="dashboard-modal-header">
+        <div class="dashboard-modal-title-group">
+          <span class="dashboard-title-icon">🧩</span>
+          <div>
+            <div class="dashboard-modal-title">我的自訂多宮格組合看板</div>
+            <div class="dashboard-modal-subtitle">自由釘選、組合不同度量與維度的 ECharts 互動圖表 · 支援多欄並列與全螢幕探索</div>
+          </div>
+        </div>
+
+        <div class="dashboard-layout-controls">
+          <span style="font-size: 11px; color: #94a3b8; margin: 0 4px;">佈局：</span>
+          <button type="button" class="dashboard-layout-btn" data-cols="1" id="btnLayoutCols1" title="單欄大圖展示">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
+            <span>1 欄</span>
+          </button>
+          <button type="button" class="dashboard-layout-btn active" data-cols="2" id="btnLayoutCols2" title="雙欄對照 (推薦)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="18" rx="2"></rect><rect x="13" y="3" width="8" height="18" rx="2"></rect></svg>
+            <span>2 欄 (推薦)</span>
+          </button>
+          <button type="button" class="dashboard-layout-btn" data-cols="3" id="btnLayoutCols3" title="三欄緊湊矩陣">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="5.5" height="18" rx="1"></rect><rect x="9.25" y="3" width="5.5" height="18" rx="1"></rect><rect x="16.5" y="3" width="5.5" height="18" rx="1"></rect></svg>
+            <span>3 欄</span>
+          </button>
+        </div>
+
+        <div class="dashboard-header-actions">
+          <button type="button" class="btn btn-sm" id="btnPinFromDashboard" style="background:#2563eb; color:#fff; border:none; padding:5px 12px; font-weight:600; font-size:12px; border-radius:6px; cursor:pointer;" title="釘選當前探索圖表">
+            ＋ 釘選當前圖表
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" id="btnClearDashboard" style="color:#ef4444; border-color:#fca5a5; padding:5px 10px; font-size:11px;" title="清空所有釘選圖表">
+            🗑️ 清空看板
+          </button>
+          <button type="button" class="modal-close-btn" id="btnCloseDashboardModal" title="關閉看板" style="margin-left: 8px;">✕</button>
+        </div>
+      </div>
+
+      <div class="dashboard-modal-body" id="customDashboardBody">
+        <div class="dashboard-grid-container cols-2" id="dashboardGridContainer">
+          <!-- 卡片由 JS 動態生成 -->
         </div>
       </div>
     </div>
