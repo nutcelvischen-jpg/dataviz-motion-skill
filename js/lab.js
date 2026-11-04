@@ -28,7 +28,15 @@
   let current = definitions.find(x => x.id === params.get('experiment')) || definitions[0];
   let provider = sourceLesson ? 'simulation' : (readStore('llm_lab_provider') || 'simulation');
   if (!['simulation','openrouter','gemini'].includes(provider)) provider = 'simulation';
-  const validModels = ['openai/gpt-3.5-turbo-16k', 'anthropic/claude-haiku-4.5', 'google/gemini-2.5-flash'];
+  const validModels = [
+    'openai/gpt-3.5-turbo-16k',
+    'anthropic/claude-haiku-4.5',
+    'google/gemini-2.5-flash',
+    'nvidia/nemotron-3.5-super-vl:free',
+    'qwen/qwen3.8-omni-flash',
+    'mistralai/mistral-large-4-0',
+    'google/gemma-4-26b-a4b-it'
+  ];
   let model = readStore('llm_lab_openrouter_model') || validModels[0];
   if (!validModels.includes(model)) model = validModels[0];
   const states = Object.fromEntries(definitions.map(x => [x.id,{prediction:'',ran:false,choice:'',text:'大語言模型如何回答問題？',prompt:'',response:'',advanced:false,archive:false,include:false}]));
@@ -88,7 +96,7 @@
     const newsLink = news && /^https:\/\//i.test(news.url || '') ? '<a href="'+esc(news.url)+'" target="_blank" rel="noopener noreferrer">查看原教材引用的來源 ↗</a>' : '';
     const legacyNews = news ? '<h3>原教材引用與摘要</h3><p>'+esc(news.tag || '')+'：'+esc(news.title || '')+'</p><p>'+esc(news.summary || '')+'</p>'+newsLink : '';
     const legacyTakeaway = old && old.takeaway ? '<h3>原教材結語</h3><div class="legacy-material">'+old.takeaway+'</div>' : '';
-    return '<details class="deep-dive" id="advanced" '+(s.advanced?'open':'')+'><summary>進階：自由測試與原有預設</summary><p>以下預設沿用舊教材，內容與事實待核對；選取只會填入文字，不會自動送出。</p><div class="button-row">'+buttons+'</div>'+systemBox+'<label class="field-label" for="free-prompt">自訂提示詞</label><textarea id="free-prompt">'+esc(s.prompt)+'</textarea><label class="field-label" for="provider">模型模式</label><p class="quiet" id="api-setup-note">選擇 OpenRouter 或 Google Gemini API 後，即可輸入 API Key。</p><select id="provider" aria-describedby="api-setup-note"><option value="simulation">教學模擬</option><option value="openrouter">OpenRouter</option><option value="gemini">Google Gemini API</option></select><div id="api-settings" hidden><p class="quiet" id="gemini-model-note" hidden>Google Gemini 模型：gemini-3.6-flash</p><label class="field-label" for="api-model">OpenRouter 模型</label><select id="api-model"><option value="openai/gpt-3.5-turbo-16k">openai/gpt-3.5-turbo-16k (GPT-3.5 Turbo · 純文字對話)</option><option value="anthropic/claude-haiku-4.5">anthropic/claude-haiku-4.5 (Claude Haiku 4.5 · 視覺理解)</option><option value="google/gemini-2.5-flash">google/gemini-2.5-flash (Gemini 2.5 Flash · 全模態旗艦)</option></select><label class="field-label" for="api-key">API Key</label><input id="api-key" type="password" autocomplete="off"><button type="button" class="action-button" data-action="save-key">儲存設定</button><p class="quiet" id="key-status"></p></div><div class="button-row"><button type="button" class="button-secondary" data-action="send">執行自由測試 →</button></div><div class="message-box" id="free-response" role="status" aria-live="polite">'+esc(s.response || '選擇或輸入文字後，按下執行查看結果。')+'</div><p class="quiet">真實 API 可能有費用；只有按下執行才會送出。模擬結果會清楚標示。</p><details class="deep-dive" id="old-analysis" '+(s.archive?'open':'')+'><summary>舊教材：原有實驗解析與來源</summary><p class="notice">既有教材資料，待核對。舊內容中的模型、數字與案例並非本次驗證的事實。</p><div class="legacy-analysis">'+(old && old.analysis || '')+legacyTakeaway+legacyNews+'</div></details></details>';
+    return '<details class="deep-dive" id="advanced" '+(s.advanced?'open':'')+'><summary>進階：自由測試與原有預設</summary><p>以下預設沿用舊教材，內容與事實待核對；選取只會填入文字，不會自動送出。</p><div class="button-row">'+buttons+'</div>'+systemBox+'<label class="field-label" for="free-prompt">自訂提示詞</label><textarea id="free-prompt">'+esc(s.prompt)+'</textarea><label class="field-label" for="provider">模型模式</label><p class="quiet" id="api-setup-note">選擇 OpenRouter 或 Google Gemini API 後，即可輸入 API Key。</p><select id="provider" aria-describedby="api-setup-note"><option value="simulation">教學模擬</option><option value="openrouter">OpenRouter</option><option value="gemini">Google Gemini API</option></select><div id="api-settings" hidden><p class="quiet" id="gemini-model-note" hidden>Google Gemini 模型：gemini-3.6-flash</p><label class="field-label" for="api-model">OpenRouter 模型</label><select id="api-model"><option value="openai/gpt-3.5-turbo-16k">openai/gpt-3.5-turbo-16k (GPT-3.5 Turbo · 純文字對話)</option><option value="anthropic/claude-haiku-4.5">anthropic/claude-haiku-4.5 (Claude Haiku 4.5 · 最新高速視覺)</option><option value="google/gemini-2.5-flash">google/gemini-2.5-flash (Gemini 2.5 Flash · 全模態旗艦)</option><option value="nvidia/nemotron-3.5-super-vl:free">nvidia/nemotron-3.5-super-vl:free (NVIDIA · 免費深度推理)</option><option value="qwen/qwen3.8-omni-flash">qwen/qwen3.8-omni-flash (通義千問 · 全模態極速推理)</option><option value="mistralai/mistral-large-4-0">mistralai/mistral-large-4-0 (Mistral Large 4.0 · 歐洲旗艦視覺)</option><option value="google/gemma-4-26b-a4b-it">google/gemma-4-26b-a4b-it (Google Gemma 4 · 開源深度思考)</option></select><label class="field-label" for="api-key">API Key</label><input id="api-key" type="password" autocomplete="off"><button type="button" class="action-button" data-action="save-key">儲存設定</button><p class="quiet" id="key-status"></p></div><div class="button-row"><button type="button" class="button-secondary" data-action="send">執行自由測試 →</button></div><div class="message-box" id="free-response" role="status" aria-live="polite">'+esc(s.response || '選擇或輸入文字後，按下執行查看結果。')+'</div><p class="quiet">真實 API 可能有費用；只有按下執行才會送出。模擬結果會清楚標示。</p><details class="deep-dive" id="old-analysis" '+(s.archive?'open':'')+'><summary>舊教材：原有實驗解析與來源</summary><p class="notice">既有教材資料，待核對。舊內容中的模型、數字與案例並非本次驗證的事實。</p><div class="legacy-analysis">'+(old && old.analysis || '')+legacyTakeaway+legacyNews+'</div></details></details>';
   }
   function renderIndex() {
     document.title='做實驗｜大語言模型學習地圖';
@@ -186,7 +194,7 @@
       const headers=isOpen?{'Authorization':'Bearer '+key,'Content-Type':'application/json'}:{'x-goog-api-key':key,'Content-Type':'application/json'};
       const systemInput=root.querySelector('#system-prompt');const system=systemInput?systemInput.value.trim():'';
       const messages=[];if(system)messages.push({role:'system',content:system});messages.push({role:'user',content:prompt});
-      const body=isOpen?{model:model,messages:messages}:{contents:[{role:'user',parts:[{text:prompt}]}]};
+      const body=isOpen?{model:model,messages:messages,reasoning:{enabled:true}}:{contents:[{role:'user',parts:[{text:prompt}]}]};
       if(!isOpen && system)body.systemInstruction={parts:[{text:system}]};
       const response=await fetch(url,{method:'POST',headers:headers,body:JSON.stringify(body),signal:controller.signal});
       if(!response.ok) {
@@ -199,7 +207,16 @@
       }
       const data=await response.json();
       const parts=data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts;
-      const answer=isOpen ? data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content : (Array.isArray(parts) ? parts.filter(part=>!part.thought && typeof part.text==='string').map(part=>part.text).join('') : '');
+      let answer = '';
+      if(isOpen) {
+        const msg = data.choices && data.choices[0] && data.choices[0].message;
+        if(msg) {
+          if(msg.reasoning) answer += '【💭 思考推導 (Reasoning)】:\n' + msg.reasoning + '\n\n【📝 正式回覆】:\n';
+          answer += (msg.content || '');
+        }
+      } else {
+        answer = Array.isArray(parts) ? parts.filter(part=>!part.thought && typeof part.text==='string').map(part=>part.text).join('') : '';
+      }
       if(seq!==requestVersion || current.id!==d.id)return;
       const usage=isOpen?data.usage:data.usageMetadata;
       s.response='真實 API 回覆：\n'+(answer||'模型未回傳文字。')+(usage?'\n\n服務回傳用量：\n'+JSON.stringify(usage,null,2):'');output.textContent=s.response;

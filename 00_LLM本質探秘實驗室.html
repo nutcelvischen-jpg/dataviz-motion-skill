@@ -661,8 +661,12 @@
         </select>
         <select id="openrouterModelSelect" class="select-clean" style="display: none;" onchange="handleModelChange()">
           <option value="openai/gpt-3.5-turbo-16k">openai/gpt-3.5-turbo-16k (GPT-3.5 Turbo · 純文字對話)</option>
-          <option value="anthropic/claude-haiku-4.5">anthropic/claude-haiku-4.5 (Claude Haiku 4.5 · 視覺理解)</option>
+          <option value="anthropic/claude-haiku-4.5">anthropic/claude-haiku-4.5 (Claude Haiku 4.5 · 最新高速視覺)</option>
           <option value="google/gemini-2.5-flash">google/gemini-2.5-flash (Gemini 2.5 Flash · 全模態旗艦)</option>
+          <option value="nvidia/nemotron-3.5-super-vl:free">nvidia/nemotron-3.5-super-vl:free (NVIDIA · 免費深度推理)</option>
+          <option value="qwen/qwen3.8-omni-flash">qwen/qwen3.8-omni-flash (通義千問 · 全模態極速推理)</option>
+          <option value="mistralai/mistral-large-4-0">mistralai/mistral-large-4-0 (Mistral Large 4.0 · 歐洲旗艦視覺)</option>
+          <option value="google/gemma-4-26b-a4b-it">google/gemma-4-26b-a4b-it (Google Gemma 4 · 開源深度思考)</option>
         </select>
         <div id="apiKeyGroup" style="display: flex; align-items: center; gap: 0.4rem;">
           <input type="password" id="apiKeyInput" class="input-clean" placeholder="輸入 API Key (選填)">
@@ -1703,7 +1707,15 @@ print("Reconciliation: PASS")
     let currentProvider = localStorage.getItem('llm_lab_provider') || 'simulation';
     let geminiApiKey = localStorage.getItem('llm_lab_gemini_key') || '';
     let openrouterApiKey = localStorage.getItem('llm_lab_openrouter_key') || '';
-    const validModels = ['openai/gpt-3.5-turbo-16k', 'anthropic/claude-haiku-4.5', 'google/gemini-2.5-flash'];
+    const validModels = [
+      'openai/gpt-3.5-turbo-16k',
+      'anthropic/claude-haiku-4.5',
+      'google/gemini-2.5-flash',
+      'nvidia/nemotron-3.5-super-vl:free',
+      'qwen/qwen3.8-omni-flash',
+      'mistralai/mistral-large-4-0',
+      'google/gemma-4-26b-a4b-it'
+    ];
     let selectedModel = localStorage.getItem('llm_lab_openrouter_model') || validModels[0];
     if (!validModels.includes(selectedModel)) selectedModel = validModels[0];
 
