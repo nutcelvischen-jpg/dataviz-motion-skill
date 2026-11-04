@@ -1222,14 +1222,24 @@
         containLabel: true
       });
 
+      // 根據量表模式決定 X 軸刻度：
+      // 'fixed': 所有子圖共用全域 X 軸分類，維持同位置跨面板對齊
+      // 'free': 各子圖自適應裁剪，只保留該子圖真正有資料的分類，避免無效空標籤擠壓
+      const localXCategories = [...new Set(catRows.map(d => String(d[xField] != null ? d[xField] : '')).filter(Boolean))];
+      const panelXCategories = (state.facetScaleMode === 'free' && localXCategories.length > 0)
+        ? localXCategories
+        : xCategories;
+
+      const isPanelRotated = panelXCategories.length > 6 || (numCols >= 3 && panelXCategories.length > 2);
+
       // 3. X 軸
       xAxes.push({
         gridIndex: idx,
         type: 'category',
-        data: xCategories,
+        data: panelXCategories,
         axisLabel: {
           interval: 0,
-          rotate: isRotated ? 35 : 0,
+          rotate: isPanelRotated ? 35 : 0,
           color: '#334155',
           fontSize: 10,
           margin: 8
@@ -1278,7 +1288,7 @@
       // 6. 主系列 Series
       const rowMap = new Map();
       catRows.forEach(d => rowMap.set(String(d[xField]), safeParseNumber(d[yField])));
-      const seriesVals = xCategories.map(x => rowMap.has(x) ? rowMap.get(x) : 0);
+      const seriesVals = panelXCategories.map(x => rowMap.has(x) ? rowMap.get(x) : '-');
 
       const chartType = state.chartType === 'line' ? 'line' : 'bar';
       series.push({
@@ -1306,7 +1316,7 @@
       if (hasSec && secYAxisIndex !== null) {
         const secMap = new Map();
         catRows.forEach(d => secMap.set(String(d[xField]), safeParseNumber(d[secField])));
-        const secVals = xCategories.map(x => secMap.has(x) ? secMap.get(x) : 0);
+        const secVals = panelXCategories.map(x => secMap.has(x) ? secMap.get(x) : '-');
 
         series.push({
           name: `${cat} · ${secField}`,
