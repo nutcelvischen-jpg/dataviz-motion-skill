@@ -2109,7 +2109,7 @@ const _jpGenderFacetDataset = {
   description: "雙維度小多圖（Small Multiples）：橫向切分為男性面板與女性面板，在同一 1080p 畫布並排呈現 12 大城市人口與所得結構對比，比例尺同步聯動。",
   defaultX: "城市",
   defaultY: "總人口(萬人)",
-  defaultColor: "性別",
+  defaultColor: "地方分區",
   defaultFacet: "性別",
   defaultSize: "勞動人口(萬人)",
   defaultSecondary: "高齡化率(%)",
