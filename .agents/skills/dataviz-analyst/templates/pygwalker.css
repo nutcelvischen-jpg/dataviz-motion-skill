@@ -24,6 +24,161 @@
   font-weight: 600;
 }
 
+/* ==========================================================================
+   Topbar Tools Dropdown Menu (方案 A - 精簡一級 + 下拉式工具箱)
+   ========================================================================== */
+.topbar-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-shrink: 0 !important;
+}
+
+.topbar-actions-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+}
+
+.dropdown-tools-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.btn-tools-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 11px;
+  border-radius: 6px;
+  height: 32px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.btn-tools-toggle:hover,
+.dropdown-tools-wrapper.open .btn-tools-toggle {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.dropdown-chevron {
+  transition: transform 0.2s ease;
+  color: #64748b;
+  margin-left: 2px;
+}
+
+.dropdown-tools-wrapper.open .dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu-tools {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 290px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.14), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+  padding: 6px 0;
+  z-index: 1050;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+}
+
+.dropdown-tools-wrapper.open .dropdown-menu-tools {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-group-label {
+  padding: 6px 14px 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 4px 0;
+}
+
+.dropdown-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none;
+  color: #1e293b;
+  transition: background-color 0.12s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.dropdown-menu-item:hover,
+.dropdown-menu-item:focus {
+  background: #f8fafc;
+  outline: none;
+}
+
+.dropdown-menu-item .item-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background-color 0.12s, color 0.12s;
+}
+
+.dropdown-menu-item:hover .item-icon {
+  background: #e0e7ff;
+  color: #4f46e5;
+}
+
+.dropdown-menu-item .item-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dropdown-menu-item .item-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.35;
+}
+
+.dropdown-menu-item .item-subtitle {
+  font-size: 10.5px;
+  color: #64748b;
+  line-height: 1.25;
+  margin-top: 1px;
+}
+
 /* 視覺編碼槽頂部條 (Graphic Walker Encoding Shelves) */
 .encoding-shelves-strip {
   background: #ffffff;
@@ -1988,16 +2143,10 @@
 
   .topbar-actions-row {
     display: flex !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
+    overflow-x: visible !important;
     gap: 6px !important;
     width: 100% !important;
-    padding-bottom: 2px !important;
-    scrollbar-width: none !important;
-  }
-
-  .topbar-actions-row::-webkit-scrollbar {
-    display: none !important;
+    align-items: center !important;
   }
 
   .topbar-actions-row button {
@@ -2006,6 +2155,12 @@
     font-size: 11.5px !important;
     padding: 6px 10px !important;
     height: 32px !important;
+  }
+
+  .dropdown-menu-tools {
+    right: 0 !important;
+    max-width: 92vw !important;
+    width: 280px !important;
   }
 
   /* 工作區主體：手機版圖表置頂 (order: 1)，側邊欄與原子庫置底 (order: 2) */

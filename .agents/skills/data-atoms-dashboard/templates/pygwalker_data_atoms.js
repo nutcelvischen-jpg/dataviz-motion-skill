@@ -1600,7 +1600,12 @@
       state.engine = 'canvas';
       const btnToggleEngine = document.getElementById('btnToggleEngine');
       if (btnToggleEngine) {
-        btnToggleEngine.innerHTML = '<span>📐 原生 1080p Canvas</span>';
+        const label = document.getElementById('btnToggleEngineLabel');
+        if (label) {
+          label.textContent = '切換為 ECharts 互動引擎';
+        } else {
+          btnToggleEngine.innerHTML = '<span>📐 原生 1080p Canvas</span>';
+        }
       }
     }
 
@@ -1998,7 +2003,12 @@
       state.engine = 'canvas';
       const btnToggleEngine = document.getElementById('btnToggleEngine');
       if (btnToggleEngine) {
-        btnToggleEngine.innerHTML = '<span>📐 原生 1080p Canvas</span>';
+        const label = document.getElementById('btnToggleEngineLabel');
+        if (label) {
+          label.textContent = '切換為 ECharts 互動引擎';
+        } else {
+          btnToggleEngine.innerHTML = '<span>📐 原生 1080p Canvas</span>';
+        }
       }
       renderVisualization();
       return;
@@ -3976,9 +3986,16 @@
     if (btnToggleEngine) {
       btnToggleEngine.addEventListener('click', () => {
         state.engine = state.engine === 'echarts' ? 'canvas' : 'echarts';
-        btnToggleEngine.innerHTML = state.engine === 'echarts' 
-          ? '<span>📊 ECharts 互動引擎</span>' 
-          : '<span>📐 原生 1080p Canvas</span>';
+        const label = document.getElementById('btnToggleEngineLabel');
+        if (label) {
+          label.textContent = state.engine === 'echarts' 
+            ? '切換圖表引擎 (Canvas 模式)' 
+            : '切換圖表引擎 (ECharts 模式)';
+        } else {
+          btnToggleEngine.innerHTML = state.engine === 'echarts' 
+            ? '<span>📊 ECharts 互動引擎</span>' 
+            : '<span>📐 原生 1080p Canvas</span>';
+        }
         renderVisualization();
         showToast(`已切換為「${state.engine === 'echarts' ? 'ECharts 互動引擎' : '原生 1080p Canvas'}」模式`);
       });
@@ -4213,6 +4230,49 @@
 
     const btnImportSheets = document.getElementById('btnImportAllSheets');
     if (btnImportSheets) btnImportSheets.addEventListener('click', importAllSheetsToDashboard);
+
+    // 頂部進階工具與設定下拉選單控制 (Topbar Tools & Settings Dropdown)
+    const toolsWrapper = document.getElementById('dropdownToolsWrapper');
+    const btnToolsToggle = document.getElementById('btnToolsToggle');
+    const menuTools = document.getElementById('dropdownMenuTools');
+
+    function closeToolsDropdown() {
+      if (toolsWrapper) toolsWrapper.classList.remove('open');
+      if (btnToolsToggle) btnToolsToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleToolsDropdown(e) {
+      if (e) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+      if (!toolsWrapper) return;
+      const isOpen = toolsWrapper.classList.toggle('open');
+      if (btnToolsToggle) btnToolsToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+
+    if (btnToolsToggle) {
+      btnToolsToggle.addEventListener('click', toggleToolsDropdown);
+    }
+
+    document.addEventListener('click', (e) => {
+      if (toolsWrapper && !toolsWrapper.contains(e.target)) {
+        closeToolsDropdown();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeToolsDropdown();
+    });
+
+    if (menuTools) {
+      menuTools.addEventListener('click', (e) => {
+        const item = e.target.closest('.dropdown-menu-item');
+        if (item) {
+          setTimeout(closeToolsDropdown, 120);
+        }
+      });
+    }
 
     // 側邊欄一鍵收合/展開 (Collapsible Sidebar)
     const btnToggleSidebar = document.getElementById('btnToggleSidebar');
