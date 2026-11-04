@@ -1378,20 +1378,24 @@
           lensKpiChip.style.borderColor = cfg.kpiBorder;
         }
 
-        // 2. 切換影片來源與海報
+        // 2. 切換影片來源與海報 (同時同步 video 與 source 標籤)
         const targetVideo = (currentTone === 'team' && cfg.videoTeam) ? cfg.videoTeam : cfg.videoExec;
         if (video) {
           video.poster = cfg.poster;
         }
-        if (videoSrc) {
-          if (videoSrc.getAttribute('src') !== targetVideo) {
-            videoSrc.setAttribute('src', targetVideo);
-            if (video) {
-              video.load();
-              video.currentTime = 0;
-              video.play().catch(() => {});
-            }
-          }
+        let needsReload = false;
+        if (videoSrc && videoSrc.getAttribute('src') !== targetVideo) {
+          videoSrc.setAttribute('src', targetVideo);
+          needsReload = true;
+        }
+        if (video && (!video.getAttribute('src') || !video.src.includes(targetVideo))) {
+          video.src = targetVideo;
+          needsReload = true;
+        }
+        if (needsReload && video) {
+          video.load();
+          video.currentTime = 0;
+          video.play().catch(() => {});
         }
 
         // 3. 更新下載連結
@@ -1503,6 +1507,17 @@
       // 套用劇本更新按鈕反饋
       if (btnApply) {
         btnApply.addEventListener('click', () => {
+          // 套用並儲存編輯後的 4 幕劇本文字
+          const cfg = BRIEFING_CONFIG[currentLens];
+          if (cfg) {
+            const isTeam = currentTone === 'team';
+            const toneKey = isTeam ? 'team' : 'exec';
+            if (s1_script && cfg.s1) cfg.s1[toneKey] = s1_script.value.trim();
+            if (s2_script && cfg.s2) cfg.s2[toneKey] = s2_script.value.trim();
+            if (s3_script && cfg.s3) cfg.s3[toneKey] = s3_script.value.trim();
+            if (s4_script && cfg.s4) cfg.s4[toneKey] = s4_script.value.trim();
+          }
+
           const originalText = btnApply.innerHTML;
           btnApply.disabled = true;
           btnApply.innerHTML = '✅ 已套用腳本並重新合成預覽';
