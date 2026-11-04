@@ -432,64 +432,84 @@
           </optgroup>
         </select>
 
-        <!-- Action Buttons Row -->
+        <!-- Action Buttons Row (方案 A: 3 顆核心平鋪 + 1 個工具與設定下拉選單) -->
         <div class="topbar-actions-row">
-          <!-- 17 Domains & Year Range Button -->
-          <button type="button" class="btn-domain-top" id="btnOpen17DomainsModalTop" title="自訂選取 e-Stat 17大領域指標變數與年份區間">
-            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="7" height="7"></rect>
-              <rect x="14" y="3" width="7" height="7"></rect>
-              <rect x="14" y="14" width="7" height="7"></rect>
-              <rect x="3" y="14" width="7" height="7"></rect>
-            </svg>
-            <span>17領域變數與年份設定</span>
-          </button>
+          <!-- 1. 進階工具與設定下拉選單 (Tools & Settings Dropdown) -->
+          <div class="dropdown-tools-wrapper" id="dropdownToolsWrapper">
+            <button type="button" class="btn btn-sm btn-outline btn-tools-toggle" id="btnToolsToggle" aria-haspopup="true" aria-expanded="false" title="開啟進階工具、資料前處理與說明手冊">
+              <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+              <span>工具與設定</span>
+              <svg class="dropdown-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="dropdown-menu-tools" id="dropdownMenuTools" role="menu">
+              <div class="dropdown-group-label">資料前處理</div>
+              <button type="button" class="dropdown-menu-item" id="btnOpen17DomainsModalTop" role="menuitem">
+                <span class="item-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                </span>
+                <div class="item-content">
+                  <span class="item-title">17領域變數與年份設定</span>
+                  <span class="item-subtitle">自選 e-Stat 官方 17 大領域指標變數與跨度</span>
+                </div>
+              </button>
+              <button type="button" class="dropdown-menu-item" id="btnOpenSchemaModalTop" role="menuitem">
+                <span class="item-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </span>
+                <div class="item-content">
+                  <span class="item-title">欄位微調與分類 (Tableau Prep)</span>
+                  <span class="item-subtitle">微調維度、度量、連續與離散型別</span>
+                </div>
+              </button>
 
-          <!-- Tableau Data Prep & Schema Button -->
-          <button type="button" class="btn btn-sm btn-outline" id="btnOpenSchemaModalTop" title="開啟 Tableau 欄位分類與資料前處理精靈">
-            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            </svg>
-            <span>欄位微調與分類 (Tableau Prep)</span>
-          </button>
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-group-label">視覺引擎與看板</div>
+              <button type="button" class="dropdown-menu-item" id="btnToggleEngine" role="menuitem">
+                <span class="item-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                </span>
+                <div class="item-content">
+                  <span class="item-title" id="btnToggleEngineLabel">切換圖表引擎 (ECharts / Canvas)</span>
+                  <span class="item-subtitle">切換高互動向量與 1080p 點陣渲染</span>
+                </div>
+              </button>
+              <button type="button" class="dropdown-menu-item" id="btnPinChart" role="menuitem" title="將當前圖表配置與狀態釘選至自訂看板">
+                <span class="item-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 17v5M9 2h6l2 7H7l2-7zM7 9l-2 5h14l-2-5"></path></svg>
+                </span>
+                <div class="item-content">
+                  <span class="item-title">釘選當前圖表至看板</span>
+                  <span class="item-subtitle">保存當前探索視覺快照至多宮格看板</span>
+                </div>
+              </button>
 
-          <!-- Toggle Engine -->
-          <button type="button" class="btn btn-sm btn-outline" id="btnToggleEngine" title="切換 ECharts 互動引擎 或 原生 1080p Bauhaus Canvas">
-            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="20" x2="18" y2="10"></line>
-              <line x1="12" y1="20" x2="12" y2="4"></line>
-              <line x1="6" y1="20" x2="6" y2="14"></line>
-            </svg>
-            <span>ECharts 互動引擎</span>
-          </button>
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-group-label">說明與導覽</div>
+              <a href="data_atoms_manual.html" target="_blank" class="dropdown-menu-item" role="menuitem">
+                <span class="item-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                </span>
+                <div class="item-content">
+                  <span class="item-title">視覺編碼操作手冊 ↗</span>
+                  <span class="item-subtitle">X、Y、色、面、濾原理與 10 大原子規格</span>
+                </div>
+              </a>
+              <button type="button" class="dropdown-menu-item" id="btnOpenBriefingModal" role="menuitem">
+                <span class="item-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </span>
+                <div class="item-content">
+                  <span class="item-title">數據動態簡報</span>
+                  <span class="item-subtitle">播放 34 秒包豪斯動態影音解說</span>
+                </div>
+              </button>
+            </div>
+          </div>
 
-          <!-- Visual Manual Button -->
-          <a href="data_atoms_manual.html" target="_blank" class="btn btn-sm btn-outline" style="text-decoration: none; color: #475569;" title="開啟 Data Atoms 視覺編碼操作手冊 (X、Y、色、面、濾 原理解析)">
-            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-            </svg>
-            <span>編碼說明書</span>
-          </a>
-
-          <!-- Data-to-Video Briefing Button -->
-          <button type="button" class="btn-briefing" id="btnOpenBriefingModal" title="查看 34秒 包豪斯動態影音簡報">
-            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
-            <span>數據動態簡報</span>
-          </button>
-
-          <!-- 釘選至看板按鈕 (Pin Chart) -->
-          <button type="button" class="btn btn-sm btn-outline" id="btnPinChart" onclick="window.PyGWalker.pinCurrentChart()" title="將當前圖表配置與狀態釘選至自訂看板">
-            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 17v5M9 2h6l2 7H7l2-7zM7 9l-2 5h14l-2-5"></path>
-            </svg>
-            <span>釘選圖表</span>
-          </button>
-
-          <!-- 開啟自訂看板按鈕 (Custom Dashboard) -->
+          <!-- 2. 開啟自訂看板按鈕 (Custom Dashboard) -->
           <button type="button" class="btn btn-sm" id="btnOpenDashboardModal" onclick="window.PyGWalker.openCustomDashboard()" style="background:#4f46e5; color:#ffffff; border:1px solid #4338ca; font-weight:700;" title="開啟已釘選的多宮格自訂看板">
             <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="8" height="8" rx="1"></rect>
@@ -501,7 +521,7 @@
             <span id="pinnedCountBadge" class="pinned-count-badge">0</span>
           </button>
 
-          <!-- Export Image -->
+          <!-- 3. 匯出圖表 (Primary Export Image) -->
           <button type="button" class="btn btn-primary" id="btnExportImage" title="匯出 1080p 高清圖表">
             <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
