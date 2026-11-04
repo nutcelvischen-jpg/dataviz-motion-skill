@@ -64,7 +64,11 @@
 
     // Tableau / PyGWalker 工作簿分頁 (Multi-Tab Workbook)
     sheets: [],
-    activeSheetId: 'sheet_1'
+    activeSheetId: 'sheet_1',
+
+    // 工作區佈局彈性伸縮與縮放狀態 (Plan 1 & Plan 2)
+    sidebarCollapsed: false,
+    zoomLevel: 100
   };
 
   let echartsInstance = null;
@@ -83,17 +87,27 @@
     if (typeof val === 'number') return isNaN(val) ? 0 : val;
     if (val === null || val === undefined) return 0;
     const str = String(val).replace(/[,%]/g, '').trim();
-    if (str === '') return 0;
+    if (str === '' || str === '-' || str === 'N/A' || str === 'null' || str === 'undefined') return 0;
     const n = Number(str);
     return isNaN(n) ? 0 : n;
+  }
+
+  function isValidNumeric(val) {
+    if (val === null || val === undefined) return false;
+    if (typeof val === 'number') return !isNaN(val) && isFinite(val);
+    const str = String(val).replace(/[,%]/g, '').trim();
+    if (str === '' || str === '-' || str === 'N/A' || str === 'null' || str === 'undefined') return false;
+    const n = Number(str);
+    return !isNaN(n) && isFinite(n);
   }
 
   function safeMin(arr, defaultVal = 0) {
     if (!arr || !arr.length) return defaultVal;
     let min = Infinity;
     for (let i = 0; i < arr.length; i++) {
-      const v = Number(arr[i]);
-      if (!isNaN(v) && v < min) min = v;
+      if (!isValidNumeric(arr[i])) continue;
+      const v = safeParseNumber(arr[i]);
+      if (v < min) min = v;
     }
     return min === Infinity ? defaultVal : min;
   }
@@ -102,8 +116,9 @@
     if (!arr || !arr.length) return defaultVal;
     let max = -Infinity;
     for (let i = 0; i < arr.length; i++) {
-      const v = Number(arr[i]);
-      if (!isNaN(v) && v > max) max = v;
+      if (!isValidNumeric(arr[i])) continue;
+      const v = safeParseNumber(arr[i]);
+      if (v > max) max = v;
     }
     return max === -Infinity ? defaultVal : max;
   }
@@ -113,11 +128,10 @@
     let min = Infinity;
     let max = -Infinity;
     for (let i = 0; i < arr.length; i++) {
-      const v = Number(arr[i]);
-      if (!isNaN(v)) {
-        if (v < min) min = v;
-        if (v > max) max = v;
-      }
+      if (!isValidNumeric(arr[i])) continue;
+      const v = safeParseNumber(arr[i]);
+      if (v < min) min = v;
+      if (v > max) max = v;
     }
     return [
       min === Infinity ? defaultMin : min,
@@ -450,6 +464,7 @@
       state.activeSheetId = 'sheet_1';
     }
     renderWorkbookTabs();
+    applyZoom(state.zoomLevel || 100, false);
 
     // 檢查 URL 參數是否指定了圖表 (如 ?chart=line, ?chart=geo, ?chart=violin)
     try {
@@ -4113,6 +4128,44 @@
 
     const btnImportSheets = document.getElementById('btnImportAllSheets');
     if (btnImportSheets) btnImportSheets.addEventListener('click', importAllSheetsToDashboard);
+
+    // 側邊欄一鍵收合/展開 (Collapsible Sidebar)
+    const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+    if (btnToggleSidebar) {
+      btnToggleSidebar.addEventListener('click', () => {
+        toggleSidebar();
+      });
+    }
+    const btnDockCollapse = document.getElementById('btnDockCollapse');
+    if (btnDockCollapse) {
+      btnDockCollapse.addEventListener('click', () => {
+        toggleSidebar();
+      });
+    }
+
+    // 視圖縮放控制器 (Workspace Zoom Controller)
+    const btnZoomIn = document.getElementById('btnZoomIn');
+    if (btnZoomIn) {
+      btnZoomIn.addEventListener('click', zoomIn);
+    }
+    const btnZoomOut = document.getElementById('btnZoomOut');
+    if (btnZoomOut) {
+      btnZoomOut.addEventListener('click', zoomOut);
+    }
+    const btnZoomReset = document.getElementById('btnZoomReset');
+    if (btnZoomReset) {
+      btnZoomReset.addEventListener('click', resetZoom);
+    }
+
+    // 鍵盤快捷鍵：[ 或 ] 收合/展開側邊欄
+    window.addEventListener('keydown', (e) => {
+      const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+      if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') return;
+      if (e.key === '[' || e.key === ']') {
+        e.preventDefault();
+        toggleSidebar();
+      }
+    });
   }
 
   // --- Tableau 語意綱要分類精靈 (Schema Classifier Modal) ---
@@ -4586,9 +4639,11 @@
     const toast = document.getElementById('toastNotice');
     if (!toast) return;
     toast.textContent = msg;
+    toast.classList.add('show');
     toast.classList.add('visible');
     clearTimeout(window._toastTimer);
     window._toastTimer = setTimeout(() => {
+      toast.classList.remove('show');
       toast.classList.remove('visible');
     }, 2800);
   }
@@ -5664,8 +5719,158 @@
     });
   }, 120));
 
+  // =========================================================================
+  // 工作區版面彈性伸縮與縮放控制器 (Plan 1 & Plan 2: Collapsible Sidebar & Zoom)
+  // =========================================================================
+
+  const ZOOM_LEVELS = [75, 90, 100, 125, 150];
+
+  function toggleSidebar(forceState) {
+    const bodyEl = document.querySelector('.workspace-body') || document.body;
+    const shellEl = document.querySelector('.app-shell') || document.body;
+
+    let shouldCollapse;
+    if (typeof forceState === 'boolean') {
+      shouldCollapse = forceState;
+    } else {
+      shouldCollapse = !bodyEl.classList.contains('sidebar-collapsed');
+    }
+
+    state.sidebarCollapsed = shouldCollapse;
+
+    if (shouldCollapse) {
+      bodyEl.classList.add('sidebar-collapsed');
+      shellEl.classList.add('sidebar-collapsed');
+    } else {
+      bodyEl.classList.remove('sidebar-collapsed');
+      shellEl.classList.remove('sidebar-collapsed');
+    }
+
+    // 更新收合按鈕狀態與提示
+    const btnHandle = document.getElementById('btnToggleSidebar');
+    if (btnHandle) {
+      const icon = btnHandle.querySelector('.toggle-icon') || btnHandle;
+      if (shouldCollapse) {
+        icon.textContent = '▶';
+        btnHandle.title = '展開側邊欄';
+        btnHandle.setAttribute('aria-label', '展開側邊欄');
+      } else {
+        icon.textContent = '◀';
+        btnHandle.title = '收合側邊欄 (最大化工作區)';
+        btnHandle.setAttribute('aria-label', '收合側邊欄 (最大化工作區)');
+      }
+    }
+
+    // 在 CSS 轉場過程 (0.28s) 中以平滑間隔調用 resize，確保 ECharts 無縫填滿全寬工作區
+    const startTime = Date.now();
+    const animTimer = setInterval(() => {
+      if (echartsInstance) echartsInstance.resize();
+      if (Date.now() - startTime > 320) {
+        clearInterval(animTimer);
+        if (echartsInstance) echartsInstance.resize();
+        window.dispatchEvent(new Event('resize'));
+      }
+    }, 30);
+
+    showToast(shouldCollapse ? '◀ 已收合側邊欄 (最大化工作區)' : '▶ 已展開側邊欄');
+  }
+
+  function applyZoom(newZoom, showToastNotice = true) {
+    if (!ZOOM_LEVELS.includes(newZoom)) {
+      newZoom = ZOOM_LEVELS.reduce((prev, curr) => Math.abs(curr - newZoom) < Math.abs(prev - newZoom) ? curr : prev);
+    }
+    state.zoomLevel = newZoom;
+
+    // 更新 UI 徽章與按鈕停用狀態
+    const badge = document.getElementById('zoomLevelBadge');
+    if (badge) badge.textContent = `${newZoom}%`;
+
+    const btnZoomOut = document.getElementById('btnZoomOut');
+    const btnZoomIn = document.getElementById('btnZoomIn');
+    const currIdx = ZOOM_LEVELS.indexOf(newZoom);
+    if (btnZoomOut) btnZoomOut.disabled = (currIdx <= 0);
+    if (btnZoomIn) btnZoomIn.disabled = (currIdx >= ZOOM_LEVELS.length - 1);
+
+    // 調整圖表視窗 #echartsViewport 尺寸與比例
+    const viewport = document.getElementById('echartsViewport');
+    if (viewport) {
+      if (newZoom === 100) {
+        viewport.style.width = '100%';
+        viewport.style.height = '100%';
+        viewport.style.minWidth = '100%';
+        viewport.style.minHeight = '100%';
+        viewport.style.flex = '1 1 auto';
+        viewport.style.margin = '0';
+      } else if (newZoom < 100) {
+        viewport.style.width = `${newZoom}%`;
+        viewport.style.height = `${newZoom}%`;
+        viewport.style.minWidth = `${newZoom}%`;
+        viewport.style.minHeight = `${newZoom}%`;
+        viewport.style.flex = '0 0 auto';
+        viewport.style.margin = 'auto';
+      } else {
+        // newZoom > 100
+        viewport.style.width = `${newZoom}%`;
+        viewport.style.height = `${newZoom}%`;
+        viewport.style.minWidth = `${newZoom}%`;
+        viewport.style.minHeight = `${newZoom}%`;
+        viewport.style.flex = `0 0 ${newZoom}%`;
+        viewport.style.margin = '0';
+      }
+    }
+
+    // 原生 Canvas 視圖同步縮放
+    const canvasWrapper = document.querySelector('.canvas-wrapper');
+    if (canvasWrapper) {
+      canvasWrapper.style.transform = (newZoom === 100) ? 'none' : `scale(${newZoom / 100})`;
+      canvasWrapper.style.transformOrigin = 'center center';
+    }
+
+    // 即時重繪與適配
+    if (echartsInstance) {
+      setTimeout(() => {
+        echartsInstance.resize();
+      }, 50);
+    }
+
+    if (showToastNotice) {
+      showToast(`🔍 視圖縮放: ${newZoom}%`);
+    }
+  }
+
+  function zoomIn() {
+    const currIdx = ZOOM_LEVELS.indexOf(state.zoomLevel || 100);
+    const nextIdx = Math.min(ZOOM_LEVELS.length - 1, (currIdx === -1 ? 2 : currIdx) + 1);
+    applyZoom(ZOOM_LEVELS[nextIdx], true);
+  }
+
+  function zoomOut() {
+    const currIdx = ZOOM_LEVELS.indexOf(state.zoomLevel || 100);
+    const prevIdx = Math.max(0, (currIdx === -1 ? 2 : currIdx) - 1);
+    applyZoom(ZOOM_LEVELS[prevIdx], true);
+  }
+
+  function resetZoom() {
+    applyZoom(100, true);
+  }
+
   // --- 暴露給全域供點擊調用 ---
   window.PyGWalker = {
+    toggleSidebar: (forceState) => {
+      toggleSidebar(forceState);
+    },
+    zoomIn: () => {
+      zoomIn();
+    },
+    zoomOut: () => {
+      zoomOut();
+    },
+    resetZoom: () => {
+      resetZoom();
+    },
+    applyZoom: (newZoom, showToastNotice) => {
+      applyZoom(newZoom, showToastNotice);
+    },
     pinCurrentChart: () => {
       pinCurrentChart();
     },
@@ -5837,6 +6042,11 @@
   window.promptRenameSheet = promptRenameSheet;
   window.deleteSheet = deleteSheet;
   window.importAllSheetsToDashboard = importAllSheetsToDashboard;
+  window.toggleSidebar = toggleSidebar;
+  window.applyZoom = applyZoom;
+  window.zoomIn = zoomIn;
+  window.zoomOut = zoomOut;
+  window.resetZoom = resetZoom;
 
   // 當 DOM 與資源就緒時初始化
   if (document.readyState === 'loading') {
