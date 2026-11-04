@@ -49,25 +49,68 @@
 
     // 1. 若在 Data Atoms 互動探索工作台 (data_atoms.html)
     const atomNavActive = document.querySelector('.atom-nav-btn.active, .chart-type-card.active');
-    if (atomNavActive || document.getElementById('echartsViewport')) {
-      const activeAtomName = atomNavActive ? atomNavActive.innerText.trim().replace(/\s+/g, ' ') : '未指定圖表';
-      const datasetSelect = document.getElementById('datasetSelect');
-      const datasetName = datasetSelect ? datasetSelect.options[datasetSelect.selectedIndex]?.text : '日本 47 都道府縣人口與高齡化全量表 (2024 e-Stat)';
+    const hasPyg = !!(window.PyGWalker?.getState || document.getElementById('echartsViewport') || document.getElementById('chartContainer') || atomNavActive);
+    if (hasPyg) {
+      const pwState = (typeof window !== 'undefined' && window.PyGWalker?.getState) ? window.PyGWalker.getState() : null;
+      const activeAtomName = pwState?.chartType 
+        ? `${pwState.chartType.toUpperCase()} (${atomNavActive?.innerText.trim().replace(/\s+/g, ' ') || pwState.chartType})`
+        : (atomNavActive ? atomNavActive.innerText.trim().replace(/\s+/g, ' ') : '未指定圖表');
 
-      const xChips = Array.from(document.querySelectorAll('#slotColumns .col-chip, #slotColumns span')).map(el => el.innerText.replace('×', '').trim()).filter(Boolean);
-      const yChips = Array.from(document.querySelectorAll('#slotRows .col-chip, #slotRows span')).map(el => el.innerText.replace('×', '').trim()).filter(Boolean);
-      const secChips = Array.from(document.querySelectorAll('#slotSecondary .col-chip, #slotSecondary span')).map(el => el.innerText.replace('×', '').trim()).filter(Boolean);
-      const colorChips = Array.from(document.querySelectorAll('#slotColor .col-chip, #slotColor span')).map(el => el.innerText.replace('×', '').trim()).filter(Boolean);
-      const filterChips = Array.from(document.querySelectorAll('#slotFilter .col-chip, #filterBadges .filter-badge, .filter-chip.active')).map(el => el.innerText.replace('×', '').trim()).filter(Boolean);
+      const dsSelect = document.getElementById('datasetQuickSelect') || document.getElementById('pygDatasetSelect') || document.getElementById('datasetSelect');
+      const datasetName = pwState?.datasetName || (dsSelect ? dsSelect.options[dsSelect.selectedIndex]?.text : '日本 47 都道府縣人口與高齡化全量表 (2024 e-Stat)');
+
+      // 提取編碼槽欄位：優先讀取 pwState.shelf，其次查詢各 shelf DOM 容器
+      const getPillTexts = (selector) => Array.from(document.querySelectorAll(selector))
+        .map(el => el.innerText.replace('×', '').trim())
+        .filter(Boolean);
+
+      const xFields = pwState?.shelf?.x ? [pwState.shelf.x] : getPillTexts('#shelfX .shelf-pill, #shelfX span, #slotColumns .col-chip, #slotColumns span');
+      const yFields = (pwState?.shelf?.yMulti && pwState.shelf.yMulti.length) 
+        ? pwState.shelf.yMulti 
+        : (pwState?.shelf?.y ? [pwState.shelf.y] : getPillTexts('#shelfY .shelf-pill, #shelfY span, #slotRows .col-chip, #slotRows span'));
+      const secFields = pwState?.shelf?.secondary ? [pwState.shelf.secondary] : getPillTexts('#shelfSecondary .shelf-pill, #shelfSecondary span, #slotSecondary .col-chip, #slotSecondary span');
+      const colorFields = pwState?.shelf?.color ? [pwState.shelf.color] : getPillTexts('#shelfColor .shelf-pill, #shelfColor span, #slotColor .col-chip, #slotColor span');
+      const facetFields = pwState?.shelf?.facet ? [pwState.shelf.facet] : getPillTexts('#shelfFacet .shelf-pill, #shelfFacet span');
+      const sizeFields = pwState?.shelf?.size ? [pwState.shelf.size] : getPillTexts('#shelfSize .shelf-pill, #shelfSize span');
+
+      // 篩選條件
+      let filterDesc = [];
+      if (pwState?.filters && Object.keys(pwState.filters).length > 0) {
+        for (const [col, f] of Object.entries(pwState.filters)) {
+          if (f.type === 'range') {
+            filterDesc.push(`${col}: ${f.min} ~ ${f.max}`);
+          } else if (f.selected && f.allValues && f.selected.size < f.allValues.length) {
+            filterDesc.push(`${col}: 選中 ${f.selected.size}/${f.allValues.length} 項`);
+          }
+        }
+      }
+      if (filterDesc.length === 0) {
+        const domFilters = getPillTexts('#shelfFilters .shelf-pill, #slotFilter .col-chip, #filterBadges .filter-badge, .filter-chip.active');
+        if (domFilters.length) filterDesc = domFilters;
+      }
+
+      // KPI Ribbon 即時數值
+      const kpiRow = document.getElementById('kpiRowCount')?.innerText?.trim();
+      const kpiSum = document.getElementById('kpiTotalSum')?.innerText?.trim();
+      const kpiMean = document.getElementById('kpiMeanVal')?.innerText?.trim();
+      const kpiMetric4 = document.getElementById('kpiMetric4Val')?.innerText?.trim();
+      const kpiMetric4Title = document.getElementById('kpiMetric4Title')?.innerText?.trim() || 'MAX/MIN';
 
       summary += `\n【Data Atoms 工作台即時狀態】：`;
       summary += `\n- 當前選用圖表原子：${activeAtomName}`;
       summary += `\n- 載入資料庫：${datasetName}`;
-      summary += `\n- Columns (X 軸)：${xChips.join(', ') || '都道府縣'}`;
-      summary += `\n- Rows (Y 軸)：${yChips.join(', ') || '總人口(人)'}`;
-      if (secChips.length) summary += `\n- 次軸折線 (Secondary)：${secChips.join(', ')}`;
-      if (colorChips.length) summary += `\n- 顏色分組 (Color)：${colorChips.join(', ')}`;
-      summary += `\n- 篩選條件：${filterChips.join('； ') || '全量呈現（未設定特殊篩選）'}`;
+      summary += `\n- Columns (X 軸)：${xFields.join(', ') || '未設定'}`;
+      summary += `\n- Rows (Y 軸)：${yFields.join(', ') || '未設定'}`;
+      if (secFields.length) summary += `\n- 次軸折線 (Secondary)：${secFields.join(', ')}`;
+      if (colorFields.length) summary += `\n- 顏色分組 (Color)：${colorFields.join(', ')}`;
+      if (facetFields.length) summary += `\n- 分面小多圖 (Facet)：${facetFields.join(', ')}`;
+      if (sizeFields.length) summary += `\n- 氣泡大小 (Size)：${sizeFields.join(', ')}`;
+      summary += `\n- 聚合運算模式 (Agg)：${pwState?.shelf?.agg || 'RAW'}`;
+      summary += `\n- 篩選條件：${filterDesc.join('； ') || '全量呈現（未設定特殊篩選）'}`;
+
+      if (kpiRow || kpiSum) {
+        summary += `\n- 即時 KPI 監控：筆數(Rows)=${kpiRow || '0'} | 總和(Sum)=${kpiSum || '0'} | 平均(Mean)=${kpiMean || '0'} | ${kpiMetric4Title}=${kpiMetric4 || '0'}`;
+      }
     }
 
     // 2. 若在 e-Stat API 實機模擬器 (estat_api_tutorial_simulator.html)
@@ -853,9 +896,8 @@
             }
           ];
         } else {
-          // 純文字訊息，附帶精簡頁面情境（避免干擾主對話，但讓模型知曉當前頁面）
-          const shortContext = `\n\n[附帶頁面情境: ${document.title} (${location.pathname.split('/').pop() || 'index.html'})]`;
-          messagePayload = message + shortContext;
+          // 純文字訊息，附帶完整學員網頁情境（包含當前圖表、資料集、維度度量、聚合方式與 KPI 即時狀態）
+          messagePayload = `${message}\n\n[當前學員網頁情境]\n${pageContext}`;
         }
 
         const payload = {
@@ -1047,6 +1089,14 @@
     return String(str || '')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+
+  // 匯出全域物件以供外部調用、除錯與自動化測試
+  if (typeof window !== 'undefined') {
+    window.DigitalJiTong = {
+      getPageContextSummary,
+      handleUserSend
+    };
   }
 
   // 自動掛載

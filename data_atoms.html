@@ -243,7 +243,8 @@
       border-color: #FF4400;
       transform: translateX(2px);
     }
-    .story-item.active-scene {
+    .story-item.active-scene,
+    .story-item.active {
       border-left-color: #FF4400;
       background: #fffdfb;
       box-shadow: 0 2px 8px rgba(255,68,0,0.08);
@@ -939,7 +940,7 @@
           <span class="control-group-label">關注焦點：</span>
           <div class="lens-pill-group">
             <button type="button" class="lens-pill-btn active" id="btnLensSales">💰 銷售與營收</button>
-            <button type="button" class="lens-pill-btn" id="btnLensScm">📦 供應鏈與庫存</button>
+            <button type="button" class="lens-pill-btn lens-scm" id="btnLensScm">📦 供應鏈與庫存</button>
           </div>
         </div>
         <div class="control-group">
@@ -1250,17 +1251,283 @@
   <script src="js/universal_geo_engine.js?v=20261104_facet_v6"></script>
   <script src="js/pygwalker_data_atoms.js?v=20261104_facet_v6"></script>
   <script>
-    // Briefing Modal Controller
+    // Briefing Modal Controller (包豪斯動態影音簡報導演層互動控制器)
     (function() {
       const btnOpen = document.getElementById('btnOpenBriefingModal');
       const btnClose = document.getElementById('btnCloseBriefingModal');
       const modal = document.getElementById('briefingModal');
       const video = document.getElementById('briefingVideoPlayer');
+      const videoSrc = document.getElementById('briefingVideoSrc');
+      const btnDownload = document.getElementById('btnDownloadBriefingVideo');
+      const btnApply = document.getElementById('btnApplyScriptChanges');
 
+      const btnLensSales = document.getElementById('btnLensSales');
+      const btnLensScm = document.getElementById('btnLensScm');
+      const btnToneExec = document.getElementById('btnToneExec');
+      const btnToneTeam = document.getElementById('btnToneTeam');
+
+      const modalLensBadge = document.getElementById('modalLensBadge');
+      const lensKpiChip = document.getElementById('lensKpiChip');
+
+      const s1_title = document.getElementById('s1_title');
+      const s1_chip = document.getElementById('s1_chip');
+      const s1_script = document.getElementById('s1_script');
+
+      const s2_title = document.getElementById('s2_title');
+      const s2_chip = document.getElementById('s2_chip');
+      const s2_script = document.getElementById('s2_script');
+
+      const s3_title = document.getElementById('s3_title');
+      const s3_chip = document.getElementById('s3_chip');
+      const s3_script = document.getElementById('s3_script');
+
+      const s4_title = document.getElementById('s4_title');
+      const s4_chip = document.getElementById('s4_chip');
+      const s4_script = document.getElementById('s4_script');
+
+      const storyCards = document.querySelectorAll('.story-item[data-time]');
+
+      let currentLens = 'sales';
+      let currentTone = 'exec';
+
+      const BRIEFING_CONFIG = {
+        sales: {
+          badge: '120 BPM SALES BAUHAUS',
+          kpiText: '營收主力：企業雲端 25.5%',
+          kpiBg: '#FFEBE5',
+          kpiColor: '#FF4400',
+          kpiBorder: '#FF4400',
+          poster: 'preview_frames/bauhaus_scene_01.png',
+          videoExec: 'videos/data_briefing_bauhaus_34s.mp4',
+          videoTeam: 'videos/dataviz_analytics_45s.mp4',
+          downloadName: 'Data_Atoms_銷售營收簡報.mp4',
+          s1: {
+            title: '01. 全量體量 · MACRO VOLUME',
+            chip: '3,690 萬元',
+            exec: '八大產品線總營收達 3,690 萬元，產出維持高位水準。',
+            team: '全產品線總營收 3,690 萬元，主力雲端貢獻持續擴大，請團隊關注交付里程碑。'
+          },
+          s2: {
+            title: '02. 結構佔比 · PARETO DOMINANCE',
+            chip: 'TOP 25.5%',
+            exec: '旗艦雲端運算突破 940 萬，以二成五份額穩居成長主力。',
+            team: '雲端運算佔比 25.5%，達成單季業績標竿；邊緣感知端需加強銷售轉換。'
+          },
+          s3: {
+            title: '03. 梯隊分佈 · DISCRETE MATRIX',
+            chip: '跨度 5.9x',
+            exec: '各品類極值跨度達 5.9 倍，高毛利模組具備強勁擴張潛力。',
+            team: '品類營收跨度達 5.9 倍，建議業務一組專注高客單價模組，二組深耕長尾客戶。'
+          },
+          s4: {
+            title: '04. 執行決策 · STRATEGIC LOCKUP',
+            chip: 'ACTION PLAN',
+            exec: '以理性幾何穿透複雜表象，驅動敏捷決策。Data Atoms 簡報完畢。',
+            team: '各敏捷小組依最新儀表板指標每週覆盤，加速商機轉換與專案落地。'
+          }
+        },
+        scm: {
+          badge: '120 BPM SCM BAUHAUS',
+          kpiText: '供應鏈瓶頸：物聯網模組 14.2%',
+          kpiBg: '#EFF6FF',
+          kpiColor: '#1E40AF',
+          kpiBorder: '#3B82F6',
+          poster: 'preview_frames/scm_scene_01.png',
+          videoExec: 'videos/briefing_supply_chain_34s.mp4',
+          videoTeam: 'videos/briefing_supply_chain_34s.mp4',
+          downloadName: 'Data_Atoms_供應鏈庫存簡報.mp4',
+          s1: {
+            title: '01. 庫存總量 · MACRO INVENTORY',
+            chip: '14,800 件',
+            exec: '供應鏈總庫存達一萬四千八百件，單品平均庫存一千八百件。',
+            team: '總庫存 14,800 件已逼近警戒水位，倉儲物流組需啟動每日進出動態監控。'
+          },
+          s2: {
+            title: '02. 瓶頸風險 · BOTTLENECK ALERT',
+            chip: '延遲 14.2%',
+            exec: '物聯網邊緣節點交期延遲率達百分之十四，構成關鍵供應鏈瓶頸。',
+            team: '物聯網節點延遲率 14.2%，採購組須於本週內完成備援供應商二開審核。'
+          },
+          s3: {
+            title: '03. 週轉天數 · TURNOVER SPREAD',
+            chip: '極差 64天',
+            exec: '庫存週轉天數極差達六十四天，智慧製造積壓八十二天亟需清理。',
+            team: '智慧製造庫存積壓 82 天，建議產銷協調會優先安排折讓促銷與轉移庫存。'
+          },
+          s4: {
+            title: '04. 交付決策 · SCM DISPATCH',
+            chip: 'ACTION PLAN',
+            exec: '啟動動態配額與供應商平行分流，保證交付並壓降週轉成本。',
+            team: '各產線即日起切換為敏捷配額制，平行排產以壓縮交期並降低持有成本。'
+          }
+        }
+      };
+
+      function updateBriefingView() {
+        const cfg = BRIEFING_CONFIG[currentLens];
+        if (!cfg) return;
+
+        // 1. 更新徽章與 KPI Chip
+        if (modalLensBadge) {
+          modalLensBadge.textContent = currentTone === 'team' ? `${cfg.badge} (團隊拆解)` : cfg.badge;
+        }
+        if (lensKpiChip) {
+          lensKpiChip.textContent = cfg.kpiText;
+          lensKpiChip.style.background = cfg.kpiBg;
+          lensKpiChip.style.color = cfg.kpiColor;
+          lensKpiChip.style.borderColor = cfg.kpiBorder;
+        }
+
+        // 2. 切換影片來源與海報
+        const targetVideo = (currentTone === 'team' && cfg.videoTeam) ? cfg.videoTeam : cfg.videoExec;
+        if (video) {
+          video.poster = cfg.poster;
+        }
+        if (videoSrc) {
+          if (videoSrc.getAttribute('src') !== targetVideo) {
+            videoSrc.setAttribute('src', targetVideo);
+            if (video) {
+              video.load();
+              video.currentTime = 0;
+              video.play().catch(() => {});
+            }
+          }
+        }
+
+        // 3. 更新下載連結
+        if (btnDownload) {
+          btnDownload.href = targetVideo;
+          btnDownload.download = cfg.downloadName;
+        }
+
+        // 4. 更新劇本文字、標題與標籤
+        const isTeam = currentTone === 'team';
+        if (s1_title) s1_title.textContent = cfg.s1.title;
+        if (s1_chip) s1_chip.textContent = cfg.s1.chip;
+        if (s1_script) s1_script.value = isTeam ? cfg.s1.team : cfg.s1.exec;
+
+        if (s2_title) s2_title.textContent = cfg.s2.title;
+        if (s2_chip) s2_chip.textContent = cfg.s2.chip;
+        if (s2_script) s2_script.value = isTeam ? cfg.s2.team : cfg.s2.exec;
+
+        if (s3_title) s3_title.textContent = cfg.s3.title;
+        if (s3_chip) s3_chip.textContent = cfg.s3.chip;
+        if (s3_script) s3_script.value = isTeam ? cfg.s3.team : cfg.s3.exec;
+
+        if (s4_title) s4_title.textContent = cfg.s4.title;
+        if (s4_chip) s4_chip.textContent = cfg.s4.chip;
+        if (s4_script) s4_script.value = isTeam ? cfg.s4.team : cfg.s4.exec;
+
+        // 重置選中第 1 幕
+        highlightStoryScene(1);
+      }
+
+      function highlightStoryScene(sceneNum) {
+        storyCards.forEach(card => {
+          if (Number(card.dataset.scene) === Number(sceneNum)) {
+            card.classList.add('active', 'active-scene');
+          } else {
+            card.classList.remove('active', 'active-scene');
+          }
+        });
+      }
+
+      // Lens 事件綁定
+      if (btnLensSales) {
+        btnLensSales.addEventListener('click', () => {
+          if (currentLens === 'sales') return;
+          currentLens = 'sales';
+          btnLensSales.classList.add('active');
+          if (btnLensScm) btnLensScm.classList.remove('active');
+          updateBriefingView();
+        });
+      }
+
+      if (btnLensScm) {
+        btnLensScm.addEventListener('click', () => {
+          if (currentLens === 'scm') return;
+          currentLens = 'scm';
+          btnLensScm.classList.add('active');
+          if (btnLensSales) btnLensSales.classList.remove('active');
+          updateBriefingView();
+        });
+      }
+
+      // Tone 事件綁定
+      if (btnToneExec) {
+        btnToneExec.addEventListener('click', () => {
+          if (currentTone === 'exec') return;
+          currentTone = 'exec';
+          btnToneExec.classList.add('active');
+          if (btnToneTeam) btnToneTeam.classList.remove('active');
+          updateBriefingView();
+        });
+      }
+
+      if (btnToneTeam) {
+        btnToneTeam.addEventListener('click', () => {
+          if (currentTone === 'team') return;
+          currentTone = 'team';
+          btnToneTeam.classList.add('active');
+          if (btnToneExec) btnToneExec.classList.remove('active');
+          updateBriefingView();
+        });
+      }
+
+      // 分鏡卡片點擊跳轉時間
+      storyCards.forEach(card => {
+        card.addEventListener('click', () => {
+          const time = Number(card.dataset.time || 0);
+          const scene = Number(card.dataset.scene || 1);
+          highlightStoryScene(scene);
+          if (video) {
+            video.currentTime = time;
+            video.play().catch(() => {});
+          }
+        });
+      });
+
+      // 影片播放時自動高亮當前分鏡
+      if (video) {
+        video.addEventListener('timeupdate', () => {
+          const t = video.currentTime;
+          let activeScene = 1;
+          if (t >= 25) activeScene = 4;
+          else if (t >= 17) activeScene = 3;
+          else if (t >= 8) activeScene = 2;
+          else activeScene = 1;
+          highlightStoryScene(activeScene);
+        });
+      }
+
+      // 套用劇本更新按鈕反饋
+      if (btnApply) {
+        btnApply.addEventListener('click', () => {
+          const originalText = btnApply.innerHTML;
+          btnApply.disabled = true;
+          btnApply.innerHTML = '✅ 已套用腳本並重新合成預覽';
+
+          if (video) {
+            video.currentTime = 0;
+            video.play().catch(() => {});
+          }
+          highlightStoryScene(1);
+
+          setTimeout(() => {
+            btnApply.disabled = false;
+            btnApply.innerHTML = originalText;
+          }, 2000);
+        });
+      }
+
+      // 彈窗開關控制
       if (btnOpen && modal) {
         btnOpen.addEventListener('click', () => {
           modal.classList.add('open');
-          if (video) { video.currentTime = 0; video.play().catch(()=>{}); }
+          if (video) {
+            video.currentTime = 0;
+            video.play().catch(() => {});
+          }
         });
       }
       if (btnClose && modal) {
