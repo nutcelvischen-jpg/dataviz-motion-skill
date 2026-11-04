@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenRouter API 三階資料流架構圖解：裸模型 ➔ 聯網增強 ➔ 工具調用智慧體</title>
+  <meta name="description" content="深入解構大語言模型從「缸中之腦（Zero Context）」、「檢索增強（Web Grounding / RAG）」到「代理人工具循環（Tool Calling / Agent Loop）」的 API 資料流向與動態封包生命週期。">
+
+  <!-- Typography & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/learning.css?v=10">
+  <link rel="stylesheet" href="css/dose_mobile.css">
+
+  <style>
+    /* diagram-design editorial design tokens */
+    :root {
+      --dd-paper: #f8fafc;
+      --dd-paper-card: #ffffff;
+      --dd-paper-tint: #f1f5f9;
+      --dd-ink: #0f172a;
+      --dd-ink-strong: #020617;
+      --dd-muted: #475569;
+      --dd-soft: #64748b;
+      --dd-rule: rgba(15, 23, 42, 0.10);
+      --dd-rule-solid: #cbd5e1;
+      --dd-accent: #bf4520;           /* Coral / Burnt-Tangerine Focal Token */
+      --dd-accent-tint: rgba(191, 69, 32, 0.08);
+      --dd-accent-border: #ea580c;
+      --dd-link: #2563eb;
+      --dd-green: #1b8354;
+      --dd-green-tint: #f0fdf4;
+      --dd-green-border: #86efac;
+      --dd-cyan: #0284c7;
+      --dd-cyan-tint: #e0f2fe;
+      --dd-purple: #7e22ce;
+      --dd-purple-tint: #faf5ff;
+
+      --font-serif: "Instrument Serif", Georgia, serif;
+      --font-sans: "Inter", "Noto Sans TC", -apple-system, sans-serif;
+      --font-mono: "DM Mono", Menlo, Monaco, monospace;
+    }
+
+    body {
+      background-color: var(--dd-paper);
+      color: var(--dd-ink);
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    /* Container */
+    .arch-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 5rem;
+    }
+
+    /* Breadcrumbs */
+    .arch-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--dd-soft);
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .arch-nav a {
+      color: var(--dd-ink);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--dd-rule-solid);
+      transition: all 0.15s ease;
+    }
+    .arch-nav a:hover {
+      color: var(--dd-accent);
+      border-bottom-color: var(--dd-accent);
+    }
+    .arch-nav .sep {
+      color: var(--dd-rule-solid);
+    }
+
+    /* Header */
+    .arch-header {
+      margin-bottom: 2.5rem;
+    }
+    .arch-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--dd-accent);
+      display: block;
+      margin-bottom: 0.6rem;
+    }
+    .arch-header h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 3.8vw, 3rem);
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--dd-ink-strong);
+      margin: 0 0 1rem;
+      letter-spacing: -0.01em;
+    }
+    .arch-lead {
+      font-size: 1.08rem;
+      color: var(--dd-muted);
+      max-width: 880px;
+      margin: 0 0 1.5rem;
+      line-height: 1.7;
+    }
+
+    /* Badge Bar */
+    .badge-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 2rem;
+    }
+    .badge-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      padding: 0.3rem 0.65rem;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+    .badge-item.green { background: var(--dd-green-tint); color: var(--dd-green); border: 1px solid var(--dd-green-border); }
+    .badge-item.orange { background: var(--dd-accent-tint); color: var(--dd-accent); border: 1px solid rgba(191, 69, 32, 0.25); }
+    .badge-item.blue { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .badge-item.cyan { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
+    .badge-item.purple { background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+    .badge-item.slate { background: var(--dd-paper-tint); color: var(--dd-soft); border: 1px solid var(--dd-rule-solid); }
+
+    /* Diagram Master Frame (Dark Blueprint Edition) */
+    .diagram-frame {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      margin-bottom: 3.5rem;
+    }
+    .diagram-frame-header {
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      padding: 0.85rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .diagram-frame-title {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      color: #f0f6fc;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    /* Mode Switcher Tabs */
+    .mode-tabs-bar {
+      background: #11161d;
+      border-bottom: 1px solid #21262d;
+      padding: 0.6rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .mode-tab-buttons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .mode-tab-btn {
+      background: #21262d;
+      color: #8b949e;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 0.45rem 0.9rem;
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+    }
+    .mode-tab-btn:hover {
+      color: #f0f6fc;
+      background: #30363d;
+      border-color: #8b949e;
+    }
+    .mode-tab-btn.active.mode-1 {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border-color: #0284c7;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+    }
+    .mode-tab-btn.active.mode-2 {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border-color: #d97706;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+    }
+    .mode-tab-btn.active.mode-3 {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border-color: #16a34a;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.25);
+    }
+
+    /* Controls Bar */
+    .diagram-controls-bar {
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      padding: 0.6rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.82rem;
+    }
+    .diagram-ctrl-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .diagram-ctrl-btn {
+      background: #21262d;
+      color: #c9d1d9;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 0.35rem 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+    }
+    .diagram-ctrl-btn:hover {
+      background: #30363d;
+      color: #f0f6fc;
+      border-color: #8b949e;
+    }
+    .diagram-ctrl-btn.active {
+      background: #1f6feb;
+      color: #ffffff;
+      border-color: #388bfd;
+      box-shadow: 0 0 8px rgba(56, 139, 253, 0.4);
+    }
+
+    /* Simulation HUD Live Banner */
+    .sim-hud-banner {
+      background: #0d1f2d;
+      border-bottom: 1px solid #1f4260;
+      padding: 0.7rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #e0f2fe;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      animation: hud-slide-down 0.25s ease-out;
+    }
+    @keyframes hud-slide-down {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hud-pill {
+      background: #0284c7;
+      color: #ffffff;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .hud-text {
+      color: #bae6fd;
+      font-weight: 500;
+    }
+    .hud-timer {
+      color: #38bdf8;
+      font-weight: 700;
+    }
+
+    /* Scrollable Container for SVG Diagram */
+    .diagram-scroll-box {
+      width: 100%;
+      overflow-x: auto;
+      background: #090d13;
+      position: relative;
+    }
+    .diagram-scroll-box svg {
+      display: block;
+      width: 100%;
+      min-width: 1100px;
+      height: auto;
+    }
+
+    /* Console / Terminal Section */
+    .console-frame {
+      background: #090d13;
+      border-top: 1px solid #30363d;
+      padding: 1.2rem 1.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+    .console-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #8b949e;
+      margin-bottom: 0.6rem;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .console-body {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      padding: 0.85rem 1rem;
+      color: #e6edf3;
+      line-height: 1.6;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .console-log-line {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      margin-bottom: 0.45rem;
+    }
+    .console-log-line:last-child {
+      margin-bottom: 0;
+    }
+    .log-time { color: #6e7681; }
+    .log-tag {
+      padding: 0.1rem 0.45rem;
+      border-radius: 3px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .log-tag.m1 { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .log-tag.m2 { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .log-tag.m3 { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+    .log-tag.openrouter { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+
+    /* Comparison Cards Grid */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3.5rem;
+    }
+    .compare-card {
+      background: var(--dd-paper-card);
+      border: 1px solid var(--dd-rule-solid);
+      border-radius: 10px;
+      padding: 1.6rem 1.4rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .compare-card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+    .compare-card.active-card {
+      border-color: var(--dd-link);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+    .compare-card-tag {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 0.8rem;
+      width: fit-content;
+    }
+    .compare-card-tag.m1 { background: #e0f2fe; color: #0369a1; }
+    .compare-card-tag.m2 { background: #fef3c7; color: #b45309; }
+    .compare-card-tag.m3 { background: #dcfce7; color: #15803d; }
+    .compare-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      color: var(--dd-ink-strong);
+    }
+    .compare-card p {
+      font-size: 0.92rem;
+      color: var(--dd-muted);
+      line-height: 1.6;
+      margin: 0 0 1.2rem;
+      flex-grow: 1;
+    }
+    .compare-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.2rem;
+      font-size: 0.86rem;
+      border-top: 1px solid var(--dd-rule);
+      padding-top: 0.8rem;
+    }
+    .compare-list li {
+      margin-bottom: 0.45rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      color: var(--dd-muted);
+    }
+    .compare-list li strong {
+      color: var(--dd-ink);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+    }
+
+    /* Code & JSON Preview Accordion */
+    .code-preview-box {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      margin-top: 1rem;
+      overflow: hidden;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+    }
+    .code-preview-header {
+      background: #161b22;
+      padding: 0.5rem 0.8rem;
+      color: #8b949e;
+      border-bottom: 1px solid #30363d;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+    .code-preview-content {
+      padding: 0.8rem;
+      color: #38bdf8;
+      max-height: 140px;
+      overflow-y: auto;
+      white-space: pre;
+    }
+
+    /* Footer & Navigation */
+    .arch-footer {
+      border-top: 1px solid var(--dd-rule-solid);
+      padding-top: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.9rem;
+      color: var(--dd-soft);
+    }
+    .arch-footer a {
+      color: var(--dd-link);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .arch-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Keyframes for SVG Dynamic Pulses */
+    @keyframes pulseGlow {
+      0%, 100% { filter: drop-shadow(0 0 2px #38bdf8); }
+      50% { filter: drop-shadow(0 0 8px #38bdf8); }
+    }
+    .pulse-glow-cyan { animation: pulseGlow 2s infinite ease-in-out; }
+  </style>
+</head>
+<body>
+
+  <div class="arch-container">
+
+    <!-- Breadcrumb Navigation -->
+    <nav class="arch-nav" aria-label="導覽路徑">
+      <a href="index.html">首頁</a>
+      <span class="sep">/</span>
+      <a href="index.html#learning-map">大語言模型學習地圖</a>
+      <span class="sep">/</span>
+      <a href="system_architecture.html">全端系統架構</a>
+      <span class="sep">/</span>
+      <span style="color:var(--dd-ink); font-weight:600;">OpenRouter 三階資料流架構</span>
+    </nav>
+
+    <!-- Header Banner -->
+    <header class="arch-header">
+      <span class="arch-eyebrow">DATA FLOW ARCHITECTURE · 3 PATTERNS</span>
+      <h1>API 打到 OpenRouter 的三階資料流：裸模型 ➔ 聯網增強 ➔ 工具調用</h1>
+      <p class="arch-lead">
+        任何向大模型發起的 API 請求，都依賴其<strong>「上下文與外部工具邊界」</strong>。本圖解以動態封包粒子（Data Packets），帶您具象化看懂大語言模型從「缸中之腦（Zero Context）」、「檢索增強（Web Grounding / RAG）」到「代理人工具循環（Tool Calling / Agent Loop）」的完整資料流向。
+      </p>
+
+      <div class="badge-bar">
+        <span class="badge-item blue">🧠 階梯 1：裸模型直接回覆 (Zero Context)</span>
+        <span class="badge-item orange">🌐 階梯 2：聯網 / 外部檢索增強 (Web Grounding)</span>
+        <span class="badge-item green">⚡ 階梯 3：工具調用與雙向驗算 (Tool Calling Agent)</span>
+        <span class="badge-item purple">🪐 OpenRouter Unified API Gateway</span>
+        <span class="badge-item slate">🛡️ OWASP LLM 安全邊界對照</span>
+      </div>
+    </header>
+
+    <!-- Master Architecture Diagram Frame -->
+    <section class="diagram-frame">
+      <div class="diagram-frame-header">
+        <div class="diagram-frame-title">
+          <span>🖥️</span>
+          <span>OpenRouter 動態資料流與封包生命週期藍圖 (Active Pipeline Blueprint)</span>
+        </div>
+        <div style="font-family:var(--font-mono); font-size:0.78rem; color:#8b949e;">
+          支援 SVG 粒子小球動畫 · 3 大模式即時切換
+        </div>
+      </div>
+
+      <!-- Mode Switcher Tabs -->
+      <div class="mode-tabs-bar">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="color:#f0f6fc; font-weight:700; font-size:0.85rem;">選擇架構模式：</span>
+          <div class="mode-tab-buttons">
+            <button type="button" class="mode-tab-btn active mode-1" id="tabMode1" onclick="switchMode(1)">
+              <span>🧠</span> 模式 1：裸模型 (無外部資訊)
+            </button>
+            <button type="button" class="mode-tab-btn mode-2" id="tabMode2" onclick="switchMode(2)">
+              <span>🌐</span> 模式 2：聯網 / 檢索增強 (Web Grounding)
+            </button>
+            <button type="button" class="mode-tab-btn mode-3" id="tabMode3" onclick="switchMode(3)">
+              <span>⚡</span> 模式 3：工具調用智慧體 (Tool Calling Loop)
+            </button>
+          </div>
+        </div>
+        <div style="font-family:var(--font-mono); font-size:0.78rem; color:#8b949e;">
+          目前端點：<span style="color:#58a6ff;">https://openrouter.ai/api/v1/chat/completions</span>
+        </div>
+      </div>
+
+      <!-- Interactive Controls Bar -->
+      <div class="diagram-controls-bar">
+        <div class="diagram-ctrl-group">
+          <span style="color:#58a6ff; font-weight:700;">動畫控制器：</span>
+          <button type="button" class="diagram-ctrl-btn active" id="btnToggleAnim" onclick="toggleAnimation()">
+            <span id="animIcon">⏸</span> <span id="animLabel">暫停循環小球</span>
+          </button>
+          <button type="button" class="diagram-ctrl-btn" id="btnSimulatePing" onclick="triggerBurstPacket()">
+            <span id="pingIcon">⚡</span> <span id="pingLabel">發射單步高亮封包 (Pulse)</span>
+          </button>
+        </div>
+        <div class="diagram-ctrl-group">
+          <span style="color:#8b949e;">當前資料流狀態：</span>
+          <span id="pipelineStatusText" style="color:#38bdf8; font-weight:600;">● 模式 1 啟動：單次往返，無外部資訊依據</span>
+        </div>
+      </div>
+
+      <!-- Simulation HUD Live Banner -->
+      <div id="simHudBanner" class="sim-hud-banner">
+        <div style="display:flex; align-items:center; gap:8px; flex:1;">
+          <span class="hud-pill" id="hudPillTag">⚡ 封包巡航中</span>
+          <span id="hudMsg" class="hud-text">正在模擬【模式 1：裸模型】請求傳輸...</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="hud-timer" id="hudTimer">⏱ 往返延遲: ~420 ms</span>
+          <span style="font-size:0.75rem; color:#8b949e;">(小球沿 SVG 向量軌跡流動)</span>
+        </div>
+      </div>
+
+      <!-- SVG Blueprint Canvas -->
+      <div class="diagram-scroll-box">
+        <svg id="archSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 660" style="background:#090d13; font-family:'Inter', 'Noto Sans TC', sans-serif;">
+          <defs>
+            <!-- Glow Filters for Moving Packet Balls -->
+            <filter id="glow-cyan" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="glow-orange" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="glow-green" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="glow-purple" x="-60%" y="-60%" width="220%" height="220%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="glow-burst" x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+
+            <!-- Arrow Markers -->
+            <marker id="arrow-cyan" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 8 5 L 0 9 z" fill="#38bdf8" />
+            </marker>
+            <marker id="arrow-orange" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 8 5 L 0 9 z" fill="#f59e0b" />
+            </marker>
+            <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 8 5 L 0 9 z" fill="#10b981" />
+            </marker>
+            <marker id="arrow-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 8 5 L 0 9 z" fill="#c084fc" />
+            </marker>
+            <marker id="arrow-slate" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 8 5 L 0 9 z" fill="#475569" />
+            </marker>
+          </defs>
+
+          <!-- Grid Background Pattern -->
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#161f2e" stroke-width="0.8" />
+          </pattern>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+
+          <!-- ==================== BACKGROUND SWIMLANES / ZONES ==================== -->
+          <!-- Zone 1: Client Environment -->
+          <rect x="35" y="150" width="250" height="340" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1.2" opacity="0.95" />
+          <rect x="35" y="150" width="250" height="38" rx="10" fill="#1e293b" />
+          <text x="50" y="174" fill="#94a3b8" font-size="11" font-weight="700" letter-spacing="0.08em">CLIENT APPLICATION</text>
+          <text x="50" y="210" fill="#f8fafc" font-size="14" font-weight="700">終端使用者 / 前端程式</text>
+          <text x="50" y="228" fill="#64748b" font-size="11">Python CLI · Web App · Agent</text>
+
+          <!-- Zone 2: External World (Mode 2) -->
+          <g id="zone-external" opacity="0.45" style="transition: opacity 0.3s ease;">
+            <rect x="330" y="25" width="270" height="120" rx="10" fill="#181308" stroke="#3d2806" stroke-width="1.2" />
+            <rect x="330" y="25" width="270" height="32" rx="10" fill="#2d1c04" />
+            <text x="345" y="46" fill="#f59e0b" font-size="10.5" font-weight="700" letter-spacing="0.08em">🌐 EXTERNAL GROUNDING (模式 2)</text>
+            <text x="345" y="78" fill="#fef3c7" font-size="13" font-weight="700">外部即時資料世界</text>
+            <text x="345" y="96" fill="#d97706" font-size="11">Web Search API · 即時氣象/股價 · RAG</text>
+            <text x="345" y="122" fill="#78350f" font-family="'DM Mono', monospace" font-size="10">注入帶時間標記之事實依據</text>
+          </g>
+
+          <!-- Zone 3: Local Tools (Mode 3) -->
+          <g id="zone-tools" opacity="0.45" style="transition: opacity 0.3s ease;">
+            <rect x="330" y="505" width="270" height="130" rx="10" fill="#061c14" stroke="#064e3b" stroke-width="1.2" />
+            <rect x="330" y="505" width="270" height="32" rx="10" fill="#063524" />
+            <text x="345" y="526" fill="#10b981" font-size="10.5" font-weight="700" letter-spacing="0.08em">🛠️ LOCAL TOOLS SANDBOX (模式 3)</text>
+            <text x="345" y="558" fill="#d1fae5" font-size="13" font-weight="700">本機工具執行沙盒</text>
+            <text x="345" y="576" fill="#34d399" font-size="11">Python 計算機 · 資料庫查詢 · 系統感測器</text>
+            <text x="345" y="605" fill="#047857" font-family="'DM Mono', monospace" font-size="10">執行 tool_calls 並回傳精準數值</text>
+          </g>
+
+          <!-- Zone 4: OpenRouter Gateway -->
+          <rect x="640" y="150" width="220" height="340" rx="10" fill="#130d22" stroke="#2d1b4e" stroke-width="1.2" opacity="0.95" />
+          <rect x="640" y="150" width="220" height="38" rx="10" fill="#24143d" />
+          <text x="655" y="174" fill="#c084fc" font-size="11" font-weight="700" letter-spacing="0.08em">OPENROUTER GATEWAY</text>
+          <text x="655" y="210" fill="#f5f3ff" font-size="14" font-weight="700">OpenRouter 聚合網關</text>
+          <text x="655" y="228" fill="#a855f7" font-size="11">統一路由 · Token 計費 · 模態轉換</text>
+
+          <!-- Gateway Features List Inside Node -->
+          <rect x="655" y="245" width="190" height="32" rx="5" fill="#1c1033" stroke="#3b2068" />
+          <text x="668" y="265" fill="#e9d5ff" font-size="10.5">🪐 多模型協議標準化映射</text>
+
+          <rect x="655" y="285" width="190" height="32" rx="5" fill="#1c1033" stroke="#3b2068" />
+          <text x="668" y="305" fill="#e9d5ff" font-size="10.5">🛡️ API Key 集中式鑒權配額</text>
+
+          <rect x="655" y="325" width="190" height="32" rx="5" fill="#1c1033" stroke="#3b2068" />
+          <text x="668" y="345" fill="#e9d5ff" font-size="10.5">⚡ 支援 Function / Tool Calls</text>
+
+          <rect x="655" y="365" width="190" height="32" rx="5" fill="#1c1033" stroke="#3b2068" />
+          <text x="668" y="385" fill="#e9d5ff" font-size="10.5">📦 支援文字、圖片、音訊、影片</text>
+
+          <rect x="655" y="405" width="190" height="32" rx="5" fill="#1c1033" stroke="#3b2068" />
+          <text x="668" y="425" fill="#e9d5ff" font-size="10.5">🔄 智慧 Provider 備援路由</text>
+
+          <!-- Zone 5: Cloud LLM Cluster -->
+          <rect x="910" y="150" width="255" height="340" rx="10" fill="#0f172a" stroke="#1e293b" stroke-width="1.2" opacity="0.95" />
+          <rect x="910" y="150" width="255" height="38" rx="10" fill="#1e293b" />
+          <text x="925" y="174" fill="#38bdf8" font-size="11" font-weight="700" letter-spacing="0.08em">UPSTREAM LLM PROVIDERS</text>
+          <text x="925" y="210" fill="#f8fafc" font-size="14" font-weight="700">雲端大語言模型叢集</text>
+          <text x="925" y="228" fill="#64748b" font-size="11">Google · Anthropic · OpenAI</text>
+
+          <!-- LLM Sub-Nodes Inside Cluster -->
+          <!-- LLM 1: GPT-3.5 Turbo -->
+          <rect id="node-gpt35" x="925" y="245" width="225" height="60" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1" />
+          <text x="938" y="268" fill="#f8fafc" font-size="11.5" font-weight="700">openai/gpt-3.5-turbo-16k</text>
+          <text x="938" y="286" fill="#94a3b8" font-size="10">文字量化推論 · 訓練凍結 · 缸中之腦</text>
+
+          <!-- LLM 2: Claude Haiku 4.5 -->
+          <rect id="node-haiku" x="925" y="315" width="225" height="60" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1" />
+          <text x="938" y="338" fill="#f8fafc" font-size="11.5" font-weight="700">anthropic/claude-haiku-4.5</text>
+          <text x="938" y="356" fill="#38bdf8" font-size="10">高速視覺 · 200k 長上下文 · 精準守序</text>
+
+          <!-- LLM 3: Gemini 2.5 Flash -->
+          <rect id="node-gemini" x="925" y="385" width="225" height="65" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1" />
+          <text x="938" y="408" fill="#f8fafc" font-size="11.5" font-weight="700">google/gemini-2.5-flash</text>
+          <text x="938" y="426" fill="#34d399" font-size="10">全模態旗艦 · 1M 視窗 · 強 Tool Calling</text>
+
+          <!-- Client Sub-Nodes Inside Client Zone -->
+          <rect x="50" y="245" width="220" height="42" rx="5" fill="#1e293b" stroke="#334155" />
+          <text x="62" y="265" fill="#f8fafc" font-size="11" font-weight="600">📝 User Prompt 提問輸入</text>
+          <text x="62" y="278" fill="#64748b" font-family="'DM Mono', monospace" font-size="9.5">{"role": "user", "content": "..."}</text>
+
+          <rect x="50" y="295" width="220" height="42" rx="5" fill="#1e293b" stroke="#334155" />
+          <text x="62" y="315" fill="#f8fafc" font-size="11" font-weight="600">🔑 API Key 標頭附加</text>
+          <text x="62" y="328" fill="#64748b" font-family="'DM Mono', monospace" font-size="9.5">Authorization: Bearer sk-or-v1-...</text>
+
+          <rect id="client-agent-loop" x="50" y="345" width="220" height="65" rx="5" fill="#1e293b" stroke="#334155" />
+          <text x="62" y="366" fill="#f8fafc" font-size="11" font-weight="600">🔄 Agent 循環編排調度器</text>
+          <text x="62" y="382" fill="#34d399" font-size="9.5">攔截 tool_calls ➔ 派發本地運算</text>
+          <text x="62" y="398" fill="#64748b" font-family="'DM Mono', monospace" font-size="9">{"role": "tool", "content": "250"}</text>
+
+          <rect x="50" y="420" width="220" height="42" rx="5" fill="#1e293b" stroke="#334155" />
+          <text x="62" y="440" fill="#f8fafc" font-size="11" font-weight="600">📊 最終核驗答案渲染</text>
+          <text x="62" y="453" fill="#38bdf8" font-family="'DM Mono', monospace" font-size="9.5">response.choices[0].message</text>
+
+          <!-- ==================== FLOW PATHS (WIRES) ==================== -->
+          
+          <!-- ========== MODE 1 PATHS (Cyan Theme) ========== -->
+          <g id="layer-paths-m1">
+            <!-- Path 1-A: Client -> OpenRouter -->
+            <path id="path-m1-req" d="M 285 265 L 640 265" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow-cyan)" />
+            <text x="440" y="255" fill="#38bdf8" font-family="'DM Mono', monospace" font-size="10.5" font-weight="600">1. Raw Prompt 請求</text>
+
+            <!-- Path 1-B: OpenRouter -> LLM -->
+            <path id="path-m1-fwd" d="M 860 265 L 910 265" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow-cyan)" />
+
+            <!-- Path 1-C: LLM -> OpenRouter -->
+            <path id="path-m1-ret" d="M 910 295 L 860 295" fill="none" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrow-cyan)" />
+
+            <!-- Path 1-D: OpenRouter -> Client -->
+            <path id="path-m1-res" d="M 640 295 L 285 295" fill="none" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrow-cyan)" />
+            <text x="440" y="315" fill="#7dd3fc" font-family="'DM Mono', monospace" font-size="10.5" font-weight="600">2. 靜態機率預測回傳 (易幻覺)</text>
+          </g>
+
+          <!-- ========== MODE 2 PATHS (Amber Theme) ========== -->
+          <g id="layer-paths-m2" opacity="0" style="transition: opacity 0.3s ease;">
+            <!-- Path 2-A: Client -> External Web Search -->
+            <path id="path-m2-search" d="M 240 150 Q 240 85 330 85" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="5,4" marker-end="url(#arrow-orange)" />
+            <text x="250" y="70" fill="#fbbf24" font-family="'DM Mono', monospace" font-size="10.5" font-weight="600">1. 即時外搜 (Web Search)</text>
+
+            <!-- Path 2-B: External Web Search -> Client Context Injector -->
+            <path id="path-m2-data" d="M 465 145 Q 465 210 285 245" fill="none" stroke="#d97706" stroke-width="2.2" marker-end="url(#arrow-orange)" />
+            <text x="410" y="195" fill="#fcd34d" font-family="'DM Mono', monospace" font-size="10">2. 回傳客觀事實依據</text>
+
+            <!-- Path 2-C: Client (Augmented) -> OpenRouter -->
+            <path id="path-m2-req" d="M 285 275 L 640 275" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-orange)" />
+            <text x="360" y="295" fill="#fbbf24" font-family="'DM Mono', monospace" font-size="10.5" font-weight="600">3. Prompt + Context 注入發送</text>
+
+            <!-- Path 2-D: OpenRouter -> LLM -->
+            <path id="path-m2-fwd" d="M 860 335 L 910 335" fill="none" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-orange)" />
+
+            <!-- Path 2-E: LLM -> OpenRouter -->
+            <path id="path-m2-ret" d="M 910 365 L 860 365" fill="none" stroke="#fbbf24" stroke-width="2.5" marker-end="url(#arrow-orange)" />
+
+            <!-- Path 2-F: OpenRouter -> Client -->
+            <path id="path-m2-res" d="M 640 365 L 285 365" fill="none" stroke="#fbbf24" stroke-width="2.5" marker-end="url(#arrow-orange)" />
+            <text x="360" y="385" fill="#fde68a" font-family="'DM Mono', monospace" font-size="10.5" font-weight="600">4. 帶引用來源之查證答案</text>
+          </g>
+
+          <!-- ========== MODE 3 PATHS (Emerald Theme) ========== -->
+          <g id="layer-paths-m3" opacity="0" style="transition: opacity 0.3s ease;">
+            <!-- Path 3-A: Client (with Tools Schema) -> OpenRouter -->
+            <path id="path-m3-req1" d="M 285 255 L 640 255" fill="none" stroke="#10b981" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow-green)" />
+            <text x="360" y="245" fill="#34d399" font-family="'DM Mono', monospace" font-size="10.5" font-weight="600">1. 提問 ＋ tools 規格注入</text>
+
+            <!-- Path 3-B: OpenRouter -> Gemini/LLM -->
+            <path id="path-m3-fwd1" d="M 860 405 L 910 405" fill="none" stroke="#10b981" stroke-width="2.5" marker-end="url(#arrow-green)" />
+
+            <!-- Path 3-C: LLM returns tool_calls -> OpenRouter -->
+            <path id="path-m3-rettool" d="M 910 435 L 860 435" fill="none" stroke="#10b981" stroke-width="2.5" marker-end="url(#arrow-green)" />
+
+            <!-- Path 3-D: OpenRouter -> Local Sandbox -->
+            <path id="path-m3-toollocal" d="M 750 490 Q 750 565 600 565" fill="none" stroke="#10b981" stroke-width="2.5" marker-end="url(#arrow-green)" />
+            <text x="655" y="555" fill="#6ee7b7" font-family="'DM Mono', monospace" font-size="10">2. tool_calls 派發</text>
+
+            <!-- Path 3-E: Local Sandbox executes Python/API -> Client Agent Loop -->
+            <path id="path-m3-toolres" d="M 330 570 Q 230 570 230 420" fill="none" stroke="#34d399" stroke-width="2.5" marker-end="url(#arrow-green)" />
+            <text x="145" y="525" fill="#34d399" font-family="'DM Mono', monospace" font-size="10.5" font-weight="600">3. 本地執行計算 (250)</text>
+
+            <!-- Path 3-F: Client Agent Loop -> OpenRouter (Tool message) -->
+            <path id="path-m3-req2" d="M 285 375 L 640 375" fill="none" stroke="#34d399" stroke-width="2.5" marker-end="url(#arrow-green)" />
+            <text x="360" y="395" fill="#6ee7b7" font-family="'DM Mono', monospace" font-size="10.5" font-weight="600">4. role: tool 數值二度上傳</text>
+
+            <!-- Path 3-G: OpenRouter -> LLM (2nd Pass) -->
+            <path id="path-m3-fwd2" d="M 860 445 L 910 445" fill="none" stroke="#34d399" stroke-width="2.5" marker-end="url(#arrow-green)" />
+
+            <!-- Path 3-H: LLM final response -> OpenRouter -->
+            <path id="path-m3-retfinal" d="M 910 465 L 860 465" fill="none" stroke="#4ade80" stroke-width="2.5" marker-end="url(#arrow-green)" />
+
+            <!-- Path 3-I: OpenRouter -> Client -->
+            <path id="path-m3-resfinal" d="M 640 450 L 285 450" fill="none" stroke="#4ade80" stroke-width="2.5" marker-end="url(#arrow-green)" />
+            <text x="360" y="470" fill="#a7f3d0" font-family="'DM Mono', monospace" font-size="10.5" font-weight="600">5. 終端經工具雙向核驗答案</text>
+          </g>
+
+          <!-- ==================== ANIMATED PACKET BALLS (MOVING PARTICLES ALONG PATHS) ==================== -->
+          
+          <!-- Mode 1 Continuous Packets (Cyan) -->
+          <g id="packets-m1">
+            <!-- Ball 1-1: Client -> OpenRouter -->
+            <circle r="4.5" fill="#38bdf8" filter="url(#glow-cyan)">
+              <animateMotion dur="1.8s" repeatCount="indefinite">
+                <mpath href="#path-m1-req" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 1-2: OpenRouter -> LLM -->
+            <circle r="4" fill="#38bdf8" filter="url(#glow-cyan)">
+              <animateMotion dur="1.8s" begin="0.9s" repeatCount="indefinite">
+                <mpath href="#path-m1-fwd" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 1-3: LLM -> OpenRouter -->
+            <circle r="4" fill="#7dd3fc" filter="url(#glow-cyan)">
+              <animateMotion dur="1.8s" begin="1.2s" repeatCount="indefinite">
+                <mpath href="#path-m1-ret" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 1-4: OpenRouter -> Client -->
+            <circle r="4.5" fill="#7dd3fc" filter="url(#glow-cyan)">
+              <animateMotion dur="1.8s" begin="1.4s" repeatCount="indefinite">
+                <mpath href="#path-m1-res" />
+              </animateMotion>
+            </circle>
+          </g>
+
+          <!-- Mode 2 Continuous Packets (Amber) -->
+          <g id="packets-m2" style="display:none;">
+            <!-- Ball 2-1: Client -> Web Search -->
+            <circle r="4.5" fill="#f59e0b" filter="url(#glow-orange)">
+              <animateMotion dur="2.2s" repeatCount="indefinite">
+                <mpath href="#path-m2-search" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 2-2: Web Search -> Client -->
+            <circle r="4" fill="#fbbf24" filter="url(#glow-orange)">
+              <animateMotion dur="2.2s" begin="0.5s" repeatCount="indefinite">
+                <mpath href="#path-m2-data" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 2-3: Client (Augmented) -> OpenRouter -->
+            <circle r="4.5" fill="#f59e0b" filter="url(#glow-orange)">
+              <animateMotion dur="2.2s" begin="1.0s" repeatCount="indefinite">
+                <mpath href="#path-m2-req" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 2-4: OpenRouter -> LLM -->
+            <circle r="4" fill="#f59e0b" filter="url(#glow-orange)">
+              <animateMotion dur="2.2s" begin="1.5s" repeatCount="indefinite">
+                <mpath href="#path-m2-fwd" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 2-5: LLM -> OpenRouter -->
+            <circle r="4" fill="#fbbf24" filter="url(#glow-orange)">
+              <animateMotion dur="2.2s" begin="1.8s" repeatCount="indefinite">
+                <mpath href="#path-m2-ret" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 2-6: OpenRouter -> Client -->
+            <circle r="4.5" fill="#fbbf24" filter="url(#glow-orange)">
+              <animateMotion dur="2.2s" begin="2.0s" repeatCount="indefinite">
+                <mpath href="#path-m2-res" />
+              </animateMotion>
+            </circle>
+          </g>
+
+          <!-- Mode 3 Continuous Packets (Emerald) -->
+          <g id="packets-m3" style="display:none;">
+            <!-- Ball 3-1: Client -> OpenRouter -->
+            <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
+              <animateMotion dur="3.0s" repeatCount="indefinite">
+                <mpath href="#path-m3-req1" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 3-2: OpenRouter -> LLM (tool_calls request) -->
+            <circle r="4" fill="#10b981" filter="url(#glow-green)">
+              <animateMotion dur="3.0s" begin="0.5s" repeatCount="indefinite">
+                <mpath href="#path-m3-fwd1" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 3-3: LLM -> OpenRouter (tool_calls) -->
+            <circle r="4" fill="#34d399" filter="url(#glow-green)">
+              <animateMotion dur="3.0s" begin="0.9s" repeatCount="indefinite">
+                <mpath href="#path-m3-rettool" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 3-4: OpenRouter -> Local Tools -->
+            <circle r="4.5" fill="#34d399" filter="url(#glow-green)">
+              <animateMotion dur="3.0s" begin="1.2s" repeatCount="indefinite">
+                <mpath href="#path-m3-toollocal" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 3-5: Local Tools -> Client Agent Loop -->
+            <circle r="4.5" fill="#4ade80" filter="url(#glow-green)">
+              <animateMotion dur="3.0s" begin="1.7s" repeatCount="indefinite">
+                <mpath href="#path-m3-toolres" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 3-6: Client Agent Loop -> OpenRouter (role: tool) -->
+            <circle r="4.5" fill="#10b981" filter="url(#glow-green)">
+              <animateMotion dur="3.0s" begin="2.1s" repeatCount="indefinite">
+                <mpath href="#path-m3-req2" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 3-7: OpenRouter -> LLM (2nd Pass) -->
+            <circle r="4" fill="#10b981" filter="url(#glow-green)">
+              <animateMotion dur="3.0s" begin="2.5s" repeatCount="indefinite">
+                <mpath href="#path-m3-fwd2" />
+              </animateMotion>
+            </circle>
+            <!-- Ball 3-8: LLM -> Client (Verified final answer) -->
+            <circle r="4.5" fill="#4ade80" filter="url(#glow-green)">
+              <animateMotion dur="3.0s" begin="2.7s" repeatCount="indefinite">
+                <mpath href="#path-m3-resfinal" />
+              </animateMotion>
+            </circle>
+          </g>
+
+          <!-- ==================== SUPERCHARGED BURST PULSE PACKETS ==================== -->
+          <g id="burst-packet-layer">
+            <g id="burst-group" opacity="0">
+              <circle id="burst-ball" r="7.5" fill="#38bdf8" stroke="#ffffff" stroke-width="2.5" filter="url(#glow-burst)">
+                <animateMotion id="anim-burst-motion" dur="0.8s" begin="indefinite" fill="freeze">
+                  <mpath id="burst-mpath" href="#path-m1-req" />
+                </animateMotion>
+              </circle>
+              <circle r="16" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.8">
+                <animateMotion id="anim-burst-ring" dur="0.8s" begin="indefinite" fill="freeze">
+                  <mpath id="burst-ring-mpath" href="#path-m1-req" />
+                </animateMotion>
+              </circle>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Real-Time Interactive Log Console -->
+      <div class="console-frame">
+        <div class="console-header">
+          <span>📡 即時 API 請求與封包資料串流日誌 (Live Packet Inspection Console)</span>
+          <span id="logCounterText" style="color:#38bdf8;">模式 1 監聽中 · READY</span>
+        </div>
+        <div class="console-body" id="consoleLogBody">
+          <div class="console-log-line">
+            <span class="log-time">[21:05:01]</span>
+            <span class="log-tag m1">MODE 1</span>
+            <span>客戶端建立連線至 OpenRouter API ...</span>
+          </div>
+          <div class="console-log-line">
+            <span class="log-time">[21:05:02]</span>
+            <span class="log-tag openrouter">PAYLOAD</span>
+            <span style="color:#7dd3fc;">{"model": "openai/gpt-3.5-turbo-16k", "messages": [{"role": "user", "content": "現在台北幾點？"}]}</span>
+          </div>
+          <div class="console-log-line">
+            <span class="log-time">[21:05:03]</span>
+            <span class="log-tag m1">RESULT</span>
+            <span style="color:#fde68a;">[裸模型回答]：「抱歉，我無法得知現在確切時間，我的知識庫只截止於訓練完成當天。」</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Detailed 3-Tier Architecture Comparison Cards -->
+    <section>
+      <div style="margin-bottom:1.5rem;">
+        <span class="arch-eyebrow">PEDAGOGICAL BREAKDOWN</span>
+        <h2 style="font-family:var(--font-serif); font-size:2rem; font-weight:400; margin:0 0 0.5rem; color:var(--dd-ink-strong);">
+          三階資料流架構深度解構與工程指標對比
+        </h2>
+        <p style="color:var(--dd-muted); margin:0; font-size:0.95rem;">
+          在生產環境中，選擇哪一種 API 調用方式取決於<strong>「精準度要求、Token 預算與外部安全性防護邊界」</strong>。
+        </p>
+      </div>
+
+      <div class="compare-grid">
+        <!-- Card 1: Mode 1 -->
+        <div class="compare-card active-card" id="cardMode1" onclick="switchMode(1)">
+          <span class="compare-card-tag m1">階梯 1 · ZERO CONTEXT</span>
+          <h3>1. 裸模型直接對話 (Raw LLM)</h3>
+          <p>
+            最簡單的原型調用。使用者輸入什麼，就原封不動直接打進模型。模型是完全切斷外部感知、被<strong>「冷凍在訓練完成那天」</strong>的機率矩陣（缸中之腦）。
+          </p>
+          <ul class="compare-list">
+            <li><strong>傳輸跳數：</strong> 1 來回（Client ⇄ OpenRouter ⇄ LLM）</li>
+            <li><strong>延遲耗時：</strong> 極低 (~300 - 600 ms)</li>
+            <li><strong>Token 消耗：</strong> 僅使用者輸入字數，成本極低</li>
+            <li><strong>時間/事實盲區：</strong> 100% 盲區，無法回答現在幾點或即時資訊</li>
+            <li><strong>運算能力：</strong> 僅能作文字機率預測，心算大數字極易出錯</li>
+          </ul>
+
+          <div class="code-preview-box">
+            <div class="code-preview-header">
+              <span>Python API 呼叫範例</span>
+              <span>JSON</span>
+            </div>
+            <div class="code-preview-content">requests.post(
+  "https://openrouter.ai/api/v1/chat/completions",
+  headers={"Authorization": "Bearer sk-or-v1-..."},
+  json={
+    "model": "openai/gpt-3.5-turbo-16k",
+    "messages": [
+      {"role": "user", "content": "現在台北幾點？"}
+    ]
+  }
+)</div>
+          </div>
+        </div>
+
+        <!-- Card 2: Mode 2 -->
+        <div class="compare-card" id="cardMode2" onclick="switchMode(2)">
+          <span class="compare-card-tag m2">階梯 2 · WEB GROUNDING / RAG</span>
+          <h3>2. 聯網 / 外部檢索增強 (RAG)</h3>
+          <p>
+            透過編排層攔截問題，先執行 Web 搜尋或向量檢索，將帶有<strong>「時間標記與可靠依據」</strong>的外部文本拼接進 System/Context，再送入 OpenRouter。
+          </p>
+          <ul class="compare-list">
+            <li><strong>傳輸跳數：</strong> 2 來回（先問外部資料源 ➔ 再送入大模型）</li>
+            <li><strong>延遲耗時：</strong> 中等 (~1.2 - 2.5 秒)</li>
+            <li><strong>Token 消耗：</strong> 增強上下文需額外消耗 500 - 2000 Tokens</li>
+            <li><strong>時間/事實盲區：</strong> 完全消除，依賴搜尋回傳的時間戳作答</li>
+            <li><strong>防禦關鍵：</strong> 外部檢索內容可能夾帶間接提示詞注入（Indirect Injection）</li>
+          </ul>
+
+          <div class="code-preview-box">
+            <div class="code-preview-header">
+              <span>Python 檢索注入範例</span>
+              <span>JSON</span>
+            </div>
+            <div class="code-preview-content"># 取得外部即時天氣資料
+evidence = weather_api.get_current("Taipei")
+requests.post(
+  "https://openrouter.ai/api/v1/chat/completions",
+  json={
+    "model": "anthropic/claude-haiku-4.5",
+    "messages": [
+      {"role": "system", "content": f"依據即時證據作答：{evidence}"},
+      {"role": "user", "content": "現在台北下雨了嗎？"}
+    ]
+  }
+)</div>
+          </div>
+        </div>
+
+        <!-- Card 3: Mode 3 -->
+        <div class="compare-card" id="cardMode3" onclick="switchMode(3)">
+          <span class="compare-card-tag m3">階梯 3 · TOOL CALLING AGENT</span>
+          <h3>3. 工具調用與雙向驗算 (Agent Loop)</h3>
+          <p>
+            將模型視為<strong>「調度決策大腦」</strong>而非計算機。模型遇到計算或專案任務時輸出結構化指令，由本機安全環境執行後二度送回，達到 100% 嚴謹驗算。
+          </p>
+          <ul class="compare-list">
+            <li><strong>傳輸跳數：</strong> 2 次 API 握手 ＋ 1 次本機代碼執行循環</li>
+            <li><strong>延遲耗時：</strong> 較高 (~2.5 - 5.0 秒，取決於工具運算)</li>
+            <li><strong>Token 消耗：</strong> 包含 Tools Schema 與工具回傳二次推理</li>
+            <li><strong>時間/事實盲區：</strong> 完全消除，可直接掛載本機時鐘感測器</li>
+            <li><strong>運算能力：</strong> 100% 絕對精確（交由 Python/SQL 執行運算）</li>
+          </ul>
+
+          <div class="code-preview-box">
+            <div class="code-preview-header">
+              <span>OpenRouter Tool Calls 雙向範例</span>
+              <span>JSON</span>
+            </div>
+            <div class="code-preview-content"># Step 1: 帶入工具定義
+res1 = requests.post(url, json={
+  "model": "google/gemini-2.5-flash",
+  "tools": [{"type": "function", "function": {"name": "calc"}}],
+  "messages": [{"role": "user", "content": "120+80+50"}]
+})
+# Step 2: 本機執行後送回
+call = res1.json()["choices"][0]["message"]["tool_calls"][0]
+result = eval(call["function"]["arguments"]["expr"]) # 250
+res2 = requests.post(url, json={
+  "messages": [..., {"role": "tool", "content": str(result)}]
+})</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="arch-footer">
+      <div>
+        <span>大語言模型學習地圖 · 互動架構圖解系列</span>
+      </div>
+      <div style="display:flex; gap:1.2rem; flex-wrap:wrap;">
+        <a href="lab.html?experiment=injection">🔬 提示詞注入實驗室</a>
+        <a href="system_architecture.html">🖥️ GAS 免費全端架構圖</a>
+        <a href="data_atoms.html">📊 Data Atoms 儀表板</a>
+        <a href="index.html#learning-map">📖 回學習路線</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Interactive JavaScript Engine -->
+  <script>
+    let currentMode = 1;
+    let isAnimPlaying = true;
+    let isBursting = false;
+
+    const modeData = {
+      1: {
+        title: "● 模式 1 啟動：單次往返，無外部資訊依據 (Zero Context)",
+        hudTag: "⚡ 模式 1 · 裸模型",
+        hudMsg: "正在模擬裸模型直接回答... 缸中之腦僅憑神經網絡權重機率預測",
+        timer: "⏱ 往返延遲: ~420 ms",
+        color: "#38bdf8",
+        logs: [
+          { time: "[21:05:01]", tag: "MODE 1", cls: "m1", text: "客戶端發送單純提問至 OpenRouter API ..." },
+          { time: "[21:05:02]", tag: "PAYLOAD", cls: "openrouter", text: '{"model": "openai/gpt-3.5-turbo-16k", "messages": [{"role": "user", "content": "現在台北幾點？"}]}' },
+          { time: "[21:05:03]", tag: "GATEWAY", cls: "openrouter", text: "OpenRouter 路由至 Azure / OpenAI 上游節點 (HTTP 200 Keep-Alive)" },
+          { time: "[21:05:04]", tag: "RESULT", cls: "m1", text: '[裸模型回答]：「抱歉，我無法得知現在確切時間，我的知識庫只截止於訓練完成當天。」' }
+        ]
+      },
+      2: {
+        title: "● 模式 2 啟動：外部搜尋檢索注入，帶時間戳事實依據 (Web Grounding)",
+        hudTag: "🌐 模式 2 · 聯網增強",
+        hudMsg: "編排層攔截問題 ➔ 呼叫 Web Search API ➔ 注入即時證據 ➔ 送往大模型",
+        timer: "⏱ 往返延遲: ~1,680 ms",
+        color: "#fbbf24",
+        logs: [
+          { time: "[21:06:10]", tag: "MODE 2", cls: "m2", text: "收到提問「現在台北下雨了嗎？」➔ 編排層觸發 Web Search API ..." },
+          { time: "[21:06:11]", tag: "SEARCH", cls: "m2", text: "取得氣象局觀測文本：【2026-11-04 21:00 台北氣溫 23°C，降雨機率 10% 多雲】" },
+          { time: "[21:06:12]", tag: "INJECT", cls: "openrouter", text: '拼接 System Prompt + 證據文本，發送至 OpenRouter (Claude Haiku 4.5)' },
+          { time: "[21:06:13]", tag: "RESULT", cls: "m2", text: '[查證回答]：「根據中央氣象局 2026-11-04 21:00 最新即時資料，目前台北為多雲天氣，沒有顯著降雨。」' }
+        ]
+      },
+      3: {
+        title: "● 模式 3 啟動：工具調用與本機安全計算雙向循環 (Tool Calling Agent)",
+        hudTag: "🛠️ 模式 3 · 代理人循環",
+        hudMsg: "模型輸出 tool_calls ➔ 本機 Python 計算機執行 ➔ 二度上傳 role:tool 驗算結果",
+        timer: "⏱ 雙向耗時: ~3,120 ms",
+        color: "#4ade80",
+        logs: [
+          { time: "[21:07:20]", tag: "MODE 3", cls: "m3", text: "客戶端提問「請精確計算 120 + 80 + 50」並夾帶 tools 函式規格清單..." },
+          { time: "[21:07:21]", tag: "LLM PASS 1", cls: "openrouter", text: 'Gemini 2.5 Flash 判定需精準計算，停止文字輸出，回傳 tool_calls: calc("120+80+50")' },
+          { time: "[21:07:22]", tag: "LOCAL EXEC", cls: "m3", text: "本機沙盒 Python Runtime 執行表達式 ➔ 獲得絕對精準數值: 250" },
+          { time: "[21:07:23]", tag: "LLM PASS 2", cls: "openrouter", text: '將 {"role": "tool", "content": "250"} 上傳至 OpenRouter 二度推理驗算...' },
+          { time: "[21:07:24]", tag: "RESULT", cls: "m3", text: '[終端核驗報告]：「經本機 Python 計算機精確核算，三筆數據 120 + 80 + 50 之總和為 250，筆數 3 筆無缺失。」' }
+        ]
+      }
+    };
+
+    function switchMode(modeNum) {
+      currentMode = modeNum;
+      
+      // Update Tab Button States
+      [1, 2, 3].forEach(m => {
+        const btn = document.getElementById(`tabMode${m}`);
+        const card = document.getElementById(`cardMode${m}`);
+        if (btn) btn.classList.toggle('active', m === modeNum);
+        if (card) card.classList.toggle('active-card', m === modeNum);
+      });
+
+      // Update Path Visibility in SVG
+      const p1 = document.getElementById('layer-paths-m1');
+      const p2 = document.getElementById('layer-paths-m2');
+      const p3 = document.getElementById('layer-paths-m3');
+      if (p1) p1.style.opacity = modeNum === 1 ? '1' : '0.15';
+      if (p2) p2.style.opacity = modeNum === 2 ? '1' : '0.15';
+      if (p3) p3.style.opacity = modeNum === 3 ? '1' : '0.15';
+
+      // Update Zones Highlight
+      const zExternal = document.getElementById('zone-external');
+      const zTools = document.getElementById('zone-tools');
+      const cAgent = document.getElementById('client-agent-loop');
+      if (zExternal) zExternal.style.opacity = modeNum === 2 ? '1' : '0.35';
+      if (zTools) zTools.style.opacity = modeNum === 3 ? '1' : '0.35';
+      if (cAgent) cAgent.style.stroke = modeNum === 3 ? '#10b981' : '#334155';
+
+      // Update Continuous Packet Layers
+      const pk1 = document.getElementById('packets-m1');
+      const pk2 = document.getElementById('packets-m2');
+      const pk3 = document.getElementById('packets-m3');
+      if (pk1) pk1.style.display = modeNum === 1 ? 'inline' : 'none';
+      if (pk2) pk2.style.display = modeNum === 2 ? 'inline' : 'none';
+      if (pk3) pk3.style.display = modeNum === 3 ? 'inline' : 'none';
+
+      // Update HUD & Status Texts
+      const info = modeData[modeNum];
+      document.getElementById('pipelineStatusText').textContent = info.title;
+      document.getElementById('pipelineStatusText').style.color = info.color;
+      document.getElementById('hudPillTag').textContent = info.hudTag;
+      document.getElementById('hudMsg').textContent = info.hudMsg;
+      document.getElementById('hudTimer').textContent = info.timer;
+
+      // Render Logs in Terminal Console
+      const consoleBox = document.getElementById('consoleLogBody');
+      consoleBox.innerHTML = info.logs.map(l => `
+        <div class="console-log-line">
+          <span class="log-time">${l.time}</span>
+          <span class="log-tag ${l.cls}">${l.tag}</span>
+          <span>${l.text}</span>
+        </div>
+      `).join('');
+      document.getElementById('logCounterText').textContent = `模式 ${modeNum} 封包串流中 · ACTIVE`;
+      document.getElementById('logCounterText').style.color = info.color;
+    }
+
+    function toggleAnimation() {
+      const svg = document.getElementById('archSvg');
+      const icon = document.getElementById('animIcon');
+      const label = document.getElementById('animLabel');
+      const btn = document.getElementById('btnToggleAnim');
+
+      if (isAnimPlaying) {
+        if (svg && svg.pauseAnimations) svg.pauseAnimations();
+        isAnimPlaying = false;
+        icon.textContent = "▶";
+        label.textContent = "播放動態小球";
+        btn.classList.remove('active');
+      } else {
+        if (svg && svg.unpauseAnimations) svg.unpauseAnimations();
+        isAnimPlaying = true;
+        icon.textContent = "⏸";
+        label.textContent = "暫停循環小球";
+        btn.classList.add('active');
+      }
+    }
+
+    function triggerBurstPacket() {
+      if (isBursting) return;
+      isBursting = true;
+
+      const burstGroup = document.getElementById('burst-group');
+      const burstBall = document.getElementById('burst-ball');
+      const burstMotion = document.getElementById('anim-burst-motion');
+      const burstRing = document.getElementById('anim-burst-ring');
+      const burstMpath = document.getElementById('burst-mpath');
+      const burstRingMpath = document.getElementById('burst-ring-mpath');
+
+      // Select target path based on current mode
+      let targetPathId = 'path-m1-req';
+      let ballColor = '#38bdf8';
+      if (currentMode === 2) {
+        targetPathId = 'path-m2-req';
+        ballColor = '#f59e0b';
+      } else if (currentMode === 3) {
+        targetPathId = 'path-m3-req1';
+        ballColor = '#10b981';
+      }
+
+      burstMpath.setAttribute('href', '#' + targetPathId);
+      burstRingMpath.setAttribute('href', '#' + targetPathId);
+      burstBall.setAttribute('fill', ballColor);
+
+      burstGroup.setAttribute('opacity', '1');
+      if (burstMotion && burstMotion.beginElement) burstMotion.beginElement();
+      if (burstRing && burstRing.beginElement) burstRing.beginElement();
+
+      // Console notification
+      const consoleBox = document.getElementById('consoleLogBody');
+      const now = new Date();
+      const timeStr = `[${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}]`;
+      const newLine = document.createElement('div');
+      newLine.className = 'console-log-line';
+      newLine.innerHTML = `
+        <span class="log-time">${timeStr}</span>
+        <span class="log-tag" style="background:${ballColor}; color:#000;">PULSE</span>
+        <span style="color:#ffffff; font-weight:700;">發射超能動態小球 ➔ 軌道: #${targetPathId}</span>
+      `;
+      consoleBox.prepend(newLine);
+
+      setTimeout(() => {
+        burstGroup.setAttribute('opacity', '0');
+        isBursting = false;
+      }, 850);
+    }
+
+    // Initialize in Mode 1
+    document.addEventListener('DOMContentLoaded', () => {
+      switchMode(1);
+    });
+  </script>
+</body>
+</html>
