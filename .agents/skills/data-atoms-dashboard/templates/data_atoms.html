@@ -14,8 +14,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=20261104_zoom_sidebar_v10">
-  <link rel="stylesheet" href="css/pygwalker.css?v=20261104_zoom_sidebar_v10">
+  <link rel="stylesheet" href="css/style.css?v=20261104_zoom_sidebar_v11">
+  <link rel="stylesheet" href="css/pygwalker.css?v=20261104_zoom_sidebar_v11">
   <style>
     /* New Briefing Action Button */
     .btn-briefing {
@@ -919,17 +919,21 @@
               </svg>
               工作簿：
             </span>
-            <div class="workbook-tabs-list" id="workbookTabsList">
-              <!-- Dynamically populated sheet tabs -->
+            <div class="workbook-actions-fixed">
+              <button type="button" class="btn-add-sheet" id="btnAddSheet" title="新增探索工作表分頁 (+ New Sheet)">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>+ 新增分頁</span>
+              </button>
+              <button type="button" class="btn-duplicate-sheet" id="btnDuplicateSheet" title="複製當前工作表為新分頁 (Duplicate Sheet)">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>📋 複製當前</span>
+              </button>
             </div>
-            <button type="button" class="btn-add-sheet" id="btnAddSheet" onclick="window.PyGWalker.addNewSheet()" title="新增探索工作表分頁 (+ New Sheet)">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              <span>+ 新增分頁</span>
-            </button>
-            <button type="button" class="btn-duplicate-sheet" id="btnDuplicateSheet" onclick="window.PyGWalker.duplicateCurrentSheet()" title="複製當前工作表為新分頁 (Duplicate Sheet)">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              <span>📋 複製當前</span>
-            </button>
+            <div class="workbook-tabs-scroll-container">
+              <div class="workbook-tabs-list" id="workbookTabsList">
+                <!-- Dynamically populated sheet tabs -->
+              </div>
+            </div>
           </div>
           <div class="workbook-tabs-right">
             <!-- 視圖縮放控制器 (Workspace Zoom Controller) -->
@@ -948,10 +952,10 @@
 
             <div class="workbook-tabs-divider"></div>
 
-            <button type="button" class="btn-sheet-quick-pin" id="btnPinCurrentSheet" onclick="window.PyGWalker.pinCurrentChart()" title="將當前工作表釘選至自訂看板">
+            <button type="button" class="btn-sheet-quick-pin" id="btnPinCurrentSheet" title="將當前工作表釘選至自訂看板">
               <span>📌 釘選當前</span>
             </button>
-            <button type="button" class="btn-sheet-dashboard" id="btnOpenDashboardFromTabs" onclick="window.PyGWalker.openCustomDashboard()" title="開啟自訂多宮格看板">
+            <button type="button" class="btn-sheet-dashboard" id="btnOpenDashboardFromTabs" title="開啟自訂多宮格看板">
               <span>🧩 組合看板</span>
             </button>
           </div>
@@ -1399,10 +1403,10 @@
   <!-- Local Script Dependencies (100% Offline) -->
   <script src="js/xlsx.full.min.js"></script>
   <script src="js/echarts.min.js"></script>
-  <script src="js/data_atoms_jp_dataset.js?v=20261104_zoom_sidebar_v10"></script>
-  <script src="js/estat_17_domains_metadata.js?v=20261104_zoom_sidebar_v10"></script>
-  <script src="js/universal_geo_engine.js?v=20261104_zoom_sidebar_v10"></script>
-  <script src="js/pygwalker_data_atoms.js?v=20261104_zoom_sidebar_v10"></script>
+  <script src="js/data_atoms_jp_dataset.js?v=20261104_zoom_sidebar_v11"></script>
+  <script src="js/estat_17_domains_metadata.js?v=20261104_zoom_sidebar_v11"></script>
+  <script src="js/universal_geo_engine.js?v=20261104_zoom_sidebar_v11"></script>
+  <script src="js/pygwalker_data_atoms.js?v=20261104_zoom_sidebar_v11"></script>
   <script>
     // Briefing Modal Controller (包豪斯動態影音簡報導演層互動控制器)
     (function() {

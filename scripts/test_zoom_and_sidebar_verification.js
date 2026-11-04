@@ -114,6 +114,7 @@ async function evaluate(ws, expression, id = 100) {
     chromeProc = spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', [
       '--headless=new',
       `--remote-debugging-port=${CDP_PORT}`,
+      '--window-size=1440,900',
       '--disable-gpu',
       '--no-sandbox',
       '--disable-extensions'
@@ -367,6 +368,124 @@ async function evaluate(ws, expression, id = 100) {
     assert(zoom75.badge === '75%', `連續縮小兩次後徽章應為 75%，得到 ${zoom75.badge}`);
     assert(zoom75.disabled === true, '達到最小檔位 75% 時縮小按鈕應自動 disabled');
     assert(zoom75.width === '75%', `圖表視窗寬度應更新為 75%，得到 ${zoom75.width}`);
+
+    // =========================================================================
+    // 測試 5: 縮放持久性 (Chart Interactions & Sheet Switch Persistence)
+    // =========================================================================
+    console.log('\n--- 測試 5: 圖表互動與多工作表切換時的縮放比例持久性 ---');
+    await evaluate(pageWs, `window.PyGWalker.applyZoom(150)`, msgId++);
+    await new Promise(r => setTimeout(r, 150));
+
+    // 觸發排序切換
+    await evaluate(pageWs, `(() => {
+      const btnSort = document.getElementById('btnToggleSort');
+      if (btnSort) btnSort.click();
+    })()`, msgId++);
+    await new Promise(r => setTimeout(r, 150));
+
+    const zoomAfterSort = await evaluate(pageWs, `(() => {
+      const vp = document.getElementById('echartsViewport');
+      return { width: vp.style.width, height: vp.style.height };
+    })()`, msgId++);
+    assert(zoomAfterSort.width === '150%' && zoomAfterSort.height === '150%', `排序重新渲染後視窗寬高應維持 150%，得到 width: ${zoomAfterSort.width}, height: ${zoomAfterSort.height}`);
+
+    // 新增並切換工作表
+    await evaluate(pageWs, `window.addNewSheet()`, msgId++);
+    await new Promise(r => setTimeout(r, 200));
+
+    const zoomAfterSheet = await evaluate(pageWs, `(() => {
+      const vp = document.getElementById('echartsViewport');
+      return { width: vp.style.width, height: vp.style.height };
+    })()`, msgId++);
+    assert(zoomAfterSheet.width === '150%' && zoomAfterSheet.height === '150%', `切換至新工作表後視窗寬高應維持 150%，得到 width: ${zoomAfterSheet.width}, height: ${zoomAfterSheet.height}`);
+
+    // =========================================================================
+    // 測試 6: 縮放放大時之水平與垂直雙向滾動能力
+    // =========================================================================
+    console.log('\n--- 測試 6: 縮放放大時之水平與垂直雙向滾動能力 (.stage-body) ---');
+    const scrollCapability = await evaluate(pageWs, `(() => {
+      const sb = document.querySelector('.stage-body');
+      const cs = window.getComputedStyle(sb);
+      sb.scrollLeft = 120;
+      return {
+        overflowX: cs.overflowX,
+        overflowY: cs.overflowY,
+        canScrollX: sb.scrollLeft > 0,
+        scrollWidth: sb.scrollWidth,
+        clientWidth: sb.clientWidth
+      };
+    })()`, msgId++);
+    assert(scrollCapability.overflowX === 'auto', `stage-body overflowX 應為 auto，得到 ${scrollCapability.overflowX}`);
+    assert(scrollCapability.canScrollX === true, `stage-body 應可水平滾動 (scrollWidth: ${scrollCapability.scrollWidth}px > clientWidth: ${scrollCapability.clientWidth}px)`);
+
+    // =========================================================================
+    // 測試 7: 手機/窄螢幕斷點適配 (<= 900px Responsive View)
+    // =========================================================================
+    console.log('\n--- 測試 7: 手機/窄螢幕斷點適配 (<= 900px) ---');
+    await sendCDP(pageWs, 'Emulation.setDeviceMetricsOverride', {
+      width: 768,
+      height: 1024,
+      deviceScaleFactor: 1,
+      mobile: true
+    }, msgId++);
+    await new Promise(r => setTimeout(r, 300));
+
+    const mobileLayout = await evaluate(pageWs, `(() => {
+      const handle = document.getElementById('btnToggleSidebar');
+      const dockBtn = document.getElementById('btnDockCollapse');
+      const dock = document.getElementById('sidebarDock');
+      return {
+        handleDisplay: window.getComputedStyle(handle).display,
+        dockBtnDisplay: window.getComputedStyle(dockBtn).display,
+        dockVisible: window.getComputedStyle(dock).visibility !== 'hidden'
+      };
+    })()`, msgId++);
+    assert(mobileLayout.handleDisplay === 'none', '窄螢幕模式下浮動收合拉柄應隱藏 (display: none)');
+    assert(mobileLayout.dockBtnDisplay === 'none', '窄螢幕模式下面板收合按鈕應隱藏 (display: none)');
+    assert(mobileLayout.dockVisible === true, '窄螢幕模式下側邊欄底座應保持可見');
+
+    // 恢復 1440x900 桌面視圖
+    await sendCDP(pageWs, 'Emulation.setDeviceMetricsOverride', {
+      width: 1440,
+      height: 900,
+      deviceScaleFactor: 1,
+      mobile: false
+    }, msgId++);
+    await new Promise(r => setTimeout(r, 200));
+
+    // =========================================================================
+    // 測試 8: 鍵盤快捷鍵冪等測試 ([ 單向收合, ] 單向展開)
+    // =========================================================================
+    console.log('\n--- 測試 8: 鍵盤快捷鍵單向冪等防護 ([ 收合 / ] 展開) ---');
+    // 連續按兩次 [
+    await evaluate(pageWs, `window.dispatchEvent(new KeyboardEvent('keydown', { key: '[' }))`, msgId++);
+    await new Promise(r => setTimeout(r, 100));
+    await evaluate(pageWs, `window.dispatchEvent(new KeyboardEvent('keydown', { key: '[' }))`, msgId++);
+    await new Promise(r => setTimeout(r, 300));
+    const isStillCollapsed = await evaluate(pageWs, `document.querySelector('.workspace-body').classList.contains('sidebar-collapsed')`, msgId++);
+    assert(isStillCollapsed === true, '連續按下 [ 鍵應穩定保持收合狀態，不發生誤展開');
+
+    // 連續按兩次 ]
+    await evaluate(pageWs, `window.dispatchEvent(new KeyboardEvent('keydown', { key: ']' }))`, msgId++);
+    await new Promise(r => setTimeout(r, 100));
+    await evaluate(pageWs, `window.dispatchEvent(new KeyboardEvent('keydown', { key: ']' }))`, msgId++);
+    await new Promise(r => setTimeout(r, 300));
+    const isStillExpanded = await evaluate(pageWs, `!document.querySelector('.workspace-body').classList.contains('sidebar-collapsed')`, msgId++);
+    assert(isStillExpanded === true, '連續按下 ] 鍵應穩定保持展開狀態，不發生誤收合');
+
+    // =========================================================================
+    // 測試 9: 圖表 Atoms 千分位資料數值解析測試 (safeParseNumber)
+    // =========================================================================
+    console.log('\n--- 測試 9: 圖表 Atoms 千分位逗號數值解析防護 ---');
+    const parseTest = await evaluate(pageWs, `(() => {
+      const parsed1 = window.safeParseNumber('1,450,200');
+      const parsed2 = window.safeParseNumber('-3,200.75%');
+      const parsed3 = window.safeParseNumber('N/A');
+      return { parsed1, parsed2, parsed3 };
+    })()`, msgId++);
+    assert(parseTest.parsed1 === 1450200, `safeParseNumber('1,450,200') 應為 1450200，得到 ${parseTest.parsed1}`);
+    assert(parseTest.parsed2 === -3200.75, `safeParseNumber('-3,200.75%') 應為 -3200.75，得到 ${parseTest.parsed2}`);
+    assert(parseTest.parsed3 === 0, `safeParseNumber('N/A') 應為 0，得到 ${parseTest.parsed3}`);
 
     // 重設回 100% 拍攝截圖
     await evaluate(pageWs, `(() => { document.getElementById('btnZoomReset').click(); })()`, msgId++);

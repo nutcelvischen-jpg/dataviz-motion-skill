@@ -2600,15 +2600,10 @@
 .workbook-tabs-left {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex: 1;
   min-width: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.workbook-tabs-left::-webkit-scrollbar {
-  display: none;
+  overflow: hidden;
 }
 
 .workbook-label {
@@ -2621,14 +2616,43 @@
   font-family: 'JetBrains Mono', monospace;
   text-transform: uppercase;
   white-space: nowrap;
-  margin-right: 4px;
+  margin-right: 2px;
+  flex-shrink: 0;
+}
+
+.workbook-actions-fixed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.workbook-tabs-scroll-container {
+  display: flex;
+  align-items: flex-end;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+  padding-bottom: 1px;
+}
+
+.workbook-tabs-scroll-container::-webkit-scrollbar {
+  height: 3px;
+}
+
+.workbook-tabs-scroll-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
 }
 
 .workbook-tabs-list {
   display: flex;
   align-items: flex-end;
   gap: 4px;
-  min-width: 0;
+  min-width: max-content;
 }
 
 .workbook-tab {
@@ -2726,6 +2750,7 @@
   white-space: nowrap;
   transition: all 0.15s ease;
   margin-bottom: 2px;
+  flex-shrink: 0;
 }
 
 .btn-add-sheet:hover {
@@ -2750,6 +2775,7 @@
   white-space: nowrap;
   transition: all 0.15s ease;
   margin-bottom: 2px;
+  flex-shrink: 0;
 }
 
 .btn-duplicate-sheet:hover {
@@ -2764,6 +2790,7 @@
   align-items: center;
   gap: 6px;
   margin-bottom: 2px;
+  flex-shrink: 0;
 }
 
 .btn-sheet-quick-pin {
@@ -2862,6 +2889,7 @@
   height: 100%;
   transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease;
   position: relative;
+  overflow: hidden;
 }
 
 .sidebar-dock-header {
@@ -3063,3 +3091,18 @@
   opacity: 1 !important;
   pointer-events: auto !important;
 }
+
+/* Stage Body 支援縮放 (>100%) 時水平與垂直平滑滾動 */
+.stage-body {
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+}
+
+/* 行動裝置與窄螢幕適配 (<= 900px) 隱藏浮動拉柄避免遮擋頂部圖表 */
+@media (max-width: 900px) {
+  .sidebar-toggle-handle,
+  .btn-dock-collapse {
+    display: none !important;
+  }
+}
+

@@ -158,14 +158,39 @@
   }
 
   // --- 核密度估計 (Kernel Density Estimation, KDE for Violin Plot) ---
-  function computeKDE(dataArr, sampleCount = 35) {
+  function computeKDE(dataArr, sampleCount = 35, globalRange = null) {
     const nums = dataArr.filter(v => typeof v === 'number' && !isNaN(v)).sort((a, b) => a - b);
     const n = nums.length;
     if (n === 0) return { kde: [], min: 0, max: 0, q1: 0, median: 0, q3: 0, lowWhisker: 0, highWhisker: 0, n: 0 };
+
+    const min = nums[0];
+    const max = nums[n - 1];
+    const effectiveGlobalRange = (globalRange !== null && globalRange > 0) ? globalRange : (max - min || Math.abs(min) || 1);
+    const minBandwidthFloor = 0.04 * effectiveGlobalRange;
+
+    // 單樣本特例 (n = 1)：以該數值為中心，渲染飽滿圓潤的高斯水滴鐘形輪廓
     if (n === 1) {
       const v = nums[0];
+      const h = minBandwidthFloor || 1;
+      const yStart = v - 2.5 * h;
+      const yEnd = v + 2.5 * h;
+      const step = (yEnd - yStart) / (sampleCount - 1);
+      const kde = [];
+      const invSqrt2Pi = 1 / Math.sqrt(2 * Math.PI);
+      let maxDensity = 0;
+
+      for (let i = 0; i < sampleCount; i++) {
+        const y = yStart + i * step;
+        const u = (y - v) / h;
+        const density = (Math.exp(-0.5 * u * u) * invSqrt2Pi) / h;
+        if (density > maxDensity) maxDensity = density;
+        kde.push({ y, density });
+      }
+      if (maxDensity <= 0) maxDensity = 1;
+      kde.forEach(pt => { pt.densityRatio = pt.density / maxDensity; });
+
       return {
-        kde: [{ y: v, density: 1, densityRatio: 1 }],
+        kde,
         min: v, max: v, q1: v, median: v, q3: v, lowWhisker: v, highWhisker: v, n: 1
       };
     }
@@ -180,11 +205,9 @@
       return nums[lower];
     };
 
-    const min = nums[0];
     const q1 = getPercentile(0.25);
     const median = getPercentile(0.5);
     const q3 = getPercentile(0.75);
-    const max = nums[n - 1];
     const iqr = q3 - q1;
     const lowWhisker = Math.max(min, q1 - 1.5 * iqr);
     const highWhisker = Math.min(max, q3 + 1.5 * iqr);
@@ -195,15 +218,18 @@
     const mean = sum / n;
     let varSum = 0;
     for (let i = 0; i < n; i++) varSum += Math.pow(nums[i] - mean, 2);
-    const std = Math.sqrt(varSum / (n - 1)) || (max - min) / 6 || 1;
+    const std = Math.sqrt(varSum / (n - 1)) || (max - min) / 6 || minBandwidthFloor;
 
     // Silverman's 最佳頻寬法則 (Rule of Thumb Bandwidth)
-    let h = 0.9 * Math.min(std, (iqr / 1.34) || std) * Math.pow(n, -0.2);
-    if (h <= 0.0001 || isNaN(h)) h = (max - min) / 10 || 1;
+    let hSilverman = 0.9 * Math.min(std, (iqr / 1.34) || std) * Math.pow(n, -0.2);
+    // 全域最小平滑頻寬保底：h = max(h_silverman, 0.04 * 全域極差)
+    let h = Math.max(hSilverman || 0, minBandwidthFloor);
+    if (h <= 0.0001 || isNaN(h)) h = minBandwidthFloor || 1;
 
-    // 取樣區間：微幅延伸 0.15h 讓頂部與底部輪廓平滑收斂
-    const yStart = Math.max(min, lowWhisker - 0.15 * h);
-    const yEnd = Math.min(max, highWhisker + 0.15 * h);
+    // 取樣區間：少樣本時微幅延伸 (n <= 2 時延伸 2.0h，多樣本時延伸 0.5h)，讓頂部與底部輪廓平滑收斂
+    const spanExtension = n <= 2 ? (2.0 * h) : (0.5 * h);
+    const yStart = Math.min(min, lowWhisker) - spanExtension;
+    const yEnd = Math.max(max, highWhisker) + spanExtension;
     const step = (yEnd - yStart) / (sampleCount - 1);
 
     const kde = [];
@@ -1616,12 +1642,22 @@
     // 視圖自適應高度計算：確保多列 (2~3列) 小多圖具備充裕縱向空間，徹底杜絕上下標籤與刻度互相擠壓
     const container = document.getElementById('echartsViewport');
     if (container) {
-      const neededHeight = numRows === 1 ? '100%' : (numRows === 2 ? '680px' : (numRows === 3 ? '920px' : `${Math.max(920, numRows * 300)}px`));
-      if (container.style.height !== neededHeight) {
-        container.style.height = neededHeight;
-        container.style.minHeight = neededHeight;
-        if (echartsInstance) echartsInstance.resize();
+      const zoomRatio = (state.zoomLevel || 100) / 100;
+      const baseHeight = numRows === 1 ? null : (numRows === 2 ? 680 : (numRows === 3 ? 920 : Math.max(920, numRows * 300)));
+      const z = state.zoomLevel || 100;
+      container.style.width = `${z}%`;
+      container.style.minWidth = `${z}%`;
+      if (baseHeight) {
+        const scaledHeight = `${Math.round(baseHeight * zoomRatio)}px`;
+        container.style.height = scaledHeight;
+        container.style.minHeight = scaledHeight;
+      } else {
+        container.style.height = `${z}%`;
+        container.style.minHeight = `${z}%`;
       }
+      container.style.flex = z > 100 ? `0 0 ${z}%` : (z < 100 ? '0 0 auto' : '1 1 auto');
+      container.style.margin = z < 100 ? 'auto' : '0';
+      if (echartsInstance) echartsInstance.resize();
     }
 
     // 計算 X 軸唯一分類 (保持一致排列順序)
@@ -2026,9 +2062,8 @@
       return;
     }
 
-    if (container && container.style.height !== '100%') {
-      container.style.height = '100%';
-      container.style.minHeight = '200px';
+    if (container) {
+      updateViewportDimensions(state.zoomLevel || 100);
     }
 
     // 排序處理
@@ -2050,6 +2085,14 @@
     const isRotated = hasCategoryX && xVals.length > 12;
     // 底部留白像素：有滑桿 + 旋轉標籤 = 82px；有滑桿 + 水平標籤 = 68px；無滑桿 + 旋轉 = 54px；無滑桿 + 水平 = 42px
     const dynamicBottomMargin = isSwapped ? 45 : (needSlider ? (isRotated ? 82 : 68) : (isRotated ? 54 : 42));
+
+    // 數值 Y 軸頂部 15% Headroom 緩衝保底，防止頂部刻度與 MarkPoint 徽章撞車
+    const yAxisHeadroomMax = (val) => {
+      if (val && typeof val.max === 'number' && !isNaN(val.max)) {
+        return val.max > 0 ? Math.ceil(val.max * 1.15) : (val.max === 0 ? 1 : Math.ceil(val.max * 0.85));
+      }
+      return undefined;
+    };
 
     let option = {
       backgroundColor: 'transparent',
@@ -2094,7 +2137,7 @@
         left: '5%',
         right: secField ? '7%' : '4%',
         bottom: dynamicBottomMargin,
-        top: '12%',
+        top: '15%',
         containLabel: true
       }
     };
@@ -2109,6 +2152,7 @@
         option.xAxis = {
           type: 'value',
           name: xField,
+          max: yAxisHeadroomMax,
           axisLabel: {
             formatter: (v) => formatCompactNumber(v)
           }
@@ -2263,6 +2307,16 @@
           {
             type: 'value',
             name: isMulti ? activeMeasures.join(' / ') : yField,
+            nameLocation: 'end',
+            nameGap: 15,
+            nameTextStyle: {
+              align: 'left',
+              padding: [0, 0, 8, 0],
+              color: '#475569',
+              fontSize: 11,
+              fontWeight: 600
+            },
+            max: yAxisHeadroomMax,
             axisLabel: {
               formatter: (v) => formatCompactNumber(v)
             }
@@ -2277,7 +2331,7 @@
               name: m,
               type: 'bar',
               barGap: '12%',
-              data: data.map(d => Number(d[m] || 0)),
+              data: data.map(d => safeParseNumber(d[m])),
               itemStyle: {
                 color: color,
                 borderRadius: [4, 4, 0, 0]
@@ -2354,17 +2408,17 @@
             type: 'value',
             name: secField,
             position: 'right',
-            nameLocation: 'middle',
-            nameRotate: -90,
-            nameGap: 42,
-            nameTextStyle: { color: '#ea580c', fontSize: 11, fontWeight: 600 },
+            nameLocation: 'end',
+            nameGap: 15,
+            nameTextStyle: { align: 'right', padding: [0, 0, 8, 0], color: '#ea580c', fontSize: 11, fontWeight: 600 },
+            max: yAxisHeadroomMax,
             axisLabel: { formatter: (v) => formatCompactNumber(v) }
           });
           seriesList.push({
             name: secField,
             type: 'line',
             yAxisIndex: 1,
-            data: data.map(d => Number(d[secField] || 0)),
+            data: data.map(d => safeParseNumber(d[secField])),
             itemStyle: { color: '#ea580c' },
             lineStyle: { width: 3 }
           });
@@ -2414,6 +2468,16 @@
         {
           type: 'value',
           name: isMulti ? activeMeasures.join(' / ') : yField,
+          nameLocation: 'end',
+          nameGap: 15,
+          nameTextStyle: {
+            align: 'left',
+            padding: [0, 0, 8, 0],
+            color: '#475569',
+            fontSize: 11,
+            fontWeight: 600
+          },
+          max: yAxisHeadroomMax,
           axisLabel: {
             formatter: (v) => formatCompactNumber(v) + (allPercent ? '%' : '')
           }
@@ -2429,7 +2493,7 @@
             type: 'line',
             smooth: true,
             symbolSize: 6,
-            data: data.map(d => Number(d[m] || 0)),
+            data: data.map(d => safeParseNumber(d[m])),
             itemStyle: { color: color },
             lineStyle: { width: 3 },
             markLine: (idx === 0 && state.showAverage) ? {
@@ -2484,10 +2548,10 @@
           type: 'value',
           name: secField,
           position: 'right',
-          nameLocation: 'middle',
-          nameRotate: -90,
-          nameGap: 42,
-          nameTextStyle: { color: '#ea580c', fontSize: 11, fontWeight: 600 },
+          nameLocation: 'end',
+          nameGap: 15,
+          nameTextStyle: { align: 'right', padding: [0, 0, 8, 0], color: '#ea580c', fontSize: 11, fontWeight: 600 },
+          max: yAxisHeadroomMax,
           axisLabel: { formatter: (v) => formatCompactNumber(v) }
         });
         seriesList.push({
@@ -2495,7 +2559,7 @@
           type: 'line',
           yAxisIndex: 1,
           smooth: true,
-          data: data.map(d => Number(d[secField] || 0)),
+          data: data.map(d => safeParseNumber(d[secField])),
           itemStyle: { color: '#ea580c' },
           lineStyle: { width: 3 }
         });
@@ -2536,10 +2600,10 @@
         {
           type: 'value',
           name: yField,
-          nameLocation: 'middle',
-          nameRotate: 90,
-          nameGap: 42,
-          nameTextStyle: { color: '#64748b', fontSize: 11, fontWeight: 600 },
+          nameLocation: 'end',
+          nameGap: 15,
+          nameTextStyle: { align: 'left', padding: [0, 0, 8, 0], color: '#64748b', fontSize: 11, fontWeight: 600 },
+          max: yAxisHeadroomMax,
           axisLabel: { formatter: (v) => formatCompactNumber(v) },
           splitLine: { lineStyle: { color: '#f1f5f9' } }
         },
@@ -2547,16 +2611,16 @@
           type: 'value',
           name: activeSecField,
           position: 'right',
-          nameLocation: 'middle',
-          nameRotate: -90,
-          nameGap: 42,
-          nameTextStyle: { color: '#ea580c', fontSize: 11, fontWeight: 600 },
+          nameLocation: 'end',
+          nameGap: 15,
+          nameTextStyle: { align: 'right', padding: [0, 0, 8, 0], color: '#ea580c', fontSize: 11, fontWeight: 600 },
+          max: yAxisHeadroomMax,
           axisLabel: { formatter: (v) => formatCompactNumber(v) },
           splitLine: { show: false }
         }
       ];
 
-      const secVals = data.map(d => Number(d[activeSecField] || 0));
+      const secVals = data.map(d => safeParseNumber(d[activeSecField]));
 
       option.series = [
         {
@@ -2633,8 +2697,8 @@
         }
 
         if (coords) {
-          const val = Number(d[yField] || 0);
-          const sVal = sizeField ? Number(d[sizeField] || 0) : val;
+          const val = safeParseNumber(d[yField]);
+          const sVal = sizeField ? safeParseNumber(d[sizeField]) : val;
           if (val < minVal) minVal = val;
           if (val > maxVal) maxVal = val;
 
@@ -2758,7 +2822,7 @@
         left: '6%',
         right: '6%',
         bottom: 70,
-        top: '12%',
+        top: '15%',
         containLabel: true
       };
 
@@ -2843,7 +2907,7 @@
         left: '5%',
         right: '5%',
         bottom: needBoxSlider ? (isBoxRotated ? 82 : 68) : (isBoxRotated ? 54 : 42),
-        top: '12%',
+        top: '15%',
         containLabel: true
       };
 
@@ -2862,13 +2926,29 @@
       option.yAxis = {
         type: 'value',
         name: measureDim,
+        nameLocation: 'end',
+        nameGap: 15,
+        nameTextStyle: { align: 'left', padding: [0, 0, 8, 0], color: '#475569', fontSize: 11, fontWeight: 600 },
+        max: yAxisHeadroomMax,
         axisLabel: { formatter: (v) => formatCompactNumber(v) },
         splitLine: { lineStyle: { color: '#f1f5f9' } }
       };
 
       if (state.chartType === 'violin') {
+        // 先計算全域數值極差 (Global Range = 全域最大值 - 全域最小值)，供 KDE 最小平滑頻寬保底
+        let globalMin = Infinity;
+        let globalMax = -Infinity;
+        groupNames.forEach((grp) => {
+          const arr = groupMap[grp] || [];
+          arr.forEach((v) => {
+            if (v < globalMin) globalMin = v;
+            if (v > globalMax) globalMax = v;
+          });
+        });
+        const globalRange = (globalMax > globalMin) ? (globalMax - globalMin) : 0;
+
         const violinMetaList = groupNames.map((grp) => {
-          return computeKDE(groupMap[grp] || [], 35);
+          return computeKDE(groupMap[grp] || [], 35, globalRange);
         });
 
         option.tooltip = {
@@ -3057,7 +3137,7 @@
         data.forEach(d => {
           const parentName = String(d[parentDim] || '其他群組');
           const childName = String(d[xField] || '');
-          const val = Number(d[sizeField || yField] || 0);
+          const val = safeParseNumber(d[sizeField || yField]);
 
           if (!groups[parentName]) {
             groups[parentName] = {
@@ -3074,7 +3154,7 @@
         treeData = Object.values(groups);
       } else {
         treeData = data.map((d, idx) => {
-          const val = Number(d[sizeField || yField] || 0);
+          const val = safeParseNumber(d[sizeField || yField]);
           return {
             name: String(d[xField] || `項 ${idx + 1}`),
             value: isNaN(val) ? 0 : val,
@@ -3173,13 +3253,17 @@
         type: 'value',
         name: actYField,
         scale: true,
+        nameLocation: 'end',
+        nameGap: 15,
+        nameTextStyle: { align: 'left', padding: [0, 0, 8, 0], color: '#475569', fontSize: 11, fontWeight: 600 },
+        max: yAxisHeadroomMax,
         axisLabel: { formatter: (v) => formatCompactNumber(v) }
       };
 
       // 計算氣泡大小基準
       let maxVal = 1;
       if (sizeField && state.measures.includes(sizeField)) {
-        maxVal = safeMax(data.map(d => Number(d[sizeField] || 0)), 1) || 1;
+        maxVal = safeMax(data.map(d => safeParseNumber(d[sizeField])), 1) || 1;
       }
 
       const colorCategories = (colorField && state.dimensions.includes(colorField))
@@ -3192,9 +3276,9 @@
           const color = REGION_COLORS[cat] || PALETTE[catIdx % PALETTE.length];
           const catRows = data.filter(d => String(d[colorField]) === cat);
           const catScatterData = catRows.map(d => {
-            const x = Number(d[actXField] || 0);
-            const y = Number(d[actYField] || 0);
-            const sVal = sizeField ? Number(d[sizeField] || 0) : 10;
+            const x = safeParseNumber(d[actXField]);
+            const y = safeParseNumber(d[actYField]);
+            const sVal = sizeField ? safeParseNumber(d[sizeField]) : 10;
             const radius = sizeField ? Math.max(6, Math.min(36, (sVal / maxVal) * 36)) : 10;
             return {
               value: [x, y],
@@ -3220,9 +3304,9 @@
         });
       } else {
         const scatterData = data.map(d => {
-          const x = Number(d[actXField] || 0);
-          const y = Number(d[actYField] || 0);
-          const sVal = sizeField ? Number(d[sizeField] || 0) : 10;
+          const x = safeParseNumber(d[actXField]);
+          const y = safeParseNumber(d[actYField]);
+          const sVal = sizeField ? safeParseNumber(d[sizeField]) : 10;
           const radius = sizeField ? Math.max(6, Math.min(36, (sVal / maxVal) * 36)) : 10;
           const color = colorField && REGION_COLORS[d[colorField]] ? REGION_COLORS[d[colorField]] : '#2563eb';
           return {
@@ -3269,7 +3353,7 @@
       } else {
         pieData = data.slice(0, 15).map((d, idx) => ({
           name: d[xField],
-          value: Number(d[yField] || 0),
+          value: safeParseNumber(d[yField]),
           itemStyle: { color: PALETTE[idx % PALETTE.length] }
         }));
       }
@@ -3291,7 +3375,7 @@
       const topItems = data.slice(0, 5);
       const metricFields = state.measures.slice(0, 6);
       const indicator = metricFields.map(m => {
-        const max = safeMax(data.map(d => Number(d[m] || 0)), 100) || 100;
+        const max = safeMax(data.map(d => safeParseNumber(d[m])), 100) || 100;
         return { name: m, max: max * 1.1 };
       });
 
@@ -3305,7 +3389,7 @@
           type: 'radar',
           data: topItems.map((item, idx) => ({
             name: item[xField],
-            value: metricFields.map(m => Number(item[m] || 0)),
+            value: metricFields.map(m => safeParseNumber(item[m])),
             itemStyle: { color: PALETTE[idx % PALETTE.length] }
           }))
         }
@@ -3315,7 +3399,7 @@
       // 轉化漏斗
       const funnelData = data.slice(0, 8).map(d => ({
         name: d[xField],
-        value: Number(d[yField] || 0)
+        value: safeParseNumber(d[yField])
       }));
 
       option.series = [
@@ -3336,7 +3420,7 @@
     } else if (state.chartType === 'overview') {
       // 07. 指標矩陣總覽 (Treemap 面積矩陣與多維層次權重)
       const treeData = data.map((item, idx) => {
-        const val = Number(item[yField] || 0);
+        const val = safeParseNumber(item[yField]);
         return {
           name: String(item[xField] || `Item ${idx + 1}`),
           value: isNaN(val) ? 0 : val
@@ -3445,7 +3529,7 @@
     if (state.chartType === 'line') {
       const data = getVisualData().slice(0, 30);
       const xVals = data.map(d => d[state.shelf.x]);
-      const yVals = data.map(d => Number(d[state.shelf.y] || 0));
+      const yVals = data.map(d => safeParseNumber(d[state.shelf.y]));
       const maxVal = Math.max(1, safeMax(yVals, 1));
       const minVal = Math.min(0, safeMin(yVals, 0));
       const range = maxVal - minVal || 1;
@@ -3491,9 +3575,9 @@
       // 雙軸複合圖 (柱狀 + 次軸折線)
       const data = getVisualData().slice(0, 20);
       const xVals = data.map(d => d[state.shelf.x]);
-      const y1Vals = data.map(d => Number(d[state.shelf.y] || 0));
+      const y1Vals = data.map(d => safeParseNumber(d[state.shelf.y]));
       const secField = state.shelf.secondary || state.measures.find(m => m !== state.shelf.y);
-      const y2Vals = secField ? data.map(d => Number(d[secField] || 0)) : [];
+      const y2Vals = secField ? data.map(d => safeParseNumber(d[secField])) : [];
 
       const max1 = Math.max(1, safeMax(y1Vals, 1));
       const max2 = y2Vals.length ? Math.max(1, safeMax(y2Vals, 1)) : 100;
@@ -3591,8 +3675,9 @@
       getActiveRows().forEach(r => {
         const k = String(r[groupCol] || '預設');
         if (!groups[k]) groups[k] = [];
-        const v = Number(r[measureCol]);
-        if (!isNaN(v)) groups[k].push(v);
+        if (isValidNumeric(r[measureCol])) {
+          groups[k].push(safeParseNumber(r[measureCol]));
+        }
       });
 
       const groupKeys = Object.keys(groups).slice(0, 10);
@@ -4157,13 +4242,16 @@
       btnZoomReset.addEventListener('click', resetZoom);
     }
 
-    // 鍵盤快捷鍵：[ 或 ] 收合/展開側邊欄
+    // 鍵盤快捷鍵：[ 收合側邊欄 / ] 展開側邊欄
     window.addEventListener('keydown', (e) => {
       const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
       if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') return;
-      if (e.key === '[' || e.key === ']') {
+      if (e.key === '[') {
         e.preventDefault();
-        toggleSidebar();
+        toggleSidebar(true);
+      } else if (e.key === ']') {
+        e.preventDefault();
+        toggleSidebar(false);
       }
     });
   }
@@ -5259,6 +5347,14 @@
         </div>
       `;
     }).join('');
+
+    // 自動平滑滾動至當前啟用工作表標籤，確保無論開多少分頁都能一目了然
+    const activeTab = tabsList.querySelector('.workbook-tab.active');
+    if (activeTab) {
+      setTimeout(() => {
+        activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      }, 20);
+    }
   }
 
   function switchSheet(targetId) {
@@ -5284,9 +5380,34 @@
     showToast(`📑 已切換至「${target.name}」(${getChartIcon(target.chartType)} ${target.chartType})`);
   }
 
+  // 工作表序號保證唯一不重複：依據目前所有已存在分頁名稱中的最大序號 + 1 命名
+  function getNextSheetNumber() {
+    let maxNum = 0;
+    (state.sheets || []).forEach(s => {
+      const match = s.name && s.name.match(/(?:工作表|Sheet)\s*(\d+)/i);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (!isNaN(num) && num > maxNum) maxNum = num;
+      }
+    });
+    return Math.max(maxNum + 1, (state.sheets ? state.sheets.length + 1 : 1));
+  }
+
+  // 300ms 防抖鎖 (Debounce Lock) 變數
+  let isSheetActionLocked = false;
+  let lastSheetActionTime = 0;
+
   function addNewSheet() {
+    const now = Date.now();
+    if (isSheetActionLocked || (now - lastSheetActionTime < 300)) {
+      return;
+    }
+    isSheetActionLocked = true;
+    lastSheetActionTime = now;
+    setTimeout(() => { isSheetActionLocked = false; }, 300);
+
     saveCurrentSheetState();
-    const count = state.sheets.length + 1;
+    const count = getNextSheetNumber();
     const newId = 'sheet_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
 
     // 依序推薦不同的 Data Atoms 讓每個新分頁有鮮明獨立的探索視角
@@ -5305,7 +5426,7 @@
     ];
 
     const presetIdx = (count - 2 + typePresets.length) % typePresets.length;
-    const preset = typePresets[presetIdx];
+    const preset = typePresets[presetIdx >= 0 ? presetIdx : 0];
 
     const newSheet = {
       id: newId,
@@ -5344,14 +5465,23 @@
   }
 
   function duplicateCurrentSheet() {
+    const now = Date.now();
+    if (isSheetActionLocked || (now - lastSheetActionTime < 300)) {
+      return;
+    }
+    isSheetActionLocked = true;
+    lastSheetActionTime = now;
+    setTimeout(() => { isSheetActionLocked = false; }, 300);
+
     saveCurrentSheetState();
     const current = state.sheets.find(s => s.id === state.activeSheetId);
     if (!current) return;
-    const count = state.sheets.length + 1;
+    const count = getNextSheetNumber();
     const newId = 'sheet_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+    const cleanName = current.name.replace(/ \(副本.*?\)$/, '');
     const newSheet = {
       id: newId,
-      name: `${current.name.replace(/ \(副本.*?\)$/, '')} (副本${count})`,
+      name: `${cleanName} (副本 ${count})`,
       chartType: current.chartType,
       shelf: JSON.parse(JSON.stringify(current.shelf)),
       datasetId: current.datasetId || state.currentDatasetId,
@@ -5725,6 +5855,35 @@
 
   const ZOOM_LEVELS = [75, 90, 100, 125, 150];
 
+  function updateViewportDimensions(newZoom) {
+    const viewport = document.getElementById('echartsViewport');
+    if (!viewport) return;
+    const z = newZoom || state.zoomLevel || 100;
+    if (z === 100) {
+      viewport.style.width = '100%';
+      viewport.style.height = '100%';
+      viewport.style.minWidth = '100%';
+      viewport.style.minHeight = '100%';
+      viewport.style.flex = '1 1 auto';
+      viewport.style.margin = '0';
+    } else if (z < 100) {
+      viewport.style.width = `${z}%`;
+      viewport.style.height = `${z}%`;
+      viewport.style.minWidth = `${z}%`;
+      viewport.style.minHeight = `${z}%`;
+      viewport.style.flex = '0 0 auto';
+      viewport.style.margin = 'auto';
+    } else {
+      // z > 100
+      viewport.style.width = `${z}%`;
+      viewport.style.height = `${z}%`;
+      viewport.style.minWidth = `${z}%`;
+      viewport.style.minHeight = `${z}%`;
+      viewport.style.flex = `0 0 ${z}%`;
+      viewport.style.margin = '0';
+    }
+  }
+
   function toggleSidebar(forceState) {
     const bodyEl = document.querySelector('.workspace-body') || document.body;
     const shellEl = document.querySelector('.app-shell') || document.body;
@@ -5761,12 +5920,20 @@
       }
     }
 
+    const btnDock = document.getElementById('btnDockCollapse');
+    if (btnDock) {
+      btnDock.title = shouldCollapse ? '展開側邊欄' : '收合側邊欄 (最大化工作區)';
+      btnDock.setAttribute('aria-label', shouldCollapse ? '展開側邊欄' : '收合側邊欄 (最大化工作區)');
+    }
+
     // 在 CSS 轉場過程 (0.28s) 中以平滑間隔調用 resize，確保 ECharts 無縫填滿全寬工作區
+    if (window._sidebarAnimTimer) clearInterval(window._sidebarAnimTimer);
     const startTime = Date.now();
-    const animTimer = setInterval(() => {
+    window._sidebarAnimTimer = setInterval(() => {
       if (echartsInstance) echartsInstance.resize();
       if (Date.now() - startTime > 320) {
-        clearInterval(animTimer);
+        clearInterval(window._sidebarAnimTimer);
+        window._sidebarAnimTimer = null;
         if (echartsInstance) echartsInstance.resize();
         window.dispatchEvent(new Event('resize'));
       }
@@ -5792,32 +5959,7 @@
     if (btnZoomIn) btnZoomIn.disabled = (currIdx >= ZOOM_LEVELS.length - 1);
 
     // 調整圖表視窗 #echartsViewport 尺寸與比例
-    const viewport = document.getElementById('echartsViewport');
-    if (viewport) {
-      if (newZoom === 100) {
-        viewport.style.width = '100%';
-        viewport.style.height = '100%';
-        viewport.style.minWidth = '100%';
-        viewport.style.minHeight = '100%';
-        viewport.style.flex = '1 1 auto';
-        viewport.style.margin = '0';
-      } else if (newZoom < 100) {
-        viewport.style.width = `${newZoom}%`;
-        viewport.style.height = `${newZoom}%`;
-        viewport.style.minWidth = `${newZoom}%`;
-        viewport.style.minHeight = `${newZoom}%`;
-        viewport.style.flex = '0 0 auto';
-        viewport.style.margin = 'auto';
-      } else {
-        // newZoom > 100
-        viewport.style.width = `${newZoom}%`;
-        viewport.style.height = `${newZoom}%`;
-        viewport.style.minWidth = `${newZoom}%`;
-        viewport.style.minHeight = `${newZoom}%`;
-        viewport.style.flex = `0 0 ${newZoom}%`;
-        viewport.style.margin = '0';
-      }
-    }
+    updateViewportDimensions(newZoom);
 
     // 原生 Canvas 視圖同步縮放
     const canvasWrapper = document.querySelector('.canvas-wrapper');
@@ -5826,11 +5968,12 @@
       canvasWrapper.style.transformOrigin = 'center center';
     }
 
-    // 即時重繪與適配
+    // 即時重繪與適配 (防抖消除連續點擊時的重複運算)
     if (echartsInstance) {
-      setTimeout(() => {
-        echartsInstance.resize();
-      }, 50);
+      if (window._zoomResizeTimer) clearTimeout(window._zoomResizeTimer);
+      window._zoomResizeTimer = setTimeout(() => {
+        if (echartsInstance) echartsInstance.resize();
+      }, 30);
     }
 
     if (showToastNotice) {
