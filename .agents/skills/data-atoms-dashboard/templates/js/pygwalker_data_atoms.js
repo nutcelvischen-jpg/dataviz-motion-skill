@@ -482,7 +482,7 @@
           chartType: state.chartType || 'bar',
           shelf: JSON.parse(JSON.stringify(state.shelf)),
           datasetId: state.currentDatasetId || 'jp_gender_facet',
-          filters: JSON.parse(JSON.stringify(state.filters || {})),
+          filters: cloneFilters(state.filters || {}),
           barStackMode: !!state.barStackMode,
           facetScaleMode: state.facetScaleMode || 'fixed'
         }
@@ -592,6 +592,11 @@
 
     const fileStatus = document.getElementById('fileStatusBadge');
     if (fileStatus) fileStatus.textContent = `${state.rawRows.length} 列資料`;
+
+    const activeSheet = (state.sheets || []).find(s => s.id === state.activeSheetId);
+    if (activeSheet) {
+      activeSheet.datasetId = state.currentDatasetId;
+    }
 
     showToast(`⚡ 已載入「${state.datasetName}」！已對齊欄位與圖表。`);
   }
@@ -1992,6 +1997,7 @@
 
     echartsInstance.clear();
     echartsInstance.setOption(smallMultiplesOption);
+    state.currentChartOption = smallMultiplesOption;
   }
 
   // --- 渲染 Apache ECharts 圖表 (超流暢現代探索) ---
@@ -3520,6 +3526,7 @@
 
     echartsInstance.clear();
     echartsInstance.setOption(option, true);
+    state.currentChartOption = option;
     echartsInstance.resize();
   }
 
@@ -4343,10 +4350,15 @@
       btnZoomReset.addEventListener('click', resetZoom);
     }
 
-    // 鍵盤快捷鍵：[ 收合側邊欄 / ] 展開側邊欄
+    // 鍵盤快捷鍵：[ 收合側邊欄 / ] 展開側邊欄 (保護 macOS Cmd+[ 與 Vim Ctrl+[)
     window.addEventListener('keydown', (e) => {
       const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
       if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') return;
+      if (document.activeElement && document.activeElement.isContentEditable) return;
+      const targetTag = e.target ? (e.target.tagName || '').toLowerCase() : '';
+      if (targetTag === 'input' || targetTag === 'textarea' || targetTag === 'select') return;
+      if (e.target && e.target.isContentEditable) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.key === '[') {
         e.preventDefault();
         toggleSidebar(true);
@@ -5389,6 +5401,55 @@
     return map[type] || '📊';
   }
 
+  // 深度複製 ECharts 配置物件，完整保留 Function (renderItem, formatter, headroom)、RegExp 與 Date
+  function cloneEChartsOption(obj, seen = new WeakMap()) {
+    if (obj === null || typeof obj !== 'object') {
+      return obj; // 原始型別以及 function (typeof fn === 'function') 直接回傳保留
+    }
+    if (typeof obj === 'function') {
+      return obj;
+    }
+    if (obj instanceof Date) {
+      return new Date(obj.getTime());
+    }
+    if (obj instanceof RegExp) {
+      return new RegExp(obj.source, obj.flags);
+    }
+    if (seen.has(obj)) {
+      return seen.get(obj);
+    }
+
+    if (Array.isArray(obj)) {
+      const copy = [];
+      seen.set(obj, copy);
+      for (let i = 0; i < obj.length; i++) {
+        copy[i] = cloneEChartsOption(obj[i], seen);
+      }
+      return copy;
+    }
+
+    if (obj instanceof Set) {
+      const copy = new Set();
+      seen.set(obj, copy);
+      obj.forEach(val => copy.add(cloneEChartsOption(val, seen)));
+      return copy;
+    }
+
+    if (obj instanceof Map) {
+      const copy = new Map();
+      seen.set(obj, copy);
+      obj.forEach((val, key) => copy.set(cloneEChartsOption(key, seen), cloneEChartsOption(val, seen)));
+      return copy;
+    }
+
+    const copy = {};
+    seen.set(obj, copy);
+    for (const key of Object.keys(obj)) {
+      copy[key] = cloneEChartsOption(obj[key], seen);
+    }
+    return copy;
+  }
+
   function cloneFilters(filters) {
     if (!filters) return {};
     const cloned = {};
@@ -5427,7 +5488,7 @@
           chartType: state.chartType || 'bar',
           shelf: JSON.parse(JSON.stringify(state.shelf)),
           datasetId: state.currentDatasetId || 'jp_gender_facet',
-          filters: {},
+          filters: cloneFilters(state.filters || {}),
           barStackMode: false,
           facetScaleMode: 'fixed'
         }
@@ -5466,12 +5527,18 @@
     if (!target) return;
 
     state.activeSheetId = target.id;
+
+    if (target.datasetId && target.datasetId !== state.currentDatasetId) {
+      loadDataset(target.datasetId);
+    }
+
     state.chartType = target.chartType;
     state.shelf = JSON.parse(JSON.stringify(target.shelf));
     state.barStackMode = !!target.barStackMode;
     state.facetScaleMode = target.facetScaleMode || 'fixed';
     state.filters = cloneFilters(target.filters);
 
+    renderFieldLists();
     renderChartTypeSelector();
     renderShelves();
     renderKPIRibbon();
@@ -5511,7 +5578,7 @@
 
     saveCurrentSheetState();
     const count = getNextSheetNumber();
-    const newId = 'sheet_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+    const newId = 'sheet_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
 
     // 依序推薦不同的 Data Atoms 讓每個新分頁有鮮明獨立的探索視角
     const timeField = state.columns.find(c => /年份|年度|year|時序/i.test(c)) || state.dimensions[0] || '';
@@ -5580,7 +5647,7 @@
     const current = state.sheets.find(s => s.id === state.activeSheetId);
     if (!current) return;
     const count = getNextSheetNumber();
-    const newId = 'sheet_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+    const newId = 'sheet_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
     const cleanName = current.name.replace(/ \(副本.*?\)$/, '');
     const newSheet = {
       id: newId,
@@ -5632,16 +5699,11 @@
       state.sheets.splice(idx, 1);
       if (state.activeSheetId === id) {
         const nextActive = state.sheets[Math.max(0, idx - 1)];
-        state.activeSheetId = nextActive.id;
-        state.chartType = nextActive.chartType;
-        state.shelf = JSON.parse(JSON.stringify(nextActive.shelf));
-        renderChartTypeSelector();
-        renderShelves();
-        renderKPIRibbon();
-        renderVisualization();
-        renderDataTable();
+        state.activeSheetId = null;
+        switchSheet(nextActive.id);
+      } else {
+        renderWorkbookTabs();
       }
-      renderWorkbookTabs();
       showToast(`🗑️ 已刪除工作表「${targetName}」`);
     }
   }
@@ -5677,6 +5739,10 @@
         const alreadyPinned = state.pinnedCharts.some(p => p.sheetId === sheet.id);
         if (alreadyPinned) return;
 
+        if (sheet.datasetId && sheet.datasetId !== state.currentDatasetId) {
+          loadDataset(sheet.datasetId);
+        }
+
         state.chartType = sheet.chartType;
         state.shelf = JSON.parse(JSON.stringify(sheet.shelf));
         state.filters = cloneFilters(sheet.filters);
@@ -5690,13 +5756,13 @@
         }
 
         if (echartsInstance) {
-          const opt = echartsInstance.getOption();
+          const opt = state.currentChartOption || echartsInstance.getOption();
           if (opt) {
             const typeName = typeMap[sheet.chartType] || sheet.chartType;
             const xDesc = sheet.shelf.x || '未排入';
             const yDesc = sheet.shelf.y || (sheet.shelf.yMulti && sheet.shelf.yMulti.length ? sheet.shelf.yMulti.join(', ') : '未排入');
             state.pinnedCharts.push({
-              id: 'pinned_sheet_' + sheet.id + '_' + Math.random().toString(36).substr(2, 4),
+              id: 'pinned_sheet_' + sheet.id + '_' + Math.random().toString(36).slice(2, 6),
               sheetId: sheet.id,
               title: `${sheet.name} (${typeName})`,
               chartType: sheet.chartType,
@@ -5704,7 +5770,7 @@
               datasetName: sheet.datasetId || state.datasetName,
               createdAt: new Date().toLocaleTimeString(),
               shelvesSummary: `X: ${xDesc} | Y: ${yDesc}${sheet.shelf.color ? ` | 色: ${sheet.shelf.color}` : ''}`,
-              option: JSON.parse(JSON.stringify(opt))
+              option: cloneEChartsOption(opt)
             });
             importedCount++;
           }
@@ -5713,12 +5779,16 @@
     } finally {
       const origSheet = state.sheets.find(s => s.id === originalSheetId);
       if (origSheet) {
+        if (origSheet.datasetId && origSheet.datasetId !== state.currentDatasetId) {
+          loadDataset(origSheet.datasetId);
+        }
         state.activeSheetId = origSheet.id;
         state.chartType = origSheet.chartType;
         state.shelf = JSON.parse(JSON.stringify(origSheet.shelf));
         state.filters = cloneFilters(origSheet.filters);
         state.barStackMode = !!origSheet.barStackMode;
         state.facetScaleMode = origSheet.facetScaleMode || 'fixed';
+        renderFieldLists();
         renderChartTypeSelector();
         renderShelves();
         renderVisualization();
@@ -5726,7 +5796,10 @@
       }
 
       updatePinnedBadge();
-      renderCustomDashboard();
+      const modal = document.getElementById('customDashboardModal');
+      if (modal && modal.classList.contains('open')) {
+        renderCustomDashboard();
+      }
     }
 
     showToast(`📥 成功將工作簿中 ${importedCount} 張工作表載入自訂看板！`);
@@ -5750,13 +5823,13 @@
       showToast('⚠️ 目前尚未生成圖表，請先排入維度或度量！');
       return;
     }
-    const currentOption = echartsInstance.getOption();
+    const currentOption = state.currentChartOption || echartsInstance.getOption();
     if (!currentOption) {
       showToast('⚠️ 無法擷取當前圖表配置！');
       return;
     }
 
-    const chartId = 'pinned_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+    const chartId = 'pinned_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
     const typeMap = {
       bar: '📊 柱狀圖',
       line: '📈 折線圖',
@@ -5783,7 +5856,7 @@
       datasetName: state.datasetName,
       createdAt: new Date().toLocaleTimeString(),
       shelvesSummary: `X: ${xDesc} | Y: ${yDesc}${state.shelf.color ? ` | 色: ${state.shelf.color}` : ''}`,
-      option: JSON.parse(JSON.stringify(currentOption))
+      option: cloneEChartsOption(currentOption)
     };
 
     state.pinnedCharts.push(pinnedItem);
@@ -5927,7 +6000,7 @@
         if (!dom) return;
         try {
           const inst = echarts.init(dom);
-          const opt = JSON.parse(JSON.stringify(item.option));
+          const opt = cloneEChartsOption(item.option);
           if (opt.grid) {
             if (Array.isArray(opt.grid)) {
               opt.grid.forEach(g => { g.containLabel = true; });
@@ -5945,8 +6018,10 @@
     });
   }
 
-  // 監聽視窗縮放以自適應看板內所有圖表
+  // 監聽視窗縮放以自適應看板內所有圖表 (若看板未打開則跳過遍歷)
   window.addEventListener('resize', debounce(() => {
+    const modal = document.getElementById('customDashboardModal');
+    if (!modal || !modal.classList.contains('open')) return;
     Object.values(dashboardChartInstances).forEach(inst => {
       if (inst && typeof inst.resize === 'function') inst.resize();
     });
@@ -6102,6 +6177,10 @@
 
   // --- 暴露給全域供點擊調用 ---
   window.PyGWalker = {
+    get state() { return state; },
+    getActiveRows: () => {
+      return getActiveRows();
+    },
     toggleSidebar: (forceState) => {
       toggleSidebar(forceState);
     },
@@ -6262,6 +6341,19 @@
     },
     deleteSheet: (id) => {
       deleteSheet(id);
+    },
+    loadDataset: (key, custom) => {
+      loadDataset(key, custom);
+    },
+    setChartType: (type) => {
+      state.chartType = type;
+      const activeSheet = state.sheets.find(s => s.id === state.activeSheetId);
+      if (activeSheet) {
+        activeSheet.chartType = state.chartType;
+      }
+      renderChartTypeSelector();
+      renderWorkbookTabs();
+      renderVisualization();
     },
     importAllSheetsToDashboard: () => {
       importAllSheetsToDashboard();
