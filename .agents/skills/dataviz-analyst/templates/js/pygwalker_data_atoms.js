@@ -60,7 +60,11 @@
 
     // 自訂多宮格儀表板 (Pin to Dashboard)
     pinnedCharts: [],
-    dashboardLayout: 2
+    dashboardLayout: 2,
+
+    // Tableau / PyGWalker 工作簿分頁 (Multi-Tab Workbook)
+    sheets: [],
+    activeSheetId: 'sheet_1'
   };
 
   let echartsInstance = null;
@@ -128,6 +132,97 @@
       timer = setTimeout(() => {
         fn.apply(this, args);
       }, wait);
+    };
+  }
+
+  function hexToRgba(hex, alpha = 0.5) {
+    if (!hex || typeof hex !== 'string' || hex[0] !== '#') return `rgba(37,99,235,${alpha})`;
+    let c = hex.substring(1);
+    if (c.length === 3) c = c.split('').map(x => x + x).join('');
+    const num = parseInt(c, 16);
+    return `rgba(${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}, ${alpha})`;
+  }
+
+  // --- 核密度估計 (Kernel Density Estimation, KDE for Violin Plot) ---
+  function computeKDE(dataArr, sampleCount = 35) {
+    const nums = dataArr.filter(v => typeof v === 'number' && !isNaN(v)).sort((a, b) => a - b);
+    const n = nums.length;
+    if (n === 0) return { kde: [], min: 0, max: 0, q1: 0, median: 0, q3: 0, lowWhisker: 0, highWhisker: 0, n: 0 };
+    if (n === 1) {
+      const v = nums[0];
+      return {
+        kde: [{ y: v, density: 1, densityRatio: 1 }],
+        min: v, max: v, q1: v, median: v, q3: v, lowWhisker: v, highWhisker: v, n: 1
+      };
+    }
+
+    const getPercentile = (p) => {
+      const idx = (n - 1) * p;
+      const lower = Math.floor(idx);
+      const frac = idx - lower;
+      if (lower + 1 < n) {
+        return nums[lower] + frac * (nums[lower + 1] - nums[lower]);
+      }
+      return nums[lower];
+    };
+
+    const min = nums[0];
+    const q1 = getPercentile(0.25);
+    const median = getPercentile(0.5);
+    const q3 = getPercentile(0.75);
+    const max = nums[n - 1];
+    const iqr = q3 - q1;
+    const lowWhisker = Math.max(min, q1 - 1.5 * iqr);
+    const highWhisker = Math.min(max, q3 + 1.5 * iqr);
+
+    // 計算平均值與標準差
+    let sum = 0;
+    for (let i = 0; i < n; i++) sum += nums[i];
+    const mean = sum / n;
+    let varSum = 0;
+    for (let i = 0; i < n; i++) varSum += Math.pow(nums[i] - mean, 2);
+    const std = Math.sqrt(varSum / (n - 1)) || (max - min) / 6 || 1;
+
+    // Silverman's 最佳頻寬法則 (Rule of Thumb Bandwidth)
+    let h = 0.9 * Math.min(std, (iqr / 1.34) || std) * Math.pow(n, -0.2);
+    if (h <= 0.0001 || isNaN(h)) h = (max - min) / 10 || 1;
+
+    // 取樣區間：微幅延伸 0.15h 讓頂部與底部輪廓平滑收斂
+    const yStart = Math.max(min, lowWhisker - 0.15 * h);
+    const yEnd = Math.min(max, highWhisker + 0.15 * h);
+    const step = (yEnd - yStart) / (sampleCount - 1);
+
+    const kde = [];
+    const invSqrt2Pi = 1 / Math.sqrt(2 * Math.PI);
+    let maxDensity = 0;
+
+    for (let i = 0; i < sampleCount; i++) {
+      const y = yStart + i * step;
+      let densitySum = 0;
+      for (let j = 0; j < n; j++) {
+        const u = (y - nums[j]) / h;
+        densitySum += Math.exp(-0.5 * u * u) * invSqrt2Pi;
+      }
+      const density = densitySum / (n * h);
+      if (density > maxDensity) maxDensity = density;
+      kde.push({ y, density });
+    }
+
+    if (maxDensity <= 0) maxDensity = 1;
+    kde.forEach(pt => {
+      pt.densityRatio = pt.density / maxDensity;
+    });
+
+    return {
+      kde,
+      min,
+      max,
+      q1,
+      median,
+      q3,
+      lowWhisker,
+      highWhisker,
+      n
     };
   }
 
@@ -214,7 +309,7 @@
     if (raw.length === 0) return raw;
     const isFacetSupported = ['bar', 'line'].includes(state.chartType);
     const effectiveAgg = (!state.shelf.agg || state.shelf.agg === 'RAW')
-      ? (state.shelf.facet && !isFacetSupported && !['scatter', 'boxplot'].includes(state.chartType) ? 'SUM' : 'RAW')
+      ? (state.shelf.facet && !isFacetSupported && !['scatter', 'boxplot', 'violin'].includes(state.chartType) ? 'SUM' : 'RAW')
       : state.shelf.agg;
     if (effectiveAgg === 'RAW') {
       return raw;
@@ -339,13 +434,33 @@
     init17DomainModal();
     loadDataset('jp_gender_facet');
 
-    // 檢查 URL 參數是否指定了圖表 (如 ?chart=line, ?chart=geo)
+    if (!state.sheets || state.sheets.length === 0) {
+      state.sheets = [
+        {
+          id: 'sheet_1',
+          name: '工作表 1 (分面柱狀)',
+          chartType: state.chartType || 'bar',
+          shelf: JSON.parse(JSON.stringify(state.shelf)),
+          datasetId: state.currentDatasetId || 'jp_gender_facet',
+          filters: JSON.parse(JSON.stringify(state.filters || {})),
+          barStackMode: !!state.barStackMode,
+          facetScaleMode: state.facetScaleMode || 'fixed'
+        }
+      ];
+      state.activeSheetId = 'sheet_1';
+    }
+    renderWorkbookTabs();
+
+    // 檢查 URL 參數是否指定了圖表 (如 ?chart=line, ?chart=geo, ?chart=violin)
     try {
       const urlParams = new URLSearchParams(window.location.search);
       const requestedChart = urlParams.get('chart');
-      if (requestedChart && ['bar', 'line', 'dual', 'geo', 'boxplot', 'treemap', 'scatter', 'donut', 'radar', 'funnel'].includes(requestedChart)) {
+      if (requestedChart && ['bar', 'line', 'dual', 'geo', 'boxplot', 'violin', 'treemap', 'scatter', 'donut', 'radar', 'funnel'].includes(requestedChart)) {
         state.chartType = requestedChart;
+        const activeSheet = state.sheets.find(s => s.id === state.activeSheetId);
+        if (activeSheet) activeSheet.chartType = requestedChart;
         renderChartTypeSelector();
+        renderWorkbookTabs();
         renderVisualization();
       }
     } catch (e) {
@@ -755,8 +870,13 @@
         if (!f) continue;
         if (f.type === 'categorical') {
           const val = String(row[field] != null ? row[field] : '');
-          if (f.selected && !f.selected.has(val)) {
-            return false;
+          if (f.selected) {
+            if (!(f.selected instanceof Set)) {
+              f.selected = new Set(Array.isArray(f.selected) ? f.selected : Object.keys(f.selected));
+            }
+            if (!f.selected.has(val)) {
+              return false;
+            }
           }
         } else if (f.type === 'range') {
           let num = f.isYear ? parseInt(String(row[field]), 10) : safeParseNumber(row[field]);
@@ -975,6 +1095,10 @@
           const k = String(r[field] != null ? r[field] : '');
           counts[k] = (counts[k] || 0) + 1;
         });
+
+        if (f.selected && !(f.selected instanceof Set)) {
+          f.selected = new Set(Array.isArray(f.selected) ? f.selected : Object.keys(f.selected));
+        }
 
         html += `
           <div class="filter-group-card">
@@ -1906,7 +2030,7 @@
 
     // 計算底部邊距與 X 軸旋轉以保證 X 軸標籤與 DataZoom 滑桿絕對不重疊
     const isSwapped = state.chartType === 'bar' && state.measures.includes(xField) && !state.measures.includes(yField);
-    const hasCategoryX = !isSwapped && ['bar', 'line', 'dual', 'boxplot'].includes(state.chartType);
+    const hasCategoryX = !isSwapped && ['bar', 'line', 'dual', 'boxplot', 'violin'].includes(state.chartType);
     const needSlider = hasCategoryX && xVals.length > 12;
     const isRotated = hasCategoryX && xVals.length > 12;
     // 底部留白像素：有滑桿 + 旋轉標籤 = 82px；有滑桿 + 水平標籤 = 68px；無滑桿 + 旋轉 = 54px；無滑桿 + 水平 = 42px
@@ -2628,8 +2752,8 @@
         { type: 'slider', bottom: 6, height: 16, borderColor: '#cbd5e1', fillerColor: 'rgba(37, 99, 235, 0.15)', handleStyle: { color: '#2563eb' } }
       ];
 
-    } else if (state.chartType === 'boxplot') {
-      // 05. 盒鬚分佈圖 (Box Plot) - 分組離散度、四分位數與極端值
+    } else if (state.chartType === 'boxplot' || state.chartType === 'violin') {
+      // 05. 盒鬚分佈圖 (Box Plot) 與 11. 小提琴圖 (Violin Plot - 核密度分佈 KDE)
       let groupDim = xField;
       let measureDim = yField;
       if (state.measures.includes(xField) && !state.measures.includes(yField)) {
@@ -2697,34 +2821,6 @@
         });
       });
 
-      option.tooltip = {
-        trigger: 'item',
-        formatter: (params) => {
-          if (params.seriesType === 'boxplot') {
-            const raw = params.value || (params.data && params.data.value) || params.data;
-            const v = Array.isArray(raw) ? (raw.length >= 6 ? raw.slice(raw.length - 5) : raw) : [];
-            const grp = groupNames[params.dataIndex];
-            const sampleCount = groupMap[grp] ? groupMap[grp].length : 0;
-            return `<div style="font-size:12px; line-height:1.6;">
-              <strong style="color:#0f172a; font-size:13px;">${escapeHtml(grp)}</strong> (樣本數: ${sampleCount})<br/>
-              指標: <b>${escapeHtml(measureDim)}</b><br/>
-              上邊界 (High Whisker): <b>${formatCompactNumber(v[4])}</b><br/>
-              第 3 四分位數 (Q3 75%): <b>${formatCompactNumber(v[3])}</b><br/>
-              中位數 (Median 50%): <b style="color:#2563eb;">${formatCompactNumber(v[2])}</b><br/>
-              第 1 四分位數 (Q1 25%): <b>${formatCompactNumber(v[1])}</b><br/>
-              下邊界 (Low Whisker): <b>${formatCompactNumber(v[0])}</b>
-            </div>`;
-          } else {
-            const outlierVal = Array.isArray(params.data) ? params.data[1] : (params.value || params.data);
-            const grpName = Array.isArray(params.data) && groupNames[params.data[0]] ? `${groupNames[params.data[0]]} · ` : '';
-            return `<div style="font-size:12px; line-height:1.6;">
-              <strong style="color:#0f172a;">${escapeHtml(grpName)}離群極值</strong><br/>
-              指標: <b>${escapeHtml(measureDim)}</b>: <b style="color:#ea580c;">${formatCompactNumber(outlierVal)}</b>
-            </div>`;
-          }
-        }
-      };
-
       const isBoxRotated = groupNames.length > 8;
       const needBoxSlider = groupNames.length > 12;
 
@@ -2755,18 +2851,161 @@
         splitLine: { lineStyle: { color: '#f1f5f9' } }
       };
 
-      option.series = [
-        {
-          name: measureDim,
-          type: 'boxplot',
-          data: boxData,
-          itemStyle: {
-            color: '#eff6ff',
-            borderColor: '#2563eb',
-            borderWidth: 2
+      if (state.chartType === 'violin') {
+        const violinMetaList = groupNames.map((grp) => {
+          return computeKDE(groupMap[grp] || [], 35);
+        });
+
+        option.tooltip = {
+          trigger: 'item',
+          formatter: (params) => {
+            if (params.seriesType === 'custom') {
+              const grp = groupNames[params.dataIndex];
+              const meta = violinMetaList[params.dataIndex];
+              if (!meta) return '';
+              return `<div style="font-size:12px; line-height:1.6;">
+                <strong style="color:#0f172a; font-size:13px;">🎻 ${escapeHtml(grp)}</strong> (樣本數: ${meta.n})<br/>
+                指標: <b>${escapeHtml(measureDim)}</b><br/>
+                上邊界 (High Whisker): <b>${formatCompactNumber(meta.highWhisker)}</b><br/>
+                第 3 四分位數 (Q3 75%): <b>${formatCompactNumber(meta.q3)}</b><br/>
+                中位數 (Median 50%): <b style="color:#2563eb;">${formatCompactNumber(meta.median)}</b><br/>
+                第 1 四分位數 (Q1 25%): <b>${formatCompactNumber(meta.q1)}</b><br/>
+                下邊界 (Low Whisker): <b>${formatCompactNumber(meta.lowWhisker)}</b><br/>
+                <span style="color:#64748b; font-size:10.5px;">核密度估計 (Gaussian KDE) 雙對稱連續分佈輪廓</span>
+              </div>`;
+            } else {
+              const outlierVal = Array.isArray(params.data) ? params.data[1] : (params.value || params.data);
+              const grpName = Array.isArray(params.data) && groupNames[params.data[0]] ? `${groupNames[params.data[0]]} · ` : '';
+              return `<div style="font-size:12px; line-height:1.6;">
+                <strong style="color:#0f172a;">${escapeHtml(grpName)}離群極值</strong><br/>
+                指標: <b>${escapeHtml(measureDim)}</b>: <b style="color:#ea580c;">${formatCompactNumber(outlierVal)}</b>
+              </div>`;
+            }
           }
-        }
-      ];
+        };
+
+        option.series = [
+          {
+            name: measureDim,
+            type: 'custom',
+            renderItem: (params, api) => {
+              const grpIdx = api.value(0);
+              const meta = violinMetaList[grpIdx];
+              if (!meta || meta.n === 0) return;
+
+              const bandWidth = api.size([1, 0])[0];
+              const maxHalfWidth = Math.min(bandWidth * 0.42, 60);
+              const centerX = api.coord([grpIdx, 0])[0];
+
+              const rightPoints = [];
+              const leftPoints = [];
+
+              meta.kde.forEach(pt => {
+                const yPix = api.coord([grpIdx, pt.y])[1];
+                const dx = (pt.densityRatio || 0) * maxHalfWidth;
+                rightPoints.push([centerX + dx, yPix]);
+                leftPoints.unshift([centerX - dx, yPix]);
+              });
+
+              const polygonPoints = rightPoints.concat(leftPoints);
+              const paletteColor = PALETTE[grpIdx % PALETTE.length];
+              const fillColor = hexToRgba(paletteColor, 0.45);
+
+              const elements = [];
+
+              // 1. 小提琴雙對稱核密度輪廓
+              if (polygonPoints.length > 2) {
+                elements.push({
+                  type: 'polygon',
+                  shape: { points: polygonPoints },
+                  style: {
+                    fill: fillColor,
+                    stroke: paletteColor,
+                    lineWidth: 1.6
+                  }
+                });
+              }
+
+              // 2. 鬚線 (Low to High Whisker)
+              const lowY = api.coord([grpIdx, meta.lowWhisker])[1];
+              const highY = api.coord([grpIdx, meta.highWhisker])[1];
+              elements.push({
+                type: 'line',
+                shape: { x1: centerX, y1: lowY, x2: centerX, y2: highY },
+                style: { stroke: '#0f172a', lineWidth: 1.5 }
+              });
+
+              // 3. 四分位實心盒 (Q1 to Q3)
+              const q1Y = api.coord([grpIdx, meta.q1])[1];
+              const q3Y = api.coord([grpIdx, meta.q3])[1];
+              const boxTop = Math.min(q1Y, q3Y);
+              const boxH = Math.max(Math.abs(q1Y - q3Y), 2);
+              const boxW = Math.max(6, Math.min(bandWidth * 0.12, 10));
+              elements.push({
+                type: 'rect',
+                shape: { x: centerX - boxW / 2, y: boxTop, width: boxW, height: boxH, r: 2 },
+                style: { fill: '#1e293b' }
+              });
+
+              // 4. 中位數白心圓點
+              const medY = api.coord([grpIdx, meta.median])[1];
+              elements.push({
+                type: 'circle',
+                shape: { cx: centerX, cy: medY, r: 3.5 },
+                style: { fill: '#ffffff', stroke: '#0f172a', lineWidth: 1.5 }
+              });
+
+              return {
+                type: 'group',
+                children: elements
+              };
+            },
+            data: groupNames.map((grp, idx) => [idx, violinMetaList[idx].median])
+          }
+        ];
+      } else {
+        // 經典盒鬚圖
+        option.tooltip = {
+          trigger: 'item',
+          formatter: (params) => {
+            if (params.seriesType === 'boxplot') {
+              const raw = params.value || (params.data && params.data.value) || params.data;
+              const v = Array.isArray(raw) ? (raw.length >= 6 ? raw.slice(raw.length - 5) : raw) : [];
+              const grp = groupNames[params.dataIndex];
+              const sampleCount = groupMap[grp] ? groupMap[grp].length : 0;
+              return `<div style="font-size:12px; line-height:1.6;">
+                <strong style="color:#0f172a; font-size:13px;">📦 ${escapeHtml(grp)}</strong> (樣本數: ${sampleCount})<br/>
+                指標: <b>${escapeHtml(measureDim)}</b><br/>
+                上邊界 (High Whisker): <b>${formatCompactNumber(v[4])}</b><br/>
+                第 3 四分位數 (Q3 75%): <b>${formatCompactNumber(v[3])}</b><br/>
+                中位數 (Median 50%): <b style="color:#2563eb;">${formatCompactNumber(v[2])}</b><br/>
+                第 1 四分位數 (Q1 25%): <b>${formatCompactNumber(v[1])}</b><br/>
+                下邊界 (Low Whisker): <b>${formatCompactNumber(v[0])}</b>
+              </div>`;
+            } else {
+              const outlierVal = Array.isArray(params.data) ? params.data[1] : (params.value || params.data);
+              const grpName = Array.isArray(params.data) && groupNames[params.data[0]] ? `${groupNames[params.data[0]]} · ` : '';
+              return `<div style="font-size:12px; line-height:1.6;">
+                <strong style="color:#0f172a;">${escapeHtml(grpName)}離群極值</strong><br/>
+                指標: <b>${escapeHtml(measureDim)}</b>: <b style="color:#ea580c;">${formatCompactNumber(outlierVal)}</b>
+              </div>`;
+            }
+          }
+        };
+
+        option.series = [
+          {
+            name: measureDim,
+            type: 'boxplot',
+            data: boxData,
+            itemStyle: {
+              color: '#eff6ff',
+              borderColor: '#2563eb',
+              borderWidth: 2
+            }
+          }
+        ];
+      }
 
       if (outlierData.length > 0) {
         option.series.push({
@@ -3617,12 +3856,17 @@
       });
     }
 
-    // 圖表類型點選 (7 Data Atoms)
+    // 圖表類型點選 (Data Atoms)
     const chartBtns = document.querySelectorAll('.chart-type-card');
     chartBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         state.chartType = btn.dataset.chart;
+        const activeSheet = state.sheets.find(s => s.id === state.activeSheetId);
+        if (activeSheet) {
+          activeSheet.chartType = state.chartType;
+        }
         renderChartTypeSelector();
+        renderWorkbookTabs();
         renderVisualization();
       });
     });
@@ -3853,6 +4097,19 @@
     if (btnLayoutCols1) btnLayoutCols1.addEventListener('click', () => setDashboardLayout(1));
     if (btnLayoutCols2) btnLayoutCols2.addEventListener('click', () => setDashboardLayout(2));
     if (btnLayoutCols3) btnLayoutCols3.addEventListener('click', () => setDashboardLayout(3));
+
+    // 工作簿多分頁按鈕綁定 (Multi-Tab Workbook)
+    const btnAddSheet = document.getElementById('btnAddSheet');
+    if (btnAddSheet) btnAddSheet.addEventListener('click', addNewSheet);
+
+    const btnPinSheet = document.getElementById('btnPinCurrentSheet');
+    if (btnPinSheet) btnPinSheet.addEventListener('click', pinCurrentChart);
+
+    const btnOpenDashTabs = document.getElementById('btnOpenDashboardFromTabs');
+    if (btnOpenDashTabs) btnOpenDashTabs.addEventListener('click', openCustomDashboard);
+
+    const btnImportSheets = document.getElementById('btnImportAllSheets');
+    if (btnImportSheets) btnImportSheets.addEventListener('click', importAllSheetsToDashboard);
   }
 
   // --- Tableau 語意綱要分類精靈 (Schema Classifier Modal) ---
@@ -4864,6 +5121,271 @@
   }
 
   // =========================================================================
+  // Tableau / PyGWalker 工作簿多分頁功能模組 (Multi-Tab Workbook)
+  // =========================================================================
+
+  function getChartIcon(type) {
+    const map = {
+      bar: '📊',
+      line: '📈',
+      dual: '📉',
+      geo: '🗺️',
+      boxplot: '📦',
+      violin: '🎻',
+      treemap: '🗂️',
+      scatter: '🟣',
+      donut: '🍩',
+      radar: '🕸️',
+      funnel: '🔻',
+      overview: '🌐'
+    };
+    return map[type] || '📊';
+  }
+
+  function cloneFilters(filters) {
+    if (!filters) return {};
+    const cloned = {};
+    for (const [key, f] of Object.entries(filters)) {
+      if (!f) continue;
+      cloned[key] = {
+        ...f,
+        selected: (f.selected instanceof Set)
+          ? new Set(f.selected)
+          : (Array.isArray(f.selected) ? new Set(f.selected) : (f.selected ? new Set(Object.keys(f.selected)) : new Set()))
+      };
+    }
+    return cloned;
+  }
+
+  function saveCurrentSheetState() {
+    const active = state.sheets.find(s => s.id === state.activeSheetId);
+    if (!active) return;
+    active.chartType = state.chartType;
+    active.shelf = JSON.parse(JSON.stringify(state.shelf));
+    active.datasetId = state.currentDatasetId;
+    active.filters = cloneFilters(state.filters);
+    active.barStackMode = !!state.barStackMode;
+    active.facetScaleMode = state.facetScaleMode || 'fixed';
+  }
+
+  function renderWorkbookTabs() {
+    const tabsList = document.getElementById('workbookTabsList');
+    if (!tabsList) return;
+
+    if (!state.sheets || state.sheets.length === 0) {
+      state.sheets = [
+        {
+          id: 'sheet_1',
+          name: '工作表 1 (分面柱狀)',
+          chartType: state.chartType || 'bar',
+          shelf: JSON.parse(JSON.stringify(state.shelf)),
+          datasetId: state.currentDatasetId || 'jp_gender_facet',
+          filters: {},
+          barStackMode: false,
+          facetScaleMode: 'fixed'
+        }
+      ];
+      state.activeSheetId = 'sheet_1';
+    }
+
+    tabsList.innerHTML = state.sheets.map(sheet => {
+      const isActive = sheet.id === state.activeSheetId;
+      const icon = getChartIcon(sheet.chartType);
+      const safeId = String(sheet.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      return `
+        <div class="workbook-tab ${isActive ? 'active' : ''}" data-sheet-id="${escapeHtml(sheet.id)}" onclick="window.PyGWalker.switchSheet('${safeId}')" title="${escapeHtml(sheet.name)} (${sheet.chartType})">
+          <span class="tab-chart-icon">${icon}</span>
+          <span class="tab-title" ondblclick="window.PyGWalker.promptRenameSheet('${safeId}')" title="按兩下自訂名稱">${escapeHtml(sheet.name)}</span>
+          <button type="button" class="tab-rename-btn" onclick="event.stopPropagation(); window.PyGWalker.promptRenameSheet('${safeId}')" title="按此修改工作表名稱">✎</button>
+          ${state.sheets.length > 1 ? `<button type="button" class="tab-close-btn" onclick="event.stopPropagation(); window.PyGWalker.deleteSheet('${safeId}')" title="刪除此工作表">✕</button>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function switchSheet(targetId) {
+    if (state.activeSheetId === targetId) return;
+    saveCurrentSheetState();
+
+    const target = state.sheets.find(s => s.id === targetId);
+    if (!target) return;
+
+    state.activeSheetId = target.id;
+    state.chartType = target.chartType;
+    state.shelf = JSON.parse(JSON.stringify(target.shelf));
+    state.barStackMode = !!target.barStackMode;
+    state.facetScaleMode = target.facetScaleMode || 'fixed';
+    state.filters = cloneFilters(target.filters);
+
+    renderChartTypeSelector();
+    renderShelves();
+    renderKPIRibbon();
+    renderVisualization();
+    renderDataTable();
+    renderWorkbookTabs();
+  }
+
+  function addNewSheet() {
+    saveCurrentSheetState();
+    const count = state.sheets.length + 1;
+    const newId = 'sheet_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+    const newSheet = {
+      id: newId,
+      name: `工作表 ${count}`,
+      chartType: 'bar',
+      shelf: {
+        x: state.dimensions[0] || state.columns[0] || '',
+        y: state.measures[0] || state.columns[1] || '',
+        yMulti: [],
+        color: '',
+        size: '',
+        secondary: '',
+        facet: '',
+        agg: 'RAW'
+      },
+      datasetId: state.currentDatasetId,
+      filters: {},
+      barStackMode: false,
+      facetScaleMode: 'fixed'
+    };
+    state.sheets.push(newSheet);
+    state.activeSheetId = newId;
+    state.chartType = newSheet.chartType;
+    state.shelf = JSON.parse(JSON.stringify(newSheet.shelf));
+
+    renderChartTypeSelector();
+    renderShelves();
+    renderKPIRibbon();
+    renderVisualization();
+    renderDataTable();
+    renderWorkbookTabs();
+    showToast(`✨ 已新增「${newSheet.name}」分頁，可自由探索新視角！`);
+  }
+
+  function promptRenameSheet(id) {
+    const sheet = state.sheets.find(s => s.id === id);
+    if (!sheet) return;
+    const newName = prompt('請輸入工作表名稱：', sheet.name);
+    if (newName && newName.trim()) {
+      sheet.name = newName.trim();
+      renderWorkbookTabs();
+      showToast(`✏️ 工作表已更名為「${sheet.name}」`);
+    }
+  }
+
+  function deleteSheet(id) {
+    if (state.sheets.length <= 1) {
+      showToast('⚠️ 工作簿中至少需保留一張工作表');
+      return;
+    }
+    const idx = state.sheets.findIndex(s => s.id === id);
+    if (idx === -1) return;
+    const targetName = state.sheets[idx].name;
+    if (confirm(`確定要刪除「${targetName}」工作表分頁嗎？`)) {
+      state.sheets.splice(idx, 1);
+      if (state.activeSheetId === id) {
+        const nextActive = state.sheets[Math.max(0, idx - 1)];
+        state.activeSheetId = nextActive.id;
+        state.chartType = nextActive.chartType;
+        state.shelf = JSON.parse(JSON.stringify(nextActive.shelf));
+        renderChartTypeSelector();
+        renderShelves();
+        renderKPIRibbon();
+        renderVisualization();
+        renderDataTable();
+      }
+      renderWorkbookTabs();
+      showToast(`🗑️ 已刪除工作表「${targetName}」`);
+    }
+  }
+
+  function importAllSheetsToDashboard() {
+    if (!state.sheets || state.sheets.length === 0) {
+      showToast('⚠️ 目前工作簿無任何工作表');
+      return;
+    }
+    saveCurrentSheetState();
+
+    const typeMap = {
+      bar: '📊 柱狀圖',
+      line: '📈 折線圖',
+      dual: '📉 雙軸複合圖',
+      geo: '🗺️ 地理地圖',
+      boxplot: '📦 盒鬚圖',
+      violin: '🎻 小提琴圖',
+      treemap: '🗂️ 矩形樹圖',
+      scatter: '🟣 散佈圖',
+      donut: '🍩 甜甜圈圖',
+      radar: '🕸️ 雷達圖',
+      funnel: '🔻 漏斗圖',
+      overview: '🌐 複合全景'
+    };
+
+    let importedCount = 0;
+    const originalSheetId = state.activeSheetId;
+
+    try {
+      // 依序切換至每張工作表渲染並釘選
+      state.sheets.forEach(sheet => {
+        const alreadyPinned = state.pinnedCharts.some(p => p.sheetId === sheet.id);
+        if (alreadyPinned) return;
+
+        state.chartType = sheet.chartType;
+        state.shelf = JSON.parse(JSON.stringify(sheet.shelf));
+        state.filters = cloneFilters(sheet.filters);
+        state.barStackMode = !!sheet.barStackMode;
+        state.facetScaleMode = sheet.facetScaleMode || 'fixed';
+
+        try {
+          renderVisualization();
+        } catch (err) {
+          console.error('renderVisualization error for sheet:', sheet.id, err);
+        }
+
+        if (echartsInstance) {
+          const opt = echartsInstance.getOption();
+          if (opt) {
+            const typeName = typeMap[sheet.chartType] || sheet.chartType;
+            const xDesc = sheet.shelf.x || '未排入';
+            const yDesc = sheet.shelf.y || (sheet.shelf.yMulti && sheet.shelf.yMulti.length ? sheet.shelf.yMulti.join(', ') : '未排入');
+            state.pinnedCharts.push({
+              id: 'pinned_sheet_' + sheet.id + '_' + Math.random().toString(36).substr(2, 4),
+              sheetId: sheet.id,
+              title: `${sheet.name} (${typeName})`,
+              chartType: sheet.chartType,
+              chartTypeName: typeName,
+              datasetName: sheet.datasetId || state.datasetName,
+              createdAt: new Date().toLocaleTimeString(),
+              shelvesSummary: `X: ${xDesc} | Y: ${yDesc}${sheet.shelf.color ? ` | 色: ${sheet.shelf.color}` : ''}`,
+              option: JSON.parse(JSON.stringify(opt))
+            });
+            importedCount++;
+          }
+        }
+      });
+    } finally {
+      const origSheet = state.sheets.find(s => s.id === originalSheetId);
+      if (origSheet) {
+        state.activeSheetId = origSheet.id;
+        state.chartType = origSheet.chartType;
+        state.shelf = JSON.parse(JSON.stringify(origSheet.shelf));
+        state.filters = cloneFilters(origSheet.filters);
+        state.barStackMode = !!origSheet.barStackMode;
+        state.facetScaleMode = origSheet.facetScaleMode || 'fixed';
+        renderChartTypeSelector();
+        renderShelves();
+        renderVisualization();
+        renderWorkbookTabs();
+      }
+
+      updatePinnedBadge();
+      renderCustomDashboard();
+    }
+
+    showToast(`📥 成功將工作簿中 ${importedCount} 張工作表載入自訂看板！`);
+  }
+
+  // =========================================================================
   // 自訂多宮格看板功能模組 (Custom Pinned Dashboard)
   // =========================================================================
 
@@ -4894,6 +5416,7 @@
       dual: '📉 雙軸複合圖',
       geo: '🗺️ 地理地圖',
       boxplot: '📦 盒鬚圖',
+      violin: '🎻 小提琴圖',
       treemap: '🗂️ 矩形樹圖',
       scatter: '🟣 散佈圖',
       donut: '🍩 甜甜圈圖',
@@ -5211,6 +5734,24 @@
     },
     renderVisualization: () => {
       renderVisualization();
+    },
+    renderWorkbookTabs: () => {
+      renderWorkbookTabs();
+    },
+    switchSheet: (id) => {
+      switchSheet(id);
+    },
+    addNewSheet: () => {
+      addNewSheet();
+    },
+    promptRenameSheet: (id) => {
+      promptRenameSheet(id);
+    },
+    deleteSheet: (id) => {
+      deleteSheet(id);
+    },
+    importAllSheetsToDashboard: () => {
+      importAllSheetsToDashboard();
     }
   };
 
@@ -5228,6 +5769,11 @@
   window.openCustomDashboard = openCustomDashboard;
   window.closeCustomDashboard = closeCustomDashboard;
   window.removePinnedChart = removePinnedChart;
+  window.switchSheet = switchSheet;
+  window.addNewSheet = addNewSheet;
+  window.promptRenameSheet = promptRenameSheet;
+  window.deleteSheet = deleteSheet;
+  window.importAllSheetsToDashboard = importAllSheetsToDashboard;
 
   // 當 DOM 與資源就緒時初始化
   if (document.readyState === 'loading') {
