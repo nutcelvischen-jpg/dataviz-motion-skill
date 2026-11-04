@@ -510,7 +510,7 @@
   }
 
   // --- 載入指定數據集 ---
-  function loadDataset(datasetKey, customObj = null) {
+  function loadDataset(datasetKey, customObj = null, options = {}) {
     let target = null;
     if (customObj) {
       target = customObj;
@@ -534,8 +534,7 @@
     state.currentDatasetId = target.id || datasetKey;
     state.datasetName = target.name || '自訂數據集';
     state.rawRows = JSON.parse(JSON.stringify(target.data));
-    state.shelf.yMulti = []; // 徹底清空多指標殘留
-    
+
     // 自動補齊標準化人口結構比率 (確保 47都道府縣 與 50年時序 皆可直接對比 幼年 vs 勞動人口占比)
     state.rawRows.forEach(r => {
       if (r['幼年人口占比(%)'] === undefined) {
@@ -560,31 +559,36 @@
     // 分析欄位綱要
     analyzeSchema(state.rawRows);
 
-    // 智慧初始化常用篩選器 (地區分組 / 年份區間)
-    initDefaultFilters();
+    if (!options.skipShelfReset) {
+      state.shelf.yMulti = []; // 徹底清空多指標殘留
+      // 智慧初始化常用篩選器 (地區分組 / 年份區間)
+      initDefaultFilters();
 
-    // 套用預設編碼槽
-    state.shelf.x = target.defaultX || (state.dimensions[0] || state.columns[0]);
-    state.shelf.y = target.defaultY || (state.measures[0] || state.columns[1]);
-    state.shelf.color = target.defaultColor || '';
-    state.shelf.size = target.defaultSize || '';
-    state.shelf.secondary = target.defaultSecondary || '';
-    state.shelf.facet = target.defaultFacet || '';
-    if (target.defaultChart) {
-      state.chartType = target.defaultChart;
+      // 套用預設編碼槽
+      state.shelf.x = target.defaultX || (state.dimensions[0] || state.columns[0]);
+      state.shelf.y = target.defaultY || (state.measures[0] || state.columns[1]);
+      state.shelf.color = target.defaultColor || '';
+      state.shelf.size = target.defaultSize || '';
+      state.shelf.secondary = target.defaultSecondary || '';
+      state.shelf.facet = target.defaultFacet || '';
+      if (target.defaultChart) {
+        state.chartType = target.defaultChart;
+      }
     }
 
     // 重設表格分頁
     state.tablePage = 1;
     state.searchQuery = '';
 
-    // 更新介面
-    renderFieldLists();
-    renderShelves();
-    renderChartTypeSelector();
-    renderKPIRibbon();
-    renderVisualization();
-    renderDataTable();
+    if (!options.skipRender) {
+      // 更新介面
+      renderFieldLists();
+      renderShelves();
+      renderChartTypeSelector();
+      renderKPIRibbon();
+      renderVisualization();
+      renderDataTable();
+    }
 
     // 更新 UI 狀態
     const dsSelect = document.getElementById('datasetQuickSelect');
@@ -594,11 +598,18 @@
     if (fileStatus) fileStatus.textContent = `${state.rawRows.length} 列資料`;
 
     const activeSheet = (state.sheets || []).find(s => s.id === state.activeSheetId);
-    if (activeSheet) {
+    if (activeSheet && !options.skipSheetUpdate) {
       activeSheet.datasetId = state.currentDatasetId;
+      if (!options.skipShelfReset) {
+        activeSheet.shelf = JSON.parse(JSON.stringify(state.shelf));
+        activeSheet.chartType = state.chartType;
+        activeSheet.filters = cloneFilters(state.filters);
+      }
     }
 
-    showToast(`⚡ 已載入「${state.datasetName}」！已對齊欄位與圖表。`);
+    if (!options.skipRender) {
+      showToast(`⚡ 已載入「${state.datasetName}」！已對齊欄位與圖表。`);
+    }
   }
 
   // --- HTML 與 JS 跳脫安全輔助函式 ---
@@ -4359,6 +4370,7 @@
       if (targetTag === 'input' || targetTag === 'textarea' || targetTag === 'select') return;
       if (e.target && e.target.isContentEditable) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.isComposing) return;
       if (e.key === '[') {
         e.preventDefault();
         toggleSidebar(true);
@@ -5401,7 +5413,7 @@
     return map[type] || '📊';
   }
 
-  // 深度複製 ECharts 配置物件，完整保留 Function (renderItem, formatter, headroom)、RegExp 與 Date
+  // 深度複製 ECharts 配置物件，完整保留 Function (renderItem, formatter, headroom)、RegExp、Date 與 TypedArray
   function cloneEChartsOption(obj, seen = new WeakMap()) {
     if (obj === null || typeof obj !== 'object') {
       return obj; // 原始型別以及 function (typeof fn === 'function') 直接回傳保留
@@ -5409,11 +5421,17 @@
     if (typeof obj === 'function') {
       return obj;
     }
+    if (typeof Element !== 'undefined' && obj instanceof Element) {
+      return obj;
+    }
     if (obj instanceof Date) {
       return new Date(obj.getTime());
     }
     if (obj instanceof RegExp) {
       return new RegExp(obj.source, obj.flags);
+    }
+    if (ArrayBuffer.isView(obj)) {
+      return obj.slice();
     }
     if (seen.has(obj)) {
       return seen.get(obj);
@@ -5455,12 +5473,15 @@
     const cloned = {};
     for (const [key, f] of Object.entries(filters)) {
       if (!f) continue;
-      cloned[key] = {
-        ...f,
-        selected: (f.selected instanceof Set)
+      cloned[key] = { ...f };
+      if (f.selected !== undefined) {
+        cloned[key].selected = (f.selected instanceof Set)
           ? new Set(f.selected)
-          : (Array.isArray(f.selected) ? new Set(f.selected) : (f.selected ? new Set(Object.keys(f.selected)) : new Set()))
-      };
+          : (Array.isArray(f.selected) ? new Set(f.selected) : (f.selected ? new Set(Object.keys(f.selected)) : new Set()));
+      }
+      if (Array.isArray(f.allValues)) {
+        cloned[key].allValues = [...f.allValues];
+      }
     }
     return cloned;
   }
@@ -5489,8 +5510,8 @@
           shelf: JSON.parse(JSON.stringify(state.shelf)),
           datasetId: state.currentDatasetId || 'jp_gender_facet',
           filters: cloneFilters(state.filters || {}),
-          barStackMode: false,
-          facetScaleMode: 'fixed'
+          barStackMode: !!state.barStackMode,
+          facetScaleMode: state.facetScaleMode || 'fixed'
         }
       ];
       state.activeSheetId = 'sheet_1';
@@ -5529,7 +5550,7 @@
     state.activeSheetId = target.id;
 
     if (target.datasetId && target.datasetId !== state.currentDatasetId) {
-      loadDataset(target.datasetId);
+      loadDataset(target.datasetId, null, { skipSheetUpdate: true, skipShelfReset: true, skipRender: true });
     }
 
     state.chartType = target.chartType;
@@ -5732,6 +5753,8 @@
 
     let importedCount = 0;
     const originalSheetId = state.activeSheetId;
+    const origSheet = state.sheets.find(s => s.id === originalSheetId);
+    const origDatasetId = origSheet ? origSheet.datasetId : state.currentDatasetId;
 
     try {
       // 依序切換至每張工作表渲染並釘選
@@ -5740,7 +5763,7 @@
         if (alreadyPinned) return;
 
         if (sheet.datasetId && sheet.datasetId !== state.currentDatasetId) {
-          loadDataset(sheet.datasetId);
+          loadDataset(sheet.datasetId, null, { skipSheetUpdate: true, skipShelfReset: true, skipRender: true });
         }
 
         state.chartType = sheet.chartType;
@@ -5777,11 +5800,11 @@
         }
       });
     } finally {
-      const origSheet = state.sheets.find(s => s.id === originalSheetId);
       if (origSheet) {
-        if (origSheet.datasetId && origSheet.datasetId !== state.currentDatasetId) {
-          loadDataset(origSheet.datasetId);
+        if (origDatasetId && origDatasetId !== state.currentDatasetId) {
+          loadDataset(origDatasetId, null, { skipSheetUpdate: true, skipShelfReset: true, skipRender: true });
         }
+        origSheet.datasetId = origDatasetId;
         state.activeSheetId = origSheet.id;
         state.chartType = origSheet.chartType;
         state.shelf = JSON.parse(JSON.stringify(origSheet.shelf));
@@ -5791,7 +5814,9 @@
         renderFieldLists();
         renderChartTypeSelector();
         renderShelves();
+        renderKPIRibbon();
         renderVisualization();
+        renderDataTable();
         renderWorkbookTabs();
       }
 
@@ -6342,8 +6367,8 @@
     deleteSheet: (id) => {
       deleteSheet(id);
     },
-    loadDataset: (key, custom) => {
-      loadDataset(key, custom);
+    loadDataset: (key, custom, options) => {
+      loadDataset(key, custom, options);
     },
     setChartType: (type) => {
       state.chartType = type;

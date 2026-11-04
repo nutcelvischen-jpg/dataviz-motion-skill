@@ -465,6 +465,64 @@ async function evaluate(ws, expression, id = 100) {
     assert(t6.afterPinnedCount >= t6.beforePinnedCount, `一鍵匯入所有工作表至看板成功 (現有 ${t6.afterPinnedCount} 張)`);
     assert(t6.allIdsValid === true, '所有釘選 ID 格式健全有效');
 
+    // =========================================================================
+    // 測試 7: [P1 #4 深度防禦] 跨資料集多工作表一鍵載入看板（防範 Sheet 1 資料集遭竄改）
+    // =========================================================================
+    console.log('\n--- 測試 7: [P1 #4 深度防禦] 跨資料集多工作表一鍵載入看板 ---');
+    await new Promise(r => setTimeout(r, 350));
+    const t7 = await evaluate(pageWs, `
+      (async function() {
+        // 清空既有看板
+        window.PyGWalker.state.pinnedCharts = [];
+        
+        // 確保目前在 Sheet 1 (jp_gender_facet)
+        window.PyGWalker.switchSheet('sheet_1');
+        const s1InitDs = window.PyGWalker.state.currentDatasetId;
+
+        // 新增一個住宅資料集分頁
+        window.PyGWalker.addNewSheet();
+        const sHousingId = window.PyGWalker.state.activeSheetId;
+        window.PyGWalker.loadDataset('jp_housing');
+
+        // 切回 Sheet 1
+        window.PyGWalker.switchSheet('sheet_1');
+        const s1BeforeImportDs = window.PyGWalker.state.currentDatasetId;
+        const s1BeforeImportRows = window.PyGWalker.state.rawRows.length;
+
+        // 執行全部載入看板
+        window.PyGWalker.importAllSheetsToDashboard();
+
+        // 驗證 Sheet 1 的狀態
+        const s1Obj = window.PyGWalker.state.sheets.find(s => s.id === 'sheet_1');
+        const s1AfterImportDs = s1Obj ? s1Obj.datasetId : null;
+        const currentDsAfterImport = window.PyGWalker.state.currentDatasetId;
+        const rowCountAfterImport = window.PyGWalker.state.rawRows.length;
+
+        // 驗證看板卡片
+        const pinnedList = window.PyGWalker.state.pinnedCharts;
+        const hasBothDatasets = pinnedList.some(p => p.datasetName === 'jp_gender_facet' || p.datasetName.includes('性別')) &&
+                                pinnedList.some(p => p.datasetName === 'jp_housing' || p.datasetName.includes('住宅'));
+
+        return {
+          s1InitDs,
+          s1BeforeImportDs,
+          s1BeforeImportRows,
+          s1AfterImportDs,
+          currentDsAfterImport,
+          rowCountAfterImport,
+          pinnedCount: pinnedList.length,
+          hasBothDatasets
+        };
+      })()
+    `, msgId++);
+
+    assert(t7.s1BeforeImportDs === 'jp_gender_facet', `匯入前工作表 1 資料集應為 jp_gender_facet，得到 ${t7.s1BeforeImportDs}`);
+    assert(t7.s1AfterImportDs === 'jp_gender_facet', `匯入後工作表 1 資料集物件絕不被竄改，得到 ${t7.s1AfterImportDs}`);
+    assert(t7.currentDsAfterImport === 'jp_gender_facet', `匯入後當前活動資料集應還原為 jp_gender_facet，得到 ${t7.currentDsAfterImport}`);
+    assert(t7.rowCountAfterImport === 24, `匯入後工作表 1 資料列數應維持 24 筆 (非被住宅覆蓋為 47 筆)，得到 ${t7.rowCountAfterImport}`);
+    assert(t7.pinnedCount >= 2, `看板應成功釘選所有分頁圖表，得到 ${t7.pinnedCount} 張`);
+    assert(t7.hasBothDatasets === true, '看板內各卡片保留各自獨立之資料集識別');
+
     console.log('\n======================================================');
     console.log(`測試彙總: 共執行 ${totalTests} 項斷言，通過 ${passedTests} 項，失敗 ${totalTests - passedTests} 項。`);
     console.log('======================================================');
