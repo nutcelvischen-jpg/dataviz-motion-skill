@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>草莓計數與 Token 盲區 · 60秒短影音動態播放器 (9:16 直式)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #0f172a;
+      --card-bg: #1e293b;
+      --text-white: #f8fafc;
+      --text-gray: #94a3b8;
+      --accent-coral: #ef4444;
+      --accent-strawberry: #f43f5e;
+      --accent-green: #10b981;
+      --accent-blue: #38bdf8;
+      --accent-amber: #f59e0b;
+      --border-dark: rgba(255, 255, 255, 0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090d16;
+      color: var(--text-white);
+      font-family: 'Plus Jakarta Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 40px;
+    }
+    header {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      margin-bottom: 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-dark);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-tag {
+      background: var(--accent-strawberry);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .viewport-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--bg-cream);
+      border-radius: 20px;
+      border: 1px solid var(--border-dark);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      overflow: hidden;
+      aspect-ratio: 9 / 16;
+      display: flex;
+      position: relative;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .controls-panel {
+      width: 100%;
+      max-width: 520px;
+      margin-top: 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-dark);
+      border-radius: 12px;
+      padding: 14px 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .timeline-row { margin-bottom: 12px; }
+    .timeline-bar-wrapper {
+      position: relative;
+      width: 100%;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .timeline-track {
+      width: 100%;
+      height: 6px;
+      background: #334155;
+      border-radius: 3px;
+      position: relative;
+      overflow: hidden;
+    }
+    .timeline-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-strawberry);
+    }
+    .timeline-thumb {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: var(--accent-strawberry);
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      top: 4px;
+      left: 0%;
+      pointer-events: none;
+    }
+    .buttons-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .btn {
+      background: #334155;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+    .btn:hover { background: #475569; }
+    .btn-primary {
+      background: var(--accent-strawberry);
+      border-color: var(--accent-strawberry);
+    }
+    .btn-primary:hover { background: #e11d48; }
+    .time-readout {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-gray);
+    }
+    .chapter-tags {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .chapter-pill {
+      font-size: 11px;
+      padding: 4px 8px;
+      background: #0f172a;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      color: var(--text-gray);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .chapter-pill.active {
+      background: #e11d48;
+      color: #fff;
+      border-color: #e11d48;
+    }
+    .info-footer {
+      width: 100%;
+      max-width: 520px;
+      margin-top: 12px;
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+    }
+    .info-footer a { color: var(--accent-blue); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-title">
+      <span>🍓 60s 動態短影音課堂</span>
+      <span class="badge-tag">9:16 Shorts</span>
+    </div>
+    <div style="font-size: 12px; color: var(--text-gray);">
+      第 1 集 · Token 盲區
+    </div>
+  </header>
+
+  <div class="viewport-card">
+    <canvas id="motionCanvas" width="1080" height="1920"></canvas>
+  </div>
+
+  <div class="controls-panel">
+    <div class="timeline-row">
+      <div class="timeline-bar-wrapper" id="timelineWrapper">
+        <div class="timeline-track">
+          <div class="timeline-fill" id="timelineFill"></div>
+        </div>
+        <div class="timeline-thumb" id="timelineThumb"></div>
+      </div>
+    </div>
+    <div class="buttons-row">
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-primary" id="playBtn">▶ 播放</button>
+        <button class="btn" id="resetBtn">↺ 重播</button>
+      </div>
+      <div class="time-readout" id="timeReadout">00.0s / 60.0s (0)</div>
+    </div>
+    <div class="chapter-tags">
+      <div class="chapter-pill active" data-frame="0">幕 1 · 🍓 草莓懸念 (00-15s)</div>
+      <div class="chapter-pill" data-frame="450">幕 2 · 📦 BPE 盲區 (15-30s)</div>
+      <div class="chapter-pill" data-frame="900">幕 3 · ⚡ 破局三招 (30-45s)</div>
+      <div class="chapter-pill" data-frame="1350">幕 4 · 🧪 實測動手 (45-60s)</div>
+    </div>
+  </div>
+
+  <div class="info-footer">
+    💡 本片由 Canvas 2D 逐幀渲染 · 支援匯出 1080p MP4 · <a href="lab.html?experiment=tokens">前往 Playground 親手實測 →</a>
+  </div>
+
+  <script>
+    const FPS = 30;
+    const DURATION_SEC = 60;
+    const TOTAL_FRAMES = FPS * DURATION_SEC; // 1800 frames
+    const SEC_PER_ACT = 15.0;
+    const FRAMES_PER_ACT = FPS * SEC_PER_ACT; // 450 frames each
+
+    const canvas = document.getElementById('motionCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const ACTS = [
+      {
+        tag: "ACT 1 · 反常識懸念",
+        title: "為什麼 AI 數不對草莓？",
+        subtitle: "How many 'r' in strawberry?",
+        bgGrad: ['#0f172a', '#1e1b4b'],
+        accent: '#f43f5e',
+        dialogue: "問 ChatGPT：'strawberry 裡面有幾個 r？' 早期模型竟脫口而出：只有 2 個！難道萬億參數的 AI 連小學生都不如？"
+      },
+      {
+        tag: "ACT 2 · 感官盲區",
+        title: "BPE 字典切塊黑盒子",
+        subtitle: "字母實體完全消失在包裹裡",
+        bgGrad: ['#0f172a', '#172554'],
+        accent: '#38bdf8',
+        dialogue: "人眼是 10 個字母逐一掃描；但 AI 根本看不到字母！分詞器查字典把它切成 [straw] + [berry] 兩個包裹，肚子裡有幾個 r 只能憑機率猜！"
+      },
+      {
+        tag: "ACT 3 · 工程破解三招",
+        title: "打破盲區，重獲視力！",
+        subtitle: "提示詞拆字 · Python 代碼 · 深度推理",
+        bgGrad: ['#0f172a', '#064e3b'],
+        accent: '#10b981',
+        dialogue: "三招秒破盲區：① 提示詞空格拆字 's t r a w b e r r y'；② 呼叫 Python 代碼計算零誤差；③ 使用次世代 Reasoning 思考模型自我驗算！"
+      },
+      {
+        tag: "ACT 4 · 認知帶走與實測",
+        title: "到 Playground 親手測",
+        subtitle: "7 款大模型即時對比 · 免費驗證",
+        bgGrad: ['#0f172a', '#451a03'],
+        accent: '#f59e0b',
+        dialogue: "記住：AI 是機率切塊，不是光學掃描！遇到字元計算務必交給代碼或思維模型。點擊連結，到我們的極簡實驗室親自測測看！"
+      }
+    ];
+
+    let currentFrame = 0;
+    let isPlaying = false;
+    let animationId = null;
+
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+    function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+
+    function drawFrame(f) {
+      const actIdx = Math.min(3, Math.floor(f / FRAMES_PER_ACT));
+      const act = ACTS[actIdx];
+      const actLocalFrame = f % FRAMES_PER_ACT;
+      const actProgress = actLocalFrame / FRAMES_PER_ACT;
+      const enterP = clamp(actLocalFrame / 25, 0, 1);
+      const enterEase = easeOutCubic(enterP);
+
+      // 1. Dynamic Background Gradient
+      const grad = ctx.createLinearGradient(0, 0, 1080, 1920);
+      grad.addColorStop(0, act.bgGrad[0]);
+      grad.addColorStop(1, act.bgGrad[1]);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1080, 1920);
+
+      // Subtle Background Grid
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < 1080; x += 120) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1920); ctx.stroke();
+      }
+      for (let y = 0; y < 1920; y += 120) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1080, y); ctx.stroke();
+      }
+
+      // 2. Top Header Bar (HUD)
+      ctx.save();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.fillRect(80, 80, 920, 84);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.strokeRect(80, 80, 920, 84);
+
+      ctx.fillStyle = act.accent;
+      ctx.font = '700 24px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText(act.tag, 110, 132);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '500 22px "JetBrains Mono", monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText(`0${actIdx + 1}/04 · ${(f/FPS).toFixed(1)}s`, 970, 132);
+      ctx.textAlign = 'left';
+      ctx.restore();
+
+      // 3. Main Title & Subtitle (with spring entrance)
+      ctx.save();
+      ctx.translate(0, (1 - enterEase) * 40);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 68px "Noto Sans TC", sans-serif';
+      ctx.fillText(act.title, 80, 240);
+
+      ctx.fillStyle = act.accent;
+      ctx.font = '600 32px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText(act.subtitle, 80, 300);
+      ctx.restore();
+
+      // 4. Center Visual Stage (Render distinct animations per act)
+      ctx.save();
+      if (actIdx === 0) {
+        // --- ACT 1: Strawberry Visual + Miscount Dialogue ---
+        // Big Strawberry Emoji with Pulse
+        const pulse = 1 + Math.sin(f * 0.1) * 0.05;
+        ctx.save();
+        ctx.translate(540, 520);
+        ctx.scale(pulse, pulse);
+        ctx.font = '160px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🍓', 0, 0);
+        ctx.restore();
+
+        // Strawberry spelled out
+        const word = "s t r a w b e r r y";
+        ctx.font = '700 48px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillText(word, 540, 680);
+
+        // Chat Bubble 1: Question
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.roundRect(140, 750, 800, 130, 20);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        ctx.stroke();
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '700 28px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('👤 使用者提問：', 180, 805);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '500 32px "JetBrains Mono", monospace';
+        ctx.fillText('How many \'r\' in strawberry?', 180, 855);
+
+        // Chat Bubble 2: AI Flawed Answer (shakes)
+        const shake = (f > 150 && f < 250) ? Math.sin(f * 0.8) * 6 : 0;
+        ctx.save();
+        ctx.translate(shake, 0);
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+        ctx.beginPath();
+        ctx.roundRect(140, 920, 800, 150, 20);
+        ctx.fill();
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = '#f43f5e';
+        ctx.font = '700 28px "Noto Sans TC", sans-serif';
+        ctx.fillText('🤖 早期 AI 回答 (GPT-4 / Claude 3)：', 180, 975);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 34px "Noto Sans TC", sans-serif';
+        ctx.fillText('「單字裡有 2 個字母 r。」 ⚠️ (大錯特錯！)', 180, 1030);
+        ctx.restore();
+
+        // Big Shock Stamp
+        if (f > 200) {
+          ctx.save();
+          ctx.translate(540, 1180);
+          ctx.rotate(-0.08);
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.2)';
+          ctx.beginPath(); ctx.roundRect(-240, -45, 480, 90, 16); ctx.fill();
+          ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3; ctx.stroke();
+          ctx.fillStyle = '#ef4444';
+          ctx.font = '900 38px "Noto Sans TC", sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('❌ 連小學生都數得對！', 0, 0);
+          ctx.restore();
+        }
+
+      } else if (actIdx === 1) {
+        // --- ACT 2: Human Eyes vs. LLM Tokenizer Parcels ---
+        // Human Optical Scan Box
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.1)';
+        ctx.beginPath(); ctx.roundRect(80, 420, 920, 250, 20); ctx.fill();
+        ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2; ctx.stroke();
+
+        ctx.fillStyle = '#10b981';
+        ctx.font = '700 28px "Noto Sans TC", sans-serif';
+        ctx.fillText('👁️ 人類的眼睛：字元級光學掃描 (100% 確定)', 120, 475);
+
+        // Spell letters with green targets
+        const letters = ['s','t','r','a','w','b','e','r','r','y'];
+        letters.forEach((l, i) => {
+          const lx = 140 + i * 82;
+          const isR = (l === 'r');
+          ctx.fillStyle = isR ? '#10b981' : '#64748b';
+          ctx.beginPath(); ctx.roundRect(lx, 515, 66, 76, 10); ctx.fill();
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '700 36px "JetBrains Mono", monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(l, lx + 33, 568);
+          if (isR) {
+            ctx.fillStyle = '#34d399';
+            ctx.font = '700 18px "JetBrains Mono", monospace';
+            ctx.fillText('命中!', lx + 33, 620);
+          }
+        });
+        ctx.textAlign = 'left';
+
+        // VS Divider
+        ctx.fillStyle = '#f59e0b';
+        ctx.font = '900 36px "Plus Jakarta Sans", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚡ VS ⚡', 540, 725);
+        ctx.textAlign = 'left';
+
+        // LLM BPE Box
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.1)';
+        ctx.beginPath(); ctx.roundRect(80, 770, 920, 380, 20); ctx.fill();
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2; ctx.stroke();
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '700 28px "Noto Sans TC", sans-serif';
+        ctx.fillText('🤖 大語言模型的視角：BPE 分詞切大塊', 120, 825);
+
+        // Two Big Parcels
+        // Parcel 1: "straw"
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath(); ctx.roundRect(140, 870, 360, 160, 16); ctx.fill();
+        ctx.strokeStyle = '#38bdf8'; ctx.stroke();
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '700 40px "JetBrains Mono", monospace';
+        ctx.fillText('"straw"', 240, 940);
+        ctx.font = '500 20px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText('Token ID: 11245', 230, 990);
+
+        // Parcel 2: "berry"
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath(); ctx.roundRect(580, 870, 360, 160, 16); ctx.fill();
+        ctx.strokeStyle = '#f43f5e'; ctx.stroke();
+        ctx.fillStyle = '#f43f5e';
+        ctx.font = '700 40px "JetBrains Mono", monospace';
+        ctx.fillText('"berry"', 680, 940);
+        ctx.font = '500 20px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText('Token ID: 32884', 670, 990);
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '600 26px "Noto Sans TC", sans-serif';
+        ctx.fillText('⚠️ 密閉包裹陷阱：進入神經網路後，字母完全消失！', 140, 1090);
+        ctx.font = '500 22px "Noto Sans TC", sans-serif';
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText('berry 誘發 double-r 共現機率，因此模型常脫口猜「2 個」！', 140, 1126);
+
+      } else if (actIdx === 2) {
+        // --- ACT 3: Three Solutions ---
+        const solutions = [
+          {
+            icon: "1️⃣",
+            title: "提示詞強制拆字 (Prompt Hack)",
+            desc: "改寫為：s t r a w b e r r y（空格分開）",
+            tag: "強迫分詞器切為單字母 Token，模型重獲視力！",
+            color: "#38bdf8"
+          },
+          {
+            icon: "2️⃣",
+            title: "代碼執行 (Code Execution)",
+            desc: "讓 AI 撰寫 Python: 'strawberry'.count('r')",
+            tag: "程式碼高精確度運算，徹底杜絕幻覺！",
+            color: "#10b981"
+          },
+          {
+            icon: "3️⃣",
+            title: "次世代思維模型 (Reasoning)",
+            desc: "Nemotron / Qwen 3.8 / Gemma 4 / DeepSeek-R1",
+            tag: "在背景思考鏈 (CoT) 自我逐字點名，精準答 3！",
+            color: "#f59e0b"
+          }
+        ];
+
+        solutions.forEach((s, i) => {
+          const sy = 420 + i * 250;
+          ctx.fillStyle = '#1e293b';
+          ctx.beginPath(); ctx.roundRect(80, sy, 920, 220, 20); ctx.fill();
+          ctx.strokeStyle = s.color; ctx.lineWidth = 2; ctx.stroke();
+
+          ctx.fillStyle = s.color;
+          ctx.font = '900 36px "Plus Jakarta Sans", sans-serif';
+          ctx.fillText(s.icon + ' ' + s.title, 120, sy + 65);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '600 28px "JetBrains Mono", monospace';
+          ctx.fillText(s.desc, 120, sy + 120);
+
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '500 24px "Noto Sans TC", sans-serif';
+          ctx.fillText('👉 ' + s.tag, 120, sy + 175);
+        });
+
+      } else {
+        // --- ACT 4: Call To Action & Playground ---
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.1)';
+        ctx.beginPath(); ctx.roundRect(80, 420, 920, 300, 24); ctx.fill();
+        ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2; ctx.stroke();
+
+        ctx.fillStyle = '#f59e0b';
+        ctx.font = '900 36px "Noto Sans TC", sans-serif';
+        ctx.fillText('💡 一句話核心啟發：', 130, 490);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '600 32px "Noto Sans TC", sans-serif';
+        ctx.fillText('大語言模型是「機率切塊」，不是「光學掃描」！', 130, 560);
+        ctx.font = '500 26px "Noto Sans TC", sans-serif';
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillText('字元計算與繁體中文計價，務必善用工具與思維模型！', 130, 620);
+        ctx.fillText('繁中 Token 膨脹 1.5 倍，帳單比英文貴 30%~80%！', 130, 670);
+
+        // Playground Mockup Card
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath(); ctx.roundRect(80, 760, 920, 360, 24); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '700 28px "Noto Sans TC", sans-serif';
+        ctx.fillText('🧪 極簡實驗室已上線 (Playground)', 130, 830);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '600 28px "JetBrains Mono", monospace';
+        ctx.fillText('7 大驗證模型 · 免費 / 免 Key 自由切換', 130, 890);
+
+        // Big CTA Button
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath(); ctx.roundRect(130, 950, 820, 110, 20); ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 36px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('👉 點擊連結，現在就親自測測看！', 540, 1020);
+        ctx.textAlign = 'left';
+      }
+      ctx.restore();
+
+      // 5. Bottom Subtitle Banner (Live Voice Sync)
+      ctx.save();
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
+      ctx.fillRect(60, 1600, 960, 220);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(60, 1600, 960, 220);
+
+      ctx.fillStyle = act.accent;
+      ctx.font = '700 24px "Noto Sans TC", sans-serif';
+      ctx.fillText('🎙️ 解說旁白：', 100, 1650);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '500 28px "Noto Sans TC", sans-serif';
+      wrapText(ctx, act.dialogue, 100, 1700, 880, 42);
+      ctx.restore();
+    }
+
+    function wrapText(context, text, x, y, maxWidth, lineHeight) {
+      let line = '';
+      for (let n = 0; n < text.length; n++) {
+        const testLine = line + text[n];
+        const metrics = context.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          context.fillText(line, x, y);
+          line = text[n];
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      context.fillText(line, x, y);
+    }
+
+    function updateUI() {
+      const p = currentFrame / TOTAL_FRAMES;
+      document.getElementById('timelineFill').style.width = (p * 100) + '%';
+      document.getElementById('timelineThumb').style.left = (p * 100) + '%';
+
+      const sec = (currentFrame / FPS).toFixed(1);
+      document.getElementById('timeReadout').textContent = `${sec}s / 60.0s (${currentFrame})`;
+
+      const actIdx = Math.min(3, Math.floor(currentFrame / FRAMES_PER_ACT));
+      document.querySelectorAll('.chapter-pill').forEach((pill, idx) => {
+        pill.classList.toggle('active', idx === actIdx);
+      });
+    }
+
+    function step() {
+      if (isPlaying) {
+        currentFrame++;
+        if (currentFrame >= TOTAL_FRAMES) {
+          currentFrame = 0;
+        }
+        drawFrame(currentFrame);
+        updateUI();
+        animationId = requestAnimationFrame(step);
+      }
+    }
+
+    document.getElementById('playBtn').addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      document.getElementById('playBtn').textContent = isPlaying ? '⏸ 暫停' : '▶ 播放';
+      if (isPlaying) step();
+      else cancelAnimationFrame(animationId);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      currentFrame = 0;
+      drawFrame(currentFrame);
+      updateUI();
+      if (isPlaying) {
+        isPlaying = false;
+        document.getElementById('playBtn').textContent = '▶ 播放';
+        cancelAnimationFrame(animationId);
+      }
+    });
+
+    document.querySelectorAll('.chapter-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        currentFrame = parseInt(pill.dataset.frame, 10);
+        drawFrame(currentFrame);
+        updateUI();
+      });
+    });
+
+    document.getElementById('timelineWrapper').addEventListener('click', (e) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const pct = Math.max(0, Math.min(1, clickX / rect.width));
+      currentFrame = Math.floor(pct * TOTAL_FRAMES);
+      drawFrame(currentFrame);
+      updateUI();
+    });
+
+    // Initial Draw
+    drawFrame(0);
+    updateUI();
+  </script>
+</body>
+</html>
