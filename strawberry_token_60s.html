@@ -3,91 +3,104 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>草莓計數與 Token 盲區 · 60秒短影音動態播放器 (9:16 直式)</title>
+  <title>草莓計數與 Token 盲區 · 60秒短影音動態播放器 (科技講透透手繪筆記風)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-cream: #0f172a;
-      --card-bg: #1e293b;
-      --text-white: #f8fafc;
-      --text-gray: #94a3b8;
-      --accent-coral: #ef4444;
-      --accent-strawberry: #f43f5e;
-      --accent-green: #10b981;
-      --accent-blue: #38bdf8;
-      --accent-amber: #f59e0b;
-      --border-dark: rgba(255, 255, 255, 0.1);
+      --bg-cream: #FBF9F4;
+      --paper-dot: #E2DDD5;
+      --ink-charcoal: #1C1917;
+      --ink-muted: #57534E;
+      --accent-purple: #6366F1;
+      --accent-blue: #2563EB;
+      --accent-hl: #FEF08A;
+      --accent-strawberry: #F43F5E;
+      --accent-green: #10B981;
+      --card-bg: #FFFFFF;
+      --card-border: #1C1917;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      background: #090d16;
-      color: var(--text-white);
-      font-family: 'Plus Jakarta Sans', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #EFECE6;
+      color: var(--ink-charcoal);
+      font-family: 'Noto Sans TC', sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 24px 16px 40px;
+      padding: 16px;
     }
+
     header {
       width: 100%;
       max-width: 520px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 18px;
-      margin-bottom: 16px;
-      background: var(--card-bg);
-      border: 1px solid var(--border-dark);
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      background: #FFFFFF;
+      border: 2px solid var(--ink-charcoal);
       border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      box-shadow: 2px 2px 0px var(--ink-charcoal);
     }
+
     .brand-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: #ffffff;
       display: flex;
       align-items: center;
       gap: 8px;
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--ink-charcoal);
     }
+
     .badge-tag {
-      background: var(--accent-strawberry);
-      color: white;
+      background: #EEF2FF;
+      color: var(--accent-purple);
+      border: 1.5px solid var(--accent-purple);
       font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
       font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 4px;
     }
+
     .viewport-card {
       width: 100%;
-      max-width: 520px;
-      background: var(--bg-cream);
-      border-radius: 20px;
-      border: 1px solid var(--border-dark);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-      overflow: hidden;
+      max-width: 440px;
       aspect-ratio: 9 / 16;
-      display: flex;
+      background: var(--bg-cream);
+      border: 3px solid var(--ink-charcoal);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 6px 6px 0px rgba(28, 25, 23, 0.85);
       position: relative;
     }
+
     canvas {
       width: 100%;
       height: 100%;
       display: block;
     }
+
     .controls-panel {
       width: 100%;
       max-width: 520px;
-      margin-top: 16px;
-      background: var(--card-bg);
-      border: 1px solid var(--border-dark);
-      border-radius: 12px;
-      padding: 14px 18px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      background: #FFFFFF;
+      border: 2px solid var(--ink-charcoal);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 14px;
+      box-shadow: 3px 3px 0px var(--ink-charcoal);
     }
-    .timeline-row { margin-bottom: 12px; }
+
+    .timeline-row {
+      margin-bottom: 10px;
+    }
+
     .timeline-bar-wrapper {
       position: relative;
       width: 100%;
@@ -96,31 +109,36 @@
       align-items: center;
       cursor: pointer;
     }
+
     .timeline-track {
       width: 100%;
-      height: 6px;
-      background: #334155;
-      border-radius: 3px;
+      height: 8px;
+      background: #E7E5E4;
+      border: 1.5px solid var(--ink-charcoal);
+      border-radius: 6px;
       position: relative;
       overflow: hidden;
     }
+
     .timeline-fill {
       height: 100%;
       width: 0%;
-      background: var(--accent-strawberry);
+      background: var(--accent-purple);
     }
+
     .timeline-thumb {
       position: absolute;
-      width: 16px;
-      height: 16px;
-      background: var(--accent-strawberry);
-      border: 2px solid #ffffff;
+      width: 18px;
+      height: 18px;
+      background: #FFFFFF;
+      border: 2px solid var(--ink-charcoal);
       border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-      top: 4px;
+      box-shadow: 1px 1px 0px var(--ink-charcoal);
+      top: 3px;
       left: 0%;
       pointer-events: none;
     }
+
     .buttons-row {
       display: flex;
       justify-content: space-between;
@@ -128,31 +146,40 @@
       flex-wrap: wrap;
       gap: 8px;
     }
+
     .btn {
-      background: #334155;
-      border: 1px solid rgba(255,255,255,0.1);
-      color: #ffffff;
-      padding: 6px 14px;
-      border-radius: 8px;
+      background: #FFFFFF;
+      border: 2px solid var(--ink-charcoal);
+      color: var(--ink-charcoal);
+      padding: 6px 16px;
+      border-radius: 10px;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: background 0.15s;
+      box-shadow: 2px 2px 0px var(--ink-charcoal);
+      transition: transform 0.1s, box-shadow 0.1s;
     }
-    .btn:hover { background: #475569; }
+
+    .btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--ink-charcoal);
+    }
+
     .btn-primary {
-      background: var(--accent-strawberry);
-      border-color: var(--accent-strawberry);
+      background: #FEF08A;
+      color: #1C1917;
     }
-    .btn-primary:hover { background: #e11d48; }
+
     .time-readout {
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px;
-      color: var(--text-gray);
+      font-weight: 700;
+      color: var(--ink-muted);
     }
+
     .chapter-tags {
       display: flex;
       gap: 6px;
@@ -160,41 +187,45 @@
       overflow-x: auto;
       padding-bottom: 4px;
     }
+
     .chapter-pill {
       font-size: 11px;
-      padding: 4px 8px;
-      background: #0f172a;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 6px;
-      color: var(--text-gray);
+      font-weight: 700;
+      padding: 4px 10px;
+      background: #F5F5F4;
+      border: 1.5px solid var(--ink-charcoal);
+      border-radius: 8px;
+      color: var(--ink-muted);
       cursor: pointer;
       white-space: nowrap;
     }
+
     .chapter-pill.active {
-      background: #e11d48;
-      color: #fff;
-      border-color: #e11d48;
+      background: var(--accent-purple);
+      color: #FFFFFF;
+      border-color: var(--ink-charcoal);
     }
+
     .info-footer {
       width: 100%;
       max-width: 520px;
       margin-top: 12px;
       text-align: center;
       font-size: 12px;
-      color: #64748b;
+      color: var(--ink-muted);
     }
-    .info-footer a { color: var(--accent-blue); text-decoration: none; }
+    .info-footer a { color: var(--accent-blue); text-decoration: underline; font-weight: 700; }
   </style>
 </head>
 <body>
 
   <header>
     <div class="brand-title">
-      <span>🍓 60s 動態短影音課堂</span>
+      <span>✏️ 科技講透透風格 · 動態短影音</span>
       <span class="badge-tag">9:16 Shorts</span>
     </div>
-    <div style="font-size: 12px; color: var(--text-gray);">
-      第 1 集 · Token 盲區
+    <div style="font-size: 12px; color: var(--ink-muted); font-weight: 600;">
+      第 1 課 · Token 盲區
     </div>
   </header>
 
@@ -227,51 +258,162 @@
   </div>
 
   <div class="info-footer">
-    💡 本片由 Canvas 2D 逐幀渲染 · 支援匯出 1080p MP4 · <a href="lab.html?experiment=tokens">前往 Playground 親手實測 →</a>
+    💡 手繪白板手帳風 · 雙語高光螢光筆字幕 · <a href="lab.html?experiment=tokens">前往 Playground 親手實測 →</a>
   </div>
 
   <script>
     const FPS = 30;
     const DURATION_SEC = 60;
-    const TOTAL_FRAMES = FPS * DURATION_SEC; // 1800 frames
-    const SEC_PER_ACT = 15.0;
-    const FRAMES_PER_ACT = FPS * SEC_PER_ACT; // 450 frames each
+    const TOTAL_FRAMES = FPS * DURATION_SEC; // 1800
+    const FRAMES_PER_ACT = 450;
 
     const canvas = document.getElementById('motionCanvas');
     const ctx = canvas.getContext('2d');
 
+    // 4幕手繪短片資料定義 (科技講透透手帳白板風 - 動態字幕切換)
     const ACTS = [
       {
-        tag: "ACT 1 · 反常識懸念",
+        tag: "科技入門 · AI 第 1 課",
+        brand: "科技講透透",
         title: "為什麼 AI 數不對草莓？",
         subtitle: "How many 'r' in strawberry?",
-        bgGrad: ['#0f172a', '#1e1b4b'],
-        accent: '#f43f5e',
-        dialogue: "問 AI：strawberry 有幾個 r？早期模型竟回答只有 2 個！難道頂級 AI 數數連小學生都不如？"
+        // 每幕細分為 3 組動態同步字卡 (與短影音節奏完全一致)
+        cues: [
+          {
+            startSec: 0.0,
+            endSec: 4.5,
+            segments: [
+              { text: "問 AI：strawberry 有幾個 ", hl: false },
+              { text: "r", hl: true },
+              { text: "？", hl: false }
+            ],
+            en: "Why does AI fail to count letters in strawberry?",
+            stylus: { x: 320, y: 520, angle: 140 }
+          },
+          {
+            startSec: 4.5,
+            endSec: 9.5,
+            segments: [
+              { text: "早期模型竟脫口而出：只有 ", hl: false },
+              { text: "2 個", hl: true },
+              { text: "！", hl: false }
+            ],
+            en: "Early models confidently say: only 2!",
+            stylus: { x: 740, y: 580, angle: 135 }
+          },
+          {
+            startSec: 9.5,
+            endSec: 15.0,
+            segments: [
+              { text: "難道頂級 AI，", hl: false },
+              { text: "屬數", hl: true },
+              { text: " 連小學生都不如？", hl: false }
+            ],
+            en: "Is cutting-edge AI worse than elementary kids?",
+            stylus: { x: 860, y: 640, angle: 130 }
+          }
+        ]
       },
       {
-        tag: "ACT 2 · 感官盲區",
-        title: "BPE 字典切塊黑盒子",
-        subtitle: "字母實體完全消失在包裹裡",
-        bgGrad: ['#0f172a', '#172554'],
-        accent: '#38bdf8',
-        dialogue: "這不是智商問題，是感官盲區！人類逐字看，AI 卻被分詞器切成兩個包裹，肚子裡幾個 r 只能靠機率猜！"
+        tag: "科技入門 · AI 第 1 課",
+        brand: "科技講透透",
+        title: "不是智商問題，是感官盲區！",
+        subtitle: "字母實體完全封閉在包裹裡",
+        cues: [
+          {
+            startSec: 0.0,
+            endSec: 6.5,
+            segments: [
+              { text: "這不是智商問題，是", hl: false },
+              { text: "感官盲區", hl: true },
+              { text: "！", hl: false }
+            ],
+            en: "It is not low IQ, but a sensory blindspot!",
+            stylus: { x: 380, y: 520, angle: 140 }
+          },
+          {
+            startSec: 6.5,
+            endSec: 15.0,
+            segments: [
+              { text: "分詞器把它切成兩個", hl: false },
+              { text: "密閉包裹", hl: true },
+              { text: "！字母完全消失", hl: false }
+            ],
+            en: "Packed into sealed tokens, letters disappear completely!",
+            stylus: { x: 760, y: 840, angle: 135 }
+          }
+        ]
       },
       {
-        tag: "ACT 3 · 工程破解三招",
-        title: "打破盲區，重獲視力！",
-        subtitle: "提示詞拆字 · Python 代碼 · 深度推理",
-        bgGrad: ['#0f172a', '#064e3b'],
-        accent: '#10b981',
-        dialogue: "三招秒破盲區：① 空格拆字強迫一字一切；② 呼叫 Python 代碼精確計算；③ 切換次世代思維模型自我驗算！"
+        tag: "科技入門 · AI 第 1 課",
+        brand: "科技講透透",
+        title: "三招秒破盲區，重獲視力！",
+        subtitle: "空格拆字 · 代碼直譯 · 思維自我驗算",
+        cues: [
+          {
+            startSec: 0.0,
+            endSec: 5.0,
+            segments: [
+              { text: "三招秒破盲區：① ", hl: false },
+              { text: "空格拆字", hl: true },
+              { text: " 強迫一字一切！", hl: false }
+            ],
+            en: "Method 1: Split letters with spaces to force 1-by-1 vision!",
+            stylus: { x: 820, y: 440, angle: 135 }
+          },
+          {
+            startSec: 5.0,
+            endSec: 10.0,
+            segments: [
+              { text: "② 呼叫 ", hl: false },
+              { text: "Python 代碼", hl: true },
+              { text: " 直譯器精準零誤差！", hl: false }
+            ],
+            en: "Method 2: Execute Python code for deterministic accuracy!",
+            stylus: { x: 820, y: 660, angle: 135 }
+          },
+          {
+            startSec: 10.0,
+            endSec: 15.0,
+            segments: [
+              { text: "③ 切換 ", hl: false },
+              { text: "思維模型", hl: true },
+              { text: " 逐字自我驗算！", hl: false }
+            ],
+            en: "Method 3: Reasoning models verify letters step by step!",
+            stylus: { x: 820, y: 880, angle: 135 }
+          }
+        ]
       },
       {
-        tag: "ACT 4 · 認知帶走與實測",
-        title: "到 Playground 親手測",
-        subtitle: "7 款大模型即時對比 · 免費驗證",
-        bgGrad: ['#0f172a', '#451a03'],
-        accent: '#f59e0b',
-        dialogue: "記住：AI 是機率切塊不是光學掃描！遇到字元計算務必善用工具。點擊下方連結，現在就親手測測看！"
+        tag: "科技入門 · AI 第 1 課",
+        brand: "科技講透透",
+        title: "大模型底層：機率切塊 vs 光學掃描",
+        subtitle: "遇到字元計算務必呼叫工具",
+        cues: [
+          {
+            startSec: 0.0,
+            endSec: 7.0,
+            segments: [
+              { text: "記住：AI 是", hl: false },
+              { text: "機率切塊", hl: true },
+              { text: "不是光學掃描！", hl: false }
+            ],
+            en: "Remember: AI predicts chunks, not optical scanning!",
+            stylus: { x: 540, y: 780, angle: 140 }
+          },
+          {
+            startSec: 7.0,
+            endSec: 15.0,
+            segments: [
+              { text: "字元計算善用工具，現在就", hl: false },
+              { text: "親手測測看", hl: true },
+              { text: "！", hl: false }
+            ],
+            en: "Always use tools for characters. Try it in our playground!",
+            stylus: { x: 620, y: 1020, angle: 135 }
+          }
+        ]
       }
     ];
 
@@ -279,332 +421,542 @@
     let isPlaying = false;
     let animationId = null;
 
-    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
-    function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+    // 手繪有機圓角矩形 (Hand-drawn wobbly rounded rect)
+    function drawHandRect(context, x, y, w, h, r = 16, strokeColor = '#1C1917', fillColor = '#FFFFFF', lineWidth = 4) {
+      context.save();
+      context.beginPath();
+      context.lineCap = 'round';
+      context.lineJoin = 'round';
+      context.lineWidth = lineWidth;
+      context.strokeStyle = strokeColor;
+      context.fillStyle = fillColor;
 
-    function drawFrame(f) {
-      const actIdx = Math.min(3, Math.floor(f / FRAMES_PER_ACT));
-      const act = ACTS[actIdx];
-      const actLocalFrame = f % FRAMES_PER_ACT;
-      const actProgress = actLocalFrame / FRAMES_PER_ACT;
-      const enterP = clamp(actLocalFrame / 25, 0, 1);
-      const enterEase = easeOutCubic(enterP);
+      // 四個角帶有輕微手繪有機感
+      context.roundRect(x, y, w, h, r);
+      if (fillColor) context.fill();
+      if (strokeColor && lineWidth > 0) context.stroke();
+      context.restore();
+    }
 
-      // 1. Dynamic Background Gradient
-      const grad = ctx.createLinearGradient(0, 0, 1080, 1920);
-      grad.addColorStop(0, act.bgGrad[0]);
-      grad.addColorStop(1, act.bgGrad[1]);
-      ctx.fillStyle = grad;
+    // 手繪 Apple Pencil / Stylus
+    function drawStylus(context, tipX, tipY, angleDeg = -40, scale = 1.0) {
+      context.save();
+      context.translate(tipX, tipY);
+      context.rotate((angleDeg * Math.PI) / 180);
+      context.scale(scale, scale);
+
+      // 柔和投影
+      context.shadowColor = 'rgba(28, 25, 23, 0.22)';
+      context.shadowBlur = 18;
+      context.shadowOffsetX = 8;
+      context.shadowOffsetY = 14;
+
+      // 1. 筆尖 (Nib)
+      context.beginPath();
+      context.moveTo(0, 0);
+      context.lineTo(14, -28);
+      context.lineTo(-14, -28);
+      context.closePath();
+      context.fillStyle = '#1C1917';
+      context.fill();
+
+      // 2. 錐體筆頭
+      context.beginPath();
+      context.moveTo(14, -28);
+      context.lineTo(16, -52);
+      context.lineTo(-16, -52);
+      context.lineTo(-14, -28);
+      context.closePath();
+      context.fillStyle = '#F4F4F5';
+      context.fill();
+      context.strokeStyle = '#1C1917';
+      context.lineWidth = 3;
+      context.stroke();
+
+      // 3. 筆身主體 (White Barrel)
+      context.beginPath();
+      context.rect(-16, -210, 32, 158);
+      context.fillStyle = '#FFFFFF';
+      context.fill();
+      context.strokeStyle = '#1C1917';
+      context.lineWidth = 3.5;
+      context.stroke();
+
+      // 筆身光澤線
+      context.beginPath();
+      context.moveTo(-8, -200);
+      context.lineTo(-8, -60);
+      context.strokeStyle = 'rgba(228, 228, 231, 0.9)';
+      context.lineWidth = 3;
+      context.stroke();
+
+      // 4. 紫色質感裝飾環
+      context.beginPath();
+      context.rect(-16, -230, 32, 20);
+      context.fillStyle = '#6366F1';
+      context.fill();
+      context.strokeStyle = '#1C1917';
+      context.lineWidth = 3.5;
+      context.stroke();
+
+      // 5. 頂端筆帽
+      context.beginPath();
+      context.roundRect(-16, -250, 32, 20, [10, 10, 0, 0]);
+      context.fillStyle = '#1C1917';
+      context.fill();
+
+      context.restore();
+    }
+
+    // 科技講透透招牌：雙語高光螢光筆字幕
+    function drawHighlightedSubtitle(context, segments, enText, baseY) {
+      context.save();
+      
+      // 計算中文總長度
+      context.font = '800 44px "Noto Sans TC", sans-serif';
+      let totalW = 0;
+      const metricsList = segments.map(seg => {
+        const w = context.measureText(seg.text).width;
+        totalW += w + (seg.hl ? 14 : 0);
+        return { ...seg, width: w };
+      });
+
+      // 起始居中 X
+      let curX = Math.max(60, (1080 - totalW) / 2);
+      const textY = baseY;
+
+      // 繪製中文與螢光筆底色
+      metricsList.forEach(seg => {
+        if (seg.hl) {
+          // 螢光筆黃色高光方塊 (柔和半透明筆刷感)
+          context.fillStyle = '#FEF08A';
+          context.beginPath();
+          context.roundRect(curX - 4, textY - 44, seg.width + 12, 54, 8);
+          context.fill();
+
+          // 高光文字 (鮮亮皇家藍)
+          context.fillStyle = '#2563EB';
+          context.fillText(seg.text, curX + 2, textY);
+          curX += seg.width + 14;
+        } else {
+          // 一般文字 (深炭黑)
+          context.fillStyle = '#1C1917';
+          context.fillText(seg.text, curX, textY);
+          curX += seg.width;
+        }
+      });
+
+      // 繪製下方英文說明 (灰色手寫副標)
+      if (enText) {
+        context.font = '500 24px "Noto Sans TC", sans-serif';
+        context.fillStyle = '#57534E';
+        context.textAlign = 'center';
+        context.fillText(enText, 540, textY + 46);
+        context.textAlign = 'left';
+      }
+
+      context.restore();
+    }
+
+    // 核心逐幀渲染器
+    function renderFrame(f) {
+      ctx.clearRect(0, 0, 1080, 1920);
+
+      // 1. 溫潤米白手帳紙底色 (#FBF9F4)
+      ctx.fillStyle = '#FBF9F4';
       ctx.fillRect(0, 0, 1080, 1920);
 
-      // Subtle Background Grid
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
-      ctx.lineWidth = 1;
-      for (let x = 0; x < 1080; x += 120) {
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1920); ctx.stroke();
-      }
-      for (let y = 0; y < 1920; y += 120) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1080, y); ctx.stroke();
+      // 2. 灰色點陣網格 (Dot Grid Notebook)
+      ctx.fillStyle = '#E2DDD5';
+      const dotSpacing = 48;
+      for (let x = 24; x < 1080; x += dotSpacing) {
+        for (let y = 24; y < 1920; y += dotSpacing) {
+          ctx.beginPath();
+          ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
 
-      // 2. Top Header Bar (HUD)
+      const actIdx = Math.min(3, Math.floor(f / FRAMES_PER_ACT));
+      const act = ACTS[actIdx];
+      const localFrame = f % FRAMES_PER_ACT;
+      const p = localFrame / FRAMES_PER_ACT;
+
+      // 3. 頂部導航欄 (Top Header)
+      // 3.1 左側品牌「科技講透透 / AI思考課堂」
       ctx.save();
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-      ctx.fillRect(80, 80, 920, 84);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-      ctx.strokeRect(80, 80, 920, 84);
+      // 漸層對話泡泡 Logo
+      const grad = ctx.createLinearGradient(70, 95, 110, 135);
+      grad.addColorStop(0, '#10B981');
+      grad.addColorStop(1, '#6366F1');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.roundRect(70, 95, 42, 38, [12, 12, 12, 2]);
+      ctx.fill();
 
-      ctx.fillStyle = act.accent;
-      ctx.font = '700 24px "Plus Jakarta Sans", sans-serif';
-      ctx.fillText(act.tag, 110, 132);
+      // 品牌字樣
+      ctx.fillStyle = '#1E1B4B';
+      ctx.font = '800 32px "Noto Sans TC", sans-serif';
+      ctx.fillText(act.brand, 126, 126);
 
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '500 22px "JetBrains Mono", monospace';
-      ctx.textAlign = 'right';
-      ctx.fillText(`0${actIdx + 1}/04 · ${(f/FPS).toFixed(1)}s`, 970, 132);
+      // 3.2 右側手繪紫色膠囊標籤「科技入門 · AI 第 1 課」
+      drawHandRect(ctx, 580, 88, 430, 56, 16, '#6366F1', '#FFFFFF', 3.5);
+      ctx.fillStyle = '#4F46E5';
+      ctx.font = '700 24px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(act.tag, 795, 125);
       ctx.textAlign = 'left';
       ctx.restore();
 
-      // 3. Main Title & Subtitle (with spring entrance)
+      // 4. 當前幕主題手繪標題
       ctx.save();
-      ctx.translate(0, (1 - enterEase) * 40);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '900 68px "Noto Sans TC", sans-serif';
+      ctx.fillStyle = '#1C1917';
+      ctx.font = '900 46px "Noto Sans TC", sans-serif';
       ctx.fillText(act.title, 80, 240);
 
-      ctx.fillStyle = act.accent;
-      ctx.font = '600 32px "Plus Jakarta Sans", sans-serif';
-      ctx.fillText(act.subtitle, 80, 300);
+      // 英文副標題 / 概念小標
+      ctx.fillStyle = '#6366F1';
+      ctx.font = '700 24px "Noto Sans TC", sans-serif';
+      ctx.fillText('💡 ' + act.subtitle, 80, 290);
       ctx.restore();
 
-      // 4. Center Visual Stage (Render distinct animations per act)
+      // 5. 各幕中央手繪教學圖解 (Main Whiteboard Illustration)
       ctx.save();
+
       if (actIdx === 0) {
-        // --- ACT 1: Strawberry Visual + Miscount Dialogue ---
-        // Big Strawberry Emoji with Pulse
-        const pulse = 1 + Math.sin(f * 0.1) * 0.05;
-        ctx.save();
-        ctx.translate(540, 520);
-        ctx.scale(pulse, pulse);
-        ctx.font = '160px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🍓', 0, 0);
-        ctx.restore();
+        // ========== 幕 1 · 3 欄手繪卡片 (反常識提問) ==========
+        const cardW = 286;
+        const cardH = 580;
+        const startY = 360;
 
-        // Strawberry spelled out
-        const word = "s t r a w b e r r y";
-        ctx.font = '700 48px "JetBrains Mono", monospace';
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#f8fafc';
-        ctx.fillText(word, 540, 680);
+        // 卡片 1: 提問主體 (Strawberry)
+        drawHandRect(ctx, 70, startY, cardW, cardH, 20, '#1C1917', '#FFFFFF', 4);
+        // ① 編號圓圈
+        drawHandRect(ctx, 90, startY + 20, 44, 44, 22, '#1C1917', '#FEF08A', 3);
+        ctx.fillStyle = '#1C1917';
+        ctx.font = '800 24px "Noto Sans TC", sans-serif';
+        ctx.fillText('①', 101, startY + 52);
 
-        // Chat Bubble 1: Question
-        ctx.fillStyle = '#1e293b';
+        // 卡片 1 內容：可愛手繪草莓 + 單字
+        ctx.font = '90px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🍓', 70 + cardW / 2, startY + 180);
+        ctx.font = '800 32px "Noto Sans TC", sans-serif';
+        ctx.fillStyle = '#E11D48';
+        ctx.fillText('strawberry', 70 + cardW / 2, startY + 260);
+
+        // 高光標註 3 個 r
+        ctx.fillStyle = '#FEF08A';
+        ctx.fillRect(70 + 40, startY + 310, cardW - 80, 52);
+        ctx.fillStyle = '#2563EB';
+        ctx.font = '700 24px "Noto Sans TC", sans-serif';
+        ctx.fillText('內含 3 個 r', 70 + cardW / 2, startY + 346);
+
+        ctx.fillStyle = '#57534E';
+        ctx.font = '500 20px "Noto Sans TC", sans-serif';
+        ctx.fillText('人類一眼能數出', 70 + cardW / 2, startY + 440);
+
+        // 卡片 2: 使用者提問 (Prompt)
+        drawHandRect(ctx, 396, startY, cardW, cardH, 20, '#1C1917', '#FFFFFF', 4);
+        drawHandRect(ctx, 416, startY + 20, 44, 44, 22, '#1C1917', '#FEF08A', 3);
+        ctx.fillStyle = '#1C1917';
+        ctx.font = '800 24px "Noto Sans TC", sans-serif';
+        ctx.fillText('②', 427, startY + 52);
+
+        // 卡片 2 內容：手繪手機 / 對話框
+        drawHandRect(ctx, 420, startY + 110, cardW - 48, 220, 14, '#6366F1', '#EEF2FF', 3);
+        ctx.fillStyle = '#4F46E5';
+        ctx.font = '700 22px "Noto Sans TC", sans-serif';
+        ctx.fillText('💬 使用者發問：', 396 + cardW / 2, startY + 160);
+        ctx.fillStyle = '#1C1917';
+        ctx.font = '600 20px "JetBrains Mono", sans-serif';
+        ctx.fillText('"How many \'r\'', 396 + cardW / 2, startY + 210);
+        ctx.fillText('in strawberry?"', 396 + cardW / 2, startY + 245);
+
+        ctx.fillStyle = '#57534E';
+        ctx.font = '500 20px "Noto Sans TC", sans-serif';
+        ctx.fillText('萬億參數大模型', 396 + cardW / 2, startY + 440);
+
+        // 卡片 3: AI 回答錯誤 (Error)
+        drawHandRect(ctx, 722, startY, cardW, cardH, 20, '#1C1917', '#FFFFFF', 4);
+        drawHandRect(ctx, 742, startY + 20, 44, 44, 22, '#1C1917', '#FEF08A', 3);
+        ctx.fillStyle = '#1C1917';
+        ctx.font = '800 24px "Noto Sans TC", sans-serif';
+        ctx.fillText('③', 753, startY + 52);
+
+        // 卡片 3 內容：脫口而出「只有 2 個」+ 大紅叉叉
+        drawHandRect(ctx, 746, startY + 110, cardW - 48, 220, 14, '#E11D48', '#FFF1F2', 3);
+        ctx.fillStyle = '#E11D48';
+        ctx.font = '800 22px "Noto Sans TC", sans-serif';
+        ctx.fillText('🤖 AI 脫口而出：', 722 + cardW / 2, startY + 160);
+        ctx.font = '800 36px "Noto Sans TC", sans-serif';
+        ctx.fillText('「只有 2 個！」', 722 + cardW / 2, startY + 225);
+
+        // 紅色巨大手繪叉叉 ❌
+        ctx.strokeStyle = '#DC2626';
+        ctx.lineWidth = 8;
         ctx.beginPath();
-        ctx.roundRect(140, 750, 800, 130, 20);
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        ctx.moveTo(760, startY + 130);
+        ctx.lineTo(930, startY + 300);
+        ctx.moveTo(930, startY + 130);
+        ctx.lineTo(760, startY + 300);
         ctx.stroke();
 
-        ctx.fillStyle = '#38bdf8';
-        ctx.font = '700 28px "Noto Sans TC", sans-serif';
+        ctx.fillStyle = '#DC2626';
+        ctx.font = '800 26px "Noto Sans TC", sans-serif';
+        ctx.fillText('⚠️ 大錯特錯！', 722 + cardW / 2, startY + 440);
         ctx.textAlign = 'left';
-        ctx.fillText('👤 使用者提問：', 180, 805);
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '500 32px "JetBrains Mono", monospace';
-        ctx.fillText('How many \'r\' in strawberry?', 180, 855);
-
-        // Chat Bubble 2: AI Flawed Answer (shakes)
-        const shake = (f > 150 && f < 250) ? Math.sin(f * 0.8) * 6 : 0;
-        ctx.save();
-        ctx.translate(shake, 0);
-        ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
-        ctx.beginPath();
-        ctx.roundRect(140, 920, 800, 150, 20);
-        ctx.fill();
-        ctx.strokeStyle = '#ef4444';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.fillStyle = '#f43f5e';
-        ctx.font = '700 28px "Noto Sans TC", sans-serif';
-        ctx.fillText('🤖 早期 AI 回答 (GPT-4 / Claude 3)：', 180, 975);
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '700 34px "Noto Sans TC", sans-serif';
-        ctx.fillText('「單字裡有 2 個字母 r。」 ⚠️ (大錯特錯！)', 180, 1030);
-        ctx.restore();
-
-        // Big Shock Stamp
-        if (f > 200) {
-          ctx.save();
-          ctx.translate(540, 1180);
-          ctx.rotate(-0.08);
-          ctx.fillStyle = 'rgba(239, 68, 68, 0.2)';
-          ctx.beginPath(); ctx.roundRect(-240, -45, 480, 90, 16); ctx.fill();
-          ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3; ctx.stroke();
-          ctx.fillStyle = '#ef4444';
-          ctx.font = '900 38px "Noto Sans TC", sans-serif';
-          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillText('❌ 連小學生都數得對！', 0, 0);
-          ctx.restore();
-        }
 
       } else if (actIdx === 1) {
-        // --- ACT 2: Human Eyes vs. LLM Tokenizer Parcels ---
-        // Human Optical Scan Box
-        ctx.fillStyle = 'rgba(16, 185, 129, 0.1)';
-        ctx.beginPath(); ctx.roundRect(80, 420, 920, 250, 20); ctx.fill();
-        ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2; ctx.stroke();
+        // ========== 幕 2 · 感官盲區 (人類逐字掃描 vs BPE 密閉包裹) ==========
+        // 頂部比較卡片：人類眼睛 (字元光學掃描)
+        drawHandRect(ctx, 70, 360, 940, 240, 20, '#1C1917', '#FFFFFF', 4);
+        // 標籤
+        drawHandRect(ctx, 94, 385, 480, 46, 12, '#059669', '#ECFDF5', 3);
+        ctx.fillStyle = '#059669';
+        ctx.font = '800 22px "Noto Sans TC", sans-serif';
+        ctx.fillText('👁️ 人類的眼睛：逐字元光學掃描 (100% 確定)', 114, 417);
 
-        ctx.fillStyle = '#10b981';
-        ctx.font = '700 28px "Noto Sans TC", sans-serif';
-        ctx.fillText('👁️ 人類的眼睛：字元級光學掃描 (100% 確定)', 120, 475);
-
-        // Spell letters with green targets
+        // 10 個手繪字元方塊
         const letters = ['s','t','r','a','w','b','e','r','r','y'];
+        const boxSize = 68;
+        const startX = 114;
         letters.forEach((l, i) => {
-          const lx = 140 + i * 82;
-          const isR = (l === 'r');
-          ctx.fillStyle = isR ? '#10b981' : '#64748b';
-          ctx.beginPath(); ctx.roundRect(lx, 515, 66, 76, 10); ctx.fill();
-          ctx.fillStyle = '#ffffff';
-          ctx.font = '700 36px "JetBrains Mono", monospace';
+          const bx = startX + i * 86;
+          const isR = l === 'r';
+          drawHandRect(ctx, bx, 465, boxSize, boxSize, 12, isR ? '#E11D48' : '#A8A29E', isR ? '#FFE4E6' : '#FAFAFA', isR ? 3.5 : 2);
+          ctx.fillStyle = isR ? '#E11D48' : '#1C1917';
+          ctx.font = '800 34px "JetBrains Mono", sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText(l, lx + 33, 568);
+          ctx.fillText(l, bx + boxSize / 2, 512);
+
           if (isR) {
-            ctx.fillStyle = '#34d399';
-            ctx.font = '700 18px "JetBrains Mono", monospace';
-            ctx.fillText('命中!', lx + 33, 620);
+            ctx.fillStyle = '#2563EB';
+            ctx.font = '700 18px "Noto Sans TC", sans-serif';
+            ctx.fillText('命中!', bx + boxSize / 2, 560);
           }
+          ctx.textAlign = 'left';
         });
-        ctx.textAlign = 'left';
 
-        // VS Divider
-        ctx.fillStyle = '#f59e0b';
-        ctx.font = '900 36px "Plus Jakarta Sans", sans-serif';
+        // 下方對比卡片：大模型分詞器 (密閉包裹黑盒子)
+        drawHandRect(ctx, 70, 640, 940, 400, 20, '#1C1917', '#FFFFFF', 4);
+        drawHandRect(ctx, 94, 665, 480, 46, 12, '#6366F1', '#EEF2FF', 3);
+        ctx.fillStyle = '#4F46E5';
+        ctx.font = '800 22px "Noto Sans TC", sans-serif';
+        ctx.fillText('🤖 大模型分詞器 (BPE)：切成封閉大包裹', 114, 697);
+
+        // 兩個手繪包裹 (Packages)
+        // 包裹 1: straw
+        drawHandRect(ctx, 160, 750, 320, 180, 16, '#6366F1', '#F8FAFC', 3.5);
+        // 包裹郵戳 / 標籤
+        drawHandRect(ctx, 180, 770, 160, 36, 8, '#6366F1', '#EEF2FF', 2);
+        ctx.fillStyle = '#4F46E5';
+        ctx.font = '700 18px "JetBrains Mono", sans-serif';
+        ctx.fillText('Token ID: 11245', 190, 794);
+        ctx.fillStyle = '#1C1917';
+        ctx.font = '900 44px "JetBrains Mono", sans-serif';
+        ctx.fillText('"straw"', 240, 860);
+
+        // 包裹 2: berry
+        drawHandRect(ctx, 600, 750, 320, 180, 16, '#E11D48', '#FFF1F2', 3.5);
+        drawHandRect(ctx, 620, 770, 160, 36, 8, '#E11D48', '#FFE4E6', 2);
+        ctx.fillStyle = '#E11D48';
+        ctx.font = '700 18px "JetBrains Mono", sans-serif';
+        ctx.fillText('Token ID: 32884', 630, 794);
+        ctx.fillStyle = '#1C1917';
+        ctx.font = '900 44px "JetBrains Mono", sans-serif';
+        ctx.fillText('"berry"', 680, 860);
+
+        // 警告提示條
+        drawHandRect(ctx, 114, 960, 852, 54, 10, '#EAB308', '#FEF9C3', 2);
+        ctx.fillStyle = '#854D0E';
+        ctx.font = '700 22px "Noto Sans TC", sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('⚡ VS ⚡', 540, 725);
+        ctx.fillText('⚠️ 字母完全封閉在包裹裡，大模型根本看不到個別字元！只能憑機率猜！', 540, 995);
         ctx.textAlign = 'left';
-
-        // LLM BPE Box
-        ctx.fillStyle = 'rgba(56, 189, 248, 0.1)';
-        ctx.beginPath(); ctx.roundRect(80, 770, 920, 380, 20); ctx.fill();
-        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2; ctx.stroke();
-
-        ctx.fillStyle = '#38bdf8';
-        ctx.font = '700 28px "Noto Sans TC", sans-serif';
-        ctx.fillText('🤖 大語言模型的視角：BPE 分詞切大塊', 120, 825);
-
-        // Two Big Parcels
-        // Parcel 1: "straw"
-        ctx.fillStyle = '#1e293b';
-        ctx.beginPath(); ctx.roundRect(140, 870, 360, 160, 16); ctx.fill();
-        ctx.strokeStyle = '#38bdf8'; ctx.stroke();
-        ctx.fillStyle = '#38bdf8';
-        ctx.font = '700 40px "JetBrains Mono", monospace';
-        ctx.fillText('"straw"', 240, 940);
-        ctx.font = '500 20px "JetBrains Mono", monospace';
-        ctx.fillStyle = '#94a3b8';
-        ctx.fillText('Token ID: 11245', 230, 990);
-
-        // Parcel 2: "berry"
-        ctx.fillStyle = '#1e293b';
-        ctx.beginPath(); ctx.roundRect(580, 870, 360, 160, 16); ctx.fill();
-        ctx.strokeStyle = '#f43f5e'; ctx.stroke();
-        ctx.fillStyle = '#f43f5e';
-        ctx.font = '700 40px "JetBrains Mono", monospace';
-        ctx.fillText('"berry"', 680, 940);
-        ctx.font = '500 20px "JetBrains Mono", monospace';
-        ctx.fillStyle = '#94a3b8';
-        ctx.fillText('Token ID: 32884', 670, 990);
-
-        ctx.fillStyle = '#f8fafc';
-        ctx.font = '600 26px "Noto Sans TC", sans-serif';
-        ctx.fillText('⚠️ 密閉包裹陷阱：進入神經網路後，字母完全消失！', 140, 1090);
-        ctx.font = '500 22px "Noto Sans TC", sans-serif';
-        ctx.fillStyle = '#94a3b8';
-        ctx.fillText('berry 誘發 double-r 共現機率，因此模型常脫口猜「2 個」！', 140, 1126);
 
       } else if (actIdx === 2) {
-        // --- ACT 3: Three Solutions ---
+        // ========== 幕 3 · 工程破局三招 (清爽手繪清單) ==========
         const solutions = [
           {
-            icon: "1️⃣",
-            title: "提示詞強制拆字 (Prompt Hack)",
-            desc: "改寫為：s t r a w b e r r y（空格分開）",
-            tag: "強迫分詞器切為單字母 Token，模型重獲視力！",
-            color: "#38bdf8"
+            num: "①",
+            title: "提示詞空格拆字 (Prompt Hack)",
+            tag: "一字一切 · 重獲視力",
+            code: "輸入: 's  t  r  a  w  b  e  r  r  y'",
+            desc: "強迫分詞器把每個字母單獨打包，立即可見！",
+            color: '#2563EB',
+            bg: '#EFF6FF'
           },
           {
-            icon: "2️⃣",
-            title: "代碼執行 (Code Execution)",
-            desc: "讓 AI 撰寫 Python: 'strawberry'.count('r')",
-            tag: "程式碼高精確度運算，徹底杜絕幻覺！",
-            color: "#10b981"
+            num: "②",
+            title: "呼叫 Python 工具 (Tool Calling)",
+            tag: "代碼直譯 · 零誤差計算",
+            code: "len([c for c in 'strawberry' if c == 'r'])",
+            desc: "不讓神經網路猜，直接讓直譯器秒算 = 3！",
+            color: '#059669',
+            bg: '#ECFDF5'
           },
           {
-            icon: "3️⃣",
-            title: "次世代思維模型 (Reasoning)",
-            desc: "Nemotron / Qwen 3.8 / Gemma 4 / DeepSeek-R1",
-            tag: "在背景思考鏈 (CoT) 自我逐字點名，精準答 3！",
-            color: "#f59e0b"
+            num: "③",
+            title: "次世代思維模型 (Reasoning Model)",
+            tag: "思維鏈 · 逐字自我驗算",
+            code: "<thought> 逐字拆解：第 3、8、9 個字母為 r </thought>",
+            desc: "切換思考模型，先想再答，徹底根治盲區！",
+            color: '#6366F1',
+            bg: '#EEF2FF'
           }
         ];
 
-        solutions.forEach((s, i) => {
-          const sy = 420 + i * 250;
-          ctx.fillStyle = '#1e293b';
-          ctx.beginPath(); ctx.roundRect(80, sy, 920, 220, 20); ctx.fill();
-          ctx.strokeStyle = s.color; ctx.lineWidth = 2; ctx.stroke();
-
+        solutions.forEach((s, idx) => {
+          const sy = 360 + idx * 220;
+          drawHandRect(ctx, 70, sy, 940, 196, 18, '#1C1917', '#FFFFFF', 4);
+          
+          // 左側編號圓圈
+          drawHandRect(ctx, 96, sy + 24, 46, 46, 23, s.color, s.bg, 3);
           ctx.fillStyle = s.color;
-          ctx.font = '900 36px "Plus Jakarta Sans", sans-serif';
-          ctx.fillText(s.icon + ' ' + s.title, 120, sy + 65);
+          ctx.font = '800 24px "Noto Sans TC", sans-serif';
+          ctx.fillText(s.num, 108, sy + 56);
 
-          ctx.fillStyle = '#ffffff';
-          ctx.font = '600 28px "JetBrains Mono", monospace';
-          ctx.fillText(s.desc, 120, sy + 120);
+          // 標題與標籤
+          ctx.fillStyle = '#1C1917';
+          ctx.font = '800 28px "Noto Sans TC", sans-serif';
+          ctx.fillText(s.title, 160, sy + 58);
 
-          ctx.fillStyle = '#94a3b8';
-          ctx.font = '500 24px "Noto Sans TC", sans-serif';
-          ctx.fillText('👉 ' + s.tag, 120, sy + 175);
+          // 手繪綠色勾勾已驗證
+          drawHandRect(ctx, 750, sy + 24, 230, 42, 10, s.color, s.bg, 2);
+          ctx.fillStyle = s.color;
+          ctx.font = '700 18px "Noto Sans TC", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('✓ ' + s.tag, 865, sy + 52);
+          ctx.textAlign = 'left';
+
+          // 代碼框
+          drawHandRect(ctx, 96, sy + 88, 888, 48, 8, '#E2DDD5', '#F5F5F4', 1.5);
+          ctx.fillStyle = '#0F172A';
+          ctx.font = '600 20px "JetBrains Mono", sans-serif';
+          ctx.fillText(s.code, 114, sy + 120);
+
+          // 核心說明
+          ctx.fillStyle = '#57534E';
+          ctx.font = '500 20px "Noto Sans TC", sans-serif';
+          ctx.fillText(s.desc, 96, sy + 168);
         });
 
       } else {
-        // --- ACT 4: Call To Action & Playground ---
-        ctx.fillStyle = 'rgba(245, 158, 11, 0.1)';
-        ctx.beginPath(); ctx.roundRect(80, 420, 920, 300, 24); ctx.fill();
-        ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2; ctx.stroke();
+        // ========== 幕 4 · 核心帶走與實測 (白板總結流程圖) ==========
+        // 核心架構流程圖
+        drawHandRect(ctx, 70, 360, 940, 320, 20, '#1C1917', '#FFFFFF', 4);
+        drawHandRect(ctx, 94, 385, 340, 46, 12, '#6366F1', '#EEF2FF', 3);
+        ctx.fillStyle = '#4F46E5';
+        ctx.font = '800 22px "Noto Sans TC", sans-serif';
+        ctx.fillText('⚡ 大語言模型運作底層本質', 114, 417);
 
-        ctx.fillStyle = '#f59e0b';
-        ctx.font = '900 36px "Noto Sans TC", sans-serif';
-        ctx.fillText('💡 一句話核心啟發：', 130, 490);
+        // 3 節點箭頭流
+        // Node 1: 使用者輸入
+        drawHandRect(ctx, 110, 470, 220, 140, 16, '#1C1917', '#F8FAFC', 3);
+        ctx.fillStyle = '#1C1917';
+        ctx.font = '800 24px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('輸入文字', 220, 530);
+        ctx.font = '500 18px "Noto Sans TC", sans-serif';
+        ctx.fillStyle = '#57534E';
+        ctx.fillText('字串實體', 220, 565);
 
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '600 32px "Noto Sans TC", sans-serif';
-        ctx.fillText('大語言模型是「機率切塊」，不是「光學掃描」！', 130, 560);
-        ctx.font = '500 26px "Noto Sans TC", sans-serif';
-        ctx.fillStyle = '#cbd5e1';
-        ctx.fillText('字元計算與繁體中文計價，務必善用工具與思維模型！', 130, 620);
-        ctx.fillText('繁中 Token 膨脹 1.5 倍，帳單比英文貴 30%~80%！', 130, 670);
+        // 箭頭 1
+        ctx.strokeStyle = '#1C1917';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(340, 540);
+        ctx.lineTo(410, 540);
+        ctx.lineTo(395, 525);
+        ctx.moveTo(410, 540);
+        ctx.lineTo(395, 555);
+        ctx.stroke();
 
-        // Playground Mockup Card
-        ctx.fillStyle = '#1e293b';
-        ctx.beginPath(); ctx.roundRect(80, 760, 920, 360, 24); ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.stroke();
+        // Node 2: BPE 切塊 (核心)
+        drawHandRect(ctx, 430, 470, 220, 140, 16, '#E11D48', '#FFF1F2', 3.5);
+        ctx.fillStyle = '#E11D48';
+        ctx.font = '800 24px "Noto Sans TC", sans-serif';
+        ctx.fillText('BPE 字典切塊', 540, 530);
+        ctx.font = '500 18px "Noto Sans TC", sans-serif';
+        ctx.fillStyle = '#881337';
+        ctx.fillText('字母消失成 ID', 540, 565);
 
-        ctx.fillStyle = '#38bdf8';
-        ctx.font = '700 28px "Noto Sans TC", sans-serif';
-        ctx.fillText('🧪 極簡實驗室已上線 (Playground)', 130, 830);
+        // 箭頭 2
+        ctx.strokeStyle = '#1C1917';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(660, 540);
+        ctx.lineTo(730, 540);
+        ctx.lineTo(715, 525);
+        ctx.moveTo(730, 540);
+        ctx.lineTo(715, 555);
+        ctx.stroke();
 
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '600 28px "JetBrains Mono", monospace';
-        ctx.fillText('7 大驗證模型 · 免費 / 免 Key 自由切換', 130, 890);
+        // Node 3: 機率推算
+        drawHandRect(ctx, 750, 470, 220, 140, 16, '#059669', '#ECFDF5', 3);
+        ctx.fillStyle = '#059669';
+        ctx.font = '800 24px "Noto Sans TC", sans-serif';
+        ctx.fillText('機率預測', 860, 530);
+        ctx.font = '500 18px "Noto Sans TC", sans-serif';
+        ctx.fillStyle = '#065F46';
+        ctx.fillText('生成下一個 Token', 860, 565);
+        ctx.textAlign = 'left';
 
-        // Big CTA Button
-        ctx.fillStyle = '#f43f5e';
-        ctx.beginPath(); ctx.roundRect(130, 950, 820, 110, 20); ctx.fill();
-        ctx.fillStyle = '#ffffff';
+        // 中央黃色手帳便利貼 (Sticky Memo)
+        drawHandRect(ctx, 70, 710, 940, 230, 18, '#CA8A04', '#FEF08A', 3.5);
+        // 便籤圖釘
+        ctx.fillStyle = '#DC2626';
+        ctx.beginPath();
+        ctx.arc(540, 732, 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#713F12';
+        ctx.font = '900 32px "Noto Sans TC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('📌 認知帶走：', 540, 790);
+        ctx.font = '800 36px "Noto Sans TC", sans-serif';
+        ctx.fillText('大模型是「機率切塊」，不是「光學掃描」！', 540, 845);
+        ctx.font = '600 24px "Noto Sans TC", sans-serif';
+        ctx.fillText('遇字元計數與繁中計價，務必善用代碼與工具！', 540, 895);
+        ctx.textAlign = 'left';
+
+        // 立即動手實測按鈕 (Call To Action)
+        drawHandRect(ctx, 70, 970, 940, 110, 20, '#6366F1', '#EEF2FF', 4);
+        ctx.fillStyle = '#4F46E5';
         ctx.font = '900 36px "Noto Sans TC", sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('👉 點擊連結，現在就親自測測看！', 540, 1020);
+        ctx.fillText('👉 點擊下方連結，現在就親手測測看！', 540, 1040);
         ctx.textAlign = 'left';
       }
       ctx.restore();
 
-      // 5. Bottom Subtitle Banner (Live Voice Sync)
-      ctx.save();
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
-      ctx.fillRect(60, 1580, 960, 240);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(60, 1580, 960, 240);
-
-      ctx.fillStyle = act.accent;
-      ctx.font = '700 26px "Noto Sans TC", sans-serif';
-      ctx.fillText('🎙️ 解說旁白：', 100, 1632);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '600 34px "Noto Sans TC", sans-serif';
-      wrapText(ctx, act.dialogue, 100, 1690, 880, 52);
-      ctx.restore();
-    }
-
-    function wrapText(context, text, x, y, maxWidth, lineHeight) {
-      let line = '';
-      for (let n = 0; n < text.length; n++) {
-        const testLine = line + text[n];
-        const metrics = context.measureText(testLine);
-        if (metrics.width > maxWidth && n > 0) {
-          context.fillText(line, x, y);
-          line = text[n];
-          y += lineHeight;
-        } else {
-          line = testLine;
+      // 6. 靈魂動態：手繪觸控筆導引 (Apple Pencil Guide) 與動態字幕選取
+      const localSec = (f % FRAMES_PER_ACT) / FPS;
+      let activeCue = act.cues[0];
+      for (const cue of act.cues) {
+        if (localSec >= cue.startSec && localSec < cue.endSec) {
+          activeCue = cue;
+          break;
         }
       }
-      context.fillText(line, x, y);
+
+      // 筆尖在各卡片平滑浮動指引
+      const target = activeCue.stylus;
+      const wobbleX = Math.sin((f / 30) * 2.5) * 10;
+      const wobbleY = Math.cos((f / 30) * 2.5) * 8;
+      drawStylus(ctx, target.x + wobbleX, target.y + wobbleY, target.angle || 135, 1.05);
+
+      // 7. 科技講透透招牌：雙語高光螢光筆字幕 (Lower Third: y = 1440)
+      drawHighlightedSubtitle(ctx, activeCue.segments, activeCue.en, 1440);
+
+      // 8. 底部安全進度條
+      ctx.save();
+      ctx.fillStyle = '#E2DDD5';
+      ctx.fillRect(80, 1530, 920, 8);
+      ctx.fillStyle = '#6366F1';
+      ctx.fillRect(80, 1530, (f / TOTAL_FRAMES) * 920, 8);
+      ctx.restore();
     }
 
     function updateUI() {
@@ -621,57 +973,61 @@
       });
     }
 
-    function step() {
-      if (isPlaying) {
-        currentFrame++;
-        if (currentFrame >= TOTAL_FRAMES) {
-          currentFrame = 0;
-        }
-        drawFrame(currentFrame);
-        updateUI();
-        animationId = requestAnimationFrame(step);
-      }
+    function loop() {
+      if (!isPlaying) return;
+      currentFrame = (currentFrame + 1) % TOTAL_FRAMES;
+      renderFrame(currentFrame);
+      updateUI();
+      animationId = requestAnimationFrame(loop);
     }
 
-    document.getElementById('playBtn').addEventListener('click', () => {
+    const playBtn = document.getElementById('playBtn');
+    playBtn.addEventListener('click', () => {
       isPlaying = !isPlaying;
-      document.getElementById('playBtn').textContent = isPlaying ? '⏸ 暫停' : '▶ 播放';
-      if (isPlaying) step();
+      playBtn.textContent = isPlaying ? '⏸ 暫停' : '▶ 播放';
+      if (isPlaying) loop();
       else cancelAnimationFrame(animationId);
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => {
+      isPlaying = false;
+      playBtn.textContent = '▶ 播放';
+      cancelAnimationFrame(animationId);
       currentFrame = 0;
-      drawFrame(currentFrame);
+      renderFrame(0);
       updateUI();
-      if (isPlaying) {
-        isPlaying = false;
-        document.getElementById('playBtn').textContent = '▶ 播放';
-        cancelAnimationFrame(animationId);
-      }
     });
 
     document.querySelectorAll('.chapter-pill').forEach(pill => {
-      pill.addEventListener('click', () => {
-        currentFrame = parseInt(pill.dataset.frame, 10);
-        drawFrame(currentFrame);
+      pill.addEventListener('click', (e) => {
+        const f = parseInt(e.target.dataset.frame, 10);
+        currentFrame = f;
+        renderFrame(currentFrame);
         updateUI();
       });
     });
 
-    document.getElementById('timelineWrapper').addEventListener('click', (e) => {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const pct = Math.max(0, Math.min(1, clickX / rect.width));
-      currentFrame = Math.floor(pct * TOTAL_FRAMES);
-      drawFrame(currentFrame);
+    // 拖曳時間軸支援
+    const wrapper = document.getElementById('timelineWrapper');
+    let isDragging = false;
+    function seek(e) {
+      const rect = wrapper.getBoundingClientRect();
+      const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      currentFrame = Math.floor(pos * TOTAL_FRAMES);
+      renderFrame(currentFrame);
       updateUI();
-    });
+    }
+    wrapper.addEventListener('mousedown', (e) => { isDragging = true; seek(e); });
+    window.addEventListener('mousemove', (e) => { if (isDragging) seek(e); });
+    window.addEventListener('mouseup', () => { isDragging = false; });
 
-    // Initial Draw
-    drawFrame(0);
+    // 初始化渲染第 0 幀
+    renderFrame(0);
     updateUI();
-    window.renderFrame = drawFrame;
+
+    // 匯出全域給 Headless Chrome 逐幀擷取
+    window.renderFrame = renderFrame;
+    window.TOTAL_FRAMES = TOTAL_FRAMES;
   </script>
 </body>
 </html>
