@@ -247,7 +247,7 @@
         subtitle: "How many 'r' in strawberry?",
         bgGrad: ['#0f172a', '#1e1b4b'],
         accent: '#f43f5e',
-        dialogue: "問 ChatGPT：'strawberry 裡面有幾個 r？' 早期模型竟脫口而出：只有 2 個！難道萬億參數的 AI 連小學生都不如？"
+        dialogue: "問 AI：strawberry 有幾個 r？早期模型竟回答只有 2 個！難道頂級 AI 數數連小學生都不如？"
       },
       {
         tag: "ACT 2 · 感官盲區",
@@ -255,7 +255,7 @@
         subtitle: "字母實體完全消失在包裹裡",
         bgGrad: ['#0f172a', '#172554'],
         accent: '#38bdf8',
-        dialogue: "人眼是 10 個字母逐一掃描；但 AI 根本看不到字母！分詞器查字典把它切成 [straw] + [berry] 兩個包裹，肚子裡有幾個 r 只能憑機率猜！"
+        dialogue: "這不是智商問題，是感官盲區！人類逐字看，AI 卻被分詞器切成兩個包裹，肚子裡幾個 r 只能靠機率猜！"
       },
       {
         tag: "ACT 3 · 工程破解三招",
@@ -263,7 +263,7 @@
         subtitle: "提示詞拆字 · Python 代碼 · 深度推理",
         bgGrad: ['#0f172a', '#064e3b'],
         accent: '#10b981',
-        dialogue: "三招秒破盲區：① 提示詞空格拆字 's t r a w b e r r y'；② 呼叫 Python 代碼計算零誤差；③ 使用次世代 Reasoning 思考模型自我驗算！"
+        dialogue: "三招秒破盲區：① 空格拆字強迫一字一切；② 呼叫 Python 代碼精確計算；③ 切換次世代思維模型自我驗算！"
       },
       {
         tag: "ACT 4 · 認知帶走與實測",
@@ -271,7 +271,7 @@
         subtitle: "7 款大模型即時對比 · 免費驗證",
         bgGrad: ['#0f172a', '#451a03'],
         accent: '#f59e0b',
-        dialogue: "記住：AI 是機率切塊，不是光學掃描！遇到字元計算務必交給代碼或思維模型。點擊連結，到我們的極簡實驗室親自測測看！"
+        dialogue: "記住：AI 是機率切塊不是光學掃描！遇到字元計算務必善用工具。點擊下方連結，現在就親手測測看！"
       }
     ];
 
@@ -576,18 +576,18 @@
       // 5. Bottom Subtitle Banner (Live Voice Sync)
       ctx.save();
       ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
-      ctx.fillRect(60, 1600, 960, 220);
+      ctx.fillRect(60, 1580, 960, 240);
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
       ctx.lineWidth = 1;
-      ctx.strokeRect(60, 1600, 960, 220);
+      ctx.strokeRect(60, 1580, 960, 240);
 
       ctx.fillStyle = act.accent;
-      ctx.font = '700 24px "Noto Sans TC", sans-serif';
-      ctx.fillText('🎙️ 解說旁白：', 100, 1650);
+      ctx.font = '700 26px "Noto Sans TC", sans-serif';
+      ctx.fillText('🎙️ 解說旁白：', 100, 1632);
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = '500 28px "Noto Sans TC", sans-serif';
-      wrapText(ctx, act.dialogue, 100, 1700, 880, 42);
+      ctx.font = '600 34px "Noto Sans TC", sans-serif';
+      wrapText(ctx, act.dialogue, 100, 1690, 880, 52);
       ctx.restore();
     }
 
