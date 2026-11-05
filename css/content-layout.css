@@ -59,7 +59,9 @@ fieldset{border:0;padding:0;margin:0}legend{padding:0;margin:0 0 12px;font-weigh
 .lab-key-item{display:flex;align-items:center;gap:8px}
 .lab-key-item .api-key-row{display:flex;align-items:center;gap:6px;margin:0}
 .lab-key-item input{width:180px;padding:7px 10px;font-size:13px}
-.lab-save-btn{padding:6px 12px;font-size:13px;min-height:36px}
+.lab-save-btn{padding:6px 14px;font-size:13px;min-height:36px;white-space:nowrap;flex-shrink:0}
+#gemini-model-note{margin:0;font-size:13px;color:var(--muted);line-height:1.4}
+#key-status{font-size:12.5px;color:var(--muted)}
 .select-clean{max-width:100%;border:1px solid #979d91;border-radius:6px;background:var(--surface);color:var(--ink)}
 .api-key-row{display:flex;gap:10px;align-items:center}
 .api-key-row input{flex:1;min-width:0}
@@ -79,6 +81,11 @@ fieldset{border:0;padding:0;margin:0}legend{padding:0;margin:0 0 12px;font-weigh
 .lab-token-live-title{font-weight:700;color:var(--olive)}
 .lab-token-stats{color:var(--muted);font-size:13px}
 .lab-token-stats strong{color:var(--ink)}
+.token-pieces{display:flex;flex-wrap:wrap;gap:6px;min-height:50px;background:#f2f4ec;padding:10px 12px;border-radius:6px;border:1px solid rgba(0,0,0,0.06);overflow-wrap:anywhere;align-items:center}
+.token-pieces span{background:#dce6d8;padding:3px 8px;border-radius:4px;font-family:var(--mono,monospace);font-size:13px;line-height:1.4;border:1px solid rgba(0,0,0,0.06);display:inline-flex;align-items:center}
+.token-pieces span:nth-child(3n+2){background:#f2dfd4}
+.token-pieces span:nth-child(3n){background:#dce7e7}
+.token-pieces .quiet{background:transparent!important;border:none!important;font-family:inherit;font-size:12px;color:var(--muted);padding:0}
 .lab-prompt-section{margin-bottom:16px}
 .lab-prompt-label{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px;display:block}
 #free-prompt{width:100%;min-height:110px;padding:12px;font-size:15px;line-height:1.6;border:1px solid #979d91;border-radius:6px;background:#fffefa;color:var(--ink);resize:vertical}
@@ -104,4 +111,5 @@ fieldset{border:0;padding:0;margin:0}legend{padding:0;margin:0 0 12px;font-weigh
   .lab-token-live-header{flex-direction:column;align-items:flex-start;gap:4px}
   .lab-action-row{flex-direction:column;align-items:stretch}
   .lab-send-btn{width:100%}
+  #key-status{white-space:normal}
 }
