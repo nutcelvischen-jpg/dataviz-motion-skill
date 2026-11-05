@@ -152,9 +152,8 @@
       '</div>'
     ) : '';
 
-    const takeawayContent = expData.takeaway || (
-      '<strong>💡 實驗觀察重點：</strong><br>' + esc(d.goal)
-    );
+    const takeawayContent = expData.takeaway || esc(d.goal);
+    const takeawayClean = takeawayContent.replace(/^<strong>💡\s*實驗觀察重點：<\/strong><br>\s*/i, '');
 
     root.innerHTML =
       '<!-- Playground 頂部 Header -->' +
@@ -230,7 +229,7 @@
           '</div>' +
           '<div class="takeaway-box">' +
             '<div class="takeaway-title">💡 實驗觀察重點</div>' +
-            '<div class="takeaway-body">' + takeawayContent + '</div>' +
+            '<div class="takeaway-body">' + takeawayClean + '</div>' +
           '</div>' +
         '</div>' +
       '</section>' +
@@ -242,6 +241,8 @@
 
     const field = root.querySelector('#provider'); if (field) field.value = provider;
     const sel = root.querySelector('#api-model'); if (sel) { if (!validModels.includes(model)) model = validModels[0]; sel.value = model; }
+    const pInput = root.querySelector('#free-prompt'); if (pInput) pInput.value = s.prompt || '';
+    const sInput = root.querySelector('#system-prompt'); if (sInput && s.system !== undefined) sInput.value = s.system;
     syncProvider();
     if (d.id === 'tokens') updateTokens();
   }
@@ -271,10 +272,11 @@
 
   function updateTokens() {
     const promptInput = root.querySelector('#free-prompt');
-    const value = (promptInput && promptInput.value != null && promptInput.value !== '')
-      ? promptInput.value
-      : ((states.tokens && states.tokens.prompt) || (states.tokens && states.tokens.text) || '');
-    states.tokens.text = value;
+    const value = promptInput ? promptInput.value : ((states.tokens && (states.tokens.prompt || states.tokens.text)) || '');
+    if (states.tokens) {
+      states.tokens.prompt = value;
+      states.tokens.text = value;
+    }
     const parts = value.match(/[A-Za-z]+|[0-9]+|[^\s]/gu) || [];
     const charEl = root.querySelector('#characters');
     if (charEl) charEl.textContent = String(Array.from(value).length);
@@ -415,7 +417,7 @@
       pending = null;
       requestVersion++;
       const id = current.id;
-      states[id] = { prompt: '', response: '', text: '大語言模型如何回答問題？', system: undefined };
+      states[id] = { prompt: '', response: '', text: '', system: undefined };
       render();
       return;
     }
