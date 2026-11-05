@@ -131,29 +131,24 @@
     }).join('');
 
     const systemBox = hasSystem ? (
-      '<label class="field-label" for="system-prompt">系統指引 (System Prompt · 可編輯)</label>' +
-      '<textarea id="system-prompt">' + esc(s.system || '') + '</textarea>' +
-      (d.id === 'injection' ?
-        '<div class="button-row" style="margin: 8px 0 16px;">' +
-          '<button type="button" class="action-button" data-system-preset="basic">基本客服指引</button>' +
-          '<button type="button" class="action-button" data-system-preset="restricted">加入服務範圍禁令</button>' +
-        '</div>' : '')
+      '<div class="lab-system-box">' +
+        '<label class="field-label" for="system-prompt">系統指引 (System Prompt · 角色設定)</label>' +
+        '<textarea id="system-prompt">' + esc(s.system || '') + '</textarea>' +
+        (d.id === 'injection' ?
+          '<div class="button-row" style="margin: 8px 0 12px;">' +
+            '<button type="button" class="action-button" data-system-preset="basic">基本客服指引</button>' +
+            '<button type="button" class="action-button" data-system-preset="restricted">加入服務範圍禁令</button>' +
+          '</div>' : '') +
+      '</div>'
     ) : '';
 
-    const tokenWidget = d.id === 'tokens' ? (
-      '<div class="token-tool-container">' +
-        '<p style="font-weight:600; margin-bottom:8px;">即時 BPE 分詞切片體驗器：</p>' +
-        '<div class="button-row" style="margin:8px 0;">' +
-          '<button type="button" class="action-button" data-preset="zh">繁體中文</button>' +
-          '<button type="button" class="action-button" data-preset="en">English</button>' +
-          '<button type="button" class="action-button" data-preset="strawberry">Strawberry</button>' +
-          '<button type="button" class="action-button" data-preset="code">程式碼</button>' +
+    const tokenLiveBar = d.id === 'tokens' ? (
+      '<div class="lab-token-live" id="token-live-container">' +
+        '<div class="lab-token-live-header">' +
+          '<span class="lab-token-live-title">即時 BPE Token 切片預覽</span>' +
+          '<span class="lab-token-stats">字元數：<strong id="characters">0</strong> ｜ 預估 Token 數：<strong id="tokens-count">0</strong></span>' +
         '</div>' +
-        '<label class="field-label" for="token-text">輸入文字觀察即時切分</label>' +
-        '<textarea id="token-text" maxlength="1200">' + esc(states.tokens.text) + '</textarea>' +
-        '<p class="quiet" style="margin: 8px 0;">字元數：<strong id="characters">0</strong>　示意 Token 數：<strong id="tokens-count">0</strong></p>' +
         '<div id="token-pieces" class="token-pieces" aria-live="polite"></div>' +
-        '<p class="quiet" style="margin-top: 6px;">示意分詞規則，展示 BPE 將詞彙切塊之行為；不同模型與分詞器有不同字典切塊方式。</p>' +
       '</div>'
     ) : '';
 
@@ -162,68 +157,76 @@
     );
 
     root.innerHTML =
-      '<header class="page-intro">' +
+      '<!-- Playground 頂部 Header -->' +
+      '<header class="lab-playground-header" id="step-concept">' +
+        '<span class="sr-only">Step 1 · 核心概念定義</span>' +
         '<h1>' + esc(d.title) + '</h1>' +
-        '<p>' + esc(expData.subtitle || d.goal) + '</p>' +
+        '<div class="lab-header-concept">' +
+          '<p class="lab-concept-lead">' + esc(expData.subtitle || d.goal) + '</p>' +
+          '<a href="' + esc(d.link) + '" class="lab-concept-link">📖 ' + esc(d.linkText) + ' ↗</a>' +
+        '</div>' +
       '</header>' +
 
-      '<!-- Step 1: 概念定義 -->' +
-      '<section class="lab-step-card" id="step-concept">' +
-        '<div class="lab-step-badge">Step 1 · 核心概念定義</div>' +
-        '<div class="lab-concept-lead">' + esc(d.goal) + '</div>' +
-        '<div class="lab-concept-detail">' + (expData.concept ? esc(expData.concept) : '') + '</div>' +
-        '<div class="lab-concept-links">' +
-          '<a href="' + esc(d.link) + '" class="button-secondary">📖 ' + esc(d.linkText) + ' →</a>' +
-        '</div>' +
-      '</section>' +
-
-      '<!-- Step 2: 模型選擇與 API 設定 -->' +
-      '<section class="lab-step-card" id="step-model">' +
-        '<div class="lab-step-badge">Step 2 · 運算模式與模型選擇</div>' +
-        '<label class="field-label" for="provider">選擇運算模式</label>' +
-        '<select id="provider" class="select-clean">' +
-          '<option value="simulation">✨ 教學模擬（免 Key · 內建典型範例與解析）</option>' +
-          '<option value="openrouter">🪐 OpenRouter（多模型生態 · 7 款已驗證模型）</option>' +
-          '<option value="gemini">⚡ Google Gemini API（官方原生直連）</option>' +
-        '</select>' +
-        '<div id="api-settings" class="api-settings-panel" hidden>' +
-          '<label class="field-label" for="api-model">選擇 OpenRouter 呼叫模型</label>' +
-          '<select id="api-model" class="select-clean">' +
-            '<option value="openai/gpt-3.5-turbo-16k">openai/gpt-3.5-turbo-16k (GPT-3.5 Turbo · 純文字對話)</option>' +
-            '<option value="anthropic/claude-haiku-4.5">anthropic/claude-haiku-4.5 (Claude Haiku 4.5 · 最新高速視覺)</option>' +
-            '<option value="google/gemini-2.5-flash">google/gemini-2.5-flash (Gemini 2.5 Flash · 全模態旗艦)</option>' +
-            '<option value="nvidia/nemotron-3.5-super-vl:free">nvidia/nemotron-3.5-super-vl:free (NVIDIA · 免費深度推理)</option>' +
-            '<option value="qwen/qwen3.8-omni-flash">qwen/qwen3.8-omni-flash (通義千問 · 全模態極速推理)</option>' +
-            '<option value="mistralai/mistral-large-4-0">mistralai/mistral-large-4-0 (Mistral Large 4.0 · 歐洲旗艦視覺)</option>' +
-            '<option value="google/gemma-4-26b-a4b-it">google/gemma-4-26b-a4b-it (Google Gemma 4 · 開源深度思考)</option>' +
-          '</select>' +
-          '<p class="quiet" id="gemini-model-note" hidden>Google Gemini 使用模型：<code>gemini-3.6-flash</code></p>' +
-          '<label class="field-label" for="api-key">API 金鑰 (API Key)</label>' +
-          '<div class="api-key-row">' +
-            '<input id="api-key" type="password" placeholder="請在此輸入金鑰..." autocomplete="off">' +
-            '<button type="button" class="action-button" data-action="save-key">儲存設定</button>' +
+      '<!-- 輕量化頂部工具列 (Top Toolbar) -->' +
+      '<div class="lab-toolbar" id="step-model">' +
+        '<span class="sr-only">Step 2 · 運算模式與模型選擇</span>' +
+        '<div class="lab-toolbar-main">' +
+          '<div class="lab-toolbar-item">' +
+            '<label class="lab-toolbar-label" for="provider">運算模式</label>' +
+            '<select id="provider" class="select-clean lab-select-provider">' +
+              '<option value="simulation">✨ 教學模擬（免 Key · 內建典型範例與解析）</option>' +
+              '<option value="openrouter">🪐 OpenRouter（多模型生態 · 7 款已驗證模型）</option>' +
+              '<option value="gemini">⚡ Google Gemini API（官方原生直連）</option>' +
+            '</select>' +
           '</div>' +
-          '<p class="quiet" id="key-status"></p>' +
-          '<p class="quiet" style="font-size:13px; color:var(--muted); margin-top:4px;">🔒 安全承諾：金鑰僅保存在本機瀏覽器 localStorage，直接發送至官方端點，絕不經過任何中介伺服器。</p>' +
+          '<div id="api-settings" class="lab-toolbar-api" hidden>' +
+            '<div class="lab-toolbar-item" id="model-select-wrapper">' +
+              '<label class="lab-toolbar-label" for="api-model">模型選擇</label>' +
+              '<select id="api-model" class="select-clean lab-select-model">' +
+                '<option value="openai/gpt-3.5-turbo-16k">openai/gpt-3.5-turbo-16k (GPT-3.5 Turbo)</option>' +
+                '<option value="anthropic/claude-haiku-4.5">anthropic/claude-haiku-4.5 (Claude Haiku 4.5)</option>' +
+                '<option value="google/gemini-2.5-flash">google/gemini-2.5-flash (Gemini 2.5 Flash)</option>' +
+                '<option value="nvidia/nemotron-3.5-super-vl:free">nvidia/nemotron-3.5-super-vl:free (NVIDIA Free)</option>' +
+                '<option value="qwen/qwen3.8-omni-flash">qwen/qwen3.8-omni-flash (通義千問 3.8)</option>' +
+                '<option value="mistralai/mistral-large-4-0">mistralai/mistral-large-4-0 (Mistral Large 4.0)</option>' +
+                '<option value="google/gemma-4-26b-a4b-it">google/gemma-4-26b-a4b-it (Google Gemma 4)</option>' +
+              '</select>' +
+              '<p class="quiet" id="gemini-model-note" hidden>Google Gemini 模型：<code>gemini-3.6-flash</code></p>' +
+            '</div>' +
+            '<div class="lab-toolbar-item lab-key-item">' +
+              '<label class="lab-toolbar-label" for="api-key">API 金鑰</label>' +
+              '<div class="api-key-row">' +
+                '<input id="api-key" type="password" placeholder="貼上 API Key..." autocomplete="off">' +
+                '<button type="button" class="action-button lab-save-btn" data-action="save-key">儲存設定</button>' +
+              '</div>' +
+              '<span class="quiet" id="key-status"></span>' +
+            '</div>' +
+          '</div>' +
         '</div>' +
-      '</section>' +
+      '</div>' +
 
-      '<!-- Step 3: 動手實驗 -->' +
-      '<section class="lab-step-card" id="step-experiment">' +
-        '<div class="lab-step-badge">Step 3 · 動手實驗</div>' +
+      '<!-- 核心操作區 (Playground Workspace) -->' +
+      '<section class="lab-playground" id="step-experiment">' +
+        '<span class="sr-only">Step 3 · 動手實驗</span>' +
         '<div id="advanced">' +
-          tokenWidget +
-          (presetButtons ? '<p style="margin-bottom:8px; font-weight:600;">精選測試範例（點選自動帶入提示詞）：</p><div class="lab-preset-grid">' + presetButtons + '</div>' : '') +
+          (presetButtons ?
+            '<div class="lab-preset-bar">' +
+              '<span class="lab-preset-label">精選測試題目（點擊直接帶入 Prompt）：</span>' +
+              '<div class="lab-preset-chips">' + presetButtons + '</div>' +
+            '</div>' : '') +
           systemBox +
-          '<label class="field-label" for="free-prompt">測試提示詞 (Prompt)</label>' +
-          '<textarea id="free-prompt" placeholder="請選擇上方範例或自行輸入提示詞...">' + esc(s.prompt) + '</textarea>' +
-          '<div class="button-row" style="margin: 16px 0;">' +
-            '<button type="button" class="button-primary" data-action="send">🚀 執行實驗 →</button>' +
-            '<button type="button" class="action-button" data-action="reset">重設本實驗</button>' +
+          tokenLiveBar +
+          '<div class="lab-prompt-section">' +
+            '<label class="lab-prompt-label" for="free-prompt">測試提示詞 (Prompt)</label>' +
+            '<textarea id="free-prompt" placeholder="請點選上方範例或自行輸入提示詞...">' + esc(s.prompt) + '</textarea>' +
           '</div>' +
-          '<div class="response-container">' +
-            '<label class="field-label" style="margin-top:20px; font-weight:700;">實驗結果回覆</label>' +
-            '<div class="message-box" id="free-response" role="status" aria-live="polite">' + esc(s.response || '選擇上方範例或輸入提示詞後，按下「執行實驗」查看模型回覆。') + '</div>' +
+          '<div class="lab-action-row">' +
+            '<button type="button" class="button-primary lab-send-btn" data-action="send">🚀 執行實驗 →</button>' +
+            '<button type="button" class="action-button" data-action="reset">重設</button>' +
+          '</div>' +
+          '<div class="lab-response-section">' +
+            '<label class="lab-response-label" for="free-response">實驗結果回覆</label>' +
+            '<div class="message-box" id="free-response" role="status" aria-live="polite">' + esc(s.response || '點擊上方範例或輸入提示詞後，按下「🚀 執行實驗」查看回覆。') + '</div>' +
           '</div>' +
           '<div class="takeaway-box">' +
             '<div class="takeaway-title">💡 實驗觀察重點</div>' +
@@ -267,7 +270,12 @@
   }
 
   function updateTokens() {
-    const value = states.tokens.text, parts = value.match(/[A-Za-z]+|[0-9]+|[^\s]/gu) || [];
+    const promptInput = root.querySelector('#free-prompt');
+    const value = (promptInput && promptInput.value != null && promptInput.value !== '')
+      ? promptInput.value
+      : ((states.tokens && states.tokens.prompt) || (states.tokens && states.tokens.text) || '');
+    states.tokens.text = value;
+    const parts = value.match(/[A-Za-z]+|[0-9]+|[^\s]/gu) || [];
     const charEl = root.querySelector('#characters');
     if (charEl) charEl.textContent = String(Array.from(value).length);
     const countEl = root.querySelector('#tokens-count');
@@ -286,7 +294,7 @@
         frag.appendChild(span);
       });
       if (!parts.length) {
-        stream.textContent = '輸入文字後顯示切分片段。';
+        stream.textContent = '輸入提示詞後即時顯示 Token 切分片段。';
       } else {
         if (parts.length > 300) {
           const note = document.createElement('span');
@@ -341,10 +349,12 @@
         strawberry: 'How many letters r are in strawberry?',
         code: 'print(sum([120, 80, 50]))'
       };
-      states.tokens.text = texts[preset.dataset.preset] || '';
-      const tInput = root.querySelector('#token-text');
-      if (tInput) tInput.value = states.tokens.text;
-      updateTokens();
+      const val = texts[preset.dataset.preset] || '';
+      states[current.id].prompt = val;
+      states.tokens.text = val;
+      const pInput = root.querySelector('#free-prompt');
+      if (pInput) pInput.value = val;
+      if (current.id === 'tokens') updateTokens();
       return;
     }
     const sys = e.target.closest('[data-system-preset]');
@@ -379,11 +389,9 @@
         if (pInput) pInput.value = sample.prompt;
         if (current.id === 'tokens') {
           states.tokens.text = sample.prompt;
-          const tInput = root.querySelector('#token-text');
-          if (tInput) tInput.value = sample.prompt;
           updateTokens();
         }
-        states[current.id].response = '已載入範例提示詞；可直接點擊「🚀 執行實驗 →」查看回覆。';
+        states[current.id].response = '已載入精選題目；可直接點擊「🚀 執行實驗 →」查看回覆。';
         const fResp = root.querySelector('#free-response');
         if (fResp) fResp.textContent = states[current.id].response;
         root.querySelectorAll('[data-legacy]').forEach(btn => {
@@ -428,9 +436,12 @@
   root.addEventListener('input', function (e) {
     const s = states[current.id];
     if (!s) return;
-    if (e.target.id === 'token-text') { s.text = e.target.value; updateTokens(); }
     if (e.target.id === 'free-prompt') {
       s.prompt = e.target.value;
+      if (current.id === 'tokens') {
+        states.tokens.text = s.prompt;
+        updateTokens();
+      }
       const normInput = s.prompt.replace(/\r\n/g, '\n').trim();
       root.querySelectorAll('[data-legacy]').forEach(function (btn) {
         const expData = (window.LAB_EXPERIMENTS || window.LEGACY_EXPERIMENTS || []).find(x => x.id === current.id);
