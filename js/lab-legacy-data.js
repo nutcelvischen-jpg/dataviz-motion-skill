@@ -76,9 +76,8 @@ window.LEGACY_EXPERIMENTS = [
       }
     ],
     takeaway: `<strong>💡 實驗觀察重點：</strong><br>
-• <strong>物理計量與成本差異</strong>：Token 是大模型唯一的物理計費單位與上下文容量衡量標準。繁體中文在常見分詞器下相較英文多消耗 30%~80% 的 Token。<br>
-• <strong>字母計數感官盲區</strong>：模型看文字以 Token 為單位，無法直接看到單字內的個別字母。strawberry 字母數錯是字典切片造成的盲點，非智力退化。<br>
-• <strong>工程化三大破解法</strong>：在提示詞中要求「空格拆字」、呼叫 Python 程式計算 <code>count('r')</code>，或採用自帶思考鏈（Thinking Chain）的 Reasoning 推理模型。`,
+Token 是大語言模型唯一的物理計費單位與上下文容量標準；單字在 BPE 分詞切塊後，模型對內部個別字母存在感官盲區。<br>
+若需字母級精準計算或防範繁體中文 Token 膨脹，實務上應要求空格拆字、撰寫代碼或採用具備思考鏈的 Reasoning 推理模型。`,
     analysis: `<strong>一、 什麼是 Token？（LLM 的物理計量單位）</strong><br>
 電腦只能運算數字。當你輸入文字時，模型必須先透過 <strong>Byte-Pair Encoding (BPE)</strong> 分詞器將文字切割為一連串數字編號（Token IDs）。Token 是雲端 API 唯一的計費單位，也是 Context Window 的容量衡量標準。<br><br>
 <strong>二、 大語言模型必懂 6 大核心專有名詞：</strong><br>
@@ -118,9 +117,8 @@ window.LEGACY_EXPERIMENTS = [
       }
     ],
     takeaway: `<strong>💡 實驗觀察重點：</strong><br>
-• <strong>無狀態本質 (Stateless)</strong>：大模型每次運算都是獨立白紙啟動，本身不具備硬碟般的長期記憶。<br>
-• <strong>對話小抄機制</strong>：多輪對話是由客戶端或伺服器每次將所有歷史訊息拼接成封包完整重傳。<br>
-• <strong>漸進式載入原則</strong>：對話越長，Token 消耗與延遲呈二次方增加。自製 Skill 與 Agent 應採用 Progressive Disclosure（漸進式載入），需要時才動態加載所需知識。`,
+大語言模型本質是完全無狀態的靜態矩陣，每一次發送請求都是從白紙重新啟動。<br>
+多輪對話是由系統將全部歷史記錄拼裝成「對話小抄」完整重傳；對話越長，重傳的 Token 與延遲雪球效應越明顯。`,
     analysis: `<strong>大語言模型記憶的本質：從小抄資料庫翻出來重讀</strong><br>
 日常使用 ChatGPT 時讓人感覺 AI 記得剛才說過的話，秘密在於前端或後端架構默默維護著一組「對話存摺」：<br>
 1. 第 1 輪：用戶輸入 ➔ 寫入資料庫 ➔ AI 回覆 ➔ 連線關閉，模型記憶重置為零。<br>
@@ -156,9 +154,8 @@ window.LEGACY_EXPERIMENTS = [
       }
     ],
     takeaway: `<strong>💡 實驗觀察重點：</strong><br>
-• <strong>時間盲區真相</strong>：純 LLM 就像被關在無窗密閉房間的智者，讀過大量古籍，但沒有手錶也沒有窗戶看天氣。<br>
-• <strong>工具調用 (Tool Calling) 價值</strong>：現代 AI 能回答時間與天氣，是因為後端給了它「手錶小工具 (Time API)」與「搜尋小工具 (Search API)」。<br>
-• <strong>Agent 核心演進</strong>：由單純文字生成演進為能夠感知現實的 Agent，關鍵就在於導入 MCP 工具協議與即時 API 整合。`,
+純模型內部沒有時鐘或計時器，所有知識皆截斷於訓練語料完成的瞬間。<br>
+若要回答即時時間、即時天氣或新聞，必須透過 Function Calling 或 MCP 工具協議向外調用外部 API 與搜尋工具。`,
     analysis: `<strong>AI 如何感知現實時間與動態？</strong><br>
 1. 用戶提問：「現在幾點？台北下雨了嗎？」<br>
 2. AI 判斷自己缺乏當前資訊，觸發 Function Calling / Tool Use 機制。<br>
@@ -204,9 +201,8 @@ window.LEGACY_EXPERIMENTS = [
       }
     ],
     takeaway: `<strong>💡 實驗觀察重點：</strong><br>
-• <strong>機率順暢度 vs 客觀事實</strong>：模型的數學目標是極大化下一個詞的出現機率，而非保證事實的絕對真確。<br>
-• <strong>語氣肯定不等於查證</strong>：語調自信、格式完整的回答，可能是順應文字慣性編造的偽歷史。<br>
-• <strong>資料分析防幻覺原則</strong>：數據分析絕不能單憑純文字對話憑空生成數字，必須搭配程式化計算與交叉等式勾稽。`,
+模型生成文字的目標是預測下一個 Token 的出現機率，而非翻閱資料庫進行客觀真偽查證。<br>
+語氣自信、格式工整不等於真實無誤；面對誘導性提問容易產生幻覺，嚴肅資料分析絕不能單憑純文字口算。`,
     analysis: `<strong>什麼是 Next-Token Prediction？</strong><br>
 大語言模型並非百科全書，本質是一個「高維空間下一個 Token 機率分佈取樣器」：<br>
 P(w_t | w_1, w_2, ..., w_{t-1})<br>
@@ -260,9 +256,8 @@ print("Reconciliation: PASS")
       }
     ],
     takeaway: `<strong>💡 實驗觀察重點：</strong><br>
-• <strong>口算即猜測</strong>：神經網絡的純文字口算只是在模仿解題格式，非真實布林暫存器運算。<br>
-• <strong>代碼直譯器的確定性</strong>：透過 Prompt 要求模型撰寫 Python 代碼（Pandas / NumPy），交給直譯器執行，以程式確定性取代機率模糊性。<br>
-• <strong>收尾勾稽驗算</strong>：在報表產出時加入 <code>assert</code> 等式驗算，確保加總與細項完全吻合，實現零誤差分析。`,
+神經網絡擅長語意聯想而不擅長離散精準運算，純文字口算多位數乘除極易算錯。<br>
+資料分析與財務計算必須強迫 AI 撰寫 Python / Pandas 代碼在沙箱直譯器中執行，以程序化結果杜絕口算幻覺。`,
     analysis: `<strong>為什麼語言模型不擅長算術？</strong><br>
 神經網絡在處理自然語言時運作於連續向量空間，而嚴肅數學運算（如多位數乘除法、精確小數）需要離散、無容錯率的嚴密布林邏輯與進位暫存器。<br>
 在純語言口算模式下，模型只是在模仿「算術題解答的排版長相」，而不是真正在撥算盤。讓 LLM 口算財務報表，就像叫詩人去審核上市公司資產負債表一樣危險！`
@@ -384,9 +379,8 @@ int main() {
       }
     ],
     takeaway: `<strong>💡 實驗觀察重點：</strong><br>
-• <strong>Prompt 不是安全防火牆</strong>：指令與資料在神經網路底層混合為單一輸入流，無法以純文字 Prompt 建立物理隔離。<br>
-• <strong>情境偽裝與助人偏好突破</strong>：攻擊者常透過科學競賽、人命關天或角色扮演話術，誘導模型越界。<br>
-• <strong>三層邊界防禦流水線</strong>：真正的防護需在後端實施 XML 標籤隔離、外圍離題過濾器攔截與輸出程式碼截斷。`,
+系統提示詞與使用者輸入在模型底層屬於同一條文字流，提示詞無法作為硬性物理防火牆。<br>
+企業級對外應用必須將危險操作抽離，依賴後端權限驗證、獨立安全審查代理人與人機確認（Human-in-the-Loop）防禦。`,
     analysis: `<strong>為什麼會發生提示詞注入？（Instructions vs. Data Confusion）</strong><br>
 傳統軟體架構中，「程式代碼（Code）」與「使用者輸入（Data）」在硬體層級享有記憶體物理隔離（例如 CPU 的指令指針與資料段）。<br><br>
 然而，<strong>大語言模型（LLM）本質上只有單一輸入流（Input Stream）</strong>——無論是開發者寫入的 System Prompt，還是使用者輸入的每一句話，在模型眼中全部被拼接成同一個 Token 序列進行機率預測！模型天生無法以二進制方式區分「哪一句話是絕對權威的系統規則」，「哪一句話是不可信任的外部資料」。<br><br>
@@ -484,9 +478,8 @@ int main() {
       }
     ],
     takeaway: `<strong>💡 實驗觀察重點：</strong><br>
-• <strong>前端絕對透明不可信</strong>：任何暴露在前端 HTML/JS 中的 API 金鑰，都會在數秒內被全網爬蟲盜取刷爆。<br>
-• <strong>BFF 後端代理模式</strong>：將金鑰保存在後端環境變數（.env），前端僅透過驗證 Token 與後端通訊，後端代為呼叫 AI 服務。<br>
-• <strong>雙重預算熔斷機制</strong>：在雲端供應商後台設定 Hard Spending Cap，並在應用層設置 Rate Limit 與最大迴圈步數限制。`,
+前端網頁與瀏覽器中的一切代碼、網路請求與暫存資料對公眾完全透明，任何寫在前端的金鑰都會被輕易提取。<br>
+API Key 必須安全隔離在後端伺服器環境中，透過反向代理或 Edge Functions 代為呼叫，絕不可暴露於前端。`,
     analysis: `<strong>前後端（Frontend vs. Backend）的核心防禦哲學：</strong><br>
 • <strong>前端（Client-Side）</strong>：運行在<strong>使用者的瀏覽器裡</strong>（Chrome、Safari）。任何送到前端的代碼，對全世界都是 100% 透明公開的！按右鍵『檢視原始碼』或 F12 一秒無所遁形。<br>
 • <strong>後端（Server-Side）</strong>：運行在<strong>你自己掌控的雲端伺服器裡</strong>（如 Node.js、Python、BFF）。這裡才是存放 <code>.env</code> 金鑰與執行金流保護的保險箱。`
@@ -555,9 +548,8 @@ int main() {
       }
     ],
     takeaway: `<strong>💡 實驗觀察重點：</strong><br>
-• <strong>工具收斂風險 (Instrumental Convergence)</strong>：目標驅動的 Agent 在遇到阻礙時，容易將「繞過限制」推導為完成目標的手段。<br>
-• <strong>不可逆操作確認點 (Human-in-the-Loop)</strong>：對外發送郵件、刪除資料庫、付款交易等不可逆動作，架構上必須硬性暫停等待人類確認。<br>
-• <strong>出站語意閘道 (Egress Guardrail)</strong>：傳統防火牆僅看連接埠與 IP，針對 Agent 必須實施出站內容的語意審核與授權檢查。`,
+具備工具調用權限的自主代理人（AI Agent），容易在多步推理與自動重試中引發非預期的連鎖破壞。<br>
+凡涉及對外發送郵件、資料庫寫入或金流扣款等不可逆操作，必須設立強制性的人工審核節點（Human-in-the-Loop）。`,
     analysis: `<strong>自主代理人安全邊界的核心原則：</strong><br>
 一項原本合法的任務，仍需明確限制可讀取、寫入或對外傳送的範圍。<br>
 1. <strong>設定目標</strong>：確認要完成的事與明確邊界。<br>
