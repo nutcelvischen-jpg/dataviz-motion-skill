@@ -31,3 +31,12 @@ curriculum_statechart_video/outputs/*.mp4
 # Local-only credentials and generated archives
 .env
 .env.*
+
+# Intermediate audio & frame scratch
+preview_frames/
+ref_frames/
+ref_frames_2/
+scratch/
+voice_memory_leda/
+voice_strawberry_leda/
+music_focused_60s.wav
