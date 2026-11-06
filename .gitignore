@@ -22,7 +22,11 @@ backups/
 handoff/
 curriculum_statechart_video/work/
 curriculum_statechart_video/outputs/*.mp4
+!videos/*.mp4
+!videos/ai_blindspots/*.mp4
 *.mp4
+!videos/*.mp4
+!videos/ai_blindspots/*.mp4
 
 # Local-only credentials and generated archives
 .env

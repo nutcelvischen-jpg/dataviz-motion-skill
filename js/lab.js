@@ -12,6 +12,82 @@
   ];
   const groups = ['理解模型的回答','用工具核對結果','管理指令與權限'];
   const lessonLabels = {'01':'認識模型','02':'理解上下文','03':'看見限制','04':'學會查證','05':'掌握使用條件','06':'完成工作'};
+
+  // 60 秒看懂 AI 盲點微課程影音資產與精講卡片
+  const BLINDSPOT_VIDEOS = {
+    tokens: {
+      ep: 'AI 盲點 #01',
+      title: '草莓與 Token（AI 讀字的方式）',
+      duration: '0:46',
+      src: 'videos/ai_blindspots/AI盲點01_草莓與Token.mp4',
+      poster: 'assets/video-posters/blindspot_01.jpg',
+      takeaways: [
+        '<strong>感官盲區 (Sensory Blindness)：</strong>AI 讀文字之前，必須查 BPE 字典切成 Token，看到的是一串數字編號，不是一個個獨立字母！',
+        '<strong>密閉包裹難題：</strong>單字 <code>strawberry</code> 被切為 <code>[straw]</code> + <code>[berry]</code> 兩個密封包裹，神經網路無法拆開包裹去數裡面的 r。',
+        '<strong>繁中 Token 膨脹：</strong>英文 1 個單字常對應 1 個 Token，而繁體中文每個漢字需 1.2~2.0 個 Token，API 費用顯著增加。'
+      ],
+      goldenQuote: 'AI 看到的是一串數字編號，不是一個個字母！'
+    },
+    memory: {
+      ep: 'AI 盲點 #02',
+      title: '金魚腦與記憶（無狀態與對話小抄）',
+      duration: '0:49',
+      src: 'videos/ai_blindspots/AI盲點02_金魚腦與記憶.mp4',
+      poster: 'assets/video-posters/blindspot_02.jpg',
+      takeaways: [
+        '<strong>無狀態矩陣 (Stateless)：</strong>大語言模型沒有內建「硬碟記憶」，回答完畢後所有狀態立刻歸零。',
+        '<strong>前端對話小抄：</strong>每一次您送出訊息，前端程式都在背後把「過去全部對話紀錄 + 新問題」整包重新打包送入。',
+        '<strong>窗口裁切危機：</strong>對話歷史超過 Context Window 上限時，最上方的舊記憶（如貓的名字）就會被自動剪掉而遺忘！'
+      ],
+      goldenQuote: 'AI 像金魚腦，每一次呼叫都重新看一遍小抄！'
+    },
+    injection: {
+      ep: 'AI 盲點 #03',
+      title: '提示詞注入（Prompt Injection 與邊界防禦）',
+      duration: '0:56',
+      src: 'videos/ai_blindspots/AI盲點03_提示詞注入.mp4',
+      poster: 'assets/video-posters/blindspot_03.jpg',
+      takeaways: [
+        '<strong>指令與資料缺乏物理隔離：</strong>在神經網路底層，系統指引、使用者問題與網頁內容屬於同一條 Token 串流。',
+        '<strong>三道守門防線：</strong>① 貼標籤（外部文字只供閱讀，不賦予執行權）② 鎖權限（摘要工具不給發信/刪庫權限）③ 後端沙箱架構隔離。',
+        '<strong>北捷真實案例：</strong>AI 客服被網友以情境扮演指令誤導寫出 Python 程式，證實提示詞無法作為硬性安全邊界。'
+      ],
+      goldenQuote: '文件是拿來讀的，不是拿來聽命令的！'
+    },
+    probability: {
+      ep: 'AI 盲點 #04 & #05',
+      title: '幻覺 (Hallucination) 與 Temperature 抽籤機制',
+      duration: '0:58 · 0:52',
+      src: 'videos/ai_blindspots/AI盲點04_幻覺.mp4',
+      poster: 'assets/video-posters/blindspot_04.jpg',
+      altVideo: {
+        title: 'AI 盲點 #05 · Temperature 抽籤',
+        duration: '0:52',
+        src: 'videos/ai_blindspots/AI盲點05_Temperature抽籤.mp4',
+        poster: 'assets/video-posters/blindspot_05.jpg'
+      },
+      takeaways: [
+        '<strong>機率採樣本質：</strong>LLM 是根據高維空間計算下一個詞的出現機率，不是在客觀查證事實。',
+        '<strong>流暢性陷阱：</strong>模型講得越順、語氣越自信，人類大腦越容易不自覺相信，甚至煞有介事地捏造論文與法規。',
+        '<strong>Temperature 抽籤：</strong>低溫（0~0.2）收斂在最高機率字詞適合精準報告；高溫（0.7~1.0）擴大抽籤範圍適合創意發想。',
+        '<strong>查證三步驟：</strong>拆開說法 ➔ 逐句比對來源與時間 ➔ 要求附上具體驗證依據。'
+      ],
+      goldenQuote: 'AI 是在抽籤不是在背答案，講得再有自信也要查證！'
+    },
+    time: {
+      ep: 'AI 盲點 #06',
+      title: '知識截止（Knowledge Cutoff 與無時鐘感知）',
+      duration: '0:53',
+      src: 'videos/ai_blindspots/AI盲點06_知識截止.mp4',
+      poster: 'assets/video-posters/blindspot_06.jpg',
+      takeaways: [
+        '<strong>時間維度凍結：</strong>LLM 缺乏即時時鐘，內部世界認知永遠定格在訓練數據集的截斷日（Knowledge Cutoff）。',
+        '<strong>即時資訊靠工具：</strong>詢問即時天氣、當日股價或突發新聞，模型若無聯網工具必然回答錯誤或產生幻覺。',
+        '<strong>問即時資訊記得三件事：</strong>看時間範圍、調用外部搜尋/API 工具、核對數據出處。'
+      ],
+      goldenQuote: 'AI 的知識有保存期限，最新消息要靠查！'
+    }
+  };
   const sanitizeApiKey = function (k) {
     if (!k) return '';
     k = String(k).replace(/[\u200B-\u200D\uFEFF\u2028\u2029]/g, '').trim();
@@ -76,6 +152,25 @@
         '<p>講概念、選模型、動手做實驗。改變條件，觀察模型的真實回答與資料流邊界。</p>' +
         '<p class="quiet">支援免 Key 教學模擬、OpenRouter 7 款主流模型與 Google Gemini 原生直連。</p>' +
       '</header>' +
+      '<section class="blindspots-index-showcase">' +
+        '<div class="blindspots-index-header">' +
+          '<h2>🎬 60 秒看懂 AI 盲點 · 影音實戰實驗室</h2>' +
+          '<p>三部曲學習心流：<strong>① 先看 60s 影片 ➔ ② 講解核心原理 ➔ ③ 動手做實驗</strong>。點選以下盲點直接進入實測：</p>' +
+        '</div>' +
+        '<div class="blindspots-grid">' +
+          Object.keys(BLINDSPOT_VIDEOS).map(function (k) {
+            var v = BLINDSPOT_VIDEOS[k];
+            return '<a href="lab.html?experiment=' + k + '" class="blindspot-card">' +
+              '<div class="blindspot-card-top">' +
+                '<span class="blindspot-card-ep">' + esc(v.ep) + '</span>' +
+                '<span class="blindspot-card-duration">⏱️ ' + esc(v.duration) + '</span>' +
+              '</div>' +
+              '<div class="blindspot-card-title">' + esc(v.title) + '</div>' +
+              '<div class="blindspot-card-quote">💡 ' + esc(v.goldenQuote) + '</div>' +
+            '</a>';
+          }).join('') +
+        '</div>' +
+      '</section>' +
       groups.map(g =>
         '<section class="experiment-index-group">' +
           '<h2>' + esc(g) + '</h2>' +
@@ -155,6 +250,55 @@
     const takeawayContent = expData.takeaway || esc(d.goal);
     const takeawayClean = takeawayContent.replace(/^<strong>💡\s*實驗觀察重點：<\/strong><br>\s*/i, '');
 
+    const videoData = BLINDSPOT_VIDEOS[d.id];
+    let videoMarkup = '';
+    if (videoData) {
+      videoMarkup =
+        '<!-- 三部曲學習導引 (Step 1 ➔ Step 2 ➔ Step 3) -->' +
+        '<div class="lab-three-steps-banner">' +
+          '<span class="lab-step-pill step-video">① 先看 60s 影片</span>' +
+          '<span class="lab-step-arrow">➔</span>' +
+          '<span class="lab-step-pill step-lesson">② 講解核心原理</span>' +
+          '<span class="lab-step-arrow">➔</span>' +
+          '<span class="lab-step-pill step-lab">③ 動手做實驗</span>' +
+        '</div>' +
+        '<!-- Step 1 & 2 影片與講解整合卡片 -->' +
+        '<section class="lab-video-lesson-card">' +
+          '<div class="lab-video-player-box">' +
+            '<div class="lab-video-frame">' +
+              '<video controls playsinline preload="metadata" poster="' + esc(videoData.poster) + '" aria-label="' + esc(videoData.title) + '">' +
+                '<source src="' + esc(videoData.src) + '" type="video/mp4" />' +
+                '瀏覽器無法直接播放時，請<a href="' + esc(videoData.src) + '">開啟影片</a>。' +
+              '</video>' +
+            '</div>' +
+            '<div class="lab-video-badge-row">' +
+              '<span class="badge-ep">' + esc(videoData.ep) + '</span>' +
+              '<span class="badge-time">⏱️ ' + esc(videoData.duration) + '</span>' +
+            '</div>' +
+            (videoData.altVideo ?
+              '<div style="margin-top:8px;font-size:12.5px;background:var(--pale);padding:7px 10px;border-radius:6px;border:1px solid var(--rule);">' +
+                '📺 <strong>延伸短片：</strong><a href="' + esc(videoData.altVideo.src) + '" target="_blank">' + esc(videoData.altVideo.title) + ' (' + esc(videoData.altVideo.duration) + ') ↗</a>' +
+              '</div>' : '') +
+          '</div>' +
+          '<div class="lab-lesson-content-box">' +
+            '<div>' +
+              '<span class="lab-lesson-pill-tag">Step 1 & 2 · 60 秒看懂與原理精講</span>' +
+              '<h2 class="lab-lesson-title">' + esc(videoData.title) + '</h2>' +
+              '<ul class="lab-lesson-points">' +
+                videoData.takeaways.map(t => '<li>' + t + '</li>').join('') +
+              '</ul>' +
+            '</div>' +
+            '<div class="lab-golden-quote">' +
+              '<span class="quote-icon">💡</span>' +
+              '<div class="quote-text">' +
+                '<strong>一句話記起來：</strong>' + esc(videoData.goldenQuote) +
+              '</div>' +
+            '</div>' +
+            '<a href="#step-model" class="lab-jump-btn">👇 往下進入 Step 3 · 動手做實驗 (Playground 實測) →</a>' +
+          '</div>' +
+        '</section>';
+    }
+
     root.innerHTML =
       '<!-- Playground 頂部 Header -->' +
       '<header class="lab-playground-header" id="step-concept">' +
@@ -165,6 +309,7 @@
           '<a href="' + esc(d.link) + '" class="lab-concept-link">📖 ' + esc(d.linkText) + ' ↗</a>' +
         '</div>' +
       '</header>' +
+      videoMarkup +
 
       '<!-- 輕量化頂部工具列 (Top Toolbar) -->' +
       '<div class="lab-toolbar" id="step-model">' +

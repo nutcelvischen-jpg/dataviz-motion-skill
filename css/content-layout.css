@@ -113,3 +113,287 @@ fieldset{border:0;padding:0;margin:0}legend{padding:0;margin:0 0 12px;font-weigh
   .lab-send-btn{width:100%}
   #key-status{white-space:normal}
 }
+
+/* ==========================================================================
+   三部曲學習心流：先看影片 ➔ 講解內容 ➔ 做實驗
+   ========================================================================== */
+.lab-three-steps-banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(32, 35, 31, 0.03);
+}
+.lab-step-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: var(--pale);
+  color: var(--ink);
+  border: 1px solid transparent;
+}
+.lab-step-pill.step-video {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+.lab-step-pill.step-lesson {
+  background: #e0e7ff;
+  color: #3730a3;
+  border-color: #c7d2fe;
+}
+.lab-step-pill.step-lab {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+.lab-step-arrow {
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* 影片與講解整合卡片 */
+.lab-video-lesson-card {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 24px;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 22px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(32, 35, 31, 0.05);
+}
+
+.lab-video-player-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lab-video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  max-height: 480px;
+  background: #111827;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.lab-video-frame video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.lab-video-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--muted);
+  padding: 2px 4px;
+}
+.lab-video-badge-row .badge-ep {
+  font-weight: 700;
+  color: var(--accent);
+}
+.lab-video-badge-row .badge-time {
+  font-weight: 600;
+  color: var(--olive);
+}
+
+.lab-lesson-content-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+.lab-lesson-pill-tag {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: var(--warm);
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.lab-lesson-title {
+  font-family: var(--serif);
+  font-size: clamp(20px, 2.2vw, 26px);
+  margin: 0 0 14px;
+  color: var(--ink);
+  line-height: 1.35;
+}
+.lab-lesson-points {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.lab-lesson-points li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+.lab-lesson-points li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--olive);
+  font-weight: 900;
+  font-size: 16px;
+}
+.lab-lesson-points li code {
+  background: var(--pale);
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 13.5px;
+  font-family: var(--font-mono, monospace);
+}
+
+.lab-golden-quote {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #fefce8;
+  border: 1.5px solid #fde047;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 12px 0 18px;
+}
+.lab-golden-quote .quote-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+.lab-golden-quote .quote-text {
+  font-size: 15px;
+  line-height: 1.55;
+  color: #713f12;
+}
+.lab-golden-quote .quote-text strong {
+  color: #854d0e;
+}
+
+.lab-jump-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 9px 18px;
+  background: var(--olive);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all .15s ease;
+}
+.lab-jump-btn:hover {
+  background: #2f4435;
+  color: #fff;
+}
+
+/* 首頁快速影音導引網格 */
+.blindspots-index-showcase {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 6px rgba(32, 35, 31, 0.04);
+}
+.blindspots-index-header {
+  margin-bottom: 20px;
+}
+.blindspots-index-header h2 {
+  font-size: 24px;
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+.blindspots-index-header p {
+  color: var(--muted);
+  font-size: 15px;
+  margin: 0;
+}
+.blindspots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.blindspot-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 14px;
+  text-decoration: none;
+  color: var(--ink);
+  transition: all 0.15s ease;
+}
+.blindspot-card:hover {
+  background: var(--surface);
+  border-color: var(--olive);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transform: translateY(-2px);
+}
+.blindspot-card-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.blindspot-card-ep {
+  font-weight: 700;
+  color: var(--accent);
+}
+.blindspot-card-duration {
+  color: var(--olive);
+  font-weight: 600;
+}
+.blindspot-card-title {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 6px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+.blindspot-card-quote {
+  font-size: 13px;
+  color: #713f12;
+  background: #fefce8;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-top: auto;
+  line-height: 1.4;
+}
+
+@media(max-width: 820px) {
+  .lab-video-lesson-card {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .lab-video-player-box {
+    max-width: 320px;
+    margin: 0 auto;
+  }
+}
