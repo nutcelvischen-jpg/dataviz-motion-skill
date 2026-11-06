@@ -8,9 +8,16 @@
     {id:'arithmetic', title:'計算正確就等於分析正確嗎？', short:'計算與核對', group:'用工具核對結果', goal:'神經網絡擅長語意聯想而不擅長離散精準運算；資料分析工作流必須強迫 AI 撰寫代碼執行與勾稽。', link:'concepts/verification.html#tool-verification', linkText:'查看工具與驗算'},
     {id:'injection', title:'外部文字何時影響原本的任務？', short:'提示詞注入', group:'管理指令與權限', goal:'系統規則與使用者輸入在模型底層屬於同一條文字流；提示詞無法作為硬性物理防火牆，需依賴後端架構防禦。', link:'metro.html', linkText:'閱讀北捷教學案例'},
     {id:'security', title:'金鑰出現在使用者能看到的哪裡？', short:'金鑰與權限', group:'管理指令與權限', goal:'前端瀏覽器中的一切對公眾透明；API 金鑰必須隔離在後端環境中，避免遭爬蟲盜刷造成天價帳單。', link:'security.html', linkText:'看金鑰與資料流圖解'},
-    {id:'agent_breach', title:'工作流程應在哪一步停下來確認？', short:'行動與確認', group:'管理指令與權限', goal:'自主代理人具備目標驅動特性；涉及對外發送或資料修改的關鍵步驟必須設立人工審核確認點 (Human-in-the-Loop)。', link:'topics/agent-incidents.html', linkText:'閱讀代理人邊界專題'}
+    {id:'agent_breach', title:'工作流程應在哪一步停下來確認？', short:'行動與確認', group:'管理指令與權限', goal:'自主代理人具備目標驅動特性；涉及對外發送或資料修改的關鍵步驟必須設立人工審核確認點 (Human-in-the-Loop)。', link:'topics/agent-incidents.html', linkText:'閱讀代理人邊界專題'},
+    // 第二季：核心機制與進階實戰（AI 盲點 #07～#12）
+    {id:'s2_attention', title:'「它」到底是指誰？Winograd 測試', short:'Attention 注意力', group:'第二季：核心機制與進階實戰', goal:'Attention 機制動態計算當前字與前文各詞的關聯權重，消解模糊指代。'},
+    {id:'s2_rag', title:'AI 如何開書考？向量相似度比對', short:'Embedding 與 RAG', group:'第二季：核心機制與進階實戰', goal:'Embedding 語意向量化與知識庫檢索，不改模型參數即時外掛最新資料。'},
+    {id:'s2_context', title:'資料塞太滿？中間迷失現象實測', short:'Context 塞太滿', group:'第二季：核心機制與進階實戰', goal:'U 型注意力衰減曲線，中間段資訊最容易被忽略；上下文工程需精選與分批。'},
+    {id:'s2_token_cost', title:'對話歷史滾雪球！Token 與成本試算', short:'Token 與費用', group:'第二季：核心機制與進階實戰', goal:'每輪歷史重送造成等差級數費用暴增，Output 比 Input 貴 2～4 倍。'},
+    {id:'s2_tool_calling', title:'AI 動腦、工具動手！三步分工調用', short:'Tool Calling 工具呼叫', group:'第二季：核心機制與進階實戰', goal:'AI 輸出符合 Schema 規格的參數，外部工具執行運算後由 AI 組織語言回傳。'},
+    {id:'s2_adaptation', title:'讓 AI 變專家的三條路：決策矩陣', short:'微調 vs RAG vs LoRA', group:'第二季：核心機制與進階實戰', goal:'根據知識更新頻率、風格客製與成本預算，評估最合適的 AI 專家改造路徑。'}
   ];
-  const groups = ['理解模型的回答','用工具核對結果','管理指令與權限'];
+  const groups = ['理解模型的回答','用工具核對結果','管理指令與權限','第二季：核心機制與進階實戰'];
   const lessonLabels = {'01':'認識模型','02':'理解上下文','03':'看見限制','04':'學會查證','05':'掌握使用條件','06':'完成工作'};
 
   // 60 秒看懂 AI 盲點微課程影音資產與精講卡片
@@ -86,13 +93,9 @@
         '<strong>問即時資訊記得三件事：</strong>看時間範圍、調用外部搜尋/API 工具、核對數據出處。'
       ],
       goldenQuote: 'AI 的知識有保存期限，最新消息要靠查！'
-    }
-  };
-
-  // 第二季：核心機制與進階實戰（AI 盲點 #07～#12）影音與實驗入口（僅限互動實驗室內預覽）
-  const BLINDSPOT_VIDEOS_S2 = [
-    {
-      id: 's2_attention',
+    },
+    // 第二季：核心機制與進階實戰（AI 盲點 #07～#12）
+    s2_attention: {
       ep: 'AI 盲點 #07',
       title: 'Attention 注意力（「它」到底是指誰？）',
       duration: '0:41',
@@ -105,8 +108,7 @@
         '<strong>不是死背字典：</strong>Attention 讓 AI 具備依據語境消解模糊指代的能力。'
       ]
     },
-    {
-      id: 's2_rag',
+    s2_rag: {
       ep: 'AI 盲點 #08',
       title: 'Embedding 與 RAG（AI 也能開書考？）',
       duration: '0:42',
@@ -119,8 +121,7 @@
         '<strong>低成本即時更新：</strong>規章異動只需要抽換資料庫，不需要重新訓練模型。'
       ]
     },
-    {
-      id: 's2_context',
+    s2_context: {
       ep: 'AI 盲點 #09',
       title: 'Context 塞太滿（迷失在中間 Lost in the Middle）',
       duration: '0:43',
@@ -133,12 +134,11 @@
         '<strong>垃圾進垃圾出：</strong>塞入無關背景只會稀釋注意力並增加出錯機率。'
       ]
     },
-    {
-      id: 's2_token_cost',
+    s2_token_cost: {
       ep: 'AI 盲點 #10',
       title: 'Token 與費用（Input/Output 計價與歷史滾雪球）',
       duration: '0:49',
-      src: 'videos/ai_blindspots/AI盲點10_Token與費用_1.mp4',
+      src: 'videos/ai_blindspots/AI盲點10_Token與費用.mp4',
       poster: 'assets/video-posters/ep10.jpg',
       goldenQuote: 'Token 就是 AI 世界的錢；聊完開新局，省錢又聰明！',
       takeaways: [
@@ -147,12 +147,11 @@
         '<strong>省錢三招：</strong>一個主題聊完就開新對話、不貼贅字、指示模型精簡回答。'
       ]
     },
-    {
-      id: 's2_tool_calling',
+    s2_tool_calling: {
       ep: 'AI 盲點 #11',
       title: 'Tool Calling 工具呼叫（AI 動腦、工具動手）',
       duration: '0:50',
-      src: 'videos/ai_blindspots/AI盲點11_ToolCalling工具呼叫_1.mp4',
+      src: 'videos/ai_blindspots/AI盲點11_ToolCalling工具呼叫.mp4',
       poster: 'assets/video-posters/ep11.jpg',
       goldenQuote: 'AI 負責動腦出參數，外部工具負責動手精確算數！',
       takeaways: [
@@ -161,12 +160,11 @@
         '<strong>人機協同安全點：</strong>關鍵敏感操作（如付款、刪除、發信）必須設置人工簽核點。'
       ]
     },
-    {
-      id: 's2_adaptation',
+    s2_adaptation: {
       ep: 'AI 盲點 #12',
       title: '微調 vs RAG vs LoRA（讓 AI 變專家的三條路）',
       duration: '0:54',
-      src: 'videos/ai_blindspots/AI盲點12_微調RAG與LoRA_1.mp4',
+      src: 'videos/ai_blindspots/AI盲點12_微調RAG與LoRA.mp4',
       poster: 'assets/video-posters/ep12.jpg',
       goldenQuote: '要知識就翻書（RAG），要習慣就補習（LoRA / 微調）！',
       takeaways: [
@@ -175,7 +173,7 @@
         '<strong>Fine-tuning 全量微調：</strong>全神經網路重訓，成本最高，適用深層邏輯與專利架構。'
       ]
     }
-  ];
+  };
 
   const sanitizeApiKey = function (k) {
     if (!k) return '';
@@ -209,11 +207,16 @@
   let requestVersion = 0;
   const root = document.getElementById('lab-root');
   const notice = document.getElementById('lab-notice');
-  const esc = function (value) {
-    return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
-    });
-  };
+
+  function esc(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
 
   function navMarkup() {
     return groups.map(function (g) {
@@ -255,9 +258,9 @@
             '<span style="font-size: 13px; color: var(--olive);">入門通識 · 5 大盲點實測</span>' +
           '</div>' +
           '<div class="blindspots-grid">' +
-            Object.keys(BLINDSPOT_VIDEOS).map(function (k) {
+            ['tokens', 'memory', 'injection', 'probability', 'time'].map(function (k) {
               var v = BLINDSPOT_VIDEOS[k];
-              return '<a href="lab.html?experiment=' + k + '" class="blindspot-card">' +
+              return '<a href="lab.html?experiment=' + k + '" class="blindspot-card" data-experiment="' + k + '">' +
                 '<div class="blindspot-card-top">' +
                   '<span class="blindspot-card-ep">' + esc(v.ep) + '</span>' +
                   '<span class="blindspot-card-duration">⏱️ ' + esc(v.duration) + '</span>' +
@@ -274,11 +277,12 @@
               '<span style="background: #f4f0ff; color: #4c2889; border: 1px solid #b69cff; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">第二季</span>' +
               '核心機制與進階實戰（AI 盲點 #07～#12）' +
             '</h3>' +
-            '<span style="font-size: 13px; color: var(--olive);">進階落地 · 6 大機制預覽</span>' +
+            '<span style="font-size: 13px; color: var(--olive);">進階落地 · 6 大機制實測</span>' +
           '</div>' +
           '<div class="blindspots-grid">' +
-            BLINDSPOT_VIDEOS_S2.map(function (v, idx) {
-              return '<div class="blindspot-card s2-preview-card" data-s2-idx="' + idx + '" role="button" tabindex="0" style="border-left: 3px solid #b69cff; cursor: pointer; transition: all .15s ease;">' +
+            ['s2_attention', 's2_rag', 's2_context', 's2_token_cost', 's2_tool_calling', 's2_adaptation'].map(function (k) {
+              var v = BLINDSPOT_VIDEOS[k];
+              return '<a href="lab.html?experiment=' + k + '" class="blindspot-card" data-experiment="' + k + '" style="border-left: 3px solid #b69cff;">' +
                 '<div class="blindspot-card-top">' +
                   '<span class="blindspot-card-ep" style="color: #6d28d9;">' + esc(v.ep) + '</span>' +
                   '<span class="blindspot-card-duration">⏱️ ' + esc(v.duration) + '</span>' +
@@ -286,16 +290,15 @@
                 '<div class="blindspot-card-title">' + esc(v.title) + '</div>' +
                 '<div class="blindspot-card-quote" style="background: #faf5ff; color: #581c87; margin-bottom: 10px;">💡 ' + esc(v.goldenQuote) + '</div>' +
                 '<div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; font-size: 12px; padding-top: 6px; border-top: 1px dashed #e9d5ff;">' +
-                  '<span style="color: #7c3aed; font-weight: 700;">▶ 點擊觀看 60s 影片</span>' +
-                  '<span style="background: #f3e8ff; color: #6b21a8; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">單元實驗籌備中</span>' +
+                  '<span style="color: #7c3aed; font-weight: 700;">▶ 進入單元 (影片・原理・實驗)</span>' +
+                  '<span style="background: #f3e8ff; color: #6b21a8; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">互動實作</span>' +
                 '</div>' +
-              '</div>';
+              '</a>';
             }).join('') +
           '</div>' +
         '</div>' +
-        '<div id="s2-video-modal-container"></div>' +
       '</section>' +
-      groups.map(g =>
+      groups.filter(g => g !== '第二季：核心機制與進階實戰').map(g =>
         '<section class="experiment-index-group">' +
           '<h2>' + esc(g) + '</h2>' +
           '<ul>' +
@@ -309,67 +312,414 @@
           '</ul>' +
         '</section>'
       ).join('');
-
-    // 綁定第二季卡片點擊事件：直接在互動實驗室原地彈出影片與精華說明，零跳頁！
-    document.querySelectorAll('[data-s2-idx]').forEach(function (card) {
-      const open = function () {
-        const idx = parseInt(card.getAttribute('data-s2-idx'), 10);
-        const item = BLINDSPOT_VIDEOS_S2[idx];
-        if (item) openS2Modal(item);
-      };
-      card.addEventListener('click', open);
-      card.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
-      });
-    });
   }
 
-  function openS2Modal(item) {
-    const container = document.getElementById('s2-video-modal-container');
-    if (!container) return;
-    container.innerHTML =
-      '<div id="s2-modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;">' +
-        '<div style="background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">' +
-          '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">' +
-            '<div>' +
-              '<span style="display: inline-block; background: #f4f0ff; color: #4c2889; border: 1px solid #b69cff; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; margin-bottom: 4px;">' + esc(item.ep) + '</span>' +
-              '<h3 style="margin: 0; font-size: 17px; color: var(--ink); line-height: 1.4;">' + esc(item.title) + '</h3>' +
+  function renderS2Playground(d) {
+    if (d.id === 's2_attention') {
+      return (
+        '<div class="s2-exp-box" id="s2-attention-exp">' +
+          '<div class="lab-preset-bar">' +
+            '<span class="lab-preset-label">選擇測試語境（Winograd Schema 模糊指代測試）：</span>' +
+            '<div class="lab-preset-chips">' +
+              '<button type="button" class="preset-button action-button active" data-s2-att="big"><strong>情境 A</strong> 獎品放不進箱子，因為它「太大了」</button>' +
+              '<button type="button" class="preset-button action-button" data-s2-att="small"><strong>情境 B</strong> 獎品放不進箱子，因為它「太小了」</button>' +
             '</div>' +
-            '<button type="button" id="close-s2-modal" style="background: none; border: 0; font-size: 24px; cursor: pointer; color: var(--muted); line-height: 1; padding: 0 4px;" aria-label="關閉">✕</button>' +
           '</div>' +
-          '<div style="background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 14px;">' +
-            '<video controls playsinline autoplay poster="' + esc(item.poster) + '" style="width: 100%; max-height: 380px; display: block; margin: 0 auto;">' +
-              '<source src="' + esc(item.src) + '" type="video/mp4" />' +
-            '</video>' +
+          '<div class="att-sentence" id="att-sentence-view">' +
+            '獎品放不進箱子，因為<span class="att-target att-pronoun">它</span><span class="att-target att-adj att-link-heat" id="att-adj-word">太大了</span>' +
           '</div>' +
-          '<div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px;">' +
-            '<strong style="color: #6b21a8; font-size: 13px;">💡 一句話記起來：</strong>' +
-            '<p style="margin: 4px 0 0; font-size: 14px; color: #581c87; font-weight: 600;">' + esc(item.goldenQuote) + '</p>' +
+          '<div class="att-bars">' +
+            '<div class="att-bar-card">' +
+              '<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;">' +
+                '<span>「它」指向 🎁 獎品 的注意力權重</span>' +
+                '<span id="att-val-prize" style="color:#7c3aed;">88%</span>' +
+              '</div>' +
+              '<div class="att-progress"><div class="att-fill" id="att-bar-prize" style="width:88%;background:#7c3aed;"></div></div>' +
+              '<p style="font-size:12px;color:var(--muted);margin:6px 0 0;" id="att-desc-prize">體積過大無法放入，邏輯主語為「獎品」。</p>' +
+            '</div>' +
+            '<div class="att-bar-card">' +
+              '<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;">' +
+                '<span>「它」指向 📦 箱子 的注意力權重</span>' +
+                '<span id="att-val-box" style="color:#0284c7;">12%</span>' +
+              '</div>' +
+              '<div class="att-progress"><div class="att-fill" id="att-bar-box" style="width:12%;background:#0284c7;"></div></div>' +
+              '<p style="font-size:12px;color:var(--muted);margin:6px 0 0;" id="att-desc-box">非限制主因。</p>' +
+            '</div>' +
           '</div>' +
-          '<ul style="margin: 0 0 16px; padding-left: 20px; font-size: 13px; color: var(--ink); line-height: 1.6;">' +
-            item.takeaways.map(function (t) { return '<li>' + t + '</li>'; }).join('') +
-          '</ul>' +
-          '<div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--rule); padding-top: 12px;">' +
-            '<span style="font-size: 12px; color: var(--muted);">🧪 本單元互動實驗架構籌備中</span>' +
-            '<button type="button" id="close-s2-modal-btn" class="action-button" style="min-height: 34px; padding: 6px 16px;">關閉</button>' +
+          '<div class="takeaway-box" style="margin-top:16px;">' +
+            '<div class="takeaway-title">💡 Attention 機制觀察重點</div>' +
+            '<div class="takeaway-body">大模型並非在內部死記字典，而是根據句子中每個字詞間的動態關聯權重（Attention Matrix）。當末尾形容詞從「太大了」切換為「太小了」，神經網路瞬間將「它」的歸屬從獎品逆轉為箱子！</div>' +
           '</div>' +
-        '</div>' +
-      '</div>';
-
-    const close = function () { container.innerHTML = ''; };
-    const closeBtn = document.getElementById('close-s2-modal');
-    const closeBtn2 = document.getElementById('close-s2-modal-btn');
-    const backdrop = document.getElementById('s2-modal-backdrop');
-    if (closeBtn) closeBtn.addEventListener('click', close);
-    if (closeBtn2) closeBtn2.addEventListener('click', close);
-    if (backdrop) backdrop.addEventListener('click', function (e) {
-      if (e.target === backdrop) close();
-    });
+        '</div>'
+      );
+    }
+    if (d.id === 's2_rag') {
+      return (
+        '<div class="s2-exp-box" id="s2-rag-exp">' +
+          '<div class="lab-preset-bar">' +
+            '<span class="lab-preset-label">選擇使用者提問（模擬發送查詢給向量資料庫）：</span>' +
+            '<div class="lab-preset-chips">' +
+              '<button type="button" class="preset-button action-button active" data-s2-rag="refund"><strong>問題 1</strong> 購買後的退貨猶豫期是幾天？</button>' +
+              '<button type="button" class="preset-button action-button" data-s2-rag="shipping"><strong>問題 2</strong> 跨國運費與海外關稅由誰負擔？</button>' +
+              '<button type="button" class="preset-button action-button" data-s2-rag="cod"><strong>問題 3</strong> 是否可以使用超商貨到付款？</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="rag-corpus">' +
+            '<div class="rag-doc hit" id="rag-doc-refund">' +
+              '<div class="rag-meta"><span>📄 知識庫文件 A：《售後服務與退換貨規範》</span><span class="rag-dist" id="sim-refund">語意相似度：0.94（最匹配）</span></div>' +
+              '<div style="font-size:13.5px;color:var(--ink);line-height:1.5;">消費者依消保法享有商品到貨 <strong>7 天猶豫期</strong>。退回商品須為全新未拆封狀態，並於簽收日起 7 日內提出線上申請，由本公司派宅配免費取回。</div>' +
+            '</div>' +
+            '<div class="rag-doc" id="rag-doc-shipping">' +
+              '<div class="rag-meta"><span>📄 知識庫文件 B：《物流運費與進口稅率規章》</span><span class="rag-dist" id="sim-shipping">語意相似度：0.21</span></div>' +
+              '<div style="font-size:13.5px;color:var(--ink);line-height:1.5;">台灣本島消費滿 999 免運費；跨國寄送採 DHL/FedEx 遞送，<strong>海外關稅及進口營業稅依各國規範，全數由收件方負擔</strong>。</div>' +
+            '</div>' +
+            '<div class="rag-doc" id="rag-doc-cod">' +
+              '<div class="rag-meta"><span>📄 知識庫文件 C：《金流結帳與付款機制說明》</span><span class="rag-dist" id="sim-cod">語意相似度：0.18</span></div>' +
+              '<div style="font-size:13.5px;color:var(--ink);line-height:1.5;">目前平台支援 Visa/Master 信用卡、Apple Pay 與 LINE Pay 線上支付。<strong>為保障高價值包裹配送安全，暫不支援任何超商取貨付款</strong>。</div>' +
+            '</div>' +
+          '</div>' +
+          '<div style="background:#faf8f5;border:1px solid var(--rule);border-radius:6px;padding:12px 14px;margin-top:14px;">' +
+            '<strong style="font-size:13px;color:#d97706;">💉 注入給模型的檢索 Prompt（開書考小抄）：</strong>' +
+            '<pre id="rag-prompt-preview" style="background:#20231f;color:#e8eadf;padding:10px;border-radius:4px;font-size:12px;margin:8px 0 0;white-space:pre-wrap;">【參考資料】\n消費者依消保法享有商品到貨 7 天猶豫期。退回商品須為全新未拆封狀態。\n\n【使用者問題】\n購買後的退貨猶豫期是幾天？\n\n【模型回答】\n根據《售後服務與退換貨規範》，購買後的退貨猶豫期為 7 天，請保持全新未拆封並於 7 日內線上申請。</pre>' +
+          '</div>' +
+        '</div>'
+      );
+    }
+    if (d.id === 's2_context') {
+      return (
+        '<div class="s2-exp-box" id="s2-context-exp">' +
+          '<div class="lab-preset-bar">' +
+            '<span class="lab-preset-label">選擇關鍵資訊（Needle）在長文本中的位置：</span>' +
+            '<div class="needle-controls">' +
+              '<button type="button" class="preset-button action-button" data-s2-pos="head"><strong>位置 1</strong> 放在最開頭（前 5%）</button>' +
+              '<button type="button" class="preset-button action-button active" data-s2-pos="middle"><strong>位置 2</strong> 迷失在中間（30%~70%）</button>' +
+              '<button type="button" class="preset-button action-button" data-s2-pos="tail"><strong>位置 3</strong> 放在最結尾（後 95%）</button>' +
+            '</div>' +
+          '</div>' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;margin:12px 0 6px;">' +
+            '<strong style="font-size:13.5px;">實測檢索準確率（U 型曲線）：</strong>' +
+            '<button type="button" class="action-button" id="toggle-opt-btn" style="font-size:12px;padding:4px 10px;">切換：未經優化</button>' +
+          '</div>' +
+          '<div class="u-chart">' +
+            '<div class="u-bar" id="ubar-head"><div class="u-bar-fill" style="height:98%;"></div>開頭 (98%)</div>' +
+            '<div class="u-bar lost" id="ubar-mid"><div class="u-bar-fill" style="height:42%;"></div>中間 (42% · 迷失)</div>' +
+            '<div class="u-bar" id="ubar-tail"><div class="u-bar-fill" style="height:96%;"></div>結尾 (96%)</div>' +
+          '</div>' +
+          '<div class="takeaway-box">' +
+            '<div class="takeaway-title">💡 實戰應對技巧（Context Engineering）</div>' +
+            '<div class="takeaway-body" id="context-advice">未經優化的超長文字中，落在 30%~70% 區間的指示最容易被忽略。<strong>解決對策：</strong>將最關鍵的要求與規則固定置於開頭 System 指引或最末尾，長篇參考文件先經過摘要提煉再注入。</div>' +
+          '</div>' +
+        '</div>'
+      );
+    }
+    if (d.id === 's2_token_cost') {
+      return (
+        '<div class="s2-exp-box" id="s2-cost-exp">' +
+          '<div class="snowball-grid">' +
+            '<div class="snowball-rounds">' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
+                '<strong style="font-size:13.5px;">多輪對話歷史滾雪球模擬：</strong>' +
+                '<div style="display:flex;gap:6px;">' +
+                  '<button type="button" class="button-primary" id="btn-next-round" style="padding:4px 10px;font-size:12px;">➕ 進行下一輪對話</button>' +
+                  '<button type="button" class="action-button" id="btn-reset-round" style="padding:4px 10px;font-size:12px;">🔄 重設新對話</button>' +
+                '</div>' +
+              '</div>' +
+              '<div id="rounds-container" style="display:flex;flex-direction:column;gap:8px;"></div>' +
+            '</div>' +
+            '<div class="snowball-bill">' +
+              '<div style="font-size:13px;color:var(--muted);font-weight:700;">累計對話輪數</div>' +
+              '<div class="bill-amount" id="bill-rounds">3 輪</div>' +
+              '<div style="font-size:13px;color:var(--muted);margin-top:12px;">累計消耗 Tokens</div>' +
+              '<div style="font-size:24px;font-weight:700;color:var(--ink);" id="bill-tokens">750 Tokens</div>' +
+              '<div style="font-size:13px;color:var(--muted);margin-top:12px;">試算費用（每 1M tokens $2.5）</div>' +
+              '<div style="font-size:20px;font-weight:700;color:#0284c7;" id="bill-cost">$0.00188</div>' +
+              '<div style="font-size:11.5px;color:#16a34a;margin-top:10px;padding:6px;background:#f0fdf4;border-radius:4px;" id="bill-saving">💡 聊完一個主題開新局，每輪可省下 60% 重複歷史消耗！</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>'
+      );
+    }
+    if (d.id === 's2_tool_calling') {
+      return (
+        '<div class="s2-exp-box" id="s2-tools-exp">' +
+          '<div class="lab-preset-bar">' +
+            '<span class="lab-preset-label">選擇任務測試 Tool Calling 三步閉環：</span>' +
+            '<div class="lab-preset-chips">' +
+              '<button type="button" class="preset-button action-button active" data-s2-tool="weather"><strong>任務 1</strong> 查詢台北即時氣溫</button>' +
+              '<button type="button" class="preset-button action-button" data-s2-tool="calc"><strong>任務 2</strong> 精確計算年化報酬率</button>' +
+              '<button type="button" class="preset-button action-button" data-s2-tool="delete"><strong>任務 3</strong> 刪除會員過期紀錄（安全阻斷）</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="tool-steps-container">' +
+            '<div class="tool-step-card active" id="tool-step-1">' +
+              '<strong style="color:#7c3aed;font-size:13px;">① AI 決策與參數提取（動腦，輸出 JSON Schema）：</strong>' +
+              '<div class="code-box" id="tool-code-ai">{\n  "tool": "get_weather",\n  "parameters": { "city": "Taipei", "unit": "celsius" }\n}</div>' +
+            '</div>' +
+            '<div class="tool-step-card" id="tool-step-2">' +
+              '<strong style="color:#0284c7;font-size:13px;">② 外部程式/API 精確執行（動手算數與調用）：</strong>' +
+              '<div class="code-box" id="tool-code-exec">// 外部 Weather API 回傳原始數據：\n{\n  "temp": 24.5,\n  "humidity": "68%",\n  "condition": "多雲時晴"\n}</div>' +
+            '</div>' +
+            '<div class="tool-step-card" id="tool-step-3">' +
+              '<strong style="color:#16a34a;font-size:13px;">③ 模型結合結果組織繁中回覆：</strong>' +
+              '<div style="font-size:13.5px;padding:8px 12px;background:#f0fdf4;border-radius:4px;margin-top:6px;color:#14532d;" id="tool-text-resp">目前台北市氣溫約為 24.5°C，濕度 68%，天氣為多雲時晴，外出建議攜帶薄外套。</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>'
+      );
+    }
+    if (d.id === 's2_adaptation') {
+      return (
+        '<div class="s2-exp-box" id="s2-adapt-exp">' +
+          '<div class="path-selector">' +
+            '<button type="button" class="path-btn selected" data-s2-adapt="rag">' +
+              '<strong style="display:block;font-size:14px;color:#0284c7;margin-bottom:4px;">1. RAG 檢索增強（開書考）</strong>' +
+              '<span style="font-size:12px;color:var(--muted);">適合：企業規章、即時價格、每週動態文件。完全不改模型參數。</span>' +
+            '</button>' +
+            '<button type="button" class="path-btn" data-s2-adapt="lora">' +
+              '<strong style="display:block;font-size:14px;color:#7c3aed;margin-bottom:4px;">2. LoRA 輕量外掛（低成本外掛）</strong>' +
+              '<span style="font-size:12px;color:var(--muted);">適合：固定角色口吻、品牌寫作規範、垂直行業專業格式。</span>' +
+            '</button>' +
+            '<button type="button" class="path-btn" data-s2-adapt="finetune">' +
+              '<strong style="display:block;font-size:14px;color:#d97706;margin-bottom:4px;">3. Fine-tuning 全量微調（深層換腦）</strong>' +
+              '<span style="font-size:12px;color:var(--muted);">適合：全新領域語言、私有特化架構、百萬級樣本訓練。</span>' +
+            '</button>' +
+          '</div>' +
+          '<div class="adapt-matrix">' +
+            '<div class="matrix-card highlight" id="mat-rag">' +
+              '<h4 style="margin:0 0 8px;font-size:14px;color:#0284c7;">📖 RAG 檢索增強</h4>' +
+              '<ul style="margin:0;padding-left:18px;font-size:12.5px;color:var(--ink);line-height:1.6;">' +
+                '<li><strong>更新成本：</strong>極低（僅抽換資料庫向量）</li>' +
+                '<li><strong>即時性：</strong>即時生效（當秒生效）</li>' +
+                '<li><strong>幻覺率：</strong>最低（必須附帶原文依據）</li>' +
+                '<li><strong>推薦情境：</strong>客服問答、法規指南、產品規格</li>' +
+              '</ul>' +
+            '</div>' +
+            '<div class="matrix-card" id="mat-lora">' +
+              '<h4 style="margin:0 0 8px;font-size:14px;color:#7c3aed;">🧩 LoRA 輕量微調</h4>' +
+              '<ul style="margin:0;padding-left:18px;font-size:12.5px;color:var(--ink);line-height:1.6;">' +
+                '<li><strong>更新成本：</strong>中低（只訓練 1% 轉接層）</li>' +
+                '<li><strong>即時性：</strong>需重新訓練權重檔（數小時）</li>' +
+                '<li><strong>幻覺率：</strong>中等（需配合提示詞約束）</li>' +
+                '<li><strong>推薦情境：</strong>風格仿寫、特定輸出 JSON 規範</li>' +
+              '</ul>' +
+            '</div>' +
+            '<div class="matrix-card" id="mat-finetune">' +
+              '<h4 style="margin:0 0 8px;font-size:14px;color:#d97706;">🧠 Full Fine-tuning 全量</h4>' +
+              '<ul style="margin:0;padding-left:18px;font-size:12.5px;color:var(--ink);line-height:1.6;">' +
+                '<li><strong>更新成本：</strong>極高（需龐大算力集群）</li>' +
+                '<li><strong>即時性：</strong>極低（天到週為單位）</li>' +
+                '<li><strong>幻覺率：</strong>取決於訓練集乾淨程度</li>' +
+                '<li><strong>推薦情境：</strong>基礎模型自研、國家級語言模型</li>' +
+              '</ul>' +
+            '</div>' +
+          '</div>' +
+        '</div>'
+      );
+    }
+    return '';
   }
+
+  function wireS2Events(d) {
+    if (d.id === 's2_attention') {
+      root.querySelectorAll('[data-s2-att]').forEach(btn => {
+        btn.addEventListener('click', function () {
+          root.querySelectorAll('[data-s2-att]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const isBig = btn.dataset.s2Att === 'big';
+          const adjWord = root.querySelector('#att-adj-word');
+          if (adjWord) adjWord.textContent = isBig ? '太大了' : '太小了';
+          const pVal = root.querySelector('#att-val-prize');
+          const pBar = root.querySelector('#att-bar-prize');
+          const pDesc = root.querySelector('#att-desc-prize');
+          const bVal = root.querySelector('#att-val-box');
+          const bBar = root.querySelector('#att-bar-box');
+          const bDesc = root.querySelector('#att-desc-box');
+          if (isBig) {
+            if (pVal) pVal.textContent = '88%';
+            if (pBar) pBar.style.width = '88%';
+            if (pDesc) pDesc.textContent = '體積過大無法放入，邏輯主語為「獎品」。';
+            if (bVal) bVal.textContent = '12%';
+            if (bBar) bBar.style.width = '12%';
+            if (bDesc) bDesc.textContent = '非限制主因。';
+          } else {
+            if (pVal) pVal.textContent = '12%';
+            if (pBar) pBar.style.width = '12%';
+            if (pDesc) pDesc.textContent = '非限制主因。';
+            if (bVal) bVal.textContent = '88%';
+            if (bBar) bBar.style.width = '88%';
+            if (bDesc) bDesc.textContent = '容量太小裝不下，邏輯主語逆轉為「箱子」。';
+          }
+        });
+      });
+    }
+    if (d.id === 's2_rag') {
+      const qMap = {
+        refund: {
+          hitId: 'rag-doc-refund',
+          sims: { refund: '0.94（最匹配）', shipping: '0.21', cod: '0.18' },
+          prompt: '【參考資料】\n消費者依消保法享有商品到貨 7 天猶豫期。退回商品須為全新未拆封狀態。\n\n【使用者問題】\n購買後的退貨猶豫期是幾天？\n\n【模型回答】\n根據《售後服務與退換貨規範》，購買後的退貨猶豫期為 7 天，請保持全新未拆封並於 7 日內線上申請。'
+        },
+        shipping: {
+          hitId: 'rag-doc-shipping',
+          sims: { refund: '0.19', shipping: '0.96（最匹配）', cod: '0.25' },
+          prompt: '【參考資料】\n跨國寄送採 DHL/FedEx 遞送，海外關稅及進口營業稅依各國規範，全數由收件方負擔。\n\n【使用者問題】\n跨國運費與海外關稅由誰負擔？\n\n【模型回答】\n依據《物流運費與進口稅率規章》，跨國寄送產生的海外關稅及進口稅，均由收件方全額負擔。'
+        },
+        cod: {
+          hitId: 'rag-doc-cod',
+          sims: { refund: '0.22', shipping: '0.30', cod: '0.91（最匹配）' },
+          prompt: '【參考資料】\n為保障高價值包裹配送安全，暫不支援任何超商取貨付款。\n\n【使用者問題】\n是否可以使用超商貨到付款？\n\n【模型回答】\n目前平台暫不支援超商取貨付款，建議使用信用卡或 Apple Pay / LINE Pay 完成線上結帳。'
+        }
+      };
+      root.querySelectorAll('[data-s2-rag]').forEach(btn => {
+        btn.addEventListener('click', function () {
+          root.querySelectorAll('[data-s2-rag]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const data = qMap[btn.dataset.s2Rag];
+          if (!data) return;
+          root.querySelectorAll('.rag-doc').forEach(d => d.classList.remove('hit'));
+          const hitDoc = root.querySelector('#' + data.hitId);
+          if (hitDoc) hitDoc.classList.add('hit');
+          const sRefund = root.querySelector('#sim-refund');
+          const sShipping = root.querySelector('#sim-shipping');
+          const sCod = root.querySelector('#sim-cod');
+          if (sRefund) sRefund.textContent = '語意相似度：' + data.sims.refund;
+          if (sShipping) sShipping.textContent = '語意相似度：' + data.sims.shipping;
+          if (sCod) sCod.textContent = '語意相似度：' + data.sims.cod;
+          const pPreview = root.querySelector('#rag-prompt-preview');
+          if (pPreview) pPreview.textContent = data.prompt;
+        });
+      });
+    }
+    if (d.id === 's2_context') {
+      let optimized = false;
+      function updateU() {
+        const hBar = root.querySelector('#ubar-head .u-bar-fill');
+        const mBar = root.querySelector('#ubar-mid .u-bar-fill');
+        const tBar = root.querySelector('#ubar-tail .u-bar-fill');
+        const mEl = root.querySelector('#ubar-mid');
+        const advice = root.querySelector('#context-advice');
+        if (optimized) {
+          if (hBar) hBar.style.height = '98%';
+          if (mBar) mBar.style.height = '94%';
+          if (tBar) tBar.style.height = '96%';
+          if (mEl) {
+            mEl.classList.remove('lost');
+            mEl.innerHTML = '<div class="u-bar-fill" style="height:94%;background:#16a34a;"></div>中間 (94% · 優化修復)';
+          }
+          if (advice) advice.innerHTML = '✅ <strong>已啟用 Context Engineering：</strong>透過「關鍵資訊雙重錨定」與「長文摘要預處理」，中間段檢索召回率從 42% 提升至 94%！';
+        } else {
+          if (hBar) hBar.style.height = '98%';
+          if (mBar) mBar.style.height = '42%';
+          if (tBar) tBar.style.height = '96%';
+          if (mEl) {
+            mEl.classList.add('lost');
+            mEl.innerHTML = '<div class="u-bar-fill" style="height:42%;"></div>中間 (42% · 迷失)';
+          }
+          if (advice) advice.innerHTML = '未經優化的超長文字中，落在 30%~70% 區間的指示最容易被忽略。<strong>解決對策：</strong>將最關鍵的要求與規則固定置於開頭 System 指引或最末尾，長篇參考文件先經過摘要提煉再注入。';
+        }
+      }
+      const optBtn = root.querySelector('#toggle-opt-btn');
+      if (optBtn) {
+        optBtn.addEventListener('click', function () {
+          optimized = !optimized;
+          optBtn.textContent = optimized ? '切換：已啟用 Context Engineering' : '切換：未經優化';
+          optBtn.classList.toggle('button-primary', optimized);
+          updateU();
+        });
+      }
+      root.querySelectorAll('[data-s2-pos]').forEach(btn => {
+        btn.addEventListener('click', function () {
+          root.querySelectorAll('[data-s2-pos]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+    }
+    if (d.id === 's2_token_cost') {
+      let roundCount = 3;
+      function renderRounds() {
+        const container = root.querySelector('#rounds-container');
+        if (!container) return;
+        let html = '';
+        let totalTokens = 0;
+        for (let i = 1; i <= roundCount; i++) {
+          const inTokens = 100 + (i - 1) * 150;
+          const outTokens = 50;
+          totalTokens += (inTokens + outTokens);
+          html += '<div class="round-row">' +
+            '<span style="width:50px;font-weight:700;">第 ' + i + ' 輪</span>' +
+            '<div class="round-bar-track">' +
+              '<div class="bar-input" style="width:' + Math.min(100, (inTokens / 12)) + '%;" title="輸入小抄 ' + inTokens + ' tokens"></div>' +
+              '<div class="bar-output" style="width:12%;" title="回答 ' + outTokens + ' tokens"></div>' +
+            '</div>' +
+            '<span style="width:110px;text-align:right;font-size:12px;color:var(--muted);">' + (inTokens + outTokens) + ' Tokens</span>' +
+          '</div>';
+        }
+        container.innerHTML = html;
+        const bR = root.querySelector('#bill-rounds');
+        const bT = root.querySelector('#bill-tokens');
+        const bC = root.querySelector('#bill-cost');
+        if (bR) bR.textContent = roundCount + ' 輪';
+        if (bT) bT.textContent = totalTokens + ' Tokens';
+        if (bC) bC.textContent = '$' + (totalTokens * 0.0000025).toFixed(5);
+      }
+      renderRounds();
+      const nBtn = root.querySelector('#btn-next-round');
+      const rBtn = root.querySelector('#btn-reset-round');
+      if (nBtn) nBtn.addEventListener('click', function () { if (roundCount < 8) { roundCount++; renderRounds(); } });
+      if (rBtn) rBtn.addEventListener('click', function () { roundCount = 1; renderRounds(); });
+    }
+    if (d.id === 's2_tool_calling') {
+      const toolMap = {
+        weather: {
+          step1: '{\n  "tool": "get_weather",\n  "parameters": { "city": "Taipei", "unit": "celsius" }\n}',
+          step2: '// 外部 Weather API 回傳原始數據：\n{\n  "temp": 24.5,\n  "humidity": "68%",\n  "condition": "多雲時晴"\n}',
+          step3: '目前台北市氣溫約為 24.5°C，濕度 68%，天氣為多雲時晴，外出建議攜帶薄外套。'
+        },
+        calc: {
+          step1: '{\n  "tool": "calculate_irr",\n  "parameters": { "initial_investment": -1000000, "cash_flows": [250000, 350000, 500000] }\n}',
+          step2: '// Python 財務庫 numpy-financial 運算完成：\n{\n  "irr": 0.0468,\n  "npv_at_3pct": 28450\n}',
+          step3: '經過精確折現計算，該專案的內部報酬率（IRR）為 4.68%，淨現值為正值，符合投資預期。'
+        },
+        delete: {
+          step1: '{\n  "tool": "delete_customer_records",\n  "parameters": { "filter": "status == \'inactive\'", "days": 365 },\n  "requires_approval": true\n}',
+          step2: '⚠️【安全防線觸發】：偵測到資料庫刪除權限調用！\n[Human-in-the-Loop] 已阻斷自動執行，等待管理員點擊簽核授權。',
+          step3: '系統已為您建立「刪除逾期會員檔案」變更申請單 #REQ-9042。在您進行人工確認授權前，AI 不會直接修改資料庫。'
+        }
+      };
+      root.querySelectorAll('[data-s2-tool]').forEach(btn => {
+        btn.addEventListener('click', function () {
+          root.querySelectorAll('[data-s2-tool]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const data = toolMap[btn.dataset.s2Tool];
+          if (!data) return;
+          const s1 = root.querySelector('#tool-code-ai');
+          const s2 = root.querySelector('#tool-code-exec');
+          const s3 = root.querySelector('#tool-text-resp');
+          if (s1) s1.textContent = data.step1;
+          if (s2) s2.textContent = data.step2;
+          if (s3) s3.textContent = data.step3;
+        });
+      });
+    }
+    if (d.id === 's2_adaptation') {
+      root.querySelectorAll('[data-s2-adapt]').forEach(btn => {
+        btn.addEventListener('click', function () {
+          root.querySelectorAll('[data-s2-adapt]').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          const target = btn.dataset.s2Adapt;
+          root.querySelectorAll('.matrix-card').forEach(c => c.classList.remove('highlight'));
+          const card = root.querySelector('#mat-' + target);
+          if (card) card.classList.add('highlight');
+        });
+      });
+    }
   }
 
   function render() {
-    if (isIndex) { renderIndex(); return; }
+    if (isIndex) {
+      renderIndex();
+      return;
+    }
     const sidebar = document.getElementById('lab-sidebar');
     if (sidebar) sidebar.hidden = false;
     const mobileMenu = document.getElementById('lab-mobile-menu');
@@ -475,10 +825,12 @@
                 '<strong>一句話記起來：</strong>' + esc(videoData.goldenQuote) +
               '</div>' +
             '</div>' +
-            '<a href="#step-model" class="lab-jump-btn">👇 往下進入 Step 3 · 動手做實驗 (Playground 實測) →</a>' +
+            '<a href="#step-experiment" class="lab-jump-btn">👇 往下進入 Step 3 · 動手做實驗 (Playground 實測) →</a>' +
           '</div>' +
         '</section>';
     }
+
+    const isS2 = d.id.startsWith('s2_');
 
     root.innerHTML =
       '<!-- Playground 頂部 Header -->' +
@@ -487,95 +839,102 @@
         '<h1>' + esc(d.title) + '</h1>' +
         '<div class="lab-header-concept">' +
           '<p class="lab-concept-lead">' + esc(expData.subtitle || d.goal) + '</p>' +
-          '<a href="' + esc(d.link) + '" class="lab-concept-link">📖 ' + esc(d.linkText) + ' ↗</a>' +
+          (d.link ? '<a href="' + esc(d.link) + '" class="lab-concept-link">📖 ' + esc(d.linkText) + ' ↗</a>' : '') +
         '</div>' +
       '</header>' +
       videoMarkup +
 
-      '<!-- 輕量化頂部工具列 (Top Toolbar) -->' +
-      '<div class="lab-toolbar" id="step-model">' +
-        '<span class="sr-only">Step 2 · 運算模式與模型選擇</span>' +
-        '<div class="lab-toolbar-main">' +
-          '<div class="lab-toolbar-item">' +
-            '<label class="lab-toolbar-label" for="provider">運算模式</label>' +
-            '<select id="provider" class="select-clean lab-select-provider">' +
-              '<option value="simulation">✨ 教學模擬（免 Key · 內建典型範例與解析）</option>' +
-              '<option value="openrouter">🪐 OpenRouter（多模型生態 · 7 款已驗證模型）</option>' +
-              '<option value="gemini">⚡ Google Gemini API（官方原生直連）</option>' +
-            '</select>' +
-          '</div>' +
-          '<div id="api-settings" class="lab-toolbar-api" hidden>' +
-            '<div class="lab-toolbar-item" id="model-select-wrapper">' +
-              '<label class="lab-toolbar-label" for="api-model">模型選擇</label>' +
-              '<select id="api-model" class="select-clean lab-select-model">' +
-                '<option value="openai/gpt-3.5-turbo-16k">openai/gpt-3.5-turbo-16k (GPT-3.5 Turbo)</option>' +
-                '<option value="anthropic/claude-haiku-4.5">anthropic/claude-haiku-4.5 (Claude Haiku 4.5)</option>' +
-                '<option value="google/gemini-2.5-flash">google/gemini-2.5-flash (Gemini 2.5 Flash)</option>' +
-                '<option value="nvidia/nemotron-3.5-super-vl:free">nvidia/nemotron-3.5-super-vl:free (NVIDIA Free)</option>' +
-                '<option value="qwen/qwen3.8-omni-flash">qwen/qwen3.8-omni-flash (通義千問 3.8)</option>' +
-                '<option value="mistralai/mistral-large-4-0">mistralai/mistral-large-4-0 (Mistral Large 4.0)</option>' +
-                '<option value="google/gemma-4-26b-a4b-it">google/gemma-4-26b-a4b-it (Google Gemma 4)</option>' +
+      (!isS2 ?
+        '<!-- 輕量化頂部工具列 (Top Toolbar) -->' +
+        '<div class="lab-toolbar" id="step-model">' +
+          '<span class="sr-only">Step 2 · 運算模式與模型選擇</span>' +
+          '<div class="lab-toolbar-main">' +
+            '<div class="lab-toolbar-item">' +
+              '<label class="lab-toolbar-label" for="provider">運算模式</label>' +
+              '<select id="provider" class="select-clean lab-select-provider">' +
+                '<option value="simulation">✨ 教學模擬（免 Key · 內建典型範例與解析）</option>' +
+                '<option value="openrouter">🪐 OpenRouter（多模型生態 · 7 款已驗證模型）</option>' +
+                '<option value="gemini">⚡ Google Gemini API（官方原生直連）</option>' +
               '</select>' +
-              '<p class="quiet" id="gemini-model-note" hidden>Google Gemini 模型：<code>gemini-3.6-flash</code></p>' +
             '</div>' +
-            '<div class="lab-toolbar-item lab-key-item">' +
-              '<label class="lab-toolbar-label" for="api-key">API 金鑰</label>' +
-              '<div class="api-key-row">' +
-                '<input id="api-key" type="password" placeholder="貼上 API Key..." autocomplete="off">' +
-                '<button type="button" class="action-button lab-save-btn" data-action="save-key">儲存設定</button>' +
+            '<div id="api-settings" class="lab-toolbar-api" hidden>' +
+              '<div class="lab-toolbar-item" id="model-select-wrapper">' +
+                '<label class="lab-toolbar-label" for="api-model">模型選擇</label>' +
+                '<select id="api-model" class="select-clean lab-select-model">' +
+                  '<option value="openai/gpt-3.5-turbo-16k">openai/gpt-3.5-turbo-16k (GPT-3.5 Turbo)</option>' +
+                  '<option value="anthropic/claude-haiku-4.5">anthropic/claude-haiku-4.5 (Claude Haiku 4.5)</option>' +
+                  '<option value="google/gemini-2.5-flash">google/gemini-2.5-flash (Gemini 2.5 Flash)</option>' +
+                  '<option value="nvidia/nemotron-3.5-super-vl:free">nvidia/nemotron-3.5-super-vl:free (NVIDIA Free)</option>' +
+                  '<option value="qwen/qwen3.8-omni-flash">qwen/qwen3.8-omni-flash (通義千問 3.8)</option>' +
+                  '<option value="mistralai/mistral-large-4-0">mistralai/mistral-large-4-0 (Mistral Large 4.0)</option>' +
+                  '<option value="google/gemma-4-26b-a4b-it">google/gemma-4-26b-a4b-it (Google Gemma 4)</option>' +
+                '</select>' +
+                '<p class="quiet" id="gemini-model-note" hidden>Google Gemini 模型：<code>gemini-3.6-flash</code></p>' +
               '</div>' +
-              '<span class="quiet" id="key-status"></span>' +
+              '<div class="lab-toolbar-item lab-key-item">' +
+                '<label class="lab-toolbar-label" for="api-key">API 金鑰</label>' +
+                '<div class="api-key-row">' +
+                  '<input id="api-key" type="password" placeholder="貼上 API Key..." autocomplete="off">' +
+                  '<button type="button" class="action-button lab-save-btn" data-action="save-key">儲存設定</button>' +
+                '</div>' +
+                '<span class="quiet" id="key-status"></span>' +
+              '</div>' +
             '</div>' +
           '</div>' +
-        '</div>' +
-      '</div>' +
+        '</div>' : '') +
 
       '<!-- 核心操作區 (Playground Workspace) -->' +
       '<section class="lab-playground" id="step-experiment">' +
         '<span class="sr-only">Step 3 · 動手實驗</span>' +
         '<div id="advanced">' +
-          (presetButtons ?
-            '<div class="lab-preset-bar">' +
-              '<span class="lab-preset-label">精選測試題目（點擊直接帶入 Prompt）：</span>' +
-              '<div class="lab-preset-chips">' + presetButtons + '</div>' +
-            '</div>' : '') +
-          systemBox +
-          tokenLiveBar +
-          '<div class="lab-prompt-section">' +
-            '<label class="lab-prompt-label" for="free-prompt">測試提示詞 (Prompt)</label>' +
-            '<textarea id="free-prompt" placeholder="請點選上方範例或自行輸入提示詞...">' + esc(s.prompt) + '</textarea>' +
-          '</div>' +
-          '<div class="lab-action-row">' +
-            '<button type="button" class="button-primary lab-send-btn" data-action="send">🚀 執行實驗 →</button>' +
-            '<button type="button" class="action-button" data-action="reset">重設</button>' +
-          '</div>' +
-          '<div class="lab-response-section">' +
-            '<label class="lab-response-label" for="free-response">實驗結果回覆</label>' +
-            '<div class="message-box" id="free-response" role="status" aria-live="polite">' + esc(s.response || '點擊上方範例或輸入提示詞後，按下「🚀 執行實驗」查看回覆。') + '</div>' +
-          '</div>' +
-          '<div class="takeaway-box">' +
-            '<div class="takeaway-title">💡 實驗觀察重點</div>' +
-            '<div class="takeaway-body">' + takeawayClean + '</div>' +
-          '</div>' +
+          (isS2 ?
+            renderS2Playground(d) :
+            (presetButtons ?
+              '<div class="lab-preset-bar">' +
+                '<span class="lab-preset-label">精選測試題目（點擊直接帶入 Prompt）：</span>' +
+                '<div class="lab-preset-chips">' + presetButtons + '</div>' +
+              '</div>' : '') +
+            systemBox +
+            tokenLiveBar +
+            '<div class="lab-prompt-section">' +
+              '<label class="lab-prompt-label" for="free-prompt">測試提示詞 (Prompt)</label>' +
+              '<textarea id="free-prompt" placeholder="請點選上方範例或自行輸入提示詞...">' + esc(s.prompt) + '</textarea>' +
+            '</div>' +
+            '<div class="lab-action-row">' +
+              '<button type="button" class="button-primary lab-send-btn" data-action="send">🚀 執行實驗 →</button>' +
+              '<button type="button" class="action-button" data-action="reset">重設</button>' +
+            '</div>' +
+            '<div class="lab-response-section">' +
+              '<label class="lab-response-label" for="free-response">實驗結果回覆</label>' +
+              '<div class="message-box" id="free-response" role="status" aria-live="polite">' + esc(s.response || '點擊上方範例或輸入提示詞後，按下「🚀 執行實驗」查看回覆。') + '</div>' +
+            '</div>' +
+            '<div class="takeaway-box">' +
+              '<div class="takeaway-title">💡 實驗觀察重點</div>' +
+              '<div class="takeaway-body">' + takeawayClean + '</div>' +
+            '</div>'
+          ) +
         '</div>' +
       '</section>' +
 
       '<nav class="lab-next" aria-label="實驗下一步">' +
-        (sourceLesson ? '<a class="button-primary" href="learn.html?lesson=' + sourceLesson + '">返回第 ' + sourceLesson + ' 站，繼續學習 →</a>' : '<a class="button-primary" href="' + esc(d.link) + '">' + esc(d.linkText) + ' →</a>') +
-        '<a href="lab.html">← 查看全部實驗</a>' +
+        (sourceLesson ? '<a class="button-primary" href="learn.html?lesson=' + sourceLesson + '">返回第 ' + sourceLesson + ' 站，繼續學習 →</a>' : (d.link ? '<a class="button-primary" href="' + esc(d.link) + '">' + esc(d.linkText) + ' →</a>' : '')) +
+        '<a class="button-primary" href="lab.html" style="background:var(--paper);color:var(--ink);border:1px solid var(--rule);">← 返回全部實驗列表</a>' +
       '</nav>';
 
-    const field = root.querySelector('#provider'); if (field) field.value = provider;
-    const sel = root.querySelector('#api-model'); if (sel) { if (!validModels.includes(model)) model = validModels[0]; sel.value = model; }
-    const pInput = root.querySelector('#free-prompt'); if (pInput) pInput.value = s.prompt || '';
-    const sInput = root.querySelector('#system-prompt'); if (sInput && s.system !== undefined) sInput.value = s.system;
-    syncProvider();
-    if (d.id === 'tokens') updateTokens();
+    if (isS2) {
+      wireS2Events(d);
+    } else {
+      const field = root.querySelector('#provider'); if (field) field.value = provider;
+      const sel = root.querySelector('#api-model'); if (sel) { if (!validModels.includes(model)) model = validModels[0]; sel.value = model; }
+      const pInput = root.querySelector('#free-prompt'); if (pInput) pInput.value = s.prompt || '';
+      syncProvider();
+      if (d.id === 'tokens') updateTokens();
+    }
   }
 
   function syncProvider() {
     const settings = root.querySelector('#api-settings'),
-          select = root.querySelector('#api-model'),
+          select = root.querySelector('#model-select-wrapper select'),
           geminiModel = root.querySelector('#gemini-model-note'),
           modelLabel = root.querySelector('label[for="api-model"]'),
           status = root.querySelector('#key-status'),

@@ -56,11 +56,8 @@ VIDEO_FILES = {
     'videos/ai_blindspots/AI盲點07_Attention注意力.mp4',
     'videos/ai_blindspots/AI盲點08_Embedding與RAG.mp4',
     'videos/ai_blindspots/AI盲點09_Context塞太滿.mp4',
-    'videos/ai_blindspots/AI盲點10_Token與費用_1.mp4',
     'videos/ai_blindspots/AI盲點10_Token與費用.mp4',
-    'videos/ai_blindspots/AI盲點11_ToolCalling工具呼叫_1.mp4',
     'videos/ai_blindspots/AI盲點11_ToolCalling工具呼叫.mp4',
-    'videos/ai_blindspots/AI盲點12_微調RAG與LoRA_1.mp4',
     'videos/ai_blindspots/AI盲點12_微調RAG與LoRA.mp4'
 }
 VIDEO_POSTERS = {'assets/video-posters/'+name+'.jpg' for name in ('ep0','ep1','ep2','ep3','ep4','overview','funnel','ep7','ep8','ep9','ep10','ep11','ep12')}
