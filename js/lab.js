@@ -88,6 +88,65 @@
       goldenQuote: 'AI 的知識有保存期限，最新消息要靠查！'
     }
   };
+
+  // 第二季：核心機制與進階實戰（AI 盲點 #07～#12）影音與實驗入口
+  const BLINDSPOT_VIDEOS_S2 = [
+    {
+      ep: 'AI 盲點 #07',
+      title: 'Attention 注意力（「它」到底是指誰？）',
+      duration: '0:41',
+      src: 'videos/ai_blindspots/AI盲點07_Attention注意力.mp4',
+      poster: 'assets/video-posters/ep7.jpg',
+      goldenQuote: 'Attention 就是幫每個字在上下文中找到最重要的關聯！',
+      url: 'learn.html?lesson=07'
+    },
+    {
+      ep: 'AI 盲點 #08',
+      title: 'Embedding 與 RAG（AI 也能開書考？）',
+      duration: '0:42',
+      src: 'videos/ai_blindspots/AI盲點08_Embedding與RAG.mp4',
+      poster: 'assets/video-posters/ep8.jpg',
+      goldenQuote: 'RAG 就是先翻書、再回答；要知識，翻書最快！',
+      url: 'learn.html?lesson=08'
+    },
+    {
+      ep: 'AI 盲點 #09',
+      title: 'Context 塞太滿（迷失在中間 Lost in the Middle）',
+      duration: '0:43',
+      src: 'videos/ai_blindspots/AI盲點09_Context塞太滿.mp4',
+      poster: 'assets/video-posters/ep9.jpg',
+      goldenQuote: '給對的資料比給多重要；Context 越乾淨，答案越精準！',
+      url: 'learn.html?lesson=09'
+    },
+    {
+      ep: 'AI 盲點 #10',
+      title: 'Token 與費用（Input/Output 計價與歷史滾雪球）',
+      duration: '0:49',
+      src: 'videos/ai_blindspots/AI盲點10_Token與費用_1.mp4',
+      poster: 'assets/video-posters/ep10.jpg',
+      goldenQuote: 'Token 就是 AI 世界的錢；聊完開新局，省錢又聰明！',
+      url: 'learn.html?lesson=10'
+    },
+    {
+      ep: 'AI 盲點 #11',
+      title: 'Tool Calling 工具呼叫（AI 動腦、工具動手）',
+      duration: '0:50',
+      src: 'videos/ai_blindspots/AI盲點11_ToolCalling工具呼叫_1.mp4',
+      poster: 'assets/video-posters/ep11.jpg',
+      goldenQuote: 'AI 負責動腦出參數，外部工具負責動手精確算數！',
+      url: 'learn.html?lesson=11'
+    },
+    {
+      ep: 'AI 盲點 #12',
+      title: '微調 vs RAG vs LoRA（讓 AI 變專家的三條路）',
+      duration: '0:54',
+      src: 'videos/ai_blindspots/AI盲點12_微調RAG與LoRA_1.mp4',
+      poster: 'assets/video-posters/ep12.jpg',
+      goldenQuote: '要知識就翻書（RAG），要習慣就補習（LoRA / 微調）！',
+      url: 'learn.html?lesson=12'
+    }
+  ];
+
   const sanitizeApiKey = function (k) {
     if (!k) return '';
     k = String(k).replace(/[\u200B-\u200D\uFEFF\u2028\u2029]/g, '').trim();
@@ -157,18 +216,48 @@
           '<h2>🎬 60 秒看懂 AI 盲點 · 影音實戰實驗室</h2>' +
           '<p>三部曲學習心流：<strong>① 先看 60s 影片 ➔ ② 講解核心原理 ➔ ③ 動手做實驗</strong>。點選以下盲點直接進入實測：</p>' +
         '</div>' +
-        '<div class="blindspots-grid">' +
-          Object.keys(BLINDSPOT_VIDEOS).map(function (k) {
-            var v = BLINDSPOT_VIDEOS[k];
-            return '<a href="lab.html?experiment=' + k + '" class="blindspot-card">' +
-              '<div class="blindspot-card-top">' +
-                '<span class="blindspot-card-ep">' + esc(v.ep) + '</span>' +
-                '<span class="blindspot-card-duration">⏱️ ' + esc(v.duration) + '</span>' +
-              '</div>' +
-              '<div class="blindspot-card-title">' + esc(v.title) + '</div>' +
-              '<div class="blindspot-card-quote">💡 ' + esc(v.goldenQuote) + '</div>' +
-            '</a>';
-          }).join('') +
+        '<div class="season-block season-block-s1" style="margin-bottom: 24px;">' +
+          '<div class="season-block-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid var(--rule); padding-bottom: 8px;">' +
+            '<h3 style="margin: 0; font-size: 16px; color: var(--accent); display: flex; align-items: center; gap: 8px;">' +
+              '<span style="background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">第一季</span>' +
+              '基礎通識（AI 盲點 #01～#06）' +
+            '</h3>' +
+            '<span style="font-size: 13px; color: var(--olive);">入門通識 · 5 大盲點實測</span>' +
+          '</div>' +
+          '<div class="blindspots-grid">' +
+            Object.keys(BLINDSPOT_VIDEOS).map(function (k) {
+              var v = BLINDSPOT_VIDEOS[k];
+              return '<a href="lab.html?experiment=' + k + '" class="blindspot-card">' +
+                '<div class="blindspot-card-top">' +
+                  '<span class="blindspot-card-ep">' + esc(v.ep) + '</span>' +
+                  '<span class="blindspot-card-duration">⏱️ ' + esc(v.duration) + '</span>' +
+                '</div>' +
+                '<div class="blindspot-card-title">' + esc(v.title) + '</div>' +
+                '<div class="blindspot-card-quote">💡 ' + esc(v.goldenQuote) + '</div>' +
+              '</a>';
+            }).join('') +
+          '</div>' +
+        '</div>' +
+        '<div class="season-block season-block-s2" style="margin-top: 28px;">' +
+          '<div class="season-block-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid var(--rule); padding-bottom: 8px;">' +
+            '<h3 style="margin: 0; font-size: 16px; color: #4c2889; display: flex; align-items: center; gap: 8px;">' +
+              '<span style="background: #f4f0ff; color: #4c2889; border: 1px solid #b69cff; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">第二季</span>' +
+              '核心機制與進階實戰（AI 盲點 #07～#12）' +
+            '</h3>' +
+            '<span style="font-size: 13px; color: var(--olive);">進階落地 · 6 大機制實測</span>' +
+          '</div>' +
+          '<div class="blindspots-grid">' +
+            BLINDSPOT_VIDEOS_S2.map(function (v) {
+              return '<a href="' + esc(v.url) + '" class="blindspot-card" style="border-left: 3px solid #b69cff;">' +
+                '<div class="blindspot-card-top">' +
+                  '<span class="blindspot-card-ep" style="color: #6d28d9;">' + esc(v.ep) + '</span>' +
+                  '<span class="blindspot-card-duration">⏱️ ' + esc(v.duration) + '</span>' +
+                '</div>' +
+                '<div class="blindspot-card-title">' + esc(v.title) + '</div>' +
+                '<div class="blindspot-card-quote" style="background: #faf5ff; color: #581c87;">💡 ' + esc(v.goldenQuote) + '</div>' +
+              '</a>';
+            }).join('') +
+          '</div>' +
         '</div>' +
       '</section>' +
       groups.map(g =>
