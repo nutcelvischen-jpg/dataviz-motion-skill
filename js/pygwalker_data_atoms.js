@@ -533,25 +533,58 @@
     setupEventListeners();
     setupDragAndDrop();
     init17DomainModal();
-    loadDataset('jp_gender_facet');
 
-    if (!state.sheets || state.sheets.length === 0) {
-      state.sheets = [
-        {
-          id: 'sheet_1',
-          name: '工作表 1 (分面柱狀)',
-          chartType: state.chartType || 'bar',
-          shelf: JSON.parse(JSON.stringify(state.shelf)),
-          datasetId: state.currentDatasetId || 'jp_gender_facet',
-          filters: cloneFilters(state.filters || {}),
-          barStackMode: !!state.barStackMode,
-          facetScaleMode: state.facetScaleMode || 'fixed'
-        }
-      ];
-      state.activeSheetId = 'sheet_1';
+    // 嘗試從 localStorage 還原先前的工作簿狀態 (Key: data_atoms_studio_state_v1)
+    const hasRestored = loadPersistedState();
+
+    if (hasRestored) {
+      const activeSheet = (state.sheets || []).find(s => s.id === state.activeSheetId) || state.sheets[0];
+      state.activeSheetId = activeSheet.id;
+
+      // 載入當前分頁指定的資料集
+      const targetDataset = activeSheet.datasetId || 'jp_gender_facet';
+      loadDataset(targetDataset, null, { skipSheetUpdate: true, skipShelfReset: true, skipRender: true });
+
+      // 套用分頁的視覺配置與篩選器
+      state.chartType = activeSheet.chartType || 'bar';
+      state.shelf = JSON.parse(JSON.stringify(activeSheet.shelf || state.shelf));
+      state.barStackMode = !!activeSheet.barStackMode;
+      state.facetScaleMode = activeSheet.facetScaleMode || 'fixed';
+      state.filters = cloneFilters(activeSheet.filters || {});
+
+      renderFieldLists();
+      renderChartTypeSelector();
+      renderShelves();
+      renderKPIRibbon();
+      renderVisualization();
+      renderDataTable();
+      renderWorkbookTabs();
+      updatePinnedBadge();
+      toggleSidebar(state.sidebarCollapsed, false);
+      applyZoom(state.zoomLevel || 100, false);
+    } else {
+      loadDataset('jp_gender_facet');
+
+      if (!state.sheets || state.sheets.length === 0) {
+        state.sheets = [
+          {
+            id: 'sheet_1',
+            name: '工作表 1 (分面柱狀)',
+            chartType: state.chartType || 'bar',
+            shelf: JSON.parse(JSON.stringify(state.shelf)),
+            datasetId: state.currentDatasetId || 'jp_gender_facet',
+            filters: cloneFilters(state.filters || {}),
+            barStackMode: !!state.barStackMode,
+            facetScaleMode: state.facetScaleMode || 'fixed'
+          }
+        ];
+        state.activeSheetId = 'sheet_1';
+      }
+      renderWorkbookTabs();
+      updatePinnedBadge();
+      applyZoom(state.zoomLevel || 100, false);
+      savePersistedState();
     }
-    renderWorkbookTabs();
-    applyZoom(state.zoomLevel || 100, false);
 
     // 檢查 URL 參數是否指定了圖表 (如 ?chart=line, ?chart=geo, ?chart=violin)
     try {
@@ -564,6 +597,7 @@
         renderChartTypeSelector();
         renderWorkbookTabs();
         renderVisualization();
+        savePersistedState();
       }
     } catch (e) {
       console.warn('URL param chart error:', e);
@@ -1144,6 +1178,8 @@
     renderVisualization();
     renderKPIRibbon();
     renderDataTable();
+    saveCurrentSheetState();
+    savePersistedState();
   }
 
   // --- 渲染 Filters 槽位中的標籤膠囊 ---
@@ -2768,7 +2804,7 @@
       ];
 
     } else if (state.chartType === 'geo') {
-      // 04. 通用地理分佈圖 (Universal Geo Map) - 支援日本/台灣/全球/坐標通用
+      // 04. 通用地理分佈圖 (Universal Geo Map) - 支援日本真實都道府縣 / 台灣縣市輪廓 / 全球自適應散佈
       const geoNames = data.map(d => d[xField]);
       const scope = window.UniversalGeoEngine 
         ? window.UniversalGeoEngine.detectGeoScope(geoNames)
@@ -2826,107 +2862,259 @@
         };
       }
 
-      // 坐標邊界 padding
-      const padLng = Math.max(1.0, (maxLng - minLng) * 0.12);
-      const padLat = Math.max(1.0, (maxLat - minLat) * 0.12);
+      // 檢查是否具備真實向量地圖 (ECharts registered map: japan / taiwan)
+      if (window.UniversalGeoMaps && typeof window.UniversalGeoMaps.registerMaps === 'function') {
+        window.UniversalGeoMaps.registerMaps();
+      }
 
-      option.xAxis = {
-        type: 'value',
-        name: '經度 (Longitude)',
-        nameLocation: 'middle',
-        nameGap: 28,
-        min: parseFloat((minLng - padLng).toFixed(2)),
-        max: parseFloat((maxLng + padLng).toFixed(2)),
-        splitLine: { lineStyle: { color: 'rgba(15, 23, 42, 0.06)', type: 'dashed' } },
-        axisLabel: { formatter: '{value}°E', color: '#64748b' }
-      };
+      const isJapan = scope === 'japan';
+      const isTaiwan = scope === 'taiwan';
+      const targetMap = isTaiwan ? 'taiwan' : (isJapan ? 'japan' : null);
+      const hasRealMap = Boolean(targetMap && typeof echarts !== 'undefined' && echarts.getMap && echarts.getMap(targetMap));
 
-      option.yAxis = {
-        type: 'value',
-        name: '緯度 (Latitude)',
-        min: parseFloat((minLat - padLat).toFixed(2)),
-        max: parseFloat((maxLat + padLat).toFixed(2)),
-        splitLine: { lineStyle: { color: 'rgba(15, 23, 42, 0.06)', type: 'dashed' } },
-        axisLabel: { formatter: '{value}°N', color: '#64748b' }
-      };
+      if (hasRealMap) {
+        // --- 04-A: 真實向量輪廓地圖 (Real Geo Vector Map) ---
+        // 清理直角坐標軸與網格
+        delete option.xAxis;
+        delete option.yAxis;
+        delete option.grid;
 
-      // 空間色階視覺映射 (VisualMap)
-      option.visualMap = {
-        min: minVal,
-        max: maxVal,
-        dimension: 2,
-        calculable: true,
-        orient: 'vertical',
-        left: 20,
-        bottom: 30,
-        inRange: {
-          color: ['#60a5fa', '#2563eb', '#1d4ed8', '#d97706', '#ea580c', '#e11d48']
-        },
-        text: ['高 (High)', '低 (Low)'],
-        textStyle: { color: '#475569', fontSize: 11 }
-      };
-
-      const maxS = safeMax(geoPoints.map(p => p.value[3]), 1) || 1;
-      const getRadius = (s) => Math.max(8, Math.min(36, 8 + (s / maxS) * 28));
-
-      option.tooltip = {
-        trigger: 'item',
-        formatter: (params) => {
-          const d = params.data.raw;
-          const v = params.data.value;
-          let tip = `<div style="font-size:12px; line-height:1.6;">
-            <strong style="font-size:13px; color:#0f172a;">${escapeHtml(params.name)}</strong>
-            <span style="font-size:10.5px; color:#2563eb; background:#eff6ff; padding:1px 5px; border-radius:3px; margin-left:4px;">${scope.toUpperCase()}</span><br/>
-            坐標: ${v[0].toFixed(2)}°E, ${v[1].toFixed(2)}°N<br/>
-            ${escapeHtml(yField)}: <b style="color:#ea580c;">${formatCompactNumber(v[2])}</b><br/>`;
-          if (sizeField) {
-            tip += `${escapeHtml(sizeField)}: <b>${formatCompactNumber(v[3])}</b><br/>`;
+        // 構建面著色資料 (Choropleth Map Data)
+        const mapData = [];
+        data.forEach(d => {
+          const rawName = String(d[xField] != null ? d[xField] : '').trim();
+          let mappedName = rawName;
+          if (targetMap === 'japan') {
+            mappedName = rawName.replace(/縣/g, '県').replace(/區/g, '区');
+            if (mappedName === '東京') mappedName = '東京都';
+            if (mappedName === '京都') mappedName = '京都府';
+            if (mappedName === '大阪') mappedName = '大阪府';
+            if (mappedName === '北海') mappedName = '北海道';
+          } else if (targetMap === 'taiwan') {
+            mappedName = rawName.replace(/臺/g, '台');
           }
-          if (colorField && d[colorField]) {
-            tip += `${escapeHtml(colorField)}: ${escapeHtml(d[colorField])}<br/>`;
-          }
-          tip += `</div>`;
-          return tip;
-        }
-      };
+          const val = safeParseNumber(d[yField]);
+          mapData.push({
+            name: mappedName,
+            value: val,
+            raw: d
+          });
+        });
 
-      option.series = [
-        {
-          name: yField,
-          type: 'scatter',
-          data: geoPoints,
-          symbolSize: (val) => getRadius(val[3]),
+        const maxS = safeMax(geoPoints.map(p => p.value[3]), 1) || 1;
+        const getRadius = (s) => Math.max(6, Math.min(26, 6 + (s / maxS) * 20));
+
+        option.geo = {
+          map: targetMap,
+          roam: true,
+          aspectScale: targetMap === 'japan' ? 0.9 : 0.85,
+          zoom: targetMap === 'japan' ? 1.15 : 1.1,
           label: {
-            show: true,
-            formatter: '{b}',
-            position: 'top',
-            color: '#1e293b',
-            fontSize: 10.5,
-            fontWeight: 600
+            show: false,
+            color: '#334155',
+            fontSize: 10
           },
           itemStyle: {
-            shadowBlur: 8,
-            shadowColor: 'rgba(0,0,0,0.2)',
-            borderWidth: 1.5,
-            borderColor: '#ffffff',
-            opacity: 0.88
+            areaColor: '#f8fafc',
+            borderColor: '#94a3b8',
+            borderWidth: 0.8
+          },
+          emphasis: {
+            itemStyle: {
+              areaColor: '#e0e7ff',
+              borderColor: '#4338ca',
+              borderWidth: 1.5
+            },
+            label: {
+              show: true,
+              color: '#0f172a',
+              fontWeight: 'bold',
+              fontSize: 11
+            }
           }
-        }
-      ];
+        };
 
-      option.grid = {
-        left: '6%',
-        right: '6%',
-        bottom: 70,
-        top: '15%',
-        containLabel: true
-      };
+        option.visualMap = {
+          min: minVal,
+          max: maxVal,
+          calculable: true,
+          orient: 'vertical',
+          left: 20,
+          bottom: 30,
+          inRange: {
+            color: ['#dbeafe', '#93c5fd', '#3b82f6', '#1d4ed8', '#ea580c', '#b91c1c']
+          },
+          text: ['高 (High)', '低 (Low)'],
+          textStyle: { color: '#475569', fontSize: 11 }
+        };
 
-      option.dataZoom = [
-        { type: 'inside' },
-        { type: 'slider', bottom: 6, height: 16, borderColor: '#cbd5e1', fillerColor: 'rgba(37, 99, 235, 0.15)', handleStyle: { color: '#2563eb' } }
-      ];
+        option.tooltip = {
+          trigger: 'item',
+          formatter: (params) => {
+            const raw = params.data ? (params.data.raw || params.data) : null;
+            if (!raw) return params.name;
+            const v = params.data.value;
+            const numVal = Array.isArray(v) ? v[2] : (typeof v === 'number' ? v : raw[yField]);
+            let tip = `<div style="font-size:12px; line-height:1.6; min-width:140px;">
+              <strong style="font-size:13px; color:#0f172a;">${escapeHtml(params.name)}</strong>
+              <span style="font-size:10px; color:#2563eb; background:#eff6ff; padding:1px 5px; border-radius:3px; margin-left:4px;">${targetMap.toUpperCase()} 地圖輪廓</span><br/>
+              ${escapeHtml(yField)}: <b style="color:#ea580c;">${formatCompactNumber(numVal)}</b><br/>`;
+            if (sizeField && raw[sizeField] !== undefined) {
+              tip += `${escapeHtml(sizeField)}: <b>${formatCompactNumber(raw[sizeField])}</b><br/>`;
+            }
+            if (colorField && raw[colorField]) {
+              tip += `${escapeHtml(colorField)}: ${escapeHtml(raw[colorField])}<br/>`;
+            }
+            tip += `</div>`;
+            return tip;
+          }
+        };
 
+        option.series = [
+          {
+            name: yField,
+            type: 'map',
+            map: targetMap,
+            geoIndex: 0,
+            data: mapData,
+            itemStyle: {
+              borderColor: '#94a3b8',
+              borderWidth: 0.8
+            },
+            emphasis: {
+              itemStyle: {
+                areaColor: '#c7d2fe',
+                borderColor: '#4f46e5',
+                borderWidth: 1.5
+              }
+            }
+          },
+          {
+            name: yField + ' (定位氣泡)',
+            type: 'scatter',
+            coordinateSystem: 'geo',
+            data: geoPoints,
+            symbolSize: (val) => getRadius(val[3]),
+            itemStyle: {
+              color: '#1d4ed8',
+              shadowBlur: 8,
+              shadowColor: 'rgba(29, 78, 216, 0.4)',
+              borderWidth: 1.5,
+              borderColor: '#ffffff',
+              opacity: 0.9
+            },
+            label: {
+              show: state.showLabels,
+              formatter: '{b}',
+              position: 'top',
+              color: '#1e293b',
+              fontSize: 10,
+              fontWeight: 600
+            }
+          }
+        ];
+      } else {
+        // --- 04-B: 優雅退回自適應散佈 (Fallback Adaptive Longitude/Latitude Scatter) ---
+        const padLng = Math.max(1.0, (maxLng - minLng) * 0.12);
+        const padLat = Math.max(1.0, (maxLat - minLat) * 0.12);
+
+        option.xAxis = {
+          type: 'value',
+          name: '經度 (Longitude)',
+          nameLocation: 'middle',
+          nameGap: 28,
+          min: parseFloat((minLng - padLng).toFixed(2)),
+          max: parseFloat((maxLng + padLng).toFixed(2)),
+          splitLine: { lineStyle: { color: 'rgba(15, 23, 42, 0.06)', type: 'dashed' } },
+          axisLabel: { formatter: '{value}°E', color: '#64748b' }
+        };
+
+        option.yAxis = {
+          type: 'value',
+          name: '緯度 (Latitude)',
+          min: parseFloat((minLat - padLat).toFixed(2)),
+          max: parseFloat((maxLat + padLat).toFixed(2)),
+          splitLine: { lineStyle: { color: 'rgba(15, 23, 42, 0.06)', type: 'dashed' } },
+          axisLabel: { formatter: '{value}°N', color: '#64748b' }
+        };
+
+        option.visualMap = {
+          min: minVal,
+          max: maxVal,
+          dimension: 2,
+          calculable: true,
+          orient: 'vertical',
+          left: 20,
+          bottom: 30,
+          inRange: {
+            color: ['#60a5fa', '#2563eb', '#1d4ed8', '#d97706', '#ea580c', '#e11d48']
+          },
+          text: ['高 (High)', '低 (Low)'],
+          textStyle: { color: '#475569', fontSize: 11 }
+        };
+
+        const maxS = safeMax(geoPoints.map(p => p.value[3]), 1) || 1;
+        const getRadius = (s) => Math.max(8, Math.min(36, 8 + (s / maxS) * 28));
+
+        option.tooltip = {
+          trigger: 'item',
+          formatter: (params) => {
+            const d = params.data.raw;
+            const v = params.data.value;
+            let tip = `<div style="font-size:12px; line-height:1.6;">
+              <strong style="font-size:13px; color:#0f172a;">${escapeHtml(params.name)}</strong>
+              <span style="font-size:10.5px; color:#2563eb; background:#eff6ff; padding:1px 5px; border-radius:3px; margin-left:4px;">${scope.toUpperCase()}</span><br/>
+              坐標: ${v[0].toFixed(2)}°E, ${v[1].toFixed(2)}°N<br/>
+              ${escapeHtml(yField)}: <b style="color:#ea580c;">${formatCompactNumber(v[2])}</b><br/>`;
+            if (sizeField) {
+              tip += `${escapeHtml(sizeField)}: <b>${formatCompactNumber(v[3])}</b><br/>`;
+            }
+            if (colorField && d[colorField]) {
+              tip += `${escapeHtml(colorField)}: ${escapeHtml(d[colorField])}<br/>`;
+            }
+            tip += `</div>`;
+            return tip;
+          }
+        };
+
+        option.series = [
+          {
+            name: yField,
+            type: 'scatter',
+            data: geoPoints,
+            symbolSize: (val) => getRadius(val[3]),
+            label: {
+              show: true,
+              formatter: '{b}',
+              position: 'top',
+              color: '#1e293b',
+              fontSize: 10.5,
+              fontWeight: 600
+            },
+            itemStyle: {
+              shadowBlur: 8,
+              shadowColor: 'rgba(0,0,0,0.2)',
+              borderWidth: 1.5,
+              borderColor: '#ffffff',
+              opacity: 0.88
+            }
+          }
+        ];
+
+        option.grid = {
+          left: '6%',
+          right: '6%',
+          bottom: 70,
+          top: '15%',
+          containLabel: true
+        };
+
+        option.dataZoom = [
+          { type: 'inside' },
+          { type: 'slider', bottom: 6, height: 16, borderColor: '#cbd5e1', fillerColor: 'rgba(37, 99, 235, 0.15)', handleStyle: { color: '#2563eb' } }
+        ];
+      }
+    
     } else if (state.chartType === 'boxplot' || state.chartType === 'violin') {
       // 05. 盒鬚分佈圖 (Box Plot) 與 11. 小提琴圖 (Violin Plot - 核密度分佈 KDE)
       let groupDim = xField;
@@ -4092,6 +4280,7 @@
         renderChartTypeSelector();
         renderWorkbookTabs();
         renderVisualization();
+        savePersistedState();
       });
     });
 
@@ -4443,6 +4632,85 @@
       } else if (e.key === ']') {
         e.preventDefault();
         toggleSidebar(false);
+      }
+    });
+
+    // === 純淨事件委派 (Centralized Clean Event Delegation - Zero Inline Onclick) ===
+    document.addEventListener('click', (e) => {
+      // 1. 開啟 / 關閉 Skills 彈窗
+      const btnOpenSkills = e.target.closest('#btnOpenSkillsModalTop');
+      if (btnOpenSkills) {
+        document.getElementById('skillsModal')?.classList.add('open');
+        return;
+      }
+      const btnCloseSkills = e.target.closest('#btnCloseSkillsModal');
+      if (btnCloseSkills) {
+        document.getElementById('skillsModal')?.classList.remove('open');
+        return;
+      }
+      if (e.target.id === 'skillsModal') {
+        document.getElementById('skillsModal')?.classList.remove('open');
+        return;
+      }
+
+      // 2. 複製 e-Stat 官方網址
+      const btnCopyUrl = e.target.closest('[data-action="copy-estat-url"], #btnCopyEstatUrlTop');
+      if (btnCopyUrl) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText('https://www.e-stat.go.jp').then(() => {
+            showToast('📋 已複製 e-Stat 官方網址至剪貼簿！');
+          }).catch(() => {
+            showToast('📋 e-Stat 官方網址: https://www.e-stat.go.jp');
+          });
+        } else {
+          showToast('📋 e-Stat 官方網址: https://www.e-stat.go.jp');
+        }
+        return;
+      }
+
+      // 3. 多數值指標彈窗 (Multi-Measure Modal) 控制
+      const btnCloseMulti = e.target.closest('[data-action="close-multi-measure"], #btnCloseMultiMeasureModal');
+      if (btnCloseMulti) {
+        document.getElementById('multiMeasureModal')?.classList.remove('open');
+        return;
+      }
+      if (e.target.id === 'multiMeasureModal') {
+        document.getElementById('multiMeasureModal')?.classList.remove('open');
+        return;
+      }
+
+      const btnPresetMulti = e.target.closest('[data-action="apply-measure-preset"]');
+      if (btnPresetMulti && btnPresetMulti.dataset.preset) {
+        const presets = btnPresetMulti.dataset.preset.split(',').map(s => s.trim()).filter(Boolean);
+        applyMeasurePreset(presets);
+        return;
+      }
+
+      const btnResetMulti = e.target.closest('[data-action="reset-multi-measure"], #btnResetMultiMeasure');
+      if (btnResetMulti) {
+        resetMultiMeasure();
+        return;
+      }
+
+      const btnConfirmMulti = e.target.closest('[data-action="confirm-multi-measure"], #btnConfirmMultiMeasure');
+      if (btnConfirmMulti) {
+        confirmMultiMeasure();
+        return;
+      }
+
+      // 4. 開啟多指標彈窗 (自槽位按鈕點擊委派)
+      const btnShelfCompare = e.target.closest('.btn-shelf-compare');
+      if (btnShelfCompare) {
+        openMultiMeasureModal();
+        return;
+      }
+
+      // 5. 還原預設工作簿 (重設快取)
+      const btnResetState = e.target.closest('#btnResetStudioState');
+      if (btnResetState) {
+        resetPersistedState();
+        closeToolsDropdown();
+        return;
       }
     });
   }
@@ -5627,6 +5895,98 @@
     active.facetScaleMode = state.facetScaleMode || 'fixed';
   }
 
+
+  // =========================================================================
+  // --- 狀態持久化管理模組 (Studio State Persistence - localStorage) ---
+  // =========================================================================
+  const PERSISTENCE_KEY = 'data_atoms_studio_state_v1';
+
+  function savePersistedState() {
+    try {
+      saveCurrentSheetState();
+      const payload = {
+        sheets: state.sheets,
+        activeSheetId: state.activeSheetId,
+        pinnedCharts: state.pinnedCharts,
+        zoomLevel: state.zoomLevel,
+        sidebarCollapsed: state.sidebarCollapsed,
+        savedAt: Date.now(),
+        version: 1
+      };
+      localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(payload));
+    } catch (err) {
+      console.warn('[Persistence] Failed to save state to localStorage:', err);
+    }
+  }
+
+  function loadPersistedState() {
+    try {
+      const raw = localStorage.getItem(PERSISTENCE_KEY);
+      if (!raw) return false;
+      const parsed = JSON.parse(raw);
+      if (!parsed || !Array.isArray(parsed.sheets) || parsed.sheets.length === 0) return false;
+
+      state.sheets = parsed.sheets;
+      state.activeSheetId = parsed.activeSheetId || parsed.sheets[0].id;
+      state.pinnedCharts = Array.isArray(parsed.pinnedCharts) ? parsed.pinnedCharts : [];
+      state.zoomLevel = typeof parsed.zoomLevel === 'number' ? parsed.zoomLevel : 100;
+      state.sidebarCollapsed = Boolean(parsed.sidebarCollapsed);
+      return true;
+    } catch (err) {
+      console.warn('[Persistence] Failed to load state from localStorage:', err);
+      return false;
+    }
+  }
+
+  function resetPersistedState() {
+    try {
+      localStorage.removeItem(PERSISTENCE_KEY);
+    } catch (e) {
+      console.warn(e);
+    }
+    // 重設回乾淨初始狀態
+    state.sidebarCollapsed = false;
+    state.zoomLevel = 100;
+    state.pinnedCharts = [];
+    state.currentDatasetId = 'jp_gender_facet';
+    state.chartType = 'bar';
+    state.barStackMode = false;
+    state.facetScaleMode = 'fixed';
+    state.shelf = {
+      x: '都道府縣',
+      y: '總人口(人)',
+      yMulti: [],
+      color: '地方分區',
+      size: '65歲以上高齡人口(人)',
+      secondary: '高齡化率(%)',
+      facet: '',
+      agg: 'RAW'
+    };
+    state.filters = {};
+    state.sheets = [
+      {
+        id: 'sheet_1',
+        name: '工作表 1 (分面柱狀)',
+        chartType: 'bar',
+        shelf: JSON.parse(JSON.stringify(state.shelf)),
+        datasetId: 'jp_gender_facet',
+        filters: {},
+        barStackMode: false,
+        facetScaleMode: 'fixed'
+      }
+    ];
+    state.activeSheetId = 'sheet_1';
+
+    // 重新載入預設資料集並套用版面
+    loadDataset('jp_gender_facet', null, { skipSheetUpdate: true });
+    toggleSidebar(false, false);
+    applyZoom(100, false);
+    renderWorkbookTabs();
+    updatePinnedBadge();
+    savePersistedState();
+    showToast('↺ 已成功還原預設工作簿並清除本機快取！');
+  }
+
   function renderWorkbookTabs() {
     const tabsList = document.getElementById('workbookTabsList');
     if (!tabsList) return;
@@ -5696,6 +6056,7 @@
     renderVisualization();
     renderDataTable();
     renderWorkbookTabs();
+    savePersistedState();
     showToast(`📑 已切換至「${target.name}」(${getChartIcon(target.chartType)} ${target.chartType})`);
   }
 
@@ -5855,7 +6216,8 @@
       } else {
         renderWorkbookTabs();
       }
-      showToast(`🗑️ 已刪除工作表「${targetName}」`);
+      savePersistedState();
+    showToast(`🗑️ 已刪除工作表「${targetName}」`);
     }
   }
 
@@ -6016,6 +6378,7 @@
 
     state.pinnedCharts.push(pinnedItem);
     updatePinnedBadge();
+    savePersistedState();
     showToast(`📌 已將「${pinnedItem.title}」釘選至自訂看板！(現有 ${state.pinnedCharts.length} 張圖表)`);
 
     const modal = document.getElementById('customDashboardModal');
@@ -6280,6 +6643,7 @@
       newZoom = ZOOM_LEVELS.reduce((prev, curr) => Math.abs(curr - newZoom) < Math.abs(prev - newZoom) ? curr : prev);
     }
     state.zoomLevel = newZoom;
+    savePersistedState();
 
     // 更新 UI 徽章與按鈕停用狀態
     const badge = document.getElementById('zoomLevelBadge');
@@ -6401,6 +6765,8 @@
       renderShelves();
       renderVisualization();
       renderKPIRibbon();
+      saveCurrentSheetState();
+      savePersistedState();
     },
     cycleAgg: (e) => {
       e.stopPropagation();
@@ -6409,30 +6775,40 @@
       state.shelf.agg = aggs[nextIdx];
       renderShelves();
       renderVisualization();
+      saveCurrentSheetState();
+      savePersistedState();
       showToast(`已切換 Y 軸聚合模式為：${state.shelf.agg}`);
     },
     toggleBarStackMode: () => {
       state.barStackMode = !state.barStackMode;
       renderShelves();
       renderVisualization();
+      saveCurrentSheetState();
+      savePersistedState();
       showToast(state.barStackMode ? '🥞 已切換為「堆疊累計柱狀圖」' : '📊 已切換為「併排對比柱狀圖」');
     },
     setBarStackMode: (stacked) => {
       state.barStackMode = !!stacked;
       renderShelves();
       renderVisualization();
+      saveCurrentSheetState();
+      savePersistedState();
       showToast(state.barStackMode ? '🥞 已切換為「堆疊累計柱狀圖」' : '📊 已切換為「併排對比柱狀圖」');
     },
     toggleFacetScale: () => {
       state.facetScaleMode = state.facetScaleMode === 'fixed' ? 'free' : 'fixed';
       renderShelves();
       renderVisualization();
+      saveCurrentSheetState();
+      savePersistedState();
       showToast(state.facetScaleMode === 'fixed' ? '🔒 已切換為「統一量表 (Fixed Scale)」' : '🔓 已切換為「獨立自適應量表 (Free Scale)」');
     },
     setFacetScaleMode: (mode) => {
       state.facetScaleMode = mode;
       renderShelves();
       renderVisualization();
+      saveCurrentSheetState();
+      savePersistedState();
     },
     sortTable: (col) => {
       if (state.sortColumn === col) {
@@ -6509,6 +6885,16 @@
       renderChartTypeSelector();
       renderWorkbookTabs();
       renderVisualization();
+      savePersistedState();
+    },
+    resetStudioState: () => {
+      resetPersistedState();
+    },
+    saveStudioState: () => {
+      savePersistedState();
+    },
+    loadStudioState: () => {
+      return loadPersistedState();
     },
     importAllSheetsToDashboard: () => {
       importAllSheetsToDashboard();
@@ -6516,6 +6902,9 @@
   };
 
   // 暴露至全域供測試與進階模組調用
+  window.resetStudioState = resetPersistedState;
+  window.savePersistedState = savePersistedState;
+  window.loadPersistedState = loadPersistedState;
   window.PALETTE_BAUHAUS = PALETTE_BAUHAUS;
   window.safeParseNumber = safeParseNumber;
   window.safeMin = safeMin;
