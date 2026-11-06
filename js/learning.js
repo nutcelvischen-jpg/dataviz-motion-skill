@@ -25,8 +25,11 @@
   }
 
   function renderHome(){
-    const state=progress.get(), count=state.completedLessonIds.length, next=progress.next();
-    const total=lessons.length;
+    const state=progress.get();
+    const s1 = lessons.filter(l=>!l.season || l.season===1);
+    const count = state.completedLessonIds.filter(id=>['01','02','03','04','05','06'].includes(id)).length;
+    const next = s1.find(l=>!state.completedLessonIds.includes(l.id)) ? (state.lastVisitedLessonId && !state.completedLessonIds.includes(state.lastVisitedLessonId) && ['01','02','03','04','05','06'].includes(state.lastVisitedLessonId) ? state.lastVisitedLessonId : s1.find(l=>!state.completedLessonIds.includes(l.id)).id) : null;
+    const total = 6;
     const progressText=`已完成 ${count}／${total} 站`;
     if(el('#home-progress-count')) el('#home-progress-count').textContent=progressText;
     if(el('#home-progress-bar')) el('#home-progress-bar').style.width=`${(count/total)*100}%`;
@@ -37,21 +40,12 @@
     if(el('#home-practice')) el('#home-practice').hidden=count!==total;
 
     if(el('#route-list')){
-      const s1 = lessons.filter(l=>!l.season || l.season===1);
-      const s2 = lessons.filter(l=>l.season===2);
-      
       const renderItem = l => {
         const status=progress.status(l.id);
         const colorDot = l.themeColor ? `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${l.themeColor};margin-right:8px;" aria-hidden="true"></span>` : '';
         return `<li><a class="route-link" href="${lessonUrl(l.id)}"><span class="route-number" style="${l.themeColor?'color:'+l.themeColor:''}">${l.id}</span><span><span class="route-title">${colorDot}${esc(l.title)}</span><span class="route-desc">${esc(l.summary)}</span></span><span class="route-status ${statusClass(status)}">${status==='已完成'?'✓ ':''}${status} →</span></a></li>`;
       };
-
-      el('#route-list').innerHTML = `
-        <li style="background:#e4e6db;padding:12px 18px;font-weight:700;font-size:14px;color:#3b4d3c;letter-spacing:.04em;border-bottom:1px solid #babcb0;">第一季：基礎通識（01～06 站）</li>
-        ${s1.map(renderItem).join('')}
-        <li style="background:#e4e6db;padding:12px 18px;font-weight:700;font-size:14px;color:#3b4d3c;letter-spacing:.04em;border-top:2px solid #873b29;border-bottom:1px solid #babcb0;margin-top:16px;">第二季：核心機制與實戰盲點（07～12 站）· 附 60 秒影音與實驗</li>
-        ${s2.map(renderItem).join('')}
-      `;
+      el('#route-list').innerHTML = s1.map(renderItem).join('');
     }
     storageNotice();
   }
