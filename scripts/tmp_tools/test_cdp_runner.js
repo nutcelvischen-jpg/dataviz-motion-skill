@@ -225,22 +225,42 @@ async function main() {
   `);
   console.log('World Geo Fallback Check:', geoResultFallback);
 
-  console.log('\n--- Test 7: State Persistence Across Reload ---');
-  // Set up custom state: add a new sheet, pin a chart, change zoom
+  console.log('\n--- Test 7: State Persistence Across Reload (Filters, Shelves, Sidebar, Sheets, Zoom) ---');
+  // Set up custom state: add a new sheet, change shelf, add filter, collapse sidebar, pin a chart, change zoom
   const stateSetup = await evaluate(`
     (() => {
+      // Ensure dataset with 地方分區 is active
+      window.PyGWalker.loadDataset('jp_prefectures');
       // Add sheet
       window.PyGWalker.addNewSheet();
       window.PyGWalker.setChartType('donut');
+      // Set shelf field
+      window.PyGWalker.setShelf('x', '地方分區');
+      // Add categorical filter
+      window.PyGWalker.addFilter('地方分區');
+      // Toggle off one item in filter to create non-trivial subset
+      const filter = window.PyGWalker.getState().filters['地方分區'];
+      if (filter && filter.allValues && filter.allValues.length > 1) {
+        window.PyGWalker.toggleFilterValue('地方分區', filter.allValues[0]);
+      }
+      // Collapse sidebar
+      window.PyGWalker.toggleSidebar(true);
       // Pin chart
       window.PyGWalker.pinCurrentChart();
       // Apply zoom
-      window.PyGWalker.applyZoom(120, false);
+      window.PyGWalker.applyZoom(125, false);
+
+      const f = window.PyGWalker.getState().filters['地方分區'];
       const preState = {
         sheetCount: window.PyGWalker.getState().sheets.length,
         activeSheetId: window.PyGWalker.getState().activeSheetId,
+        activeShelfX: window.PyGWalker.getState().shelf.x,
         pinnedCount: window.PyGWalker.getState().pinnedCharts.length,
         zoomLevel: window.PyGWalker.getState().zoomLevel,
+        sidebarCollapsed: window.PyGWalker.getState().sidebarCollapsed,
+        filterField: f ? f.field : null,
+        filterSelectedCount: (f && f.selected) ? f.selected.size : 0,
+        filterSelectedIsSet: (f && f.selected instanceof Set),
         storageItem: localStorage.getItem('data_atoms_studio_state_v1') ? true : false
       };
       return preState;
@@ -257,12 +277,18 @@ async function main() {
   const restoredState = await evaluate(`
     (() => {
       const state = window.PyGWalker.getState();
+      const f = state.filters['地方分區'];
       return {
         sheetCount: state.sheets.length,
         activeSheetId: state.activeSheetId,
         activeChartType: state.chartType,
+        activeShelfX: state.shelf.x,
         pinnedCount: state.pinnedCharts.length,
         zoomLevel: state.zoomLevel,
+        sidebarCollapsed: state.sidebarCollapsed,
+        filterField: f ? f.field : null,
+        filterSelectedCount: (f && f.selected) ? f.selected.size : 0,
+        filterSelectedIsSet: (f && f.selected instanceof Set),
         hasStorage: !!localStorage.getItem('data_atoms_studio_state_v1')
       };
     })()
@@ -286,6 +312,7 @@ async function main() {
         activeSheetId: state.activeSheetId,
         pinnedCount: state.pinnedCharts.length,
         zoomLevel: state.zoomLevel,
+        sidebarCollapsed: state.sidebarCollapsed,
         toastText: document.getElementById('pygToast')?.innerText,
         storageKeyPresent: localStorage.getItem('data_atoms_studio_state_v1') !== null
       };
@@ -329,7 +356,15 @@ async function main() {
     restoredState.sheetCount === stateSetup.sheetCount &&
     restoredState.pinnedCount === stateSetup.pinnedCount &&
     restoredState.zoomLevel === stateSetup.zoomLevel &&
-    resetState.sheetCount === 1 && resetState.zoomLevel === 100 &&
+    restoredState.activeShelfX === stateSetup.activeShelfX &&
+    restoredState.sidebarCollapsed === true &&
+    restoredState.filterSelectedIsSet === true &&
+    restoredState.filterSelectedCount === stateSetup.filterSelectedCount &&
+    restoredState.filterSelectedCount > 0 &&
+    resetState.sheetCount === 1 &&
+    resetState.zoomLevel === 100 &&
+    resetState.sidebarCollapsed === false &&
+    resetState.storageKeyPresent === false &&
     Object.values(atomResults).every(v => v === true)
   );
 

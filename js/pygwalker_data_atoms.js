@@ -560,8 +560,8 @@
       renderDataTable();
       renderWorkbookTabs();
       updatePinnedBadge();
-      toggleSidebar(state.sidebarCollapsed, false);
-      applyZoom(state.zoomLevel || 100, false);
+      toggleSidebar(state.sidebarCollapsed, false, true);
+      applyZoom(state.zoomLevel || 100, false, true);
     } else {
       loadDataset('jp_gender_facet');
 
@@ -582,8 +582,7 @@
       }
       renderWorkbookTabs();
       updatePinnedBadge();
-      applyZoom(state.zoomLevel || 100, false);
-      savePersistedState();
+      applyZoom(state.zoomLevel || 100, false, true);
     }
 
     // 檢查 URL 參數是否指定了圖表 (如 ?chart=line, ?chart=geo, ?chart=violin)
@@ -700,6 +699,7 @@
         activeSheet.chartType = state.chartType;
         activeSheet.filters = cloneFilters(state.filters);
       }
+      savePersistedState();
     }
 
     if (!options.skipRender) {
@@ -1341,7 +1341,7 @@
       }).join('');
 
       pillsHtml += `
-        <button type="button" class="btn btn-sm btn-outline btn-shelf-compare" onclick="window.PyGWalker.openMultiMeasureModal()" title="調整或增加對比指標" style="margin-left: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; border-color: #ea580c; color: #c2410c; background: #fff7ed; border-radius: 4px;">
+        <button type="button" class="btn btn-sm btn-outline btn-shelf-compare" title="調整或增加對比指標" style="margin-left: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; border-color: #ea580c; color: #c2410c; background: #fff7ed; border-radius: 4px;">
           ⚡ 多指標對比 (${state.shelf.yMulti.length})
         </button>
       `;
@@ -1366,7 +1366,7 @@
       let extraCompareBtn = '';
       if (shelfKey === 'y') {
         extraCompareBtn = `
-          <button type="button" class="btn btn-sm btn-outline btn-shelf-compare" onclick="window.PyGWalker.openMultiMeasureModal()" title="開啟多數值指標並列比較 (幼年 vs 勞動占比等)" style="margin-left: 6px; padding: 2px 7px; font-size: 11px; font-weight: 600; border-color: #cbd5e1; color: #475569; background: #fff; border-radius: 4px;">
+          <button type="button" class="btn btn-sm btn-outline btn-shelf-compare" title="開啟多數值指標並列比較 (幼年 vs 勞動占比等)" style="margin-left: 6px; padding: 2px 7px; font-size: 11px; font-weight: 600; border-color: #cbd5e1; color: #475569; background: #fff; border-radius: 4px;">
             ＋ 多指標比較
           </button>
         `;
@@ -1505,6 +1505,8 @@
     renderShelves();
     renderVisualization();
     renderKPIRibbon();
+    saveCurrentSheetState();
+    savePersistedState();
     const shelfDescMap = {
       x: 'Columns (X 軸)',
       y: 'Rows (Y 軸)',
@@ -2881,17 +2883,50 @@
 
         // 構建面著色資料 (Choropleth Map Data)
         const mapData = [];
+        let officialFeatureNames = [];
+        if (window.UniversalGeoMaps && window.UniversalGeoMaps[targetMap] && window.UniversalGeoMaps[targetMap].features) {
+          officialFeatureNames = window.UniversalGeoMaps[targetMap].features.map(f => f.properties && f.properties.name).filter(Boolean);
+        }
+
         data.forEach(d => {
           const rawName = String(d[xField] != null ? d[xField] : '').trim();
           let mappedName = rawName;
           if (targetMap === 'japan') {
-            mappedName = rawName.replace(/縣/g, '県').replace(/區/g, '区');
+            mappedName = rawName.replace(/縣/g, '県').replace(/區/g, '区')
+              .replace(/靜/g, '静').replace(/廣/g, '広').replace(/[繩縄]/g, '縄');
             if (mappedName === '東京') mappedName = '東京都';
-            if (mappedName === '京都') mappedName = '京都府';
-            if (mappedName === '大阪') mappedName = '大阪府';
-            if (mappedName === '北海') mappedName = '北海道';
+            else if (mappedName === '京都') mappedName = '京都府';
+            else if (mappedName === '大阪') mappedName = '大阪府';
+            else if (mappedName === '北海' || mappedName === '北海道') mappedName = '北海道';
+
+            if (officialFeatureNames.length > 0 && !officialFeatureNames.includes(mappedName)) {
+              if (officialFeatureNames.includes(mappedName + '県')) {
+                mappedName = mappedName + '県';
+              } else if (officialFeatureNames.includes(mappedName + '府')) {
+                mappedName = mappedName + '府';
+              } else if (officialFeatureNames.includes(mappedName + '都')) {
+                mappedName = mappedName + '都';
+              } else if (officialFeatureNames.includes(mappedName + '道')) {
+                mappedName = mappedName + '道';
+              } else {
+                const stem = mappedName.replace(/(區部|区部|[都府県市])$/, '');
+                const found = officialFeatureNames.find(n => n.startsWith(stem) || (stem.length >= 2 && n.includes(stem)));
+                if (found) mappedName = found;
+              }
+            }
           } else if (targetMap === 'taiwan') {
             mappedName = rawName.replace(/臺/g, '台');
+            if (officialFeatureNames.length > 0 && !officialFeatureNames.includes(mappedName)) {
+              if (officialFeatureNames.includes(mappedName + '市')) {
+                mappedName = mappedName + '市';
+              } else if (officialFeatureNames.includes(mappedName + '縣')) {
+                mappedName = mappedName + '縣';
+              } else {
+                const stem = mappedName.replace(/[縣市]$/, '');
+                const found = officialFeatureNames.find(n => n.startsWith(stem) || (stem.length >= 2 && n.includes(stem)));
+                if (found) mappedName = found;
+              }
+            }
           }
           const val = safeParseNumber(d[yField]);
           mapData.push({
@@ -2937,6 +2972,7 @@
         option.visualMap = {
           min: minVal,
           max: maxVal,
+          seriesIndex: [0],
           calculable: true,
           orient: 'vertical',
           left: 20,
@@ -4315,6 +4351,8 @@
         renderShelves();
         renderVisualization();
         renderKPIRibbon();
+        saveCurrentSheetState();
+        savePersistedState();
         showToast('⇄ 已成功對調 X 軸與 Y 軸！');
       });
     }
@@ -4333,6 +4371,8 @@
         renderShelves();
         renderVisualization();
         renderKPIRibbon();
+        saveCurrentSheetState();
+        savePersistedState();
         showToast('已清除所有視覺編碼槽');
       });
     }
@@ -5739,6 +5779,8 @@
     if (modal) modal.classList.remove('open');
     renderShelves();
     renderVisualization();
+    saveCurrentSheetState();
+    savePersistedState();
     showToast(`⚡ 已套用 ${selected.length} 項指標並列比較！已更新圖表。`);
   }
 
@@ -5761,6 +5803,8 @@
       if (modal) modal.classList.remove('open');
       renderShelves();
       renderVisualization();
+      saveCurrentSheetState();
+      savePersistedState();
       showToast(`🌟 已成功套用預設對比組合：${finalMeasures.join(' vs ')}！`);
     } else {
       showToast('⚠️ 當前資料集欄位不完全包含此組合，請手動自選指標。');
@@ -5773,6 +5817,8 @@
     if (modal) modal.classList.remove('open');
     renderShelves();
     renderVisualization();
+    saveCurrentSheetState();
+    savePersistedState();
     showToast('已重設為單一指標模式。');
   }
 
@@ -5787,6 +5833,8 @@
     }
     renderShelves();
     renderVisualization();
+    saveCurrentSheetState();
+    savePersistedState();
   }
 
   // =========================================================================
@@ -5866,6 +5914,43 @@
     return copy;
   }
 
+  function serializeFilters(filters) {
+    if (!filters) return {};
+    const serialized = {};
+    for (const [key, f] of Object.entries(filters)) {
+      if (!f) continue;
+      serialized[key] = { ...f };
+      if (f.selected instanceof Set) {
+        serialized[key].selected = Array.from(f.selected);
+      } else if (Array.isArray(f.selected)) {
+        serialized[key].selected = [...f.selected];
+      }
+    }
+    return serialized;
+  }
+
+  function deserializeFilters(filters) {
+    if (!filters) return {};
+    const deserialized = {};
+    for (const [key, f] of Object.entries(filters)) {
+      if (!f) continue;
+      deserialized[key] = { ...f };
+      if (Array.isArray(f.selected)) {
+        deserialized[key].selected = new Set(f.selected);
+      } else if (f.selected instanceof Set) {
+        deserialized[key].selected = new Set(f.selected);
+      } else if (f.selected && typeof f.selected === 'object') {
+        deserialized[key].selected = new Set(Object.keys(f.selected));
+      } else {
+        deserialized[key].selected = new Set();
+      }
+      if (Array.isArray(f.allValues)) {
+        deserialized[key].allValues = [...f.allValues];
+      }
+    }
+    return deserialized;
+  }
+
   function cloneFilters(filters) {
     if (!filters) return {};
     const cloned = {};
@@ -5904,12 +5989,17 @@
   function savePersistedState() {
     try {
       saveCurrentSheetState();
+      const serializableSheets = (state.sheets || []).map(s => ({
+        ...s,
+        filters: serializeFilters(s.filters)
+      }));
       const payload = {
-        sheets: state.sheets,
+        sheets: serializableSheets,
         activeSheetId: state.activeSheetId,
         pinnedCharts: state.pinnedCharts,
         zoomLevel: state.zoomLevel,
         sidebarCollapsed: state.sidebarCollapsed,
+        dashboardLayout: state.dashboardLayout || 2,
         savedAt: Date.now(),
         version: 1
       };
@@ -5926,11 +6016,17 @@
       const parsed = JSON.parse(raw);
       if (!parsed || !Array.isArray(parsed.sheets) || parsed.sheets.length === 0) return false;
 
-      state.sheets = parsed.sheets;
+      state.sheets = parsed.sheets.map(s => ({
+        ...s,
+        filters: deserializeFilters(s.filters)
+      }));
       state.activeSheetId = parsed.activeSheetId || parsed.sheets[0].id;
       state.pinnedCharts = Array.isArray(parsed.pinnedCharts) ? parsed.pinnedCharts : [];
       state.zoomLevel = typeof parsed.zoomLevel === 'number' ? parsed.zoomLevel : 100;
       state.sidebarCollapsed = Boolean(parsed.sidebarCollapsed);
+      if (parsed.dashboardLayout) {
+        state.dashboardLayout = parsed.dashboardLayout;
+      }
       return true;
     } catch (err) {
       console.warn('[Persistence] Failed to load state from localStorage:', err);
@@ -5939,11 +6035,6 @@
   }
 
   function resetPersistedState() {
-    try {
-      localStorage.removeItem(PERSISTENCE_KEY);
-    } catch (e) {
-      console.warn(e);
-    }
     // 重設回乾淨初始狀態
     state.sidebarCollapsed = false;
     state.zoomLevel = 100;
@@ -5979,11 +6070,16 @@
 
     // 重新載入預設資料集並套用版面
     loadDataset('jp_gender_facet', null, { skipSheetUpdate: true });
-    toggleSidebar(false, false);
-    applyZoom(100, false);
+    toggleSidebar(false, false, true);
+    applyZoom(100, false, true);
     renderWorkbookTabs();
     updatePinnedBadge();
-    savePersistedState();
+
+    try {
+      localStorage.removeItem(PERSISTENCE_KEY);
+    } catch (e) {
+      console.warn(e);
+    }
     showToast('↺ 已成功還原預設工作簿並清除本機快取！');
   }
 
@@ -6143,6 +6239,8 @@
     renderVisualization();
     renderDataTable();
     renderWorkbookTabs();
+    saveCurrentSheetState();
+    savePersistedState();
     showToast(`✨ 已新增「${newSheet.name}」分頁 (${getChartIcon(newSheet.chartType)})，可自由探索新視角！`);
   }
 
@@ -6185,6 +6283,8 @@
     renderVisualization();
     renderDataTable();
     renderWorkbookTabs();
+    saveCurrentSheetState();
+    savePersistedState();
     showToast(`📋 已建立「${newSheet.name}」分頁副本！可自由修改或切換圖表。`);
   }
 
@@ -6195,6 +6295,8 @@
     if (newName && newName.trim()) {
       sheet.name = newName.trim();
       renderWorkbookTabs();
+      saveCurrentSheetState();
+      savePersistedState();
       showToast(`✏️ 工作表已更名為「${sheet.name}」`);
     }
   }
@@ -6319,6 +6421,7 @@
       }
     }
 
+    savePersistedState();
     showToast(`📥 成功將工作簿中 ${importedCount} 張工作表載入自訂看板！`);
   }
 
@@ -6401,6 +6504,7 @@
 
   function setDashboardLayout(cols) {
     state.dashboardLayout = cols;
+    savePersistedState();
     const container = document.getElementById('dashboardGridContainer');
     if (container) {
       container.className = `dashboard-grid-container cols-${cols}`;
@@ -6433,6 +6537,7 @@
     }
     updatePinnedBadge();
     renderCustomDashboard();
+    savePersistedState();
     showToast('🗑️ 已從看板移除該圖表');
   }
 
@@ -6449,6 +6554,7 @@
       state.pinnedCharts = [];
       updatePinnedBadge();
       renderCustomDashboard();
+      savePersistedState();
       showToast('🗑️ 看板已清空');
     }
   }
@@ -6580,7 +6686,7 @@
     }
   }
 
-  function toggleSidebar(forceState) {
+  function toggleSidebar(forceState, showToastNotice = true, skipSave = false) {
     const bodyEl = document.querySelector('.workspace-body') || document.body;
     const shellEl = document.querySelector('.app-shell') || document.body;
 
@@ -6635,15 +6741,22 @@
       }
     }, 30);
 
-    showToast(shouldCollapse ? '◀ 已收合側邊欄 (最大化工作區)' : '▶ 已展開側邊欄');
+    if (!skipSave) {
+      savePersistedState();
+    }
+    if (showToastNotice) {
+      showToast(shouldCollapse ? '◀ 已收合側邊欄 (最大化工作區)' : '▶ 已展開側邊欄');
+    }
   }
 
-  function applyZoom(newZoom, showToastNotice = true) {
+  function applyZoom(newZoom, showToastNotice = true, skipSave = false) {
     if (!ZOOM_LEVELS.includes(newZoom)) {
       newZoom = ZOOM_LEVELS.reduce((prev, curr) => Math.abs(curr - newZoom) < Math.abs(prev - newZoom) ? curr : prev);
     }
     state.zoomLevel = newZoom;
-    savePersistedState();
+    if (!skipSave) {
+      savePersistedState();
+    }
 
     // 更新 UI 徽章與按鈕停用狀態
     const badge = document.getElementById('zoomLevelBadge');
@@ -6749,6 +6862,12 @@
       removeMultiMeasure(fieldName);
     },
     assignToShelf: (shelfKey, fieldName) => {
+      setShelfField(shelfKey, fieldName);
+    },
+    setShelf: (shelfKey, fieldName) => {
+      setShelfField(shelfKey, fieldName);
+    },
+    setShelfField: (shelfKey, fieldName) => {
       setShelfField(shelfKey, fieldName);
     },
     getEChartsInstance: () => {
