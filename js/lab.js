@@ -89,61 +89,91 @@
     }
   };
 
-  // 第二季：核心機制與進階實戰（AI 盲點 #07～#12）影音與實驗入口
+  // 第二季：核心機制與進階實戰（AI 盲點 #07～#12）影音與實驗入口（僅限互動實驗室內預覽）
   const BLINDSPOT_VIDEOS_S2 = [
     {
+      id: 's2_attention',
       ep: 'AI 盲點 #07',
       title: 'Attention 注意力（「它」到底是指誰？）',
       duration: '0:41',
       src: 'videos/ai_blindspots/AI盲點07_Attention注意力.mp4',
       poster: 'assets/video-posters/ep7.jpg',
       goldenQuote: 'Attention 就是幫每個字在上下文中找到最重要的關聯！',
-      url: 'learn.html?lesson=07'
+      takeaways: [
+        '<strong>動態關聯計算：</strong>模型生成文字時，會計算當前字與前文所有詞的關聯權重。',
+        '<strong>Winograd Schema 測試：</strong>更換一句話中的微小形容詞，「它」所指向的名詞就會瞬間逆轉。',
+        '<strong>不是死背字典：</strong>Attention 讓 AI 具備依據語境消解模糊指代的能力。'
+      ]
     },
     {
+      id: 's2_rag',
       ep: 'AI 盲點 #08',
       title: 'Embedding 與 RAG（AI 也能開書考？）',
       duration: '0:42',
       src: 'videos/ai_blindspots/AI盲點08_Embedding與RAG.mp4',
       poster: 'assets/video-posters/ep8.jpg',
       goldenQuote: 'RAG 就是先翻書、再回答；要知識，翻書最快！',
-      url: 'learn.html?lesson=08'
+      takeaways: [
+        '<strong>向量語意座標：</strong>Embedding 將文字化為多維空間座標，意思相近的距離越短。',
+        '<strong>開書考不改腦袋：</strong>先檢索相近文件注入 Prompt，模型照著資料回答並附來源。',
+        '<strong>低成本即時更新：</strong>規章異動只需要抽換資料庫，不需要重新訓練模型。'
+      ]
     },
     {
+      id: 's2_context',
       ep: 'AI 盲點 #09',
       title: 'Context 塞太滿（迷失在中間 Lost in the Middle）',
       duration: '0:43',
       src: 'videos/ai_blindspots/AI盲點09_Context塞太滿.mp4',
       poster: 'assets/video-posters/ep9.jpg',
       goldenQuote: '給對的資料比給多重要；Context 越乾淨，答案越精準！',
-      url: 'learn.html?lesson=09'
+      takeaways: [
+        '<strong>U型注意力曲線：</strong>模型對文本開頭與結尾最敏銳，落在 30%~70% 處最容易被忽略。',
+        '<strong>上下文工程三原則：</strong>① 精選（只給必要的）② 壓縮（長文先摘要）③ 分批（步驟導向）。',
+        '<strong>垃圾進垃圾出：</strong>塞入無關背景只會稀釋注意力並增加出錯機率。'
+      ]
     },
     {
+      id: 's2_token_cost',
       ep: 'AI 盲點 #10',
       title: 'Token 與費用（Input/Output 計價與歷史滾雪球）',
       duration: '0:49',
       src: 'videos/ai_blindspots/AI盲點10_Token與費用_1.mp4',
       poster: 'assets/video-posters/ep10.jpg',
       goldenQuote: 'Token 就是 AI 世界的錢；聊完開新局，省錢又聰明！',
-      url: 'learn.html?lesson=10'
+      takeaways: [
+        '<strong>輸出比輸入貴：</strong>Output 生成運算更耗時，價格常為 Input 的 2～4 倍。',
+        '<strong>歷史重送等差暴增：</strong>維持記憶的代價是每輪都將全部前文重新送入模型。',
+        '<strong>省錢三招：</strong>一個主題聊完就開新對話、不貼贅字、指示模型精簡回答。'
+      ]
     },
     {
+      id: 's2_tool_calling',
       ep: 'AI 盲點 #11',
       title: 'Tool Calling 工具呼叫（AI 動腦、工具動手）',
       duration: '0:50',
       src: 'videos/ai_blindspots/AI盲點11_ToolCalling工具呼叫_1.mp4',
       poster: 'assets/video-posters/ep11.jpg',
       goldenQuote: 'AI 負責動腦出參數，外部工具負責動手精確算數！',
-      url: 'learn.html?lesson=11'
+      takeaways: [
+        '<strong>三步分工循環：</strong>① AI 動腦判斷需工具並出參數 ➔ ② 程式執行工具 ➔ ③ 回傳結果 AI 組織語言。',
+        '<strong>Schema 規格說明書：</strong>以 JSON 定義工具名稱、參數型態與約束條件。',
+        '<strong>人機協同安全點：</strong>關鍵敏感操作（如付款、刪除、發信）必須設置人工簽核點。'
+      ]
     },
     {
+      id: 's2_adaptation',
       ep: 'AI 盲點 #12',
       title: '微調 vs RAG vs LoRA（讓 AI 變專家的三條路）',
       duration: '0:54',
       src: 'videos/ai_blindspots/AI盲點12_微調RAG與LoRA_1.mp4',
       poster: 'assets/video-posters/ep12.jpg',
       goldenQuote: '要知識就翻書（RAG），要習慣就補習（LoRA / 微調）！',
-      url: 'learn.html?lesson=12'
+      takeaways: [
+        '<strong>RAG 開書考：</strong>完全不改權重，適用動態變動知識與最新文件。',
+        '<strong>LoRA 輕量外掛：</strong>凍結主腦只訓轉接層，便宜快速，適用特定語氣與垂直習慣。',
+        '<strong>Fine-tuning 全量微調：</strong>全神經網路重訓，成本最高，適用深層邏輯與專利架構。'
+      ]
     }
   ];
 
@@ -244,21 +274,26 @@
               '<span style="background: #f4f0ff; color: #4c2889; border: 1px solid #b69cff; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">第二季</span>' +
               '核心機制與進階實戰（AI 盲點 #07～#12）' +
             '</h3>' +
-            '<span style="font-size: 13px; color: var(--olive);">進階落地 · 6 大機制實測</span>' +
+            '<span style="font-size: 13px; color: var(--olive);">進階落地 · 6 大機制預覽</span>' +
           '</div>' +
           '<div class="blindspots-grid">' +
-            BLINDSPOT_VIDEOS_S2.map(function (v) {
-              return '<a href="' + esc(v.url) + '" class="blindspot-card" style="border-left: 3px solid #b69cff;">' +
+            BLINDSPOT_VIDEOS_S2.map(function (v, idx) {
+              return '<div class="blindspot-card s2-preview-card" data-s2-idx="' + idx + '" role="button" tabindex="0" style="border-left: 3px solid #b69cff; cursor: pointer; transition: all .15s ease;">' +
                 '<div class="blindspot-card-top">' +
                   '<span class="blindspot-card-ep" style="color: #6d28d9;">' + esc(v.ep) + '</span>' +
                   '<span class="blindspot-card-duration">⏱️ ' + esc(v.duration) + '</span>' +
                 '</div>' +
                 '<div class="blindspot-card-title">' + esc(v.title) + '</div>' +
-                '<div class="blindspot-card-quote" style="background: #faf5ff; color: #581c87;">💡 ' + esc(v.goldenQuote) + '</div>' +
-              '</a>';
+                '<div class="blindspot-card-quote" style="background: #faf5ff; color: #581c87; margin-bottom: 10px;">💡 ' + esc(v.goldenQuote) + '</div>' +
+                '<div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; font-size: 12px; padding-top: 6px; border-top: 1px dashed #e9d5ff;">' +
+                  '<span style="color: #7c3aed; font-weight: 700;">▶ 點擊觀看 60s 影片</span>' +
+                  '<span style="background: #f3e8ff; color: #6b21a8; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">單元實驗籌備中</span>' +
+                '</div>' +
+              '</div>';
             }).join('') +
           '</div>' +
         '</div>' +
+        '<div id="s2-video-modal-container"></div>' +
       '</section>' +
       groups.map(g =>
         '<section class="experiment-index-group">' +
@@ -274,6 +309,63 @@
           '</ul>' +
         '</section>'
       ).join('');
+
+    // 綁定第二季卡片點擊事件：直接在互動實驗室原地彈出影片與精華說明，零跳頁！
+    document.querySelectorAll('[data-s2-idx]').forEach(function (card) {
+      const open = function () {
+        const idx = parseInt(card.getAttribute('data-s2-idx'), 10);
+        const item = BLINDSPOT_VIDEOS_S2[idx];
+        if (item) openS2Modal(item);
+      };
+      card.addEventListener('click', open);
+      card.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+      });
+    });
+  }
+
+  function openS2Modal(item) {
+    const container = document.getElementById('s2-video-modal-container');
+    if (!container) return;
+    container.innerHTML =
+      '<div id="s2-modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;">' +
+        '<div style="background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">' +
+          '<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">' +
+            '<div>' +
+              '<span style="display: inline-block; background: #f4f0ff; color: #4c2889; border: 1px solid #b69cff; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; margin-bottom: 4px;">' + esc(item.ep) + '</span>' +
+              '<h3 style="margin: 0; font-size: 17px; color: var(--ink); line-height: 1.4;">' + esc(item.title) + '</h3>' +
+            '</div>' +
+            '<button type="button" id="close-s2-modal" style="background: none; border: 0; font-size: 24px; cursor: pointer; color: var(--muted); line-height: 1; padding: 0 4px;" aria-label="關閉">✕</button>' +
+          '</div>' +
+          '<div style="background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 14px;">' +
+            '<video controls playsinline autoplay poster="' + esc(item.poster) + '" style="width: 100%; max-height: 380px; display: block; margin: 0 auto;">' +
+              '<source src="' + esc(item.src) + '" type="video/mp4" />' +
+            '</video>' +
+          '</div>' +
+          '<div style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px;">' +
+            '<strong style="color: #6b21a8; font-size: 13px;">💡 一句話記起來：</strong>' +
+            '<p style="margin: 4px 0 0; font-size: 14px; color: #581c87; font-weight: 600;">' + esc(item.goldenQuote) + '</p>' +
+          '</div>' +
+          '<ul style="margin: 0 0 16px; padding-left: 20px; font-size: 13px; color: var(--ink); line-height: 1.6;">' +
+            item.takeaways.map(function (t) { return '<li>' + t + '</li>'; }).join('') +
+          '</ul>' +
+          '<div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--rule); padding-top: 12px;">' +
+            '<span style="font-size: 12px; color: var(--muted);">🧪 本單元互動實驗架構籌備中</span>' +
+            '<button type="button" id="close-s2-modal-btn" class="action-button" style="min-height: 34px; padding: 6px 16px;">關閉</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    const close = function () { container.innerHTML = ''; };
+    const closeBtn = document.getElementById('close-s2-modal');
+    const closeBtn2 = document.getElementById('close-s2-modal-btn');
+    const backdrop = document.getElementById('s2-modal-backdrop');
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (closeBtn2) closeBtn2.addEventListener('click', close);
+    if (backdrop) backdrop.addEventListener('click', function (e) {
+      if (e.target === backdrop) close();
+    });
+  }
   }
 
   function render() {
