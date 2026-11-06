@@ -45,8 +45,25 @@ CONCEPTS = {'concepts/'+name+'.html' for name in (
     'overview','model','tokens','sampling','time','knowledge','moe','prompt','context',
     'context-engineering','agent','agent-tools','agent-operation','graphics','evidence',
     'verification','injection','api','cost','models','deployment')}
-VIDEO_FILES = {'數位乩童.mp4','數位乩童開示_AI漏斗.mp4','法器篇EP0_神明的後台.mp4','法器篇EP1_咒語.mp4','法器篇EP2_布壇.mp4','法器篇EP3_起乩循環.mp4','法器篇EP4_宮廟.mp4'}
-VIDEO_POSTERS = {'assets/video-posters/'+name+'.jpg' for name in ('ep0','ep1','ep2','ep3','ep4','overview','funnel')}
+VIDEO_FILES = {
+    '數位乩童.mp4','數位乩童開示_AI漏斗.mp4','法器篇EP0_神明的後台.mp4','法器篇EP1_咒語.mp4','法器篇EP2_布壇.mp4','法器篇EP3_起乩循環.mp4','法器篇EP4_宮廟.mp4',
+    'videos/ai_blindspots/AI盲點01_草莓與Token.mp4',
+    'videos/ai_blindspots/AI盲點02_金魚腦與記憶.mp4',
+    'videos/ai_blindspots/AI盲點03_提示詞注入.mp4',
+    'videos/ai_blindspots/AI盲點04_幻覺.mp4',
+    'videos/ai_blindspots/AI盲點05_Temperature抽籤.mp4',
+    'videos/ai_blindspots/AI盲點06_知識截止.mp4',
+    'videos/ai_blindspots/AI盲點07_Attention注意力.mp4',
+    'videos/ai_blindspots/AI盲點08_Embedding與RAG.mp4',
+    'videos/ai_blindspots/AI盲點09_Context塞太滿.mp4',
+    'videos/ai_blindspots/AI盲點10_Token與費用_1.mp4',
+    'videos/ai_blindspots/AI盲點10_Token與費用.mp4',
+    'videos/ai_blindspots/AI盲點11_ToolCalling工具呼叫_1.mp4',
+    'videos/ai_blindspots/AI盲點11_ToolCalling工具呼叫.mp4',
+    'videos/ai_blindspots/AI盲點12_微調RAG與LoRA_1.mp4',
+    'videos/ai_blindspots/AI盲點12_微調RAG與LoRA.mp4'
+}
+VIDEO_POSTERS = {'assets/video-posters/'+name+'.jpg' for name in ('ep0','ep1','ep2','ep3','ep4','overview','funnel','ep7','ep8','ep9','ep10','ep11','ep12')}
 ALLOWED = PAGES | ASSETS | TOPICS | CONCEPTS | COURSE | LEGACY_PAGES | VIDEO_FILES | VIDEO_POSTERS | {'videos.html','css/course-videos.css'}
 
 class Handler(SimpleHTTPRequestHandler):

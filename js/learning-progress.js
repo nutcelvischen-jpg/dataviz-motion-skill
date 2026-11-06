@@ -1,7 +1,8 @@
 (function () {
   'use strict';
   const KEY = 'llm_learning_progress_v1';
-  const valid = new Set(['01','02','03','04','05','06']);
+  const allIds = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+  const valid = new Set(allIds);
   let available = true;
   const empty = () => ({version:1,lastVisitedLessonId:null,startedLessonIds:[],completedLessonIds:[],quizPassedLessonIds:[],updatedAt:null});
   let state = empty();
@@ -30,7 +31,7 @@
     complete(id){if(!valid.has(id)||!state.quizPassedLessonIds.includes(id))return false;add('completedLessonIds',id);save();return true;},
     reset(){state=empty();try{localStorage.removeItem(KEY);}catch(e){available=false;}window.dispatchEvent(new Event('learning-progress-change'));},
     status(id){return state.completedLessonIds.includes(id)?'已完成':state.startedLessonIds.includes(id)?'學習中':'尚未開始';},
-    next(){const last=state.lastVisitedLessonId;if(last&&!state.completedLessonIds.includes(last))return last;return ['01','02','03','04','05','06'].find(id=>!state.completedLessonIds.includes(id))||null;}
+    next(){const last=state.lastVisitedLessonId;if(last&&!state.completedLessonIds.includes(last))return last;return allIds.find(id=>!state.completedLessonIds.includes(id))||null;}
   };
   window.addEventListener('storage',e=>{if(e.key===KEY||e.key===null){state=read();window.dispatchEvent(new Event('learning-progress-change'));}});
 }());

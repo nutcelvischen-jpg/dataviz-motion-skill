@@ -22,8 +22,8 @@ function setup(initial = {}, disabled = false) {
   return {progress:window.LearningProgress, lessons:window.LEARNING_LESSONS, values};
 }
 let t = setup({llm_lab_provider:'openrouter'});
-assert.equal(t.lessons.length, 6);
-assert.deepEqual(Array.from(t.lessons, x => x.id), ['01','02','03','04','05','06']);
+assert.equal(t.lessons.length, 12);
+assert.deepEqual(Array.from(t.lessons, x => x.id), ['01','02','03','04','05','06','07','08','09','10','11','12']);
 for (const lesson of t.lessons) {
   assert.equal(lesson.objectives.length, 2);
   assert.ok(lesson.explanation.length >= 2 && lesson.flow.length >= 3 && lesson.observation);
