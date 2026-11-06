@@ -83,22 +83,34 @@
   const PALETTE_BAUHAUS = ['#1d4ed8', '#0284c7', '#0f766e', '#16a34a', '#eab308', '#ea580c', '#e11d48', '#7c3aed', '#db2777', '#475569'];
 
   // --- 數值與統計安全輔助函式 (防溢位、防 NaN、防髒資料) ---
-  function safeParseNumber(val) {
-    if (typeof val === 'number') return isNaN(val) ? 0 : val;
-    if (val === null || val === undefined) return 0;
-    const str = String(val).replace(/[,%]/g, '').trim();
-    if (str === '' || str === '-' || str === 'N/A' || str === 'null' || str === 'undefined') return 0;
+  // 缺值標記：e-Stat 以 "-"、"…"、"x"、"***" 表示秘匿或無資料
+  const MISSING_TOKEN_RE = /^(-|－|—|…|\.\.\.|x|X|\*+|N\/A|NA|NaN|null|undefined)$/i;
+
+  // 解析數值；缺值或非數值回傳 null（不再默默變成 0）
+  function toNumberOrNull(val) {
+    if (typeof val === 'number') return Number.isFinite(val) ? val : null;
+    if (val === null || val === undefined || typeof val === 'boolean') return null;
+    let str = String(val).normalize('NFKC').replace(/[,%\s]/g, '');
+    if (str === '' || MISSING_TOKEN_RE.test(str)) return null;
+    str = str.replace(/^\((.+)\)$/, '-$1'); // 會計負數 (123) → -123
     const n = Number(str);
-    return isNaN(n) ? 0 : n;
+    return Number.isFinite(n) ? n : null;
+  }
+
+  // 繪圖用：缺值回傳 ECharts 的空值標記 '-'，折線會斷開而非掉到 0
+  function numOrGap(val) {
+    const n = toNumberOrNull(val);
+    return n === null ? '-' : n;
+  }
+
+  // 算術用 (加總、排序)：缺值視為 0
+  function safeParseNumber(val) {
+    const n = toNumberOrNull(val);
+    return n === null ? 0 : n;
   }
 
   function isValidNumeric(val) {
-    if (val === null || val === undefined) return false;
-    if (typeof val === 'number') return !isNaN(val) && isFinite(val);
-    const str = String(val).replace(/[,%]/g, '').trim();
-    if (str === '' || str === '-' || str === 'N/A' || str === 'null' || str === 'undefined') return false;
-    const n = Number(str);
-    return !isNaN(n) && isFinite(n);
+    return toNumberOrNull(val) !== null;
   }
 
   function safeMin(arr, defaultVal = 0) {
@@ -267,6 +279,22 @@
   }
 
   // --- 真正的 Group-By 聚合計算引擎 ---
+  // 比率 / 百分比 / 平均類欄位不可直接加總 (例如 10% + 30% ≠ 40%)
+  const RATE_FIELD_RE = /率|%|％|ratio|rate|percent|pct|平均|均價|單價|坪價/i;
+  function isRateField(m) {
+    const cfg = state.schemaConfig && state.schemaConfig[m];
+    if (cfg && cfg.agg === 'avg') return true;
+    return RATE_FIELD_RE.test(m);
+  }
+
+  // 只在顯示層四捨五入：大數保留 2 位小數，小數保留 4 位有效數字 (避免 0.0012 → 0)
+  function tidyNumber(v) {
+    if (typeof v !== 'number' || !Number.isFinite(v) || v % 1 === 0) return v;
+    return Math.abs(v) >= 1 ? parseFloat(v.toFixed(2)) : parseFloat(v.toPrecision(4));
+  }
+
+  let lastRateAggNotice = '';
+
   function aggregateRows(rows, groupKeys, measureKeys, aggType) {
     if (!aggType || aggType === 'RAW' || !rows || rows.length === 0) {
       return rows;
@@ -275,6 +303,12 @@
     if (validGroupKeys.length === 0) return rows;
 
     const validMeasures = [...new Set((measureKeys || []).filter(m => m && typeof m === 'string'))];
+    const measureSet = new Set(validMeasures);
+    const groupKeySet = new Set(validGroupKeys);
+
+    // SUM 時，比率欄位改用平均值
+    const aggFor = (m) => (aggType === 'SUM' && isRateField(m)) ? 'MEAN' : aggType;
+    const rateSwapped = validMeasures.filter(m => aggFor(m) !== aggType);
 
     const groups = new Map();
     for (let i = 0; i < rows.length; i++) {
@@ -286,31 +320,35 @@
       if (!entry) {
         entry = {
           protoRow: { ...r },
+          mixedCols: new Set(),
           count: 0,
           sum: {},
           min: {},
           max: {},
-          values: {}
+          n: {}
         };
         validMeasures.forEach(m => {
           entry.sum[m] = 0;
           entry.min[m] = Infinity;
           entry.max[m] = -Infinity;
-          entry.values[m] = [];
+          entry.n[m] = 0;
         });
         groups.set(groupKey, entry);
+      } else {
+        // 非分組、非度量欄位：若群組內數值不一致，不能沿用第一列的值
+        for (const k in entry.protoRow) {
+          if (groupKeySet.has(k) || measureSet.has(k) || entry.mixedCols.has(k)) continue;
+          if (entry.protoRow[k] !== r[k]) entry.mixedCols.add(k);
+        }
       }
       entry.count++;
       validMeasures.forEach(m => {
-        const rawVal = r[m];
-        if (rawVal !== null && rawVal !== undefined && String(rawVal).trim() !== '') {
-          const val = safeParseNumber(rawVal);
-          if (!isNaN(val)) {
-            entry.sum[m] += val;
-            if (val < entry.min[m]) entry.min[m] = val;
-            if (val > entry.max[m]) entry.max[m] = val;
-            entry.values[m].push(val);
-          }
+        const val = toNumberOrNull(r[m]);
+        if (val !== null) {
+          entry.sum[m] += val;
+          if (val < entry.min[m]) entry.min[m] = val;
+          if (val > entry.max[m]) entry.max[m] = val;
+          entry.n[m]++;
         }
       });
     }
@@ -318,39 +356,62 @@
     const aggregated = [];
     groups.forEach((entry) => {
       const row = { ...entry.protoRow };
+      entry.mixedCols.forEach(k => { row[k] = '(多值)'; });
       validMeasures.forEach(m => {
-        const hasValues = entry.values[m].length > 0;
-        if (aggType === 'SUM') {
-          row[m] = hasValues ? entry.sum[m] : 0;
-        } else if (aggType === 'MEAN') {
-          row[m] = hasValues ? entry.sum[m] / entry.values[m].length : 0;
-        } else if (aggType === 'MAX') {
-          row[m] = hasValues && entry.max[m] !== -Infinity ? entry.max[m] : 0;
-        } else if (aggType === 'MIN') {
-          row[m] = hasValues && entry.min[m] !== Infinity ? entry.min[m] : 0;
-        } else if (aggType === 'COUNT') {
-          row[m] = entry.count;
+        const hasValues = entry.n[m] > 0;
+        const agg = aggFor(m);
+        if (agg === 'COUNT') {
+          row[m] = entry.n[m];
+        } else if (!hasValues) {
+          row[m] = null; // 整組皆缺值 → 保留缺值，而非顯示 0
+        } else if (agg === 'SUM') {
+          row[m] = entry.sum[m];
+        } else if (agg === 'MEAN') {
+          row[m] = entry.sum[m] / entry.n[m];
+        } else if (agg === 'MAX') {
+          row[m] = entry.max[m];
+        } else if (agg === 'MIN') {
+          row[m] = entry.min[m];
         }
-        if (typeof row[m] === 'number' && row[m] % 1 !== 0) {
-          row[m] = parseFloat(row[m].toFixed(2));
-        }
+        row[m] = tidyNumber(row[m]);
       });
-      if (aggType === 'COUNT' && validMeasures.length === 0) {
+      if (aggType === 'COUNT') {
         row['計數'] = entry.count;
       }
       aggregated.push(row);
     });
 
+    // 提示使用者哪些比率欄位改用平均 (同一組合只提示一次)
+    const noticeKey = rateSwapped.join('|');
+    if (rateSwapped.length && noticeKey !== lastRateAggNotice && typeof document !== 'undefined') {
+      lastRateAggNotice = noticeKey;
+      const shown = rateSwapped.filter(m => m === state.shelf.y || m === state.shelf.x || m === state.shelf.secondary);
+      if (shown.length) setTimeout(() => showToast(`ℹ️「${shown.join('、')}」為比率欄位，SUM 已改用平均值計算`), 0);
+    }
+
     return aggregated;
   }
+
+  const MAX_RAW_MARKS = 5000;
+  let lastBigDataNotice = '';
 
   function getVisualData(customRows = null) {
     const raw = customRows || getActiveRows();
     if (raw.length === 0) return raw;
     const isFacetSupported = ['bar', 'line'].includes(state.chartType);
-    const effectiveAgg = (!state.shelf.agg || state.shelf.agg === 'RAW')
+    let effectiveAgg = (!state.shelf.agg || state.shelf.agg === 'RAW')
       ? (state.shelf.facet && !isFacetSupported && !['scatter', 'boxplot', 'violin'].includes(state.chartType) ? 'SUM' : 'RAW')
       : state.shelf.agg;
+    // 大資料保護：類別軸圖表逐列繪製上萬根柱子會讓頁面凍結數十秒，超過上限時自動彙總
+    const categoryAxisCharts = ['bar', 'line', 'dual', 'donut', 'funnel', 'treemap', 'radar', 'geo'];
+    if (effectiveAgg === 'RAW' && raw.length > MAX_RAW_MARKS && categoryAxisCharts.includes(state.chartType)) {
+      effectiveAgg = 'SUM';
+      const noticeKey = `${state.currentDatasetId}|${state.chartType}`;
+      if (lastBigDataNotice !== noticeKey) {
+        lastBigDataNotice = noticeKey;
+        setTimeout(() => showToast(`⚡ 資料共 ${raw.length.toLocaleString()} 列，已自動依 X 軸彙總以保持流暢 (可手動切換聚合方式)`), 0);
+      }
+    }
     if (effectiveAgg === 'RAW') {
       return raw;
     }
@@ -472,25 +533,58 @@
     setupEventListeners();
     setupDragAndDrop();
     init17DomainModal();
-    loadDataset('jp_gender_facet');
 
-    if (!state.sheets || state.sheets.length === 0) {
-      state.sheets = [
-        {
-          id: 'sheet_1',
-          name: '工作表 1 (分面柱狀)',
-          chartType: state.chartType || 'bar',
-          shelf: JSON.parse(JSON.stringify(state.shelf)),
-          datasetId: state.currentDatasetId || 'jp_gender_facet',
-          filters: cloneFilters(state.filters || {}),
-          barStackMode: !!state.barStackMode,
-          facetScaleMode: state.facetScaleMode || 'fixed'
-        }
-      ];
-      state.activeSheetId = 'sheet_1';
+    // 嘗試從 localStorage 還原先前的工作簿狀態 (Key: data_atoms_studio_state_v1)
+    const hasRestored = loadPersistedState();
+
+    if (hasRestored) {
+      const activeSheet = (state.sheets || []).find(s => s.id === state.activeSheetId) || state.sheets[0];
+      state.activeSheetId = activeSheet.id;
+
+      // 載入當前分頁指定的資料集
+      const targetDataset = activeSheet.datasetId || 'jp_gender_facet';
+      loadDataset(targetDataset, null, { skipSheetUpdate: true, skipShelfReset: true, skipRender: true });
+
+      // 套用分頁的視覺配置與篩選器
+      state.chartType = activeSheet.chartType || 'bar';
+      state.shelf = JSON.parse(JSON.stringify(activeSheet.shelf || state.shelf));
+      state.barStackMode = !!activeSheet.barStackMode;
+      state.facetScaleMode = activeSheet.facetScaleMode || 'fixed';
+      state.filters = cloneFilters(activeSheet.filters || {});
+
+      renderFieldLists();
+      renderChartTypeSelector();
+      renderShelves();
+      renderKPIRibbon();
+      renderVisualization();
+      renderDataTable();
+      renderWorkbookTabs();
+      updatePinnedBadge();
+      toggleSidebar(state.sidebarCollapsed, false);
+      applyZoom(state.zoomLevel || 100, false);
+    } else {
+      loadDataset('jp_gender_facet');
+
+      if (!state.sheets || state.sheets.length === 0) {
+        state.sheets = [
+          {
+            id: 'sheet_1',
+            name: '工作表 1 (分面柱狀)',
+            chartType: state.chartType || 'bar',
+            shelf: JSON.parse(JSON.stringify(state.shelf)),
+            datasetId: state.currentDatasetId || 'jp_gender_facet',
+            filters: cloneFilters(state.filters || {}),
+            barStackMode: !!state.barStackMode,
+            facetScaleMode: state.facetScaleMode || 'fixed'
+          }
+        ];
+        state.activeSheetId = 'sheet_1';
+      }
+      renderWorkbookTabs();
+      updatePinnedBadge();
+      applyZoom(state.zoomLevel || 100, false);
+      savePersistedState();
     }
-    renderWorkbookTabs();
-    applyZoom(state.zoomLevel || 100, false);
 
     // 檢查 URL 參數是否指定了圖表 (如 ?chart=line, ?chart=geo, ?chart=violin)
     try {
@@ -503,6 +597,7 @@
         renderChartTypeSelector();
         renderWorkbookTabs();
         renderVisualization();
+        savePersistedState();
       }
     } catch (e) {
       console.warn('URL param chart error:', e);
@@ -645,9 +740,11 @@
     const distinctSet = new Set();
     const sampleValues = [];
 
-    // 取樣前 120 筆資料深入探查
-    const scanLimit = Math.min(total, 120);
-    for (let i = 0; i < scanLimit; i++) {
+    // 全檔等距取樣 (最多約 600 筆)，避免資料已排序時只看到前段
+    const step = Math.max(1, Math.floor(total / 600));
+    let sampledCount = 0;
+    for (let i = 0; i < total; i += step) {
+      sampledCount++;
       const val = rows[i][colName];
       if (val !== null && val !== undefined && val !== '') {
         nonNullCount++;
@@ -656,11 +753,7 @@
           sampleValues.push(String(val));
         }
 
-        const isActuallyNumeric = typeof val === 'number' || (
-          typeof val === 'string' &&
-          val.trim() !== '' &&
-          !isNaN(Number(val.replace(/[,%]/g, '').trim()))
-        );
+        const isActuallyNumeric = toNumberOrNull(val) !== null;
         if (isActuallyNumeric) {
           numericCount++;
           const num = safeParseNumber(val);
@@ -680,7 +773,7 @@
                   Array.from(distinctSet).some(v => /東京|大阪|京都|北海道|愛知|福岡|神奈川|兵庫|廣島|沖繩|東北|關東|近畿|中部|中國|四國|九州/i.test(String(v)));
     const isDate = /年|月|日|date|time|year|month|day|時序|季度|quarter|period/i.test(colName);
     const isRateOrAvg = /率|%|ratio|rate|percent|pct|平均|均價|單價|坪價|所得/i.test(colName);
-    const isCodeOrId = /id|code|代碼|代号|編號|序號/i.test(colName);
+    const isCodeOrId = /(^|[^a-z])(id|code)([^a-z]|$)|代碼|代号|代號|編號|序號/i.test(colName);
     const isBoolean = Array.from(distinctSet).every(v => /^(true|false|是|否|0|1|y|n)$/i.test(String(v))) && distinctCount <= 2;
 
     let role = 'dimension';
@@ -699,7 +792,8 @@
         nature = 'discrete';
         agg = 'count';
         reason = '歷史時序年度維度 (可切換為連續時間軸)';
-      } else if (isCodeOrId || (distinctCount <= 4 && !isRateOrAvg && !isHighCardinality && decimalCount === 0)) {
+      } else if (isCodeOrId || (distinctCount <= 4 && nonNullCount >= 30 && !isRateOrAvg && decimalCount === 0)) {
+        // 少量相異整數只在資料量夠大時才視為分類代碼；小資料集 (如 5 列人口數) 仍是度量
         type = 'integer';
         role = 'dimension';
         nature = 'discrete';
@@ -751,7 +845,7 @@
       agg,
       alias: colName,
       distinctCount,
-      nullCount: total - nonNullCount,
+      nullCount: sampledCount > 0 ? Math.round(((sampledCount - nonNullCount) / sampledCount) * total) : 0,
       sampleValues,
       reason
     };
@@ -878,13 +972,19 @@
   }
 
   // --- 智慧初始化常用篩選器 (地區分組 / 年份區間) ---
+  // 篩選器用的類別鍵：空白值歸入「(空白)」，避免加上篩選器後空白列默默消失
+  const FILTER_BLANK = '(空白)';
+  function filterKey(v) {
+    return (v === null || v === undefined || String(v).trim() === '') ? FILTER_BLANK : String(v);
+  }
+
   function initDefaultFilters() {
     state.filters = {};
 
     // 1. 地區分區 / 洲別 / 分區 篩選器
-    const regionField = state.columns.find(c => /地方分區|分區|洲別|地區|區域|地域/i.test(c));
+    const regionField = state.columns.find(c => /地方分區|分區|洲別|地區|區域|地域|^region$|^area$|^continent$/i.test(c));
     if (regionField) {
-      const vals = [...new Set(state.rawRows.map(r => String(r[regionField] != null ? r[regionField] : '')).filter(Boolean))];
+      const vals = [...new Set(state.rawRows.map(r => filterKey(r[regionField])))];
       if (vals.length > 1 && vals.length <= 15) {
         state.filters[regionField] = {
           field: regionField,
@@ -926,7 +1026,7 @@
         const f = state.filters[field];
         if (!f) continue;
         if (f.type === 'categorical') {
-          const val = String(row[field] != null ? row[field] : '');
+          const val = filterKey(row[field]);
           if (f.selected) {
             if (!(f.selected instanceof Set)) {
               f.selected = new Set(Array.isArray(f.selected) ? f.selected : Object.keys(f.selected));
@@ -936,11 +1036,9 @@
             }
           }
         } else if (f.type === 'range') {
-          let num = f.isYear ? parseInt(String(row[field]), 10) : safeParseNumber(row[field]);
-          if (isNaN(num)) {
-            num = parseInt(String(row[field]), 10);
-          }
-          if (!isNaN(num)) {
+          // 缺值列不因區間篩選被剔除 (舊版會把空白當 0)
+          let num = f.isYear ? parseInt(String(row[field]), 10) : toNumberOrNull(row[field]);
+          if (num !== null && !isNaN(num)) {
             if (f.currentMin != null && num < f.currentMin) return false;
             if (f.currentMax != null && num > f.currentMax) return false;
           }
@@ -961,7 +1059,7 @@
     const isYear = /年份|年度|year|時序/i.test(fieldName);
     const isNumeric = state.measures.includes(fieldName) || isYear;
     if (isNumeric) {
-      const nums = state.rawRows.map(r => isYear ? parseInt(String(r[fieldName]), 10) : safeParseNumber(r[fieldName])).filter(v => !isNaN(v));
+      const nums = state.rawRows.map(r => isYear ? parseInt(String(r[fieldName]), 10) : toNumberOrNull(r[fieldName])).filter(v => v !== null && !isNaN(v));
       if (nums.length > 0) {
         const [minVal, maxVal] = safeExtent(nums);
         state.filters[fieldName] = {
@@ -975,7 +1073,7 @@
         };
       }
     } else {
-      const vals = [...new Set(state.rawRows.map(r => String(r[fieldName] != null ? r[fieldName] : '')).filter(Boolean))];
+      const vals = [...new Set(state.rawRows.map(r => filterKey(r[fieldName])))];
       state.filters[fieldName] = {
         field: fieldName,
         type: 'categorical',
@@ -1055,7 +1153,7 @@
         onFilterChanged();
         showToast(`已套用「${fieldName}」區間：${minV} ~ ${maxV}`);
       } else {
-        alert('請輸入有效的數值範圍 (起始 <= 結束)！');
+        showToast('⚠️ 請輸入有效的數值範圍 (起始 <= 結束)');
       }
     }
   }
@@ -1080,6 +1178,8 @@
     renderVisualization();
     renderKPIRibbon();
     renderDataTable();
+    saveCurrentSheetState();
+    savePersistedState();
   }
 
   // --- 渲染 Filters 槽位中的標籤膠囊 ---
@@ -1161,7 +1261,7 @@
           <div class="filter-group-card">
             <span class="filter-group-header">📍 ${escapeHtml(field)}:</span>
             <button type="button" class="filter-quick-action" onclick="window.PyGWalker.setAllFilterValues('${escapeJsStr(field)}', true)">全選</button>
-            <button type="button" class="filter-quick-action" onclick="window.PyGWalker.setAllFilterValues('${escapeJsStr(field)}', false)">全清</button>
+            <button type="button" class="filter-quick-action" onclick="window.PyGWalker.setAllFilterValues('${escapeJsStr(field)}', false)" title="清除其他選項，只保留第一項">只留第一項</button>
             <div class="filter-chip-container">
               ${f.allValues.map(val => {
                 const isAct = f.selected.has(val);
@@ -1452,7 +1552,7 @@
       : ((state.shelf.x && state.measures.includes(state.shelf.x)) ? state.shelf.x : null);
 
     if (activeMeasure) {
-      const nums = data.map(d => safeParseNumber(d[activeMeasure])).filter(v => typeof v === 'number' && !isNaN(v));
+      const nums = data.map(d => toNumberOrNull(d[activeMeasure])).filter(v => v !== null);
       if (nums.length > 0) {
         const sum = nums.reduce((a, b) => a + b, 0);
         const avg = sum / nums.length;
@@ -1861,7 +1961,7 @@
         activeYFields.forEach((mField, mIdx) => {
           const mColor = PALETTE[mIdx % PALETTE.length];
           const mMap = new Map();
-          catRows.forEach(d => mMap.set(String(d[xField]), safeParseNumber(d[mField])));
+          catRows.forEach(d => mMap.set(String(d[xField]), numOrGap(d[mField])));
           const mVals = panelXCategories.map(x => mMap.has(x) ? mMap.get(x) : '-');
           series.push({
             name: mField,
@@ -1899,7 +1999,7 @@
         });
       } else {
         const rowMap = new Map();
-        catRows.forEach(d => rowMap.set(String(d[xField]), safeParseNumber(d[yField])));
+        catRows.forEach(d => rowMap.set(String(d[xField]), numOrGap(d[yField])));
 
         const colorField = state.shelf.color;
         const colorMap = new Map();
@@ -1960,7 +2060,7 @@
       // 7. 次指標 Series (若有)
       if (hasSec && secYAxisIndex !== null) {
         const secMap = new Map();
-        catRows.forEach(d => secMap.set(String(d[xField]), safeParseNumber(d[secField])));
+        catRows.forEach(d => secMap.set(String(d[xField]), numOrGap(d[secField])));
         const secVals = panelXCategories.map(x => secMap.has(x) ? secMap.get(x) : '-');
 
         series.push({
@@ -2094,16 +2194,18 @@
     }
 
     // 排序處理
+    // 複製後再排序：data 可能直接引用 state.rawRows，原地排序會打亂原始順序
+    // (例如先看柱狀圖再切折線圖，時間軸會變成倒序)
     if (state.sortDescending && state.chartType === 'bar') {
       if (state.measures.includes(yField)) {
-        data.sort((a, b) => safeParseNumber(b[yField]) - safeParseNumber(a[yField]));
+        data = [...data].sort((a, b) => safeParseNumber(b[yField]) - safeParseNumber(a[yField]));
       } else if (state.measures.includes(xField)) {
-        data.sort((a, b) => safeParseNumber(b[xField]) - safeParseNumber(a[xField]));
+        data = [...data].sort((a, b) => safeParseNumber(b[xField]) - safeParseNumber(a[xField]));
       }
     }
 
     const xVals = data.map(d => d[xField]);
-    const yVals = data.map(d => safeParseNumber(d[yField]));
+    const yVals = data.map(d => numOrGap(d[yField]));
 
     // 計算底部邊距與 X 軸旋轉以保證 X 軸標籤與 DataZoom 滑桿絕對不重疊
     const isSwapped = state.chartType === 'bar' && state.measures.includes(xField) && !state.measures.includes(yField);
@@ -2361,7 +2463,7 @@
               name: m,
               type: 'bar',
               barGap: '12%',
-              data: data.map(d => safeParseNumber(d[m])),
+              data: data.map(d => numOrGap(d[m])),
               itemStyle: {
                 color: color,
                 borderRadius: [4, 4, 0, 0]
@@ -2374,7 +2476,7 @@
             const color = REGION_COLORS[cat] || PALETTE[catIdx % PALETTE.length];
             const rowMap = new Map();
             data.filter(d => String(d[colorField]) === cat).forEach(d => {
-              rowMap.set(String(d[xField]), safeParseNumber(d[yField]));
+              rowMap.set(String(d[xField]), numOrGap(d[yField]));
             });
             const catVals = xCategories.map(x => rowMap.has(x) ? rowMap.get(x) : '-');
 
@@ -2448,7 +2550,7 @@
             name: secField,
             type: 'line',
             yAxisIndex: 1,
-            data: data.map(d => safeParseNumber(d[secField])),
+            data: data.map(d => numOrGap(d[secField])),
             itemStyle: { color: '#ea580c' },
             lineStyle: { width: 3 }
           });
@@ -2523,7 +2625,7 @@
             type: 'line',
             smooth: true,
             symbolSize: 6,
-            data: data.map(d => safeParseNumber(d[m])),
+            data: data.map(d => numOrGap(d[m])),
             itemStyle: { color: color },
             lineStyle: { width: 3 },
             markLine: (idx === 0 && state.showAverage) ? {
@@ -2536,7 +2638,7 @@
           const color = REGION_COLORS[cat] || PALETTE[catIdx % PALETTE.length];
           const rowMap = new Map();
           data.filter(d => String(d[colorField]) === cat).forEach(d => {
-            rowMap.set(String(d[xField]), safeParseNumber(d[yField]));
+            rowMap.set(String(d[xField]), numOrGap(d[yField]));
           });
           const catVals = xCategories.map(x => rowMap.has(x) ? rowMap.get(x) : null);
           return {
@@ -2589,7 +2691,7 @@
           type: 'line',
           yAxisIndex: 1,
           smooth: true,
-          data: data.map(d => safeParseNumber(d[secField])),
+          data: data.map(d => numOrGap(d[secField])),
           itemStyle: { color: '#ea580c' },
           lineStyle: { width: 3 }
         });
@@ -2702,7 +2804,7 @@
       ];
 
     } else if (state.chartType === 'geo') {
-      // 04. 通用地理分佈圖 (Universal Geo Map) - 支援日本/台灣/全球/坐標通用
+      // 04. 通用地理分佈圖 (Universal Geo Map) - 支援日本真實都道府縣 / 台灣縣市輪廓 / 全球自適應散佈
       const geoNames = data.map(d => d[xField]);
       const scope = window.UniversalGeoEngine 
         ? window.UniversalGeoEngine.detectGeoScope(geoNames)
@@ -2760,107 +2862,259 @@
         };
       }
 
-      // 坐標邊界 padding
-      const padLng = Math.max(1.0, (maxLng - minLng) * 0.12);
-      const padLat = Math.max(1.0, (maxLat - minLat) * 0.12);
+      // 檢查是否具備真實向量地圖 (ECharts registered map: japan / taiwan)
+      if (window.UniversalGeoMaps && typeof window.UniversalGeoMaps.registerMaps === 'function') {
+        window.UniversalGeoMaps.registerMaps();
+      }
 
-      option.xAxis = {
-        type: 'value',
-        name: '經度 (Longitude)',
-        nameLocation: 'middle',
-        nameGap: 28,
-        min: parseFloat((minLng - padLng).toFixed(2)),
-        max: parseFloat((maxLng + padLng).toFixed(2)),
-        splitLine: { lineStyle: { color: 'rgba(15, 23, 42, 0.06)', type: 'dashed' } },
-        axisLabel: { formatter: '{value}°E', color: '#64748b' }
-      };
+      const isJapan = scope === 'japan';
+      const isTaiwan = scope === 'taiwan';
+      const targetMap = isTaiwan ? 'taiwan' : (isJapan ? 'japan' : null);
+      const hasRealMap = Boolean(targetMap && typeof echarts !== 'undefined' && echarts.getMap && echarts.getMap(targetMap));
 
-      option.yAxis = {
-        type: 'value',
-        name: '緯度 (Latitude)',
-        min: parseFloat((minLat - padLat).toFixed(2)),
-        max: parseFloat((maxLat + padLat).toFixed(2)),
-        splitLine: { lineStyle: { color: 'rgba(15, 23, 42, 0.06)', type: 'dashed' } },
-        axisLabel: { formatter: '{value}°N', color: '#64748b' }
-      };
+      if (hasRealMap) {
+        // --- 04-A: 真實向量輪廓地圖 (Real Geo Vector Map) ---
+        // 清理直角坐標軸與網格
+        delete option.xAxis;
+        delete option.yAxis;
+        delete option.grid;
 
-      // 空間色階視覺映射 (VisualMap)
-      option.visualMap = {
-        min: minVal,
-        max: maxVal,
-        dimension: 2,
-        calculable: true,
-        orient: 'vertical',
-        left: 20,
-        bottom: 30,
-        inRange: {
-          color: ['#60a5fa', '#2563eb', '#1d4ed8', '#d97706', '#ea580c', '#e11d48']
-        },
-        text: ['高 (High)', '低 (Low)'],
-        textStyle: { color: '#475569', fontSize: 11 }
-      };
-
-      const maxS = safeMax(geoPoints.map(p => p.value[3]), 1) || 1;
-      const getRadius = (s) => Math.max(8, Math.min(36, 8 + (s / maxS) * 28));
-
-      option.tooltip = {
-        trigger: 'item',
-        formatter: (params) => {
-          const d = params.data.raw;
-          const v = params.data.value;
-          let tip = `<div style="font-size:12px; line-height:1.6;">
-            <strong style="font-size:13px; color:#0f172a;">${escapeHtml(params.name)}</strong>
-            <span style="font-size:10.5px; color:#2563eb; background:#eff6ff; padding:1px 5px; border-radius:3px; margin-left:4px;">${scope.toUpperCase()}</span><br/>
-            坐標: ${v[0].toFixed(2)}°E, ${v[1].toFixed(2)}°N<br/>
-            ${escapeHtml(yField)}: <b style="color:#ea580c;">${formatCompactNumber(v[2])}</b><br/>`;
-          if (sizeField) {
-            tip += `${escapeHtml(sizeField)}: <b>${formatCompactNumber(v[3])}</b><br/>`;
+        // 構建面著色資料 (Choropleth Map Data)
+        const mapData = [];
+        data.forEach(d => {
+          const rawName = String(d[xField] != null ? d[xField] : '').trim();
+          let mappedName = rawName;
+          if (targetMap === 'japan') {
+            mappedName = rawName.replace(/縣/g, '県').replace(/區/g, '区');
+            if (mappedName === '東京') mappedName = '東京都';
+            if (mappedName === '京都') mappedName = '京都府';
+            if (mappedName === '大阪') mappedName = '大阪府';
+            if (mappedName === '北海') mappedName = '北海道';
+          } else if (targetMap === 'taiwan') {
+            mappedName = rawName.replace(/臺/g, '台');
           }
-          if (colorField && d[colorField]) {
-            tip += `${escapeHtml(colorField)}: ${escapeHtml(d[colorField])}<br/>`;
-          }
-          tip += `</div>`;
-          return tip;
-        }
-      };
+          const val = safeParseNumber(d[yField]);
+          mapData.push({
+            name: mappedName,
+            value: val,
+            raw: d
+          });
+        });
 
-      option.series = [
-        {
-          name: yField,
-          type: 'scatter',
-          data: geoPoints,
-          symbolSize: (val) => getRadius(val[3]),
+        const maxS = safeMax(geoPoints.map(p => p.value[3]), 1) || 1;
+        const getRadius = (s) => Math.max(6, Math.min(26, 6 + (s / maxS) * 20));
+
+        option.geo = {
+          map: targetMap,
+          roam: true,
+          aspectScale: targetMap === 'japan' ? 0.9 : 0.85,
+          zoom: targetMap === 'japan' ? 1.15 : 1.1,
           label: {
-            show: true,
-            formatter: '{b}',
-            position: 'top',
-            color: '#1e293b',
-            fontSize: 10.5,
-            fontWeight: 600
+            show: false,
+            color: '#334155',
+            fontSize: 10
           },
           itemStyle: {
-            shadowBlur: 8,
-            shadowColor: 'rgba(0,0,0,0.2)',
-            borderWidth: 1.5,
-            borderColor: '#ffffff',
-            opacity: 0.88
+            areaColor: '#f8fafc',
+            borderColor: '#94a3b8',
+            borderWidth: 0.8
+          },
+          emphasis: {
+            itemStyle: {
+              areaColor: '#e0e7ff',
+              borderColor: '#4338ca',
+              borderWidth: 1.5
+            },
+            label: {
+              show: true,
+              color: '#0f172a',
+              fontWeight: 'bold',
+              fontSize: 11
+            }
           }
-        }
-      ];
+        };
 
-      option.grid = {
-        left: '6%',
-        right: '6%',
-        bottom: 70,
-        top: '15%',
-        containLabel: true
-      };
+        option.visualMap = {
+          min: minVal,
+          max: maxVal,
+          calculable: true,
+          orient: 'vertical',
+          left: 20,
+          bottom: 30,
+          inRange: {
+            color: ['#dbeafe', '#93c5fd', '#3b82f6', '#1d4ed8', '#ea580c', '#b91c1c']
+          },
+          text: ['高 (High)', '低 (Low)'],
+          textStyle: { color: '#475569', fontSize: 11 }
+        };
 
-      option.dataZoom = [
-        { type: 'inside' },
-        { type: 'slider', bottom: 6, height: 16, borderColor: '#cbd5e1', fillerColor: 'rgba(37, 99, 235, 0.15)', handleStyle: { color: '#2563eb' } }
-      ];
+        option.tooltip = {
+          trigger: 'item',
+          formatter: (params) => {
+            const raw = params.data ? (params.data.raw || params.data) : null;
+            if (!raw) return params.name;
+            const v = params.data.value;
+            const numVal = Array.isArray(v) ? v[2] : (typeof v === 'number' ? v : raw[yField]);
+            let tip = `<div style="font-size:12px; line-height:1.6; min-width:140px;">
+              <strong style="font-size:13px; color:#0f172a;">${escapeHtml(params.name)}</strong>
+              <span style="font-size:10px; color:#2563eb; background:#eff6ff; padding:1px 5px; border-radius:3px; margin-left:4px;">${targetMap.toUpperCase()} 地圖輪廓</span><br/>
+              ${escapeHtml(yField)}: <b style="color:#ea580c;">${formatCompactNumber(numVal)}</b><br/>`;
+            if (sizeField && raw[sizeField] !== undefined) {
+              tip += `${escapeHtml(sizeField)}: <b>${formatCompactNumber(raw[sizeField])}</b><br/>`;
+            }
+            if (colorField && raw[colorField]) {
+              tip += `${escapeHtml(colorField)}: ${escapeHtml(raw[colorField])}<br/>`;
+            }
+            tip += `</div>`;
+            return tip;
+          }
+        };
 
+        option.series = [
+          {
+            name: yField,
+            type: 'map',
+            map: targetMap,
+            geoIndex: 0,
+            data: mapData,
+            itemStyle: {
+              borderColor: '#94a3b8',
+              borderWidth: 0.8
+            },
+            emphasis: {
+              itemStyle: {
+                areaColor: '#c7d2fe',
+                borderColor: '#4f46e5',
+                borderWidth: 1.5
+              }
+            }
+          },
+          {
+            name: yField + ' (定位氣泡)',
+            type: 'scatter',
+            coordinateSystem: 'geo',
+            data: geoPoints,
+            symbolSize: (val) => getRadius(val[3]),
+            itemStyle: {
+              color: '#1d4ed8',
+              shadowBlur: 8,
+              shadowColor: 'rgba(29, 78, 216, 0.4)',
+              borderWidth: 1.5,
+              borderColor: '#ffffff',
+              opacity: 0.9
+            },
+            label: {
+              show: state.showLabels,
+              formatter: '{b}',
+              position: 'top',
+              color: '#1e293b',
+              fontSize: 10,
+              fontWeight: 600
+            }
+          }
+        ];
+      } else {
+        // --- 04-B: 優雅退回自適應散佈 (Fallback Adaptive Longitude/Latitude Scatter) ---
+        const padLng = Math.max(1.0, (maxLng - minLng) * 0.12);
+        const padLat = Math.max(1.0, (maxLat - minLat) * 0.12);
+
+        option.xAxis = {
+          type: 'value',
+          name: '經度 (Longitude)',
+          nameLocation: 'middle',
+          nameGap: 28,
+          min: parseFloat((minLng - padLng).toFixed(2)),
+          max: parseFloat((maxLng + padLng).toFixed(2)),
+          splitLine: { lineStyle: { color: 'rgba(15, 23, 42, 0.06)', type: 'dashed' } },
+          axisLabel: { formatter: '{value}°E', color: '#64748b' }
+        };
+
+        option.yAxis = {
+          type: 'value',
+          name: '緯度 (Latitude)',
+          min: parseFloat((minLat - padLat).toFixed(2)),
+          max: parseFloat((maxLat + padLat).toFixed(2)),
+          splitLine: { lineStyle: { color: 'rgba(15, 23, 42, 0.06)', type: 'dashed' } },
+          axisLabel: { formatter: '{value}°N', color: '#64748b' }
+        };
+
+        option.visualMap = {
+          min: minVal,
+          max: maxVal,
+          dimension: 2,
+          calculable: true,
+          orient: 'vertical',
+          left: 20,
+          bottom: 30,
+          inRange: {
+            color: ['#60a5fa', '#2563eb', '#1d4ed8', '#d97706', '#ea580c', '#e11d48']
+          },
+          text: ['高 (High)', '低 (Low)'],
+          textStyle: { color: '#475569', fontSize: 11 }
+        };
+
+        const maxS = safeMax(geoPoints.map(p => p.value[3]), 1) || 1;
+        const getRadius = (s) => Math.max(8, Math.min(36, 8 + (s / maxS) * 28));
+
+        option.tooltip = {
+          trigger: 'item',
+          formatter: (params) => {
+            const d = params.data.raw;
+            const v = params.data.value;
+            let tip = `<div style="font-size:12px; line-height:1.6;">
+              <strong style="font-size:13px; color:#0f172a;">${escapeHtml(params.name)}</strong>
+              <span style="font-size:10.5px; color:#2563eb; background:#eff6ff; padding:1px 5px; border-radius:3px; margin-left:4px;">${scope.toUpperCase()}</span><br/>
+              坐標: ${v[0].toFixed(2)}°E, ${v[1].toFixed(2)}°N<br/>
+              ${escapeHtml(yField)}: <b style="color:#ea580c;">${formatCompactNumber(v[2])}</b><br/>`;
+            if (sizeField) {
+              tip += `${escapeHtml(sizeField)}: <b>${formatCompactNumber(v[3])}</b><br/>`;
+            }
+            if (colorField && d[colorField]) {
+              tip += `${escapeHtml(colorField)}: ${escapeHtml(d[colorField])}<br/>`;
+            }
+            tip += `</div>`;
+            return tip;
+          }
+        };
+
+        option.series = [
+          {
+            name: yField,
+            type: 'scatter',
+            data: geoPoints,
+            symbolSize: (val) => getRadius(val[3]),
+            label: {
+              show: true,
+              formatter: '{b}',
+              position: 'top',
+              color: '#1e293b',
+              fontSize: 10.5,
+              fontWeight: 600
+            },
+            itemStyle: {
+              shadowBlur: 8,
+              shadowColor: 'rgba(0,0,0,0.2)',
+              borderWidth: 1.5,
+              borderColor: '#ffffff',
+              opacity: 0.88
+            }
+          }
+        ];
+
+        option.grid = {
+          left: '6%',
+          right: '6%',
+          bottom: 70,
+          top: '15%',
+          containLabel: true
+        };
+
+        option.dataZoom = [
+          { type: 'inside' },
+          { type: 'slider', bottom: 6, height: 16, borderColor: '#cbd5e1', fillerColor: 'rgba(37, 99, 235, 0.15)', handleStyle: { color: '#2563eb' } }
+        ];
+      }
+    
     } else if (state.chartType === 'boxplot' || state.chartType === 'violin') {
       // 05. 盒鬚分佈圖 (Box Plot) 與 11. 小提琴圖 (Violin Plot - 核密度分佈 KDE)
       let groupDim = xField;
@@ -2877,8 +3131,8 @@
 
       data.forEach(d => {
         const grp = String(d[groupDim] || '全體');
-        const num = safeParseNumber(d[measureDim]);
-        if (d[measureDim] !== null && d[measureDim] !== '' && !isNaN(num)) {
+        const num = toNumberOrNull(d[measureDim]);
+        if (num !== null) {
           if (!groupMap[grp]) groupMap[grp] = [];
           groupMap[grp].push(num);
         }
@@ -3331,7 +3585,7 @@
       if (hasColorGrouping) {
         option.series = colorCategories.map((cat, catIdx) => {
           const color = REGION_COLORS[cat] || PALETTE[catIdx % PALETTE.length];
-          const catRows = data.filter(d => String(d[colorField]) === cat);
+          const catRows = data.filter(d => String(d[colorField]) === cat && isValidNumeric(d[actXField]) && isValidNumeric(d[actYField]));
           const catScatterData = catRows.map(d => {
             const x = safeParseNumber(d[actXField]);
             const y = safeParseNumber(d[actYField]);
@@ -3360,7 +3614,7 @@
           };
         });
       } else {
-        const scatterData = data.map(d => {
+        const scatterData = data.filter(d => isValidNumeric(d[actXField]) && isValidNumeric(d[actYField])).map(d => {
           const x = safeParseNumber(d[actXField]);
           const y = safeParseNumber(d[actYField]);
           const sVal = sizeField ? safeParseNumber(d[sizeField]) : 10;
@@ -4026,6 +4280,7 @@
         renderChartTypeSelector();
         renderWorkbookTabs();
         renderVisualization();
+        savePersistedState();
       });
     });
 
@@ -4379,6 +4634,85 @@
         toggleSidebar(false);
       }
     });
+
+    // === 純淨事件委派 (Centralized Clean Event Delegation - Zero Inline Onclick) ===
+    document.addEventListener('click', (e) => {
+      // 1. 開啟 / 關閉 Skills 彈窗
+      const btnOpenSkills = e.target.closest('#btnOpenSkillsModalTop');
+      if (btnOpenSkills) {
+        document.getElementById('skillsModal')?.classList.add('open');
+        return;
+      }
+      const btnCloseSkills = e.target.closest('#btnCloseSkillsModal');
+      if (btnCloseSkills) {
+        document.getElementById('skillsModal')?.classList.remove('open');
+        return;
+      }
+      if (e.target.id === 'skillsModal') {
+        document.getElementById('skillsModal')?.classList.remove('open');
+        return;
+      }
+
+      // 2. 複製 e-Stat 官方網址
+      const btnCopyUrl = e.target.closest('[data-action="copy-estat-url"], #btnCopyEstatUrlTop');
+      if (btnCopyUrl) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText('https://www.e-stat.go.jp').then(() => {
+            showToast('📋 已複製 e-Stat 官方網址至剪貼簿！');
+          }).catch(() => {
+            showToast('📋 e-Stat 官方網址: https://www.e-stat.go.jp');
+          });
+        } else {
+          showToast('📋 e-Stat 官方網址: https://www.e-stat.go.jp');
+        }
+        return;
+      }
+
+      // 3. 多數值指標彈窗 (Multi-Measure Modal) 控制
+      const btnCloseMulti = e.target.closest('[data-action="close-multi-measure"], #btnCloseMultiMeasureModal');
+      if (btnCloseMulti) {
+        document.getElementById('multiMeasureModal')?.classList.remove('open');
+        return;
+      }
+      if (e.target.id === 'multiMeasureModal') {
+        document.getElementById('multiMeasureModal')?.classList.remove('open');
+        return;
+      }
+
+      const btnPresetMulti = e.target.closest('[data-action="apply-measure-preset"]');
+      if (btnPresetMulti && btnPresetMulti.dataset.preset) {
+        const presets = btnPresetMulti.dataset.preset.split(',').map(s => s.trim()).filter(Boolean);
+        applyMeasurePreset(presets);
+        return;
+      }
+
+      const btnResetMulti = e.target.closest('[data-action="reset-multi-measure"], #btnResetMultiMeasure');
+      if (btnResetMulti) {
+        resetMultiMeasure();
+        return;
+      }
+
+      const btnConfirmMulti = e.target.closest('[data-action="confirm-multi-measure"], #btnConfirmMultiMeasure');
+      if (btnConfirmMulti) {
+        confirmMultiMeasure();
+        return;
+      }
+
+      // 4. 開啟多指標彈窗 (自槽位按鈕點擊委派)
+      const btnShelfCompare = e.target.closest('.btn-shelf-compare');
+      if (btnShelfCompare) {
+        openMultiMeasureModal();
+        return;
+      }
+
+      // 5. 還原預設工作簿 (重設快取)
+      const btnResetState = e.target.closest('#btnResetStudioState');
+      if (btnResetState) {
+        resetPersistedState();
+        closeToolsDropdown();
+        return;
+      }
+    });
   }
 
   // --- Tableau 語意綱要分類精靈 (Schema Classifier Modal) ---
@@ -4642,6 +4976,46 @@
   }
 
   // --- 處理自訂上傳檔案 (CSV / Excel / JSON) ---
+  // 偵測文字編碼：UTF-8 (含 BOM) → Big5 (台灣政府開放資料) → Shift_JIS (e-Stat 下載檔)
+  function decodeTextSmart(buf) {
+    const bytes = new Uint8Array(buf);
+    try {
+      return { text: new TextDecoder('utf-8', { fatal: true }).decode(bytes).replace(/^\uFEFF/, ''), encoding: 'UTF-8' };
+    } catch (e) { /* 非 UTF-8，嘗試其他編碼 */ }
+    const candidates = ['big5', 'shift_jis'].map(enc => {
+      let text = '';
+      try { text = new TextDecoder(enc).decode(bytes); } catch (e) { return { enc, text: '', score: -Infinity }; }
+      const bad = (text.match(/\uFFFD/g) || []).length;
+      // 日文假名在 Big5 誤判時常出現；繁中字在 Shift_JIS 誤判時常變成半形片假名
+      const kana = (text.match(/[\u3040-\u30ff]/g) || []).length;
+      const halfKana = (text.match(/[\uff61-\uff9f]/g) || []).length;
+      const score = enc === 'big5' ? -bad * 10 - halfKana : -bad * 10 + kana - halfKana * 2;
+      return { enc, text, score };
+    }).sort((x, y) => y.score - x.score);
+    return { text: candidates[0].text, encoding: candidates[0].enc === 'big5' ? 'Big5' : 'Shift_JIS' };
+  }
+
+  // SheetJS (約 860KB) 改為第一次上傳 Excel 時才載入
+  let xlsxLoadPromise = null;
+  function ensureXLSX() {
+    if (typeof XLSX !== 'undefined') return Promise.resolve();
+    if (!xlsxLoadPromise) {
+      xlsxLoadPromise = new Promise((resolve, reject) => {
+        const sc = document.createElement('script');
+        sc.src = 'js/xlsx.full.min.js';
+        sc.onload = () => resolve();
+        sc.onerror = () => { xlsxLoadPromise = null; reject(new Error('無法載入 Excel 解析元件')); };
+        document.head.appendChild(sc);
+      });
+    }
+    return xlsxLoadPromise;
+  }
+
+  function reportUploadError(msg) {
+    showToast('❌ ' + msg);
+    console.error(msg);
+  }
+
   function handleUploadedFile(file) {
     const ext = file.name.split('.').pop().toLowerCase();
     showToast(`正在解析上傳檔案：${file.name}...`);
@@ -4650,50 +5024,56 @@
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          const json = JSON.parse(e.target.result);
+          const { text } = decodeTextSmart(e.target.result);
+          const json = JSON.parse(text);
           const rows = Array.isArray(json) ? json : (json.data || json.rows || []);
           if (rows.length === 0) throw new Error('JSON 未包含陣列資料');
           mountCustomDataset(file.name, rows);
         } catch (err) {
-          alert('JSON 解析失敗：' + err.message);
-        }
-      };
-      reader.readAsText(file);
-    } else if (ext === 'xlsx' || ext === 'xls') {
-      if (typeof XLSX === 'undefined') {
-        alert('SheetJS (XLSX) 尚未就緒，請稍候重試');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const rows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
-          if (rows.length === 0) throw new Error('工作表內容為空');
-          mountCustomDataset(file.name, rows);
-        } catch (err) {
-          alert('Excel 解析失敗：' + err.message);
+          reportUploadError('JSON 解析失敗：' + err.message);
         }
       };
       reader.readAsArrayBuffer(file);
-    } else if (ext === 'csv') {
+    } else if (ext === 'xlsx' || ext === 'xls') {
+      ensureXLSX().then(() => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            // raw:false → 儲存格以顯示文字讀出，保留 "01" 這類代碼的前導零，再由 coerceColumnTypes 判斷型態
+            const rows = coerceColumnTypes(XLSX.utils.sheet_to_json(worksheet, { defval: '', raw: false }));
+            if (rows.length === 0) throw new Error('工作表內容為空');
+            if (workbook.SheetNames.length > 1) {
+              setTimeout(() => showToast(`ℹ️ 活頁簿有 ${workbook.SheetNames.length} 個工作表，已載入第一個「${sheetName}」`), 900);
+            }
+            mountCustomDataset(file.name, rows);
+          } catch (err) {
+            reportUploadError('Excel 解析失敗：' + err.message);
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      }).catch(err => reportUploadError(err.message));
+    } else if (ext === 'csv' || ext === 'tsv' || ext === 'txt') {
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          const text = e.target.result;
+          const { text, encoding } = decodeTextSmart(e.target.result);
           const rows = parseCSVText(text);
           if (rows.length === 0) throw new Error('CSV 內容為空');
           mountCustomDataset(file.name, rows);
+          if (encoding !== 'UTF-8') {
+            setTimeout(() => showToast(`ℹ️ 偵測到 ${encoding} 編碼，已自動轉換`), 900);
+          }
         } catch (err) {
-          alert('CSV 解析失敗：' + err.message);
+          reportUploadError('CSV 解析失敗：' + err.message);
         }
       };
-      reader.readAsText(file);
+      reader.readAsArrayBuffer(file);
     } else {
-      alert('僅支援上傳 .xlsx, .xls, .csv, .json 格式檔案！');
+      reportUploadError('僅支援上傳 .xlsx, .xls, .csv, .json 格式檔案！');
     }
   }
 
@@ -4730,26 +5110,41 @@
     }, 200);
   }
 
-  // --- 強健 CSV 文字解析器 (優先使用 SheetJS，相容 RFC 4180 標準) ---
+  // --- 依欄位整體判斷型態：整欄皆為數值才轉數字；含前導零 (01、007) 的代碼欄保留文字 ---
+  function coerceColumnTypes(rows) {
+    if (!Array.isArray(rows) || rows.length === 0) return rows;
+    const cols = Object.keys(rows[0]);
+    const numericCols = cols.filter(c => {
+      if (/(^|[^a-z])(id|code)([^a-z]|$)|代碼|代号|代號|編號|序號|郵遞區號|電話|zip/i.test(c)) return false;
+      let seen = 0;
+      for (let i = 0; i < rows.length; i++) {
+        const v = rows[i][c];
+        if (typeof v === 'number') { seen++; continue; }
+        if (v === null || v === undefined) continue;
+        const str = String(v).trim();
+        if (str === '' || MISSING_TOKEN_RE.test(str)) continue;
+        if (/^[0０][0-9０-９]/.test(str) && !/^[0０][.．]/.test(str)) return false; // 前導零
+        if (toNumberOrNull(str) === null) return false;
+        seen++;
+      }
+      return seen > 0;
+    });
+    if (numericCols.length === 0) return rows;
+    return rows.map(r => {
+      const o = { ...r };
+      numericCols.forEach(c => { o[c] = toNumberOrNull(o[c]); });
+      return o;
+    });
+  }
+
+  // --- CSV 解析器 (RFC 4180：支援引號、引號內逗號與換行；自動偵測逗號 / Tab / 分號) ---
   function parseCSVText(text) {
     if (!text || typeof text !== 'string') return [];
-    if (typeof XLSX !== 'undefined') {
-      try {
-        const workbook = XLSX.read(text, { type: 'string' });
-        const sheetName = workbook.SheetNames[0];
-        if (sheetName) {
-          const worksheet = workbook.Sheets[sheetName];
-          const rows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
-          if (rows && rows.length > 0) {
-            return rows;
-          }
-        }
-      } catch (err) {
-        console.warn('XLSX.read CSV error, falling back to RFC parser:', err);
-      }
-    }
+    text = text.replace(/^\uFEFF/, '');
 
-    // RFC 4180 備援解析器 (支援含引號、引號內逗號與換行)
+    const firstLine = text.slice(0, text.search(/\r?\n/) === -1 ? text.length : text.search(/\r?\n/));
+    const delim = [',', '\t', ';'].map(d => [d, firstLine.split(d).length]).sort((a, b) => b[1] - a[1])[0][0];
+
     const lines = [];
     let row = [''];
     let inQuotes = false;
@@ -4763,7 +5158,7 @@
         } else {
           inQuotes = !inQuotes;
         }
-      } else if (c === ',' && !inQuotes) {
+      } else if (c === delim && !inQuotes) {
         row.push('');
       } else if ((c === '\r' || c === '\n') && !inQuotes) {
         if (c === '\r' && next === '\n') i++;
@@ -4776,21 +5171,24 @@
     if (row.length > 1 || row[0] !== '') lines.push(row);
 
     if (lines.length < 2) return [];
-    const headers = lines[0].map(h => h.trim().replace(/^"|"$/g, ''));
+    // 重複或空白表頭自動改名，避免欄位互相覆蓋
+    const seenHeaders = {};
+    const headers = lines[0].map((h, idx) => {
+      let name = h.trim() || `欄位${idx + 1}`;
+      if (seenHeaders[name]) { seenHeaders[name]++; name = `${name}_${seenHeaders[name]}`; } else { seenHeaders[name] = 1; }
+      return name;
+    });
     const rows = [];
     for (let r = 1; r < lines.length; r++) {
       const vals = lines[r];
       if (vals.length === 0 || (vals.length === 1 && vals[0] === '')) continue;
       const obj = {};
       headers.forEach((h, idx) => {
-        const val = vals[idx] !== undefined ? vals[idx].trim().replace(/^"|"$/g, '') : '';
-        const cleaned = typeof val === 'string' ? val.replace(/,/g, '').trim() : val;
-        const num = Number(cleaned);
-        obj[h] = (!isNaN(num) && cleaned !== '') ? num : val;
+        obj[h] = vals[idx] !== undefined ? vals[idx].trim() : '';
       });
       rows.push(obj);
     }
-    return rows;
+    return coerceColumnTypes(rows);
   }
 
   // --- 匯出 CSV (以 getActiveRows() 結合搜尋之當前有效列為準) ---
@@ -5035,7 +5433,7 @@
     if (btnApply) {
       btnApply.addEventListener('click', () => {
         if (domainState.selectedVarCodes.size === 0) {
-          alert('請至少勾選一項指標變數！');
+          showToast('⚠️ 請至少勾選一項指標變數');
           return;
         }
 
@@ -5060,7 +5458,7 @@
     if (btnCSV) {
       btnCSV.addEventListener('click', () => {
         if (domainState.selectedVarCodes.size === 0) {
-          alert('請至少勾選一項指標變數！');
+          showToast('⚠️ 請至少勾選一項指標變數');
           return;
         }
 
@@ -5096,7 +5494,7 @@
     if (btnJSON) {
       btnJSON.addEventListener('click', () => {
         if (domainState.selectedVarCodes.size === 0) {
-          alert('請至少勾選一項指標變數！');
+          showToast('⚠️ 請至少勾選一項指標變數');
           return;
         }
 
@@ -5497,6 +5895,98 @@
     active.facetScaleMode = state.facetScaleMode || 'fixed';
   }
 
+
+  // =========================================================================
+  // --- 狀態持久化管理模組 (Studio State Persistence - localStorage) ---
+  // =========================================================================
+  const PERSISTENCE_KEY = 'data_atoms_studio_state_v1';
+
+  function savePersistedState() {
+    try {
+      saveCurrentSheetState();
+      const payload = {
+        sheets: state.sheets,
+        activeSheetId: state.activeSheetId,
+        pinnedCharts: state.pinnedCharts,
+        zoomLevel: state.zoomLevel,
+        sidebarCollapsed: state.sidebarCollapsed,
+        savedAt: Date.now(),
+        version: 1
+      };
+      localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(payload));
+    } catch (err) {
+      console.warn('[Persistence] Failed to save state to localStorage:', err);
+    }
+  }
+
+  function loadPersistedState() {
+    try {
+      const raw = localStorage.getItem(PERSISTENCE_KEY);
+      if (!raw) return false;
+      const parsed = JSON.parse(raw);
+      if (!parsed || !Array.isArray(parsed.sheets) || parsed.sheets.length === 0) return false;
+
+      state.sheets = parsed.sheets;
+      state.activeSheetId = parsed.activeSheetId || parsed.sheets[0].id;
+      state.pinnedCharts = Array.isArray(parsed.pinnedCharts) ? parsed.pinnedCharts : [];
+      state.zoomLevel = typeof parsed.zoomLevel === 'number' ? parsed.zoomLevel : 100;
+      state.sidebarCollapsed = Boolean(parsed.sidebarCollapsed);
+      return true;
+    } catch (err) {
+      console.warn('[Persistence] Failed to load state from localStorage:', err);
+      return false;
+    }
+  }
+
+  function resetPersistedState() {
+    try {
+      localStorage.removeItem(PERSISTENCE_KEY);
+    } catch (e) {
+      console.warn(e);
+    }
+    // 重設回乾淨初始狀態
+    state.sidebarCollapsed = false;
+    state.zoomLevel = 100;
+    state.pinnedCharts = [];
+    state.currentDatasetId = 'jp_gender_facet';
+    state.chartType = 'bar';
+    state.barStackMode = false;
+    state.facetScaleMode = 'fixed';
+    state.shelf = {
+      x: '都道府縣',
+      y: '總人口(人)',
+      yMulti: [],
+      color: '地方分區',
+      size: '65歲以上高齡人口(人)',
+      secondary: '高齡化率(%)',
+      facet: '',
+      agg: 'RAW'
+    };
+    state.filters = {};
+    state.sheets = [
+      {
+        id: 'sheet_1',
+        name: '工作表 1 (分面柱狀)',
+        chartType: 'bar',
+        shelf: JSON.parse(JSON.stringify(state.shelf)),
+        datasetId: 'jp_gender_facet',
+        filters: {},
+        barStackMode: false,
+        facetScaleMode: 'fixed'
+      }
+    ];
+    state.activeSheetId = 'sheet_1';
+
+    // 重新載入預設資料集並套用版面
+    loadDataset('jp_gender_facet', null, { skipSheetUpdate: true });
+    toggleSidebar(false, false);
+    applyZoom(100, false);
+    renderWorkbookTabs();
+    updatePinnedBadge();
+    savePersistedState();
+    showToast('↺ 已成功還原預設工作簿並清除本機快取！');
+  }
+
   function renderWorkbookTabs() {
     const tabsList = document.getElementById('workbookTabsList');
     if (!tabsList) return;
@@ -5566,6 +6056,7 @@
     renderVisualization();
     renderDataTable();
     renderWorkbookTabs();
+    savePersistedState();
     showToast(`📑 已切換至「${target.name}」(${getChartIcon(target.chartType)} ${target.chartType})`);
   }
 
@@ -5725,7 +6216,8 @@
       } else {
         renderWorkbookTabs();
       }
-      showToast(`🗑️ 已刪除工作表「${targetName}」`);
+      savePersistedState();
+    showToast(`🗑️ 已刪除工作表「${targetName}」`);
     }
   }
 
@@ -5886,6 +6378,7 @@
 
     state.pinnedCharts.push(pinnedItem);
     updatePinnedBadge();
+    savePersistedState();
     showToast(`📌 已將「${pinnedItem.title}」釘選至自訂看板！(現有 ${state.pinnedCharts.length} 張圖表)`);
 
     const modal = document.getElementById('customDashboardModal');
@@ -6150,6 +6643,7 @@
       newZoom = ZOOM_LEVELS.reduce((prev, curr) => Math.abs(curr - newZoom) < Math.abs(prev - newZoom) ? curr : prev);
     }
     state.zoomLevel = newZoom;
+    savePersistedState();
 
     // 更新 UI 徽章與按鈕停用狀態
     const badge = document.getElementById('zoomLevelBadge');
@@ -6271,6 +6765,8 @@
       renderShelves();
       renderVisualization();
       renderKPIRibbon();
+      saveCurrentSheetState();
+      savePersistedState();
     },
     cycleAgg: (e) => {
       e.stopPropagation();
@@ -6279,30 +6775,40 @@
       state.shelf.agg = aggs[nextIdx];
       renderShelves();
       renderVisualization();
+      saveCurrentSheetState();
+      savePersistedState();
       showToast(`已切換 Y 軸聚合模式為：${state.shelf.agg}`);
     },
     toggleBarStackMode: () => {
       state.barStackMode = !state.barStackMode;
       renderShelves();
       renderVisualization();
+      saveCurrentSheetState();
+      savePersistedState();
       showToast(state.barStackMode ? '🥞 已切換為「堆疊累計柱狀圖」' : '📊 已切換為「併排對比柱狀圖」');
     },
     setBarStackMode: (stacked) => {
       state.barStackMode = !!stacked;
       renderShelves();
       renderVisualization();
+      saveCurrentSheetState();
+      savePersistedState();
       showToast(state.barStackMode ? '🥞 已切換為「堆疊累計柱狀圖」' : '📊 已切換為「併排對比柱狀圖」');
     },
     toggleFacetScale: () => {
       state.facetScaleMode = state.facetScaleMode === 'fixed' ? 'free' : 'fixed';
       renderShelves();
       renderVisualization();
+      saveCurrentSheetState();
+      savePersistedState();
       showToast(state.facetScaleMode === 'fixed' ? '🔒 已切換為「統一量表 (Fixed Scale)」' : '🔓 已切換為「獨立自適應量表 (Free Scale)」');
     },
     setFacetScaleMode: (mode) => {
       state.facetScaleMode = mode;
       renderShelves();
       renderVisualization();
+      saveCurrentSheetState();
+      savePersistedState();
     },
     sortTable: (col) => {
       if (state.sortColumn === col) {
@@ -6379,6 +6885,16 @@
       renderChartTypeSelector();
       renderWorkbookTabs();
       renderVisualization();
+      savePersistedState();
+    },
+    resetStudioState: () => {
+      resetPersistedState();
+    },
+    saveStudioState: () => {
+      savePersistedState();
+    },
+    loadStudioState: () => {
+      return loadPersistedState();
     },
     importAllSheetsToDashboard: () => {
       importAllSheetsToDashboard();
@@ -6386,6 +6902,9 @@
   };
 
   // 暴露至全域供測試與進階模組調用
+  window.resetStudioState = resetPersistedState;
+  window.savePersistedState = savePersistedState;
+  window.loadPersistedState = loadPersistedState;
   window.PALETTE_BAUHAUS = PALETTE_BAUHAUS;
   window.safeParseNumber = safeParseNumber;
   window.safeMin = safeMin;

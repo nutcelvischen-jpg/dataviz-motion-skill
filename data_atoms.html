@@ -368,7 +368,7 @@
 
     <!-- 右側：官方網站直連與技能彈窗 -->
     <div style="display: flex; gap: 10px; align-items: center; font-size: 12px;">
-      <button type="button" class="btn btn-sm" id="btnOpenSkillsModalTop" onclick="document.getElementById('skillsModal').classList.add('open')" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #fff; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+      <button type="button" class="btn btn-sm" id="btnOpenSkillsModalTop" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #fff; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
         <span>💡 Skills (26) & MCP (3)</span>
       </button>
 
@@ -377,7 +377,7 @@
         <span style="font-family: monospace;">e-Stat 官網</span>
         <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
       </a>
-      <button onclick="navigator.clipboard.writeText('https://www.e-stat.go.jp'); alert('已複製 e-Stat 官方網址！');" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">複製網址</button>
+      <button type="button" id="btnCopyEstatUrlTop" data-action="copy-estat-url" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">複製網址</button>
     </div>
   </div>
 
@@ -504,6 +504,18 @@
                 <div class="item-content">
                   <span class="item-title">數據動態簡報</span>
                   <span class="item-subtitle">播放 34 秒包豪斯動態影音解說</span>
+                </div>
+              </button>
+
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-group-label">狀態與快取管理</div>
+              <button type="button" class="dropdown-menu-item" id="btnResetStudioState" role="menuitem" title="清除 localStorage 快取並還原預設工作簿">
+                <span class="item-icon" style="color: #ef4444;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                </span>
+                <div class="item-content">
+                  <span class="item-title" style="color: #dc2626;">↺ 還原預設工作簿 (重設快取)</span>
+                  <span class="item-subtitle">清除自訂工作表與快取，重置為初始狀態</span>
                 </div>
               </button>
             </div>
@@ -1423,10 +1435,11 @@
   <!-- Local Script Dependencies (100% Offline) -->
   <!-- SheetJS 改為上傳 Excel 時才動態載入 (見 ensureXLSX)，首頁少下載約 860KB -->
   <script src="js/echarts.min.js"></script>
+  <script src="js/universal_geo_maps.js?v=20261106_v1"></script>
   <script src="js/data_atoms_jp_dataset.js?v=20261105_v3"></script>
   <script src="js/estat_17_domains_metadata.js?v=20261105_v3"></script>
   <script src="js/universal_geo_engine.js?v=20261105_v3"></script>
-  <script src="js/pygwalker_data_atoms.js?v=20261105_v3"></script>
+  <script src="js/pygwalker_data_atoms.js?v=20261106_v1"></script>
   <script>
     // Briefing Modal Controller (包豪斯動態影音簡報導演層互動控制器)
     (function() {
@@ -1747,7 +1760,7 @@
           <span style="background: #2563eb; color: #ffffff; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.05em;">ANTIGRAVITY SKILLS</span>
           <span style="font-size: 17px; font-weight: 700;">Data Atoms 視覺化所封裝之核心 26 大 Skill 全集與實戰 MCP 工具庫</span>
         </div>
-        <button type="button" class="modal-close-btn" id="btnCloseSkillsModal" onclick="document.getElementById('skillsModal').classList.remove('open')" style="background: transparent; border: none; color: #ffffff; font-size: 24px; cursor: pointer; line-height: 1;">×</button>
+        <button type="button" class="modal-close-btn" id="btnCloseSkillsModal" style="background: transparent; border: none; color: #ffffff; font-size: 24px; cursor: pointer; line-height: 1;">×</button>
       </div>
 
       <div style="padding: 24px 28px; color: #1e293b; font-size: 14px; line-height: 1.6;">
@@ -2074,7 +2087,7 @@
           <span style="background: #ea580c; color: #fff; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px;">MULTI-MEASURE</span>
           <span style="font-size: 16px; font-weight: 700;">多數值指標並列比較 (支援 2~4+ 指標同圖繪製)</span>
         </div>
-        <button type="button" onclick="document.getElementById('multiMeasureModal').classList.remove('open')" style="background: transparent; border: none; color: #fff; font-size: 22px; cursor: pointer;">✕</button>
+        <button type="button" class="modal-close-btn" id="btnCloseMultiMeasureModal" data-action="close-multi-measure" style="background: transparent; border: none; color: #fff; font-size: 22px; cursor: pointer;">✕</button>
       </div>
 
       <div style="padding: 20px 24px;">
@@ -2086,13 +2099,13 @@
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 18px;">
           <div style="font-size: 12px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">⚡ 常用熱門對比組合 (一鍵套用)：</div>
           <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-            <button type="button" class="btn btn-sm btn-outline" onclick="window.PyGWalker.applyMeasurePreset(['幼年人口占比(%)', '勞動人口占比(%)'])" style="font-size: 12px; font-weight: 600; border-color: #2563eb; color: #1d4ed8;">
+            <button type="button" class="btn btn-sm btn-outline" data-action="apply-measure-preset" data-preset="幼年人口占比(%),勞動人口占比(%)" style="font-size: 12px; font-weight: 600; border-color: #2563eb; color: #1d4ed8;">
               👶 vs 💼 幼年 vs 勞動人口占比 (2指標)
             </button>
-            <button type="button" class="btn btn-sm btn-outline" onclick="window.PyGWalker.applyMeasurePreset(['幼年人口占比(%)', '勞動人口占比(%)', '老年人口占比(%)'])" style="font-size: 12px; font-weight: 600; border-color: #ea580c; color: #c2410c;">
+            <button type="button" class="btn btn-sm btn-outline" data-action="apply-measure-preset" data-preset="幼年人口占比(%),勞動人口占比(%),老年人口占比(%)" style="font-size: 12px; font-weight: 600; border-color: #ea580c; color: #c2410c;">
               📊 三世代全景：幼年 vs 勞動 vs 老年 (3指標)
             </button>
-            <button type="button" class="btn btn-sm btn-outline" onclick="window.PyGWalker.applyMeasurePreset(['總人口(人)', '15-64歲勞動力人口(人)', '65歲以上高齡人口(人)'])" style="font-size: 12px; font-weight: 600;">
+            <button type="button" class="btn btn-sm btn-outline" data-action="apply-measure-preset" data-preset="總人口(人),15-64歲勞動力人口(人),65歲以上高齡人口(人)" style="font-size: 12px; font-weight: 600;">
               👥 總體量 vs 勞動力 vs 高齡體量 (3指標)
             </button>
           </div>
@@ -2107,10 +2120,10 @@
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e2e8f0; padding-top: 14px;">
-          <button type="button" class="btn btn-sm btn-ghost" onclick="window.PyGWalker.resetMultiMeasure()" style="color: #64748b;">重設為單一指標</button>
+          <button type="button" class="btn btn-sm btn-ghost" id="btnResetMultiMeasure" data-action="reset-multi-measure" style="color: #64748b;">重設為單一指標</button>
           <div style="display: flex; gap: 10px;">
-            <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('multiMeasureModal').classList.remove('open')">取消</button>
-            <button type="button" class="btn btn-sm btn-primary" onclick="window.PyGWalker.confirmMultiMeasure()" style="background: #2563eb; color: #fff;">套用指標比較 ➔</button>
+            <button type="button" class="btn btn-sm btn-outline" id="btnCancelMultiMeasure" data-action="close-multi-measure">取消</button>
+            <button type="button" class="btn btn-sm btn-primary" id="btnConfirmMultiMeasure" data-action="confirm-multi-measure" style="background: #2563eb; color: #fff;">套用指標比較 ➔</button>
           </div>
         </div>
       </div>
