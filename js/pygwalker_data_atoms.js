@@ -153,12 +153,31 @@
 
   function debounce(fn, wait = 100) {
     let timer = null;
-    return function (...args) {
+    let lastArgs = null;
+    let lastThis = null;
+    const debounced = function (...args) {
+      lastArgs = args;
+      lastThis = this;
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => {
-        fn.apply(this, args);
+        timer = null;
+        fn.apply(lastThis, lastArgs);
       }, wait);
     };
+    debounced.flush = function () {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+        fn.apply(lastThis, lastArgs);
+      }
+    };
+    debounced.cancel = function () {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
+    return debounced;
   }
 
   function hexToRgba(hex, alpha = 0.5) {
@@ -275,6 +294,110 @@
       lowWhisker,
       highWhisker,
       n
+    };
+  }
+
+  // --- 小提琴圖自定義系列 renderItem 工廠 (可自還原，杜絕序列化丟失崩潰) ---
+  function createViolinRenderItem(metaList) {
+    return (params, api) => {
+      const grpIdx = api.value(0);
+      const meta = metaList ? metaList[grpIdx] : null;
+      if (!meta || meta.n === 0) return;
+
+      const bandWidth = api.size([1, 0])[0];
+      const maxHalfWidth = Math.min(bandWidth * 0.42, 60);
+      const centerX = api.coord([grpIdx, 0])[0];
+
+      const rightPoints = [];
+      const leftPoints = [];
+
+      (meta.kde || []).forEach(pt => {
+        const yPix = api.coord([grpIdx, pt.y])[1];
+        const dx = (pt.densityRatio || 0) * maxHalfWidth;
+        rightPoints.push([centerX + dx, yPix]);
+        leftPoints.unshift([centerX - dx, yPix]);
+      });
+
+      const polygonPoints = rightPoints.concat(leftPoints);
+      const paletteColor = PALETTE[grpIdx % PALETTE.length];
+      const fillColor = hexToRgba(paletteColor, 0.45);
+
+      const elements = [];
+
+      // 1. 小提琴雙對稱核密度輪廓
+      if (polygonPoints.length > 2) {
+        elements.push({
+          type: 'polygon',
+          shape: { points: polygonPoints },
+          style: {
+            fill: fillColor,
+            stroke: paletteColor,
+            lineWidth: 1.6
+          }
+        });
+      }
+
+      // 2. 鬚線 (Low to High Whisker)
+      const lowY = api.coord([grpIdx, meta.lowWhisker])[1];
+      const highY = api.coord([grpIdx, meta.highWhisker])[1];
+      elements.push({
+        type: 'line',
+        shape: { x1: centerX, y1: lowY, x2: centerX, y2: highY },
+        style: { stroke: '#0f172a', lineWidth: 1.5 }
+      });
+
+      // 3. 四分位實心盒 (Q1 to Q3)
+      const q1Y = api.coord([grpIdx, meta.q1])[1];
+      const q3Y = api.coord([grpIdx, meta.q3])[1];
+      const boxTop = Math.min(q1Y, q3Y);
+      const boxH = Math.max(Math.abs(q1Y - q3Y), 2);
+      const boxW = Math.max(6, Math.min(bandWidth * 0.12, 10));
+      elements.push({
+        type: 'rect',
+        shape: { x: centerX - boxW / 2, y: boxTop, width: boxW, height: boxH, r: 2 },
+        style: { fill: '#1e293b' }
+      });
+
+      // 4. 中位數白心圓點
+      const medY = api.coord([grpIdx, meta.median])[1];
+      elements.push({
+        type: 'circle',
+        shape: { cx: centerX, cy: medY, r: 3.5 },
+        style: { fill: '#ffffff', stroke: '#0f172a', lineWidth: 1.5 }
+      });
+
+      return {
+        type: 'group',
+        children: elements
+      };
+    };
+  }
+
+  // --- 小提琴圖 Tooltip Formatter 工廠 ---
+  function createViolinTooltipFormatter(groupNames, metaList, measureDim) {
+    return (params) => {
+      if (params.seriesType === 'custom') {
+        const grp = (groupNames && groupNames[params.dataIndex]) || `群組 ${params.dataIndex + 1}`;
+        const meta = metaList ? metaList[params.dataIndex] : null;
+        if (!meta) return '';
+        return `<div style="font-size:12px; line-height:1.6;">
+          <strong style="color:#0f172a; font-size:13px;">🎻 ${escapeHtml(grp)}</strong> (樣本數: ${meta.n})<br/>
+          指標: <b>${escapeHtml(measureDim || '')}</b><br/>
+          上邊界 (High Whisker): <b>${formatCompactNumber(meta.highWhisker)}</b><br/>
+          第 3 四分位數 (Q3 75%): <b>${formatCompactNumber(meta.q3)}</b><br/>
+          中位數 (Median 50%): <b style="color:#2563eb;">${formatCompactNumber(meta.median)}</b><br/>
+          第 1 四分位數 (Q1 25%): <b>${formatCompactNumber(meta.q1)}</b><br/>
+          下邊界 (Low Whisker): <b>${formatCompactNumber(meta.lowWhisker)}</b><br/>
+          <span style="color:#64748b; font-size:10.5px;">核密度估計 (Gaussian KDE) 雙對稱連續分佈輪廓</span>
+        </div>`;
+      } else {
+        const outlierVal = Array.isArray(params.data) ? params.data[1] : (params.value || params.data);
+        const grpName = Array.isArray(params.data) && groupNames && groupNames[params.data[0]] ? `${groupNames[params.data[0]]} · ` : '';
+        return `<div style="font-size:12px; line-height:1.6;">
+          <strong style="color:#0f172a;">${escapeHtml(grpName)}離群極值</strong><br/>
+          指標: <b>${escapeHtml(measureDim || '')}</b>: <b style="color:#ea580c;">${formatCompactNumber(outlierVal)}</b>
+        </div>`;
+      }
     };
   }
 
@@ -942,17 +1065,16 @@
     const displayName = cfg.alias && cfg.alias !== fieldName ? `${cfg.alias} (${fieldName})` : fieldName;
     const tooltipText = `${displayName} · ${cfg.nature === 'continuous' ? '連續度量' : '離散維度'} · 預設聚合: ${(cfg.agg || 'RAW').toUpperCase()}`;
 
-    const safeJsField = escapeJsStr(fieldName);
     div.innerHTML = `
       <span class="field-drag-handle">⋮⋮</span>
       <span class="field-type-badge" title="${escapeHtml(cfg.type || fieldType)}">${iconBadge}</span>
       <span class="field-name-text" title="${escapeHtml(tooltipText)}">${escapeHtml(cfg.alias || fieldName)}</span>
       <div class="field-quick-actions">
-        <button type="button" class="field-quick-btn" title="指派至 X 軸 (Columns)" onclick="window.PyGWalker.assignToShelf('x', '${safeJsField}')">+X</button>
-        <button type="button" class="field-quick-btn" title="指派至 Y 軸 (Rows)" onclick="window.PyGWalker.assignToShelf('y', '${safeJsField}')">+Y</button>
-        <button type="button" class="field-quick-btn" title="指派至 顏色/大小" onclick="window.PyGWalker.assignToShelf('${fieldType === 'dimension' ? 'color' : 'size'}', '${safeJsField}')">${fieldType === 'dimension' ? '+色' : '+大'}</button>
-        ${fieldType === 'dimension' ? `<button type="button" class="field-quick-btn facet-btn" title="指派至 分面小多圖 (Facet Small Multiples)" onclick="window.PyGWalker.assignToShelf('facet', '${safeJsField}')">+面</button>` : ''}
-        <button type="button" class="field-quick-btn filter-btn" title="加入至篩選器 (Filters)" onclick="window.PyGWalker.addFilter('${safeJsField}')">+濾</button>
+        <button type="button" class="field-quick-btn" title="指派至 X 軸 (Columns)" data-action="assign-shelf" data-shelf="x" data-field="${escapeHtml(fieldName)}">+X</button>
+        <button type="button" class="field-quick-btn" title="指派至 Y 軸 (Rows)" data-action="assign-shelf" data-shelf="y" data-field="${escapeHtml(fieldName)}">+Y</button>
+        <button type="button" class="field-quick-btn" title="指派至 顏色/大小" data-action="assign-shelf" data-shelf="${fieldType === 'dimension' ? 'color' : 'size'}" data-field="${escapeHtml(fieldName)}">${fieldType === 'dimension' ? '+色' : '+大'}</button>
+        ${fieldType === 'dimension' ? `<button type="button" class="field-quick-btn facet-btn" title="指派至 分面小多圖 (Facet Small Multiples)" data-action="assign-shelf" data-shelf="facet" data-field="${escapeHtml(fieldName)}">+面</button>` : ''}
+        <button type="button" class="field-quick-btn filter-btn" title="加入至篩選器 (Filters)" data-action="add-filter" data-field="${escapeHtml(fieldName)}">+濾</button>
       </div>
     `;
 
@@ -1217,7 +1339,7 @@
           <div class="shelf-pill dimension" style="margin: 2px 0;">
             <span class="field-type-badge" style="color: #2563eb;">▼</span>
             <span class="shelf-pill-name" title="${escapeHtml(field)} (${summary})">${escapeHtml(field)}: ${summary}</span>
-            <button type="button" class="shelf-pill-remove" onclick="window.PyGWalker.removeFilter('${escapeJsStr(field)}')" title="移除此篩選條件">✕</button>
+            <button type="button" class="shelf-pill-remove" data-action="remove-filter" data-field="${escapeHtml(field)}" title="移除此篩選條件">✕</button>
           </div>
         `;
       }).join('');
@@ -1272,13 +1394,13 @@
         html += `
           <div class="filter-group-card">
             <span class="filter-group-header">📍 ${escapeHtml(field)}:</span>
-            <button type="button" class="filter-quick-action" onclick="window.PyGWalker.setAllFilterValues('${escapeJsStr(field)}', true)">全選</button>
-            <button type="button" class="filter-quick-action" onclick="window.PyGWalker.setAllFilterValues('${escapeJsStr(field)}', false)" title="清除其他選項，只保留第一項">只留第一項</button>
+            <button type="button" class="filter-quick-action" data-action="set-all-filters" data-field="${escapeHtml(field)}" data-select-all="true">全選</button>
+            <button type="button" class="filter-quick-action" data-action="set-all-filters" data-field="${escapeHtml(field)}" data-select-all="false" title="清除其他選項，只保留第一項">只留第一項</button>
             <div class="filter-chip-container">
               ${f.allValues.map(val => {
                 const isAct = f.selected.has(val);
                 const c = counts[val] || 0;
-                return `<button type="button" class="filter-chip-btn ${isAct ? 'active' : ''}" onclick="window.PyGWalker.toggleFilterValue('${escapeJsStr(field)}', '${escapeJsStr(val)}')">
+                return `<button type="button" class="filter-chip-btn ${isAct ? 'active' : ''}" data-action="toggle-filter-value" data-field="${escapeHtml(field)}" data-value="${escapeHtml(String(val))}">
                   ${escapeHtml(val)} <span class="filter-count">(${c})</span>
                 </button>`;
               }).join('')}
@@ -1291,17 +1413,17 @@
             <div class="filter-group-card">
               <span class="filter-group-header">📅 ${escapeHtml(field)}:</span>
               <div class="filter-range-wrap">
-                <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeJsStr(field)}', 'all')">全部 (${f.min}–${f.max})</button>
-                <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeJsStr(field)}', 30)">近30年</button>
-                <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeJsStr(field)}', 20)">近20年</button>
-                <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeJsStr(field)}', 10)">近10年</button>
-                <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeJsStr(field)}', 'latest')">最新 (${f.max})</button>
+                <button type="button" class="filter-preset-btn" data-action="set-year-preset" data-field="${escapeHtml(field)}" data-preset="all">全部 (${f.min}–${f.max})</button>
+                <button type="button" class="filter-preset-btn" data-action="set-year-preset" data-field="${escapeHtml(field)}" data-preset="30">近30年</button>
+                <button type="button" class="filter-preset-btn" data-action="set-year-preset" data-field="${escapeHtml(field)}" data-preset="20">近20年</button>
+                <button type="button" class="filter-preset-btn" data-action="set-year-preset" data-field="${escapeHtml(field)}" data-preset="10">近10年</button>
+                <button type="button" class="filter-preset-btn" data-action="set-year-preset" data-field="${escapeHtml(field)}" data-preset="latest">最新 (${f.max})</button>
                 <span>｜ 從</span>
                 <input type="number" class="filter-range-input" id="rangeMin_${escapeHtml(field)}" data-range-min="${escapeHtml(field)}" value="${f.currentMin}" min="${f.min}" max="${f.max}">
                 <span>至</span>
                 <input type="number" class="filter-range-input" id="rangeMax_${escapeHtml(field)}" data-range-max="${escapeHtml(field)}" value="${f.currentMax}" min="${f.min}" max="${f.max}">
                 <span>年</span>
-                <button type="button" class="filter-range-btn" onclick="window.PyGWalker.applyRangeFilter('${escapeJsStr(field)}')">套用</button>
+                <button type="button" class="filter-range-btn" data-action="apply-range-filter" data-field="${escapeHtml(field)}">套用</button>
               </div>
             </div>
           `;
@@ -1310,12 +1432,12 @@
             <div class="filter-group-card">
               <span class="filter-group-header">🔢 ${escapeHtml(field)}:</span>
               <div class="filter-range-wrap">
-                <button type="button" class="filter-preset-btn" onclick="window.PyGWalker.setYearPreset('${escapeJsStr(field)}', 'all')">全部 (${f.min}–${f.max})</button>
+                <button type="button" class="filter-preset-btn" data-action="set-year-preset" data-field="${escapeHtml(field)}" data-preset="all">全部 (${f.min}–${f.max})</button>
                 <span>｜ 從</span>
                 <input type="number" step="any" class="filter-range-input" id="rangeMin_${escapeHtml(field)}" data-range-min="${escapeHtml(field)}" value="${f.currentMin}" min="${f.min}" max="${f.max}">
                 <span>至</span>
                 <input type="number" step="any" class="filter-range-input" id="rangeMax_${escapeHtml(field)}" data-range-max="${escapeHtml(field)}" value="${f.currentMax}" min="${f.min}" max="${f.max}">
-                <button type="button" class="filter-range-btn" onclick="window.PyGWalker.applyRangeFilter('${escapeJsStr(field)}')">套用</button>
+                <button type="button" class="filter-range-btn" data-action="apply-range-filter" data-field="${escapeHtml(field)}">套用</button>
               </div>
             </div>
           `;
@@ -1324,7 +1446,7 @@
     });
 
     html += `
-      <button type="button" class="filter-reset-btn" onclick="window.PyGWalker.resetAllFilters()" title="重設所有條件，恢復顯示全量數據">
+      <button type="button" class="filter-reset-btn" data-action="reset-all-filters" title="重設所有條件，恢復顯示全量數據">
         ✕ 重設所有篩選
       </button>
     `;
@@ -1347,7 +1469,7 @@
           <div class="shelf-pill measure" style="border-left: 3px solid ${color};">
             <span class="field-type-badge">#</span>
             <span class="shelf-pill-name" style="font-weight: 600;">${escapeHtml(f)}</span>
-            <button type="button" class="shelf-pill-remove" onclick="window.PyGWalker.removeMultiMeasure('${escapeJsStr(f)}')" title="移除此對比指標">✕</button>
+            <button type="button" class="shelf-pill-remove" data-action="remove-multi-measure" data-field="${escapeHtml(f)}" title="移除此對比指標">✕</button>
           </div>
         `;
       }).join('');
@@ -1372,7 +1494,7 @@
       
       let aggHtml = '';
       if (isMeasure && shelfKey === 'y') {
-        aggHtml = `<span class="shelf-agg-badge" onclick="window.PyGWalker.cycleAgg(event)" title="點擊切換聚合方式 (RAW ➔ SUM ➔ MEAN ➔ MAX ➔ MIN ➔ COUNT)">[${state.shelf.agg}]</span>`;
+        aggHtml = `<span class="shelf-agg-badge" data-action="cycle-agg" title="點擊切換聚合方式 (RAW ➔ SUM ➔ MEAN ➔ MAX ➔ MIN ➔ COUNT)">[${state.shelf.agg}]</span>`;
       }
 
       let extraCompareBtn = '';
@@ -1387,10 +1509,10 @@
         if (hasColorGrouping && state.chartType === 'bar') {
           extraCompareBtn = `
             <div class="shelf-mode-toggle-group" title="切換柱狀圖：併排對比 (Grouped) 或 堆疊累計 (Stacked)">
-              <button type="button" class="btn-stack-toggle ${!state.barStackMode ? 'active' : ''}" onclick="window.PyGWalker.setBarStackMode(false)" title="併排柱狀圖 (Grouped / Clustered Bars)">
+              <button type="button" class="btn-stack-toggle ${!state.barStackMode ? 'active' : ''}" data-action="set-bar-stack-mode" data-stacked="false" title="併排柱狀圖 (Grouped / Clustered Bars)">
                 併排
               </button>
-              <button type="button" class="btn-stack-toggle ${state.barStackMode ? 'active' : ''}" onclick="window.PyGWalker.setBarStackMode(true)" title="堆疊柱狀圖 (Stacked Bars)">
+              <button type="button" class="btn-stack-toggle ${state.barStackMode ? 'active' : ''}" data-action="set-bar-stack-mode" data-stacked="true" title="堆疊柱狀圖 (Stacked Bars)">
                 堆疊
               </button>
             </div>
@@ -1400,7 +1522,7 @@
         const hasFacet = state.dimensions.includes(currentField);
         if (hasFacet) {
           extraCompareBtn = `
-            <button type="button" class="btn-facet-scale ${state.facetScaleMode === 'free' ? 'scale-free' : ''}" onclick="window.PyGWalker.toggleFacetScale()" title="切換 Y 軸比例尺：統一量表 (Fixed) 或 獨立自適應 (Free)">
+            <button type="button" class="btn-facet-scale ${state.facetScaleMode === 'free' ? 'scale-free' : ''}" data-action="toggle-facet-scale" title="切換 Y 軸比例尺：統一量表 (Fixed) 或 獨立自適應 (Free)">
               ${state.facetScaleMode === 'fixed' ? '🔒 統一量表' : '🔓 獨立量表'}
             </button>
           `;
@@ -1413,7 +1535,7 @@
           <span class="field-type-badge">${badge}</span>
           ${aggHtml}
           <span class="shelf-pill-name">${escapeHtml(currentField)}</span>
-          <button type="button" class="shelf-pill-remove" onclick="window.PyGWalker.clearShelf('${shelfKey}')" title="移除此槽位欄位">✕</button>
+          <button type="button" class="shelf-pill-remove" data-action="clear-shelf" data-shelf="${shelfKey}" title="移除此槽位欄位">✕</button>
         </div>
         ${extraCompareBtn}
       `;
@@ -1674,7 +1796,7 @@
       }
 
       const resMeasure = `
-        <div class="col-profiling-box measure-profile" onclick="event.stopPropagation()" title="連續度量直方圖分佈：${min.toLocaleString()} ~ ${max.toLocaleString()} (有效樣本: ${nums.length} 筆)">
+        <div class="col-profiling-box measure-profile" title="連續度量直方圖分佈：${min.toLocaleString()} ~ ${max.toLocaleString()} (有效樣本: ${nums.length} 筆)">
           <svg class="profiling-svg" viewBox="0 0 100 18" preserveAspectRatio="none">
             ${svgBars}
           </svg>
@@ -1724,7 +1846,7 @@
       const top1Pct = top3[0] ? Math.round((top3[0][1] / total) * 100) : 0;
 
       const resDimension = `
-        <div class="col-profiling-box dimension-profile" onclick="event.stopPropagation()" title="離散維度類別佔比 (共 ${uniqueCount} 種不同值)：\n${top3.map(t => `${t[0]}: ${t[1]} 筆 (${Math.round(t[1]/total*100)}%)`).join('\n')}">
+        <div class="col-profiling-box dimension-profile" title="離散維度類別佔比 (共 ${uniqueCount} 種不同值)：\n${top3.map(t => `${t[0]}: ${t[1]} 筆 (${Math.round(t[1]/total*100)}%)`).join('\n')}">
           <div class="profiling-category-bar">
             ${barSegments}
           </div>
@@ -2277,7 +2399,7 @@
                   total += num;
                   valCount++;
                 }
-                const colorDot = `<span style="display:inline-block;margin-right:5px;border-radius:50%;width:8px;height:8px;background-color:${p.color};"></span>`;
+                const colorDot = `<span style="display:inline-block;margin-right:5px;border-radius:50%;width:8px;height:8px;background-color:${escapeHtml(p.color)};"></span>`;
                 tip += `${colorDot} ${escapeHtml(p.seriesName)}: <b>${formatCompactNumber(val)}</b><br/>`;
               }
             });
@@ -3351,108 +3473,17 @@
 
         option.tooltip = {
           trigger: 'item',
-          formatter: (params) => {
-            if (params.seriesType === 'custom') {
-              const grp = groupNames[params.dataIndex];
-              const meta = violinMetaList[params.dataIndex];
-              if (!meta) return '';
-              return `<div style="font-size:12px; line-height:1.6;">
-                <strong style="color:#0f172a; font-size:13px;">🎻 ${escapeHtml(grp)}</strong> (樣本數: ${meta.n})<br/>
-                指標: <b>${escapeHtml(measureDim)}</b><br/>
-                上邊界 (High Whisker): <b>${formatCompactNumber(meta.highWhisker)}</b><br/>
-                第 3 四分位數 (Q3 75%): <b>${formatCompactNumber(meta.q3)}</b><br/>
-                中位數 (Median 50%): <b style="color:#2563eb;">${formatCompactNumber(meta.median)}</b><br/>
-                第 1 四分位數 (Q1 25%): <b>${formatCompactNumber(meta.q1)}</b><br/>
-                下邊界 (Low Whisker): <b>${formatCompactNumber(meta.lowWhisker)}</b><br/>
-                <span style="color:#64748b; font-size:10.5px;">核密度估計 (Gaussian KDE) 雙對稱連續分佈輪廓</span>
-              </div>`;
-            } else {
-              const outlierVal = Array.isArray(params.data) ? params.data[1] : (params.value || params.data);
-              const grpName = Array.isArray(params.data) && groupNames[params.data[0]] ? `${groupNames[params.data[0]]} · ` : '';
-              return `<div style="font-size:12px; line-height:1.6;">
-                <strong style="color:#0f172a;">${escapeHtml(grpName)}離群極值</strong><br/>
-                指標: <b>${escapeHtml(measureDim)}</b>: <b style="color:#ea580c;">${formatCompactNumber(outlierVal)}</b>
-              </div>`;
-            }
-          }
+          formatter: createViolinTooltipFormatter(groupNames, violinMetaList, measureDim)
         };
 
         option.series = [
           {
             name: measureDim,
             type: 'custom',
-            renderItem: (params, api) => {
-              const grpIdx = api.value(0);
-              const meta = violinMetaList[grpIdx];
-              if (!meta || meta.n === 0) return;
-
-              const bandWidth = api.size([1, 0])[0];
-              const maxHalfWidth = Math.min(bandWidth * 0.42, 60);
-              const centerX = api.coord([grpIdx, 0])[0];
-
-              const rightPoints = [];
-              const leftPoints = [];
-
-              meta.kde.forEach(pt => {
-                const yPix = api.coord([grpIdx, pt.y])[1];
-                const dx = (pt.densityRatio || 0) * maxHalfWidth;
-                rightPoints.push([centerX + dx, yPix]);
-                leftPoints.unshift([centerX - dx, yPix]);
-              });
-
-              const polygonPoints = rightPoints.concat(leftPoints);
-              const paletteColor = PALETTE[grpIdx % PALETTE.length];
-              const fillColor = hexToRgba(paletteColor, 0.45);
-
-              const elements = [];
-
-              // 1. 小提琴雙對稱核密度輪廓
-              if (polygonPoints.length > 2) {
-                elements.push({
-                  type: 'polygon',
-                  shape: { points: polygonPoints },
-                  style: {
-                    fill: fillColor,
-                    stroke: paletteColor,
-                    lineWidth: 1.6
-                  }
-                });
-              }
-
-              // 2. 鬚線 (Low to High Whisker)
-              const lowY = api.coord([grpIdx, meta.lowWhisker])[1];
-              const highY = api.coord([grpIdx, meta.highWhisker])[1];
-              elements.push({
-                type: 'line',
-                shape: { x1: centerX, y1: lowY, x2: centerX, y2: highY },
-                style: { stroke: '#0f172a', lineWidth: 1.5 }
-              });
-
-              // 3. 四分位實心盒 (Q1 to Q3)
-              const q1Y = api.coord([grpIdx, meta.q1])[1];
-              const q3Y = api.coord([grpIdx, meta.q3])[1];
-              const boxTop = Math.min(q1Y, q3Y);
-              const boxH = Math.max(Math.abs(q1Y - q3Y), 2);
-              const boxW = Math.max(6, Math.min(bandWidth * 0.12, 10));
-              elements.push({
-                type: 'rect',
-                shape: { x: centerX - boxW / 2, y: boxTop, width: boxW, height: boxH, r: 2 },
-                style: { fill: '#1e293b' }
-              });
-
-              // 4. 中位數白心圓點
-              const medY = api.coord([grpIdx, meta.median])[1];
-              elements.push({
-                type: 'circle',
-                shape: { cx: centerX, cy: medY, r: 3.5 },
-                style: { fill: '#ffffff', stroke: '#0f172a', lineWidth: 1.5 }
-              });
-
-              return {
-                type: 'group',
-                children: elements
-              };
-            },
+            _violinMetaList: violinMetaList,
+            _groupNames: groupNames,
+            _measureDim: measureDim,
+            renderItem: createViolinRenderItem(violinMetaList),
             data: groupNames.map((grp, idx) => [idx, violinMetaList[idx].median])
           }
         ];
@@ -3570,7 +3601,7 @@
         formatter: (params) => {
           const d = params?.data?.raw || {};
           let tip = `<strong style="font-size:13px; color:#0f172a;">${escapeHtml(params?.name || '')}</strong><br/>`;
-          tip += `體量 (${sizeField || yField}): <b style="color:#2563eb;">${formatCompactNumber(params?.value || 0)}</b><br/>`;
+          tip += `體量 (${escapeHtml(sizeField || yField)}): <b style="color:#2563eb;">${formatCompactNumber(params?.value || 0)}</b><br/>`;
           if (d && secField && d[secField] !== undefined) {
             tip += `${escapeHtml(secField)}: <b>${formatCompactNumber(d[secField])}</b><br/>`;
           }
@@ -4318,8 +4349,7 @@
             const arrow = isSorted ? (state.sortOrder === 'desc' ? ' ▼' : ' ▲') : '';
             const typeBadge = state.measures.includes(col) ? '#' : 'T';
             const escCol = escapeHtml(col);
-            const safeColArg = String(col).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-            return `<th onclick="window.PyGWalker.sortTable('${safeColArg}')" style="cursor: pointer; vertical-align: top;" title="點擊依此欄位排序">
+            return `<th data-action="sort-table" data-col="${escCol}" style="cursor: pointer; vertical-align: top;" title="點擊依此欄位排序">
               <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 2px;">
                 <span><span style="opacity: 0.6; font-size: 10px;">${typeBadge}</span> <b>${escCol}</b>${arrow}</span>
               </div>
@@ -4362,6 +4392,162 @@
 
   // --- 事件監聽配置 ---
   function setupEventListeners() {
+    // =========================================================================
+    // 全域事件委派中心 (Centralized Event Delegation for Zero-Inline-Handlers)
+    // =========================================================================
+    document.addEventListener('click', (e) => {
+      const actEl = e.target.closest('[data-action]');
+      if (!actEl) return;
+
+      const action = actEl.dataset.action;
+      switch (action) {
+        case 'assign-shelf': {
+          const shelf = actEl.dataset.shelf;
+          const field = actEl.dataset.field;
+          if (shelf && field) {
+            setShelfField(shelf, field);
+          }
+          break;
+        }
+        case 'add-filter': {
+          const field = actEl.dataset.field;
+          if (field) addFilter(field);
+          break;
+        }
+        case 'remove-filter': {
+          const field = actEl.dataset.field;
+          if (field) removeFilter(field);
+          break;
+        }
+        case 'set-all-filters': {
+          const field = actEl.dataset.field;
+          const selectAll = actEl.dataset.selectAll === 'true';
+          if (field) setAllFilterValues(field, selectAll);
+          break;
+        }
+        case 'toggle-filter-value': {
+          const field = actEl.dataset.field;
+          const val = actEl.dataset.value;
+          if (field !== undefined && val !== undefined) toggleFilterValue(field, val);
+          break;
+        }
+        case 'set-year-preset': {
+          const field = actEl.dataset.field;
+          const preset = actEl.dataset.preset;
+          if (field && preset) setYearPreset(field, preset);
+          break;
+        }
+        case 'apply-range-filter': {
+          const field = actEl.dataset.field;
+          if (field) applyRangeFilter(field);
+          break;
+        }
+        case 'reset-all-filters': {
+          resetAllFilters();
+          break;
+        }
+        case 'remove-multi-measure': {
+          const field = actEl.dataset.field;
+          if (field) removeMultiMeasure(field);
+          break;
+        }
+        case 'cycle-agg': {
+          e.stopPropagation();
+          const aggs = ['RAW', 'SUM', 'MEAN', 'MAX', 'MIN', 'COUNT'];
+          const nextIdx = (aggs.indexOf(state.shelf.agg) + 1) % aggs.length;
+          state.shelf.agg = aggs[nextIdx];
+          renderShelves();
+          renderVisualization();
+          saveCurrentSheetState();
+          savePersistedState();
+          showToast(`已切換 Y 軸聚合模式為：${state.shelf.agg}`);
+          break;
+        }
+        case 'set-bar-stack-mode': {
+          const isStacked = actEl.dataset.stacked === 'true';
+          setBarStackMode(isStacked);
+          break;
+        }
+        case 'toggle-facet-scale': {
+          toggleFacetScale();
+          break;
+        }
+        case 'clear-shelf': {
+          const shelf = actEl.dataset.shelf;
+          if (shelf) {
+            state.shelf[shelf] = '';
+            if (shelf === 'y') state.shelf.yMulti = [];
+            renderShelves();
+            renderVisualization();
+            renderKPIRibbon();
+            saveCurrentSheetState();
+            savePersistedState();
+          }
+          break;
+        }
+        case 'sort-table': {
+          if (e.target.closest('.col-profiling-box')) return;
+          const col = actEl.dataset.col;
+          if (col) {
+            if (state.sortColumn === col) {
+              state.sortOrder = state.sortOrder === 'desc' ? 'asc' : 'desc';
+            } else {
+              state.sortColumn = col;
+              state.sortOrder = 'desc';
+            }
+            renderDataTable();
+          }
+          break;
+        }
+        case 'switch-sheet': {
+          if (e.target.closest('.tab-rename-btn') || e.target.closest('.tab-close-btn')) return;
+          const sheetId = actEl.dataset.sheetId;
+          if (sheetId) switchSheet(sheetId);
+          break;
+        }
+        case 'rename-sheet': {
+          e.stopPropagation();
+          const sheetId = actEl.dataset.sheetId;
+          if (sheetId) promptRenameSheet(sheetId);
+          break;
+        }
+        case 'delete-sheet': {
+          e.stopPropagation();
+          const sheetId = actEl.dataset.sheetId;
+          if (sheetId) deleteSheet(sheetId);
+          break;
+        }
+        case 'close-dashboard': {
+          closeCustomDashboard();
+          break;
+        }
+        case 'remove-pinned-chart': {
+          const chartId = actEl.dataset.chartId;
+          if (chartId) removePinnedChart(chartId);
+          break;
+        }
+      }
+    });
+
+    // 工作表標籤雙擊重新命名委派
+    const tabsList = document.getElementById('workbookTabsList');
+    if (tabsList) {
+      tabsList.addEventListener('dblclick', (e) => {
+        const tab = e.target.closest('.workbook-tab');
+        if (tab && tab.dataset.sheetId) {
+          promptRenameSheet(tab.dataset.sheetId);
+        }
+      });
+    }
+
+    // 視窗離開時強制排空待儲存的持久化狀態防抖計時器
+    window.addEventListener('beforeunload', () => {
+      debouncedSavePersistedState.flush();
+    });
+    window.addEventListener('pagehide', () => {
+      debouncedSavePersistedState.flush();
+    });
+
     // 數據集快速切換
     const dsSelect = document.getElementById('datasetQuickSelect');
     if (dsSelect) {
@@ -6067,17 +6253,82 @@
   // =========================================================================
   const PERSISTENCE_KEY = 'data_atoms_studio_state_v1';
 
-  function savePersistedState() {
+  // --- ECharts 配置物件函式自動還原器 (解決 localStorage 序列化丟失 renderItem, formatter 之根本崩潰漏洞) ---
+  function restoreOptionFunctions(opt, item) {
+    if (!opt || typeof opt !== 'object') return opt;
+
+    // 1. 軸標籤格式化自還原 (Y 軸與 X 軸)
+    const restoreAxis = (ax) => {
+      if (!ax) return;
+      if (Array.isArray(ax)) { ax.forEach(restoreAxis); return; }
+      if (!ax.axisLabel) ax.axisLabel = {};
+      if (typeof ax.axisLabel.formatter !== 'function' && !ax.axisLabel.formatter) {
+        ax.axisLabel.formatter = (v) => formatCompactNumber(v);
+      }
+    };
+    restoreAxis(opt.yAxis);
+    restoreAxis(opt.xAxis);
+
+    // 2. Series 自定義系列（小提琴圖等）與 Tooltip 自還原
+    if (Array.isArray(opt.series)) {
+      opt.series.forEach(s => {
+        if (s && s.type === 'custom') {
+          const metaList = s._violinMetaList || item?.violinMetaList || item?.option?.series?.[0]?._violinMetaList || [];
+          const grpNames = s._groupNames || item?.groupNames || (opt.xAxis && opt.xAxis.data) || [];
+          const measureName = s._measureDim || item?.measureDim || s.name || '';
+
+          s.renderItem = createViolinRenderItem(metaList);
+
+          if (!opt.tooltip || typeof opt.tooltip.formatter !== 'function') {
+            opt.tooltip = opt.tooltip || { trigger: 'item' };
+            opt.tooltip.formatter = createViolinTooltipFormatter(grpNames, metaList, measureName);
+          }
+        }
+      });
+    }
+
+    // 3. 通用 Tooltip 格式化修復（若丟失 formatter 且非 custom series）
+    if (opt.tooltip && typeof opt.tooltip.formatter !== 'function' && !opt.tooltip.formatter) {
+      if (opt.tooltip.trigger === 'axis') {
+        opt.tooltip.formatter = (params) => {
+          if (!Array.isArray(params) || params.length === 0) return '';
+          let tip = `<div style="font-size:12px; line-height:1.6;"><strong style="font-size:13px; color:#0f172a;">${escapeHtml(params[0].axisValueLabel || params[0].name)}</strong><br/>`;
+          params.forEach(p => {
+            const val = (p.data && typeof p.data === 'object' && p.data.value !== undefined) ? p.data.value : p.value;
+            if (val !== '-' && val !== null && val !== undefined) {
+              const colorDot = `<span style="display:inline-block;margin-right:5px;border-radius:50%;width:8px;height:8px;background-color:${escapeHtml(p.color)};"></span>`;
+              tip += `${colorDot} ${escapeHtml(p.seriesName)}: <b>${formatCompactNumber(val)}</b><br/>`;
+            }
+          });
+          tip += `</div>`;
+          return tip;
+        };
+      }
+    }
+
+    return opt;
+  }
+
+  function savePersistedStateImmediate() {
     try {
       saveCurrentSheetState();
       const serializableSheets = (state.sheets || []).map(s => ({
         ...s,
         filters: serializeFilters(s.filters)
       }));
+      const serializablePinned = (state.pinnedCharts || []).map(p => ({
+        ...p,
+        recipe: p.recipe || {
+          chartType: p.chartType,
+          datasetId: p.datasetId || state.currentDatasetId,
+          sheetId: p.sheetId,
+          shelf: p.shelf ? JSON.parse(JSON.stringify(p.shelf)) : undefined
+        }
+      }));
       const payload = {
         sheets: serializableSheets,
         activeSheetId: state.activeSheetId,
-        pinnedCharts: state.pinnedCharts,
+        pinnedCharts: serializablePinned,
         zoomLevel: state.zoomLevel,
         sidebarCollapsed: state.sidebarCollapsed,
         dashboardLayout: state.dashboardLayout || 2,
@@ -6087,6 +6338,19 @@
       localStorage.setItem(PERSISTENCE_KEY, JSON.stringify(payload));
     } catch (err) {
       console.warn('[Persistence] Failed to save state to localStorage:', err);
+    }
+  }
+
+  const debouncedSavePersistedState = debounce(() => {
+    savePersistedStateImmediate();
+  }, 300);
+
+  function savePersistedState(immediate = false) {
+    if (immediate) {
+      debouncedSavePersistedState.cancel();
+      savePersistedStateImmediate();
+    } else {
+      debouncedSavePersistedState();
     }
   }
 
@@ -6199,6 +6463,7 @@
     updatePinnedBadge();
 
     try {
+      debouncedSavePersistedState.cancel();
       localStorage.removeItem(PERSISTENCE_KEY);
     } catch (e) {
       console.warn(e);
@@ -6229,13 +6494,12 @@
     tabsList.innerHTML = state.sheets.map(sheet => {
       const isActive = sheet.id === state.activeSheetId;
       const icon = getChartIcon(sheet.chartType);
-      const safeId = String(sheet.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
       return `
-        <div class="workbook-tab ${isActive ? 'active' : ''}" data-sheet-id="${escapeHtml(sheet.id)}" onclick="window.PyGWalker.switchSheet('${safeId}')" title="${escapeHtml(sheet.name)} (${sheet.chartType})">
+        <div class="workbook-tab ${isActive ? 'active' : ''}" data-sheet-id="${escapeHtml(sheet.id)}" data-action="switch-sheet" title="${escapeHtml(sheet.name)} (${sheet.chartType})">
           <span class="tab-chart-icon">${icon}</span>
-          <span class="tab-title" ondblclick="window.PyGWalker.promptRenameSheet('${safeId}')" title="按兩下自訂名稱">${escapeHtml(sheet.name)}</span>
-          <button type="button" class="tab-rename-btn" onclick="event.stopPropagation(); window.PyGWalker.promptRenameSheet('${safeId}')" title="按此修改工作表名稱">✎</button>
-          ${state.sheets.length > 1 ? `<button type="button" class="tab-close-btn" onclick="event.stopPropagation(); window.PyGWalker.deleteSheet('${safeId}')" title="刪除此工作表">✕</button>` : ''}
+          <span class="tab-title" data-sheet-id="${escapeHtml(sheet.id)}" title="按兩下自訂名稱">${escapeHtml(sheet.name)}</span>
+          <button type="button" class="tab-rename-btn" data-action="rename-sheet" data-sheet-id="${escapeHtml(sheet.id)}" title="按此修改工作表名稱">✎</button>
+          ${state.sheets.length > 1 ? `<button type="button" class="tab-close-btn" data-action="delete-sheet" data-sheet-id="${escapeHtml(sheet.id)}" title="刪除此工作表">✕</button>` : ''}
         </div>
       `;
     }).join('');
@@ -6501,6 +6765,15 @@
             const typeName = typeMap[sheet.chartType] || sheet.chartType;
             const xDesc = sheet.shelf.x || '未排入';
             const yDesc = sheet.shelf.y || (sheet.shelf.yMulti && sheet.shelf.yMulti.length ? sheet.shelf.yMulti.join(', ') : '未排入');
+            const recipe = {
+              chartType: sheet.chartType,
+              datasetId: sheet.datasetId || state.currentDatasetId,
+              sheetId: sheet.id,
+              shelf: JSON.parse(JSON.stringify(sheet.shelf)),
+              filters: serializeFilters(sheet.filters),
+              facetScaleMode: sheet.facetScaleMode,
+              barStackMode: sheet.barStackMode
+            };
             state.pinnedCharts.push({
               id: 'pinned_sheet_' + sheet.id + '_' + Math.random().toString(36).slice(2, 6),
               sheetId: sheet.id,
@@ -6510,6 +6783,7 @@
               datasetName: sheet.datasetId || state.datasetName,
               createdAt: new Date().toLocaleTimeString(),
               shelvesSummary: `X: ${xDesc} | Y: ${yDesc}${sheet.shelf.color ? ` | 色: ${sheet.shelf.color}` : ''}`,
+              recipe: recipe,
               option: cloneEChartsOption(opt)
             });
             importedCount++;
@@ -6591,14 +6865,27 @@
     const xDesc = state.shelf.x ? state.shelf.x : (state.shelf.yMulti && state.shelf.yMulti.length ? '多度量' : '預設維度');
     const yDesc = state.shelf.y ? state.shelf.y : (state.shelf.yMulti && state.shelf.yMulti.length ? state.shelf.yMulti.join(', ') : '預設度量');
 
+    const recipe = {
+      chartType: state.chartType,
+      datasetId: state.currentDatasetId,
+      sheetId: state.activeSheetId,
+      shelf: JSON.parse(JSON.stringify(state.shelf)),
+      filters: serializeFilters(state.filters),
+      facetScaleMode: state.facetScaleMode,
+      barStackMode: state.barStackMode,
+      sortDescending: state.sortDescending
+    };
+
     const pinnedItem = {
       id: chartId,
+      sheetId: state.activeSheetId,
       title: `${typeName} · ${state.shelf.y || state.shelf.x || state.datasetName}`,
       chartType: state.chartType,
       chartTypeName: typeName,
       datasetName: state.datasetName,
       createdAt: new Date().toLocaleTimeString(),
       shelvesSummary: `X: ${xDesc} | Y: ${yDesc}${state.shelf.color ? ` | 色: ${state.shelf.color}` : ''}`,
+      recipe: recipe,
       option: cloneEChartsOption(currentOption)
     };
 
@@ -6714,7 +7001,7 @@
           <div class="dashboard-empty-desc">
             在視覺化探索工作台中，調整好維度、度量與圖表樣式後，點擊頂部「📌 釘選圖表」按鈕，即可將圖表收藏並拼裝成您的專屬多宮格看板！
           </div>
-          <button type="button" class="btn btn-primary" onclick="window.PyGWalker.closeCustomDashboard()">
+          <button type="button" class="btn btn-primary" data-action="close-dashboard">
             ← 返回工作台釘選圖表
           </button>
         </div>
@@ -6724,7 +7011,6 @@
 
     container.innerHTML = state.pinnedCharts.map(item => {
       const escId = escapeHtml(item.id);
-      const safeId = String(item.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
       return `
         <div class="dashboard-card" id="card_${escId}">
           <div class="dashboard-card-header">
@@ -6734,7 +7020,7 @@
               <span class="dashboard-card-dataset" title="資料集: ${escapeHtml(item.datasetName)}">${escapeHtml(item.datasetName)}</span>
             </div>
             <div class="dashboard-card-tools">
-              <button type="button" class="dashboard-card-tool-btn btn-remove" onclick="window.PyGWalker.removePinnedChart('${safeId}')" title="移除此圖表">
+              <button type="button" class="dashboard-card-tool-btn btn-remove" data-action="remove-pinned-chart" data-chart-id="${escId}" title="移除此圖表">
                 ✕
               </button>
             </div>
@@ -6759,8 +7045,9 @@
         if (!dom) return;
         try {
           const inst = echarts.init(dom);
-          const opt = cloneEChartsOption(item.option);
-          if (opt.grid) {
+          const rawOpt = cloneEChartsOption(item.option);
+          const opt = restoreOptionFunctions(rawOpt, item);
+          if (opt && opt.grid) {
             if (Array.isArray(opt.grid)) {
               opt.grid.forEach(g => { g.containLabel = true; });
             } else {
@@ -7167,13 +7454,19 @@
     },
     clearProfilingCache: () => {
       clearProfilingCache();
+    },
+    restoreOptionFunctions: (opt, item) => {
+      return restoreOptionFunctions(opt, item);
     }
   };
 
   // 暴露至全域供測試與進階模組調用
   window.resetStudioState = resetPersistedState;
   window.savePersistedState = savePersistedState;
+  window.savePersistedStateImmediate = savePersistedStateImmediate;
+  window.debouncedSavePersistedState = debouncedSavePersistedState;
   window.loadPersistedState = loadPersistedState;
+  window.restoreOptionFunctions = restoreOptionFunctions;
   window.PALETTE_BAUHAUS = PALETTE_BAUHAUS;
   window.safeParseNumber = safeParseNumber;
   window.safeMin = safeMin;
