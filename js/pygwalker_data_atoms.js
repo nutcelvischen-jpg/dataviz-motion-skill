@@ -624,7 +624,7 @@
 
     if (!target || !target.data || target.data.length === 0) {
       console.warn('Dataset not found or empty:', datasetKey);
-      if (datasetKey && (String(datasetKey).startsWith('custom_') || !target)) {
+      if (datasetKey !== 'japan_population' && (String(datasetKey).startsWith('custom_') || !target)) {
         showToast('⚠️ 找不到指定的資料集或自訂上傳資料已過期，已自動降級載入預設日本人口資料集。請重新上傳檔案！', 5000);
         return loadDataset('japan_population', null, options);
       }
@@ -1184,6 +1184,7 @@
   }
 
   function onFilterChanged() {
+    clearProfilingCache();
     renderShelves();
     renderFilterControls();
     renderVisualization();
@@ -1615,7 +1616,8 @@
 
     const cfg = state.schemaConfig && state.schemaConfig[col];
     const isMeasure = state.measures.includes(col) || (cfg && cfg.role === 'measure');
-    const cacheKey = `${state.currentDatasetId || ''}_${col}_${isMeasure ? 'M' : 'D'}_${rows.length}`;
+    const filterFingerprint = JSON.stringify(serializeFilters(state.filters || {}));
+    const cacheKey = `${state.currentDatasetId || ''}_${col}_${isMeasure ? 'M' : 'D'}_${rows.length}_${filterFingerprint}`;
     if (profilingHtmlCache.has(cacheKey)) {
       return profilingHtmlCache.get(cacheKey);
     }
@@ -2288,7 +2290,7 @@
           if (params && params.seriesType === 'scatter') {
             return undefined; // use scatter specific formatter
           }
-          return `${escapeHtml(params.name)}: ${formatCompactNumber(params.value)}`;
+          return `${escapeHtml(params?.name || '')}: ${formatCompactNumber(params?.value)}`;
         }
       },
       legend: {
@@ -3016,7 +3018,7 @@
           trigger: 'item',
           formatter: (params) => {
             const raw = params?.data ? (params.data.raw || params.data) : null;
-            if (!raw) return params?.name || '';
+            if (!raw) return escapeHtml(params?.name || '');
             const v = params?.data?.value;
             const numVal = Array.isArray(v) ? v[2] : (typeof v === 'number' ? v : raw[yField]);
             let tip = `<div style="font-size:12px; line-height:1.6; min-width:140px;">
@@ -3322,17 +3324,22 @@
           ? (violinAllMax > 10 ? Math.ceil(violinAllMax * 1.15) : parseFloat((violinAllMax * 1.15).toFixed(4)))
           : (violinAllMax === 0 ? 1 : Math.ceil(violinAllMax * 0.85));
 
+        const isSmallScale = violinAllMax <= 10;
         if (violinAllMin < 0) {
-          option.yAxis.min = Math.floor(violinAllMin * 1.15);
+          option.yAxis.min = Math.abs(violinAllMin) <= 10 ? parseFloat((violinAllMin * 1.15).toFixed(4)) : Math.floor(violinAllMin * 1.15);
           option.yAxis.max = violinHeadroomMax;
         } else if (violinAllMin > 0) {
           if (violinRange > 0 && violinAllMin > 2 * violinRange) {
             // 大正數且極差相對集中：避免強制以 0 為底壓扁水滴輪廓，改用動態比例 Headroom 舒展密度輪廓
-            option.yAxis.min = Math.max(0, Math.floor(violinAllMin - 0.15 * violinRange));
-            option.yAxis.max = Math.ceil(violinAllMax + 0.15 * violinRange);
+            const rawMin = Math.max(0, violinAllMin - 0.15 * violinRange);
+            const rawMax = violinAllMax + 0.15 * violinRange;
+            option.yAxis.min = isSmallScale ? parseFloat(rawMin.toFixed(4)) : Math.floor(rawMin);
+            option.yAxis.max = isSmallScale ? parseFloat(rawMax.toFixed(4)) : Math.ceil(rawMax);
           } else if (violinRange === 0) {
-            option.yAxis.min = Math.max(0, Math.floor(violinAllMin * 0.9));
-            option.yAxis.max = Math.ceil(violinAllMax * 1.1);
+            const rawMin = Math.max(0, violinAllMin * 0.9);
+            const rawMax = violinAllMax * 1.1;
+            option.yAxis.min = isSmallScale ? parseFloat(rawMin.toFixed(4)) : Math.floor(rawMin);
+            option.yAxis.max = isSmallScale ? parseFloat(rawMax.toFixed(4)) : Math.ceil(rawMax);
           } else {
             option.yAxis.min = 0;
             option.yAxis.max = violinHeadroomMax;
@@ -3823,8 +3830,8 @@
         trigger: 'item',
         formatter: (params) => {
           return `<div style="font-family:sans-serif;font-size:12px;padding:2px 4px;">
-            <strong style="font-size:13px;color:#0f172a;">${params.name}</strong><br/>
-            ${yField}: <b style="color:#2563eb;">${formatCompactNumber(params.value)}</b>
+            <strong style="font-size:13px;color:#0f172a;">${escapeHtml(params?.name || '')}</strong><br/>
+            ${escapeHtml(yField)}: <b style="color:#2563eb;">${formatCompactNumber(params?.value)}</b>
           </div>`;
         }
       };
@@ -4299,7 +4306,7 @@
     }
 
     // 構建表頭 (含 PyGWalker 微型特徵畫像 Sparklines - 換頁緩存機制)
-    const filterFingerprint = JSON.stringify(state.filters || {});
+    const filterFingerprint = JSON.stringify(serializeFilters(state.filters || {}));
     const targetTheadKey = `${state.currentDatasetId || ''}|${(state.columns || []).join(',')}|${state.sortColumn || ''}|${state.sortOrder || ''}|${getActiveRows().length}|${filterFingerprint}`;
 
     if (thead.dataset.cachedKey !== targetTheadKey || !thead.children.length) {
@@ -4459,6 +4466,9 @@
         if (state.tablePage > 1) {
           state.tablePage--;
           renderDataTable();
+        } else if (state.tablePage < 1) {
+          state.tablePage = 1;
+          renderDataTable();
         }
       });
     }
@@ -4468,6 +4478,9 @@
         const totalPages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
         if (state.tablePage < totalPages) {
           state.tablePage++;
+          renderDataTable();
+        } else if (state.tablePage > totalPages) {
+          state.tablePage = totalPages;
           renderDataTable();
         }
       });
@@ -4681,7 +4694,10 @@
     });
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeToolsDropdown();
+      if (e.key === 'Escape') {
+        closeToolsDropdown();
+        closeCustomDashboard();
+      }
     });
 
     if (menuTools) {
@@ -5986,9 +6002,9 @@
       if (!f) continue;
       serialized[key] = { ...f };
       if (f.selected instanceof Set) {
-        serialized[key].selected = Array.from(f.selected);
+        serialized[key].selected = Array.from(f.selected).sort();
       } else if (Array.isArray(f.selected)) {
-        serialized[key].selected = [...f.selected];
+        serialized[key].selected = [...f.selected].sort();
       }
     }
     return serialized;

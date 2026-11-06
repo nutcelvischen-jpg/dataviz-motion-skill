@@ -228,6 +228,13 @@ async function runTests() {
     const trElAfterSort = thead.querySelector('tr');
     const sentinelAfterSort = trElAfterSort ? trElAfterSort.__cachedSentinel : null;
 
+    // 驗證篩選器變更時，快取鍵值會更新且重新繪製 thead
+    const keyBeforeFilter = thead.dataset.cachedKey;
+    const regionCol = window.PyGWalker.getState().columns.find(c => !window.PyGWalker.getState().measures.includes(c));
+    if (regionCol) window.PyGWalker.addFilter(regionCol);
+    const keyAfterFilter = thead.dataset.cachedKey;
+    if (regionCol) window.PyGWalker.removeFilter(regionCol);
+
     // 還原回第 1 頁
     btnPrev.click();
 
@@ -236,13 +243,14 @@ async function runTests() {
       keyAfterNext,
       pageAfterNext,
       isDomReusedOnNext: sentinelAfterNext === 'sentinel_marker_should_fix_2',
-      isDomRebuiltOnSort: sentinelAfterSort === null || keyAfterSort !== keyAfterNext
+      isDomRebuiltOnSort: sentinelAfterSort === null || keyAfterSort !== keyAfterNext,
+      isKeyUpdatedOnFilter: keyBeforeFilter !== keyAfterFilter
     };
   })()`, idRef);
 
-  const t2Pass = t2Res.isDomReusedOnNext && t2Res.keyBefore === t2Res.keyAfterNext && t2Res.isDomRebuiltOnSort;
-  reportResult('Should Fix 2: 換頁時 thead DOM 節點完全重用無重新計算，排序時自適應刷新', t2Pass,
-    `換頁 DOM 重用: ${t2Res.isDomReusedOnNext}, 快取 Key 一致: ${t2Res.keyBefore === t2Res.keyAfterNext}, 排序觸發重繪: ${t2Res.isDomRebuiltOnSort}`);
+  const t2Pass = t2Res.isDomReusedOnNext && t2Res.keyBefore === t2Res.keyAfterNext && t2Res.isDomRebuiltOnSort && t2Res.isKeyUpdatedOnFilter;
+  reportResult('Should Fix 2: 換頁時 thead DOM 節點完全重用無重新計算，排序與篩選自適應刷新', t2Pass,
+    `換頁 DOM 重用: ${t2Res.isDomReusedOnNext}, 快取 Key 一致: ${t2Res.keyBefore === t2Res.keyAfterNext}, 排序觸發重繪: ${t2Res.isDomRebuiltOnSort}, 篩選更新: ${t2Res.isKeyUpdatedOnFilter}`);
 
   // --- Test 3: [Should Fix 3] 自訂上傳 CSV/Excel 資料集於頁面重新整理後的優雅降級容錯提示 ---
   console.log('\n▶ [Test 3] 自訂資料集重新整理後優雅降級容錯與 Toast 提示');
@@ -378,16 +386,31 @@ async function runTests() {
       scatterTooltipSafe = false;
     }
 
+    // 4. overview 指標矩陣樹圖 tooltip 防禦測試
+    let overviewTooltipSafe = false;
+    try {
+      window.PyGWalker.setChartType('overview');
+      const opt = window.PyGWalker.getChartOption();
+      if (opt && opt.tooltip && typeof opt.tooltip.formatter === 'function') {
+        const tip1 = opt.tooltip.formatter({});
+        const tip2 = opt.tooltip.formatter({ name: null, value: null });
+        overviewTooltipSafe = typeof tip1 === 'string' && typeof tip2 === 'string';
+      }
+    } catch (e) {
+      overviewTooltipSafe = false;
+    }
+
     return {
       mapTooltipSafe,
       treemapTooltipSafe,
-      scatterTooltipSafe
+      scatterTooltipSafe,
+      overviewTooltipSafe
     };
   })()`, idRef);
 
-  const t5Pass = t5Res.mapTooltipSafe && t5Res.treemapTooltipSafe && t5Res.scatterTooltipSafe;
+  const t5Pass = t5Res.mapTooltipSafe && t5Res.treemapTooltipSafe && t5Res.scatterTooltipSafe && t5Res.overviewTooltipSafe;
   reportResult('Should Fix 5: Tooltip 缺損 params.data.raw 時具備安全預設值不報錯', t5Pass,
-    `地圖散佈安全: ${t5Res.mapTooltipSafe}, 矩形樹圖安全: ${t5Res.treemapTooltipSafe}, 散佈圖安全: ${t5Res.scatterTooltipSafe}`);
+    `地圖散佈安全: ${t5Res.mapTooltipSafe}, 矩形樹圖安全: ${t5Res.treemapTooltipSafe}, 散佈圖安全: ${t5Res.scatterTooltipSafe}, Overview安全: ${t5Res.overviewTooltipSafe}`);
 
   // --- Test 6: [Should Fix 6] 小提琴圖 Y 軸下界優化 (避免大正數壓扁密度輪廓) ---
   console.log('\n▶ [Test 6] 小提琴圖 Y 軸下界動態比例 Headroom 優化');
@@ -433,17 +456,39 @@ async function runTests() {
     const optNormal = window.PyGWalker.getChartOption();
     const yAxisMinNormal = optNormal.yAxis.min;
 
+    // 構造小數值集中分佈 (例如比率 0.81 ~ 0.85，極差 0.04，0.81 > 2 * 0.04)
+    const smallDecimalRows = [];
+    for (let i = 0; i < 20; i++) {
+      smallDecimalRows.push({
+        '類別': i % 2 === 0 ? 'D1' : 'D2',
+        '佔比': 0.81 + (i * 0.002)
+      });
+    }
+    window.PyGWalker.mountCustomDataset('small_decimal.json', smallDecimalRows);
+    window.PyGWalker.setShelf('x', '類別');
+    window.PyGWalker.setShelf('y', '佔比');
+    window.PyGWalker.setChartType('violin');
+
+    const optSmall = window.PyGWalker.getChartOption();
+    const yAxisMinSmall = optSmall.yAxis.min;
+    const yAxisMaxSmall = optSmall.yAxis.max;
+
     return {
       yAxisMinHigh,
       yAxisMaxHigh,
-      yAxisMinNormal
+      yAxisMinNormal,
+      yAxisMinSmall,
+      yAxisMaxSmall
     };
   })()`, idRef);
 
-  // 大正數下界應大於 4,000,000 (動態 Headroom)，而非 0；常規指標下界保持為 0
-  const t6Pass = t6Res.yAxisMinHigh > 4000000 && t6Res.yAxisMinNormal === 0;
-  reportResult('Should Fix 6: 大正數指標自適應動態 Headroom 下界，常規指標保持 0 原點', t6Pass,
-    `大正數 Y 軸 min: ${t6Res.yAxisMinHigh.toLocaleString()} (非 0, 輪廓舒展), 常規 Y 軸 min: ${t6Res.yAxisMinNormal}`);
+  // 大正數下界應大於 4,000,000 (動態 Headroom)，而非 0；常規指標下界保持為 0；小數值指標保持精確浮點 Headroom 而非截斷為 0 與 1
+  const t6Pass = t6Res.yAxisMinHigh > 4000000 && 
+                 t6Res.yAxisMinNormal === 0 &&
+                 t6Res.yAxisMinSmall > 0.70 && t6Res.yAxisMinSmall < 0.81 &&
+                 t6Res.yAxisMaxSmall > 0.85 && t6Res.yAxisMaxSmall < 0.95;
+  reportResult('Should Fix 6: 大正數指標自適應動態 Headroom 下界，常規指標保持 0 原點，小數指標精準保留浮點輪廓', t6Pass,
+    `大正數 Y 軸 min: ${t6Res.yAxisMinHigh.toLocaleString()} (非 0), 常規 Y 軸 min: ${t6Res.yAxisMinNormal}, 小數值動態 min/max: [${t6Res.yAxisMinSmall}, ${t6Res.yAxisMaxSmall}] (非 0/1 壓扁)`);
 
   // --- Test 7: [Edge Cases] 極限邊界條件驗證 (小提琴零極差、負數分佈、搜尋無匹配、看板多次開關) ---
   console.log('\n▶ [Test 7] 極限邊界條件驗證');
@@ -490,12 +535,23 @@ async function runTests() {
     searchInput.value = '';
     searchInput.dispatchEvent(new Event('input'));
 
-    // 4. 重複開啟/關閉看板 3 次
+    // 4. 重複開啟/關閉看板 3 次並測試 Escape 鍵關閉
     for (let i = 0; i < 3; i++) {
       window.PyGWalker.openCustomDashboard();
       window.PyGWalker.closeCustomDashboard();
     }
+    window.PyGWalker.openCustomDashboard();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    const modalClosedByEscape = !document.getElementById('customDashboardModal')?.classList.contains('open');
     const danglingInstancesCount = Object.keys(window.PyGWalker.getDashboardChartInstances()).length;
+
+    // 5. 驗證無效資料集防護不引起爆棧
+    let didNotCrashOnUnknownDataset = true;
+    try {
+      window.PyGWalker.loadDataset('non_existent_ghost_dataset_xyz');
+    } catch (e) {
+      didNotCrashOnUnknownDataset = false;
+    }
 
     return {
       zeroRangeMin,
@@ -505,7 +561,9 @@ async function runTests() {
       zeroRowsPage,
       afterNextOnZero,
       btnNextDisabledOnZero,
-      danglingInstancesCount
+      danglingInstancesCount,
+      modalClosedByEscape,
+      didNotCrashOnUnknownDataset
     };
   })()`, idRef);
 
@@ -516,10 +574,12 @@ async function runTests() {
                  t7Res.zeroRowsCount === 0 &&
                  t7Res.afterNextOnZero === 1 &&
                  t7Res.btnNextDisabledOnZero === true &&
-                 t7Res.danglingInstancesCount === 0;
+                 t7Res.danglingInstancesCount === 0 &&
+                 t7Res.modalClosedByEscape === true &&
+                 t7Res.didNotCrashOnUnknownDataset === true;
 
-  reportResult('Should Fix Edge Cases: 零極差、負數分佈、無匹配搜尋防護與看板連續釋放', t7Pass,
-    `零極差 min/max: [${t7Res.zeroRangeMin}, ${t7Res.zeroRangeMax}], 負數 min: ${t7Res.negMin}, 0 筆 Next 鎖定: ${t7Res.btnNextDisabledOnZero}, 3次開關殘留: ${t7Res.danglingInstancesCount}`);
+  reportResult('Should Fix Edge Cases: 零極差、負數分佈、無匹配搜尋防護、Escape看板釋放與無效集防爆棧', t7Pass,
+    `零極差 min/max: [${t7Res.zeroRangeMin}, ${t7Res.zeroRangeMax}], 負數 min: ${t7Res.negMin}, 0 筆 Next 鎖定: ${t7Res.btnNextDisabledOnZero}, Escape釋放: ${t7Res.modalClosedByEscape}, 殘留實例: ${t7Res.danglingInstancesCount}, 防爆棧: ${t7Res.didNotCrashOnUnknownDataset}`);
 
   console.log('\n======================================================');
   console.log(`📊 驗證統計: 通過 ${testPassedCount} / 失敗 ${testFailedCount}`);
