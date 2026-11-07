@@ -4465,11 +4465,11 @@
         }
         case 'set-bar-stack-mode': {
           const isStacked = actEl.dataset.stacked === 'true';
-          setBarStackMode(isStacked);
+          window.PyGWalker.setBarStackMode(isStacked);
           break;
         }
         case 'toggle-facet-scale': {
-          toggleFacetScale();
+          window.PyGWalker.toggleFacetScale();
           break;
         }
         case 'clear-shelf': {
