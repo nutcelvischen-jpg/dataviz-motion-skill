@@ -5,6 +5,8 @@
 > **授課教師**：國立臺中科技大學 國際貿易與經營系 陳俊智 副教授  
 > **專案核心**：以實踐導向（>60% 實作），帶領大專院校師生、行政同仁從「單純對話」進階到「依照個人業務 SOP 驅動 AI 代理人」的高階生產力閉環。
 
+🎬 **[Data Atoms 操作示範影片（約 2 分鐘，含旁白與字幕）](data_atoms_demo.html)**：拖曳欄位組圖、分面、篩選到儀表板。
+
 ![Resolution](https://img.shields.io/badge/Resolution-1080p_Full_HD-orange)
 ![Format](https://img.shields.io/badge/Workflow-Agent_%7C_Skill_%7C_MCP_%7C_Video-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
