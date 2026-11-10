@@ -1,5 +1,5 @@
-/* 首頁的一炷香：Canvas 2D 繪製，香頭一點火光，煙往上先直後散。
-   不是 3D；煙是許多半透明的柔邊小圓，沿著隨高度變大的正弦擾動上升。
+/* 首頁的一炷香：Canvas 2D 繪製，香頭一點火光，白煙一圈一圈往上。
+   不是 3D；煙是傾斜投影的螺旋線，白天與夜晚都是白色。
    尊重 prefers-reduced-motion（只畫一張靜止畫面），離開畫面或分頁隱藏時暫停。 */
 (function () {
   'use strict';
@@ -8,24 +8,15 @@
   var ctx = canvas.getContext('2d');
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var W = 0, H = 0, dpr = 1, tipX = 0, tipY = 0, baseY = 0;
-  var parts = [], t = 0, running = false, visible = true, raf = 0;
-  var ink = '28,27,25', seal = '#a8322a', night = false, sprite = null;
+  var t = Math.random() * 1000, running = false, visible = true, raf = 0;
+  var SPEED = .016;   // 每格前進的相位；約等於每秒上升 7–8 像素
+  var ink = '28,27,25', seal = '#a8322a', night = false;
 
   function readTheme() {
     night = document.documentElement.getAttribute('data-theme') === 'night';
     ink = night ? '239,233,220' : '28,27,25';
     var cs = getComputedStyle(document.documentElement);
     seal = (cs.getPropertyValue('--seal') || '#a8322a').trim();
-    sprite = makeSprite();
-  }
-  function makeSprite() {
-    var s = document.createElement('canvas'); s.width = s.height = 64;
-    var g = s.getContext('2d'), grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-    grd.addColorStop(0, 'rgba(' + ink + ',1)');
-    grd.addColorStop(.45, 'rgba(' + ink + ',.45)');
-    grd.addColorStop(1, 'rgba(' + ink + ',0)');
-    g.fillStyle = grd; g.fillRect(0, 0, 64, 64);
-    return s;
   }
   function resize() {
     var r = canvas.getBoundingClientRect();
@@ -35,37 +26,47 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     baseY = H - 6; tipX = W * .5 + 4; tipY = H * .62;
   }
-  function emit() {
-    parts.push({ x: tipX, y: tipY, vy: -(0.55 + Math.random() * 0.35), ph: Math.random() * 6.28, drift: (Math.random() - .5) * .12, age: 0, life: 300 + Math.random() * 220, r: 1.6 + Math.random() * 1.2 });
-  }
-  function step() {
-    t += 1;
-    if (t % 2 === 0) emit();
-    if (Math.random() < .35) emit();
-    for (var i = parts.length - 1; i >= 0; i--) {
-      var p = parts[i]; p.age++;
-      var h = tipY - p.y;                       // 離香頭多高
-      var loose = Math.min(1, Math.max(0, (h - 40) / 150)); // 0 = 筆直，1 = 完全散開
-      p.y += p.vy * (1 - loose * .35);
-      var sway = Math.sin(h * .028 + t * .012 + p.ph * .25) * (4 + loose * 26)
-               + Math.sin(h * .061 - t * .019 + p.ph) * loose * 12;
-      p.dx = sway * (h / 60 > 1 ? 1 : h / 60) + p.drift * p.age * loose;
-      if (p.age > p.life || p.y < -30) parts.splice(i, 1);
+  /* 煙：一條白色的煙絲繞成螺旋，一圈一圈往上。
+     做法是把一條螺旋線（半徑隨高度變大）略微傾斜後投影到平面，線就會自己繞出圈；
+     每一圈靠後的半邊畫得淡一點，看起來才有前後。 */
+  function strand(phase, k, tilt, strength) {
+    var top = tipY - 8, steps = Math.floor(top / 2.5), px = 0, py = 0, pa = 0, pw = 0;
+    for (var i = 0; i <= steps; i++) {
+      var h = i * 2.5;                                   // 離香頭多高
+      var grow = Math.min(1, Math.max(0, (h - 22) / 120)); // 香頭上方先直，再慢慢繞開
+      var R = grow * (10 + h * .11);
+      var th = h * k - t * SPEED + phase;                // 相位隨時間後退 → 圈往上走（SPEED 越小越慢）
+      var sway = Math.sin(h * .012 + t * .003 + phase) * h * .05;
+      var x = tipX + Math.cos(th) * R + sway;
+      var y = tipY - h + Math.sin(th) * R * tilt;
+      var fade = Math.min(1, h / 14) * Math.pow(1 - h / top, 1.25);
+      var depth = .62 + .38 * Math.sin(th);              // 靠前的半圈較亮
+      var a = strength * fade * depth, w = 1.1 + grow * 3.4 + h * .012;
+      if (i > 0) seg(px, py, x, y, (a + pa) / 2, (w + pw) / 2);
+      px = x; py = y; pa = a; pw = w;
     }
   }
+  function seg(x0, y0, x1, y1, a, w) {
+    if (a <= .004) return;
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1);
+    ctx.strokeStyle = 'rgba(255,255,255,' + (a * .16) + ')'; ctx.lineWidth = w * 4.2; ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,' + (a * .34) + ')'; ctx.lineWidth = w * 2; ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,' + (a * .9) + ')'; ctx.lineWidth = w * .7; ctx.stroke();
+  }
+  function step() { t += 1; }
   function draw() {
     ctx.clearRect(0, 0, W, H);
-    // 煙
-    for (var i = 0; i < parts.length; i++) {
-      var p = parts[i], k = p.age / p.life;
-      var h = tipY - p.y, loose = Math.min(1, Math.max(0, (h - 40) / 150));
-      var r = p.r + loose * 13 + k * 10;
-      var a = (night ? .13 : .1) * (1 - k) * (1 - loose * .55) * Math.min(1, p.age / 12);
-      if (a <= 0.002) continue;
-      ctx.globalAlpha = a;
-      ctx.drawImage(sprite, p.x + (p.dx || 0) - r, p.y - r, r * 2, r * 2);
+    // 白天在紙色上白煙看不見，先在後面暈一層極淡的墨，夜裡不需要
+    if (!night) {
+      var cx = tipX, cy = tipY * .5, rx = W * .5, ry = tipY * .62;
+      ctx.save(); ctx.translate(cx, cy); ctx.scale(1, ry / rx);
+      var wash = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+      wash.addColorStop(0, 'rgba(28,27,25,.24)'); wash.addColorStop(.5, 'rgba(28,27,25,.13)'); wash.addColorStop(1, 'rgba(28,27,25,0)');
+      ctx.fillStyle = wash; ctx.beginPath(); ctx.arc(0, 0, rx, 0, 6.2832); ctx.fill(); ctx.restore();
     }
-    ctx.globalAlpha = 1;
+    ctx.lineCap = 'round';
+    strand(0, .135, .62, night ? .8 : 1);
+    strand(2.4, .112, .5, night ? .4 : .5);
     // 香腳（紅）與香身
     var lean = 4, mid = baseY - (baseY - tipY) * .32;
     ctx.lineCap = 'round';
@@ -77,7 +78,7 @@
     ctx.strokeStyle = 'rgba(' + ink + ',.32)'; ctx.lineWidth = 2.2;
     ctx.beginPath(); ctx.moveTo(tipX, tipY + 5); ctx.lineTo(tipX + .4, tipY + 1.5); ctx.stroke();
     // 火光
-    var flick = reduce ? .8 : .72 + Math.sin(t * .09) * .12 + Math.random() * .1;
+    var flick = reduce ? .8 : .72 + Math.sin(t * .035) * .12 + Math.sin(t * .011) * .06;
     var g = ctx.createRadialGradient(tipX, tipY, 0, tipX, tipY, 13);
     g.addColorStop(0, 'rgba(255,170,90,' + (.6 * flick) + ')');
     g.addColorStop(.35, 'rgba(214,74,48,' + (.34 * flick) + ')');
@@ -100,7 +101,6 @@
   }
 
   readTheme(); resize();
-  for (var i = 0; i < 420; i++) step();   // 先跑一段，載入時煙就已經在
   draw();
   window.addEventListener('resize', function () { resize(); draw(); });
   document.addEventListener('visibilitychange', sync);
