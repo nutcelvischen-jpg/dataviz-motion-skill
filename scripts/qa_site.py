@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""站台驗收（SITE_REDESIGN_SPEC §9）。用法：python3 scripts/qa_site.py [--shots DIR]
+"""站台驗收（SITE_REDESIGN_SPEC §9；V2 調整：5 項導覽、4 步路線、數位乩童只在影片頁）。用法：python3 scripts/qa_site.py [--shots DIR]
 
 需要 playwright（pip install playwright）與 Chrome／Chromium。
 """
@@ -10,12 +10,12 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 PORT = 8897
 PAGES = [
     'index.html', 'learn.html?lesson=01', 'learn.html?lesson=06', 'encyclopedia.html', 'lab.html',
-    'concepts/overview.html', 'videos.html', 'workshop.html',
+    'concepts/overview.html', 'videos.html', 'workshop.html', 'skills.html',
     'curriculum_1105_workflow.html', 'student_data_analyst_workflow.html',
     'estat_api_tutorial_simulator.html', 'estat_catalog_and_research_guide.html', 'data_atoms.html',
     '00_課程手冊與即時看板/WORKSHOP_BOARD.html',
 ]
-STEPS = ['curriculum_1105_workflow.html', 'student_data_analyst_workflow.html',
+STEPS = ['student_data_analyst_workflow.html',
          'estat_api_tutorial_simulator.html', 'estat_catalog_and_research_guide.html', 'data_atoms.html']
 APP_PAGES = {'data_atoms.html'}
 BLUE = re.compile(r'#2563eb|#1e40af|#0284c7', re.I)
@@ -60,7 +60,7 @@ def static_checks():
         check('11/05' not in s, f'{name} 靜態寫死日期 11/05')
         # 8. 數位乩童
         has_j = 'digital_jitong.js' in s
-        check(has_j == (name in ('index.html', 'videos.html')), f'{name} 數位乩童載入狀態不符')
+        check(has_j == (name == 'videos.html'), f'{name} 數位乩童載入狀態不符')
     # 7.
     idx = open(os.path.join(ROOT, 'index.html'), encoding='utf-8').read()
     check(idx.count('style=') == 0, 'index.html 仍有 inline style')
@@ -120,7 +120,7 @@ async def page_checks(browser, shots):
         if info['nav']:
             seen.append(info['t'])
             check(info['o'] != 'none', f'焦點無外框：{info}')
-    check(seen == ['跟著學', '查概念', '做實驗', '工作坊'], f'Tab 順序不符：{seen}')
+    check(seen == ['跟著學', '查概念', '做實驗', '看影片', '工作坊'], f'Tab 順序不符：{seen}')
     await ctx.close()
 
     # 12. 進度 → 「繼續第 0N 站」
