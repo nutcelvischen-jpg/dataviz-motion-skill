@@ -7,9 +7,6 @@
   <meta name="description" content="e-Stat 日本政府官方統計資料庫導航：10 大資料視覺化分析法、17 大統計領域研究矩陣、百年歷史時序長度與 Data Atoms 互動儀表板對應。">
 
   <!-- Typography -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Noto+Sans+TC:wght@400;500;600;700&family=Schibsted+Grotesk:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/dose_mobile.css">
 
   <style>
@@ -1104,25 +1101,11 @@ footer {
   }
 }
   </style>
+<link href="css/tokens.css" rel="stylesheet"/><link href="css/components.css" rel="stylesheet"/><link href="css/shell.css" rel="stylesheet"/><link href="css/workshop-pages.css" rel="stylesheet"/>
 </head>
-<body>
+<body data-nav="workshop" data-step="4"><script src="js/site-config.js"></script><script src="js/site-shell.js"></script>
 
   <!-- 頂部全站步驟導航列 -->
-  <header class="step-nav-bar">
-    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-      <span class="stamp-badge">11/05 workshop</span>
-      <span style="font-weight: 600;">資料分析實戰步驟：</span>
-    </div>
-    <nav class="step-nav-pills" aria-label="資料分析流程步驟">
-      <a href="curriculum_1105_workflow.html" class="step-pill">01. 全日課程架構</a>
-      <a href="data_analysis.html" class="step-pill">02. 分析師工作流程</a>
-      <a href="estat_api_tutorial_simulator.html" class="step-pill">03. 日本資料與 API 申請</a>
-      <span class="step-pill active" aria-current="page">04. 17 領域研究指南與分析法 (當前)</span>
-      <a href="data_atoms.html" class="step-pill">05. Data Atoms 儀表板實作</a>
-      <a href="https://www.e-stat.go.jp" class="step-pill" target="_blank" rel="noopener">e-Stat 官網 ↗</a>
-    </nav>
-  </header>
-
   <!-- 官方入口子指示列 -->
   <div class="portal-subbar">
     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
@@ -1138,10 +1121,7 @@ footer {
   <main class="container">
     <!-- Hero 區塊 -->
     <section class="hero-block">
-      <div class="hero-kicker">
-        <span class="stamp-badge">step 04</span>
-        <span>e-Stat 官方資料庫全集 / 10 大資料視覺化分析法 / 17 大領域與百年時序</span>
-      </div>
+      <p class="hero-date">步驟 4／5</p>
       <h1 class="hero-headline">日本官方統計視覺化實戰導航與數據矩陣</h1>
       <p class="hero-sentence">
         專為學員與分析師設計：從生活與商業問題出發 ➔ 10 大圖表選型 ➔ 一鍵在 Data Atoms 儀表板開啟繪出洞察，打通官方 API 數據到可互動圖表。
@@ -2261,6 +2241,5 @@ window.addEventListener('DOMContentLoaded', () => {
   switchView('dataviz');
 });
 </script>
-  <script src="js/digital_jitong.js"></script>
-</body>
+  </body>
 </html>

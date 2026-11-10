@@ -7,9 +7,6 @@
   <meta name="description" content="手把手帶您取得日本政府統計局 e-Stat 官方 API 金鑰，完整解析核心避坑參數 http://test.localhost 與 Python 自動化抓取程式碼。">
 
   <!-- Typography -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Noto+Sans+TC:wght@400;500;600;700&family=Schibsted+Grotesk:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/dose_mobile.css">
 
   <style>
@@ -685,34 +682,14 @@ a:focus-visible, button:focus-visible {
   }
 }
 </style>
+<link href="css/tokens.css" rel="stylesheet"/><link href="css/components.css" rel="stylesheet"/><link href="css/shell.css" rel="stylesheet"/><link href="css/workshop-pages.css" rel="stylesheet"/>
 </head>
-<body>
-
-  <header class="step-nav-bar">
-    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-      <span class="stamp-badge">11/05 workshop</span>
-      <span style="font-weight: 600;">資料分析實戰步驟：</span>
-    </div>
-    <nav class="step-nav-pills" aria-label="資料分析流程步驟">
-      <a href="curriculum_1105_workflow.html" class="step-pill">01. 全日課程架構</a>
-      <a href="data_analysis.html" class="step-pill">02. 分析師工作流程</a>
-      <span class="step-pill active" aria-current="page">03. 日本資料與 API 申請 (當前)</span>
-      <a href="estat_catalog_and_research_guide.html" class="step-pill">04. 17 領域研究指南與分析法</a>
-      <a href="data_atoms.html" class="step-pill">05. Data Atoms 儀表板實作</a>
-      <a href="https://www.e-stat.go.jp" target="_blank" class="step-pill" style="background: var(--color-accent); border-color: var(--color-accent-deep);">e-Stat 官網 ↗</a>
-    </nav>
-  </header>
+<body data-nav="workshop" data-step="3"><script src="js/site-config.js"></script><script src="js/site-shell.js"></script>
 
   <main class="container">
 
     <section class="hero-block">
-      <div class="hero-kicker">
-        <span>track: api ingestion</span>
-        <span>/</span>
-        <span>environment: antigravity</span>
-        <span>/</span>
-        <span>theme: dose</span>
-      </div>
+      <p class="hero-date">步驟 3／5</p>
       <h1 class="hero-headline">手把手動態錄影：取得日本政府 e-Stat 統計 API 金鑰</h1>
       <p class="hero-sentence">
         完整還原日本總務省統計局官方介面。解析核心避坑參數 <code>http://test.localhost</code>，動態演示從登入、發行 40 碼專屬金鑰到以 Python 程式獲取 47 都道府縣面板數據的全流程。
@@ -720,7 +697,7 @@ a:focus-visible, button:focus-visible {
       <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
         <button type="button" class="btn btn--primary" onclick="restartDemo()">重新播放實境錄影</button>
         <a href="https://www.e-stat.go.jp" target="_blank" class="btn btn--clear">前往 e-Stat 官方首頁 ↗</a>
-        <a href="data_analysis.html" class="btn btn--clear">返回分析師工作流 ↗</a>
+        <a href="student_data_analyst_workflow.html" class="btn btn--clear">返回分析師工作流 ↗</a>
       </div>
     </section>
 
@@ -817,7 +794,7 @@ a:focus-visible, button:focus-visible {
                     <div class="form-item-row">
                       <div class="form-item-label">Overview</div>
                       <div class="form-item-input-wrap">
-                        <input type="text" id="targetInputOverview" class="official-input" value="Antigravity 11/05 workshop dashboard integration">
+                        <input type="text" id="targetInputOverview" class="official-input" value="Antigravity workshop dashboard integration">
                       </div>
                     </div>
 
@@ -946,7 +923,7 @@ print(f"獲取成功，共載入 {len(data['GET_STATS_DATA']['STATISTICAL_DATA']
           endpoint: api.e-stat.go.jp/rest/3.0/app / status: operational
         </div>
         <div style="display: flex; gap: 8px;">
-          <a href="data_analysis.html" style="font-size: 13px; color: var(--color-accent-deep); font-weight: 700; text-decoration: underline;">返回分析師工作流 ↗</a>
+          <a href="student_data_analyst_workflow.html" style="font-size: 13px; color: var(--color-accent-deep); font-weight: 700; text-decoration: underline;">返回分析師工作流 ↗</a>
         </div>
       </div>
     </section>
@@ -1150,6 +1127,5 @@ print(f"獲取成功，共載入 {len(data['GET_STATS_DATA']['STATISTICAL_DATA']
       }, 50);
     });
   </script>
-  <script src="js/digital_jitong.js"></script>
-</body>
+  </body>
 </html>

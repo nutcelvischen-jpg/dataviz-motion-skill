@@ -1,0 +1,28 @@
+/* 工作坊步驟 1–4 頁：把頁內 dose 主題變數對應到全站 tokens（SITE_REDESIGN_SPEC §6.3、§6.4） */
+:root {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--surface-2);
+  --color-paper-3: #e6e3d6;
+  --color-ink: var(--ink);
+  --color-ink-2: #3a3f38;
+  --color-muted: var(--ink-2);
+  --color-rule: var(--rule);
+  --color-rule-soft: #e6e4d8;
+  --color-white: var(--surface);
+  --color-accent: var(--olive);
+  --color-accent-deep: #2f4637;
+  --color-accent-soft: var(--olive-soft);
+  --color-accent-ink: #ffffff;
+  --color-focus: var(--focus);
+  --font-display: var(--font-serif);
+  --font-body: var(--font-sans);
+  --font-outlier: var(--font-mono);
+  --radius-card: var(--radius-lg);
+  --radius-input: var(--radius);
+}
+body { background: var(--paper); font-family: var(--font-sans); }
+.hero-headline, h1, h2 { font-family: var(--font-serif); letter-spacing: -.01em; }
+.hero-date { margin: 0 0 8px; font: 600 var(--fs-sm)/1.4 var(--font-mono); color: var(--olive); }
+.container { max-width: var(--wrap); }
+table { max-width: 100%; }
+@media (max-width: 640px) { .container table { display: block; overflow-x: auto; } }
