@@ -40,3 +40,13 @@
 1. 決定 `workshop_registration_dashboard.html` 要刪除、去識別化，還是改放在不公開的地方；並決定是否清除 git 歷史（指令見 `docs/REDESIGN_OPEN_QUESTIONS.md`）。
 2. 檢查對話日誌試算表的分享權限。
 3. 把 `.agents/…/data_atoms_manual.html` 的本機路徑改成相對路徑。
+
+---
+
+## 處理結果（2026-11-10）
+
+- 已刪除 `workshop_registration_dashboard.html`（名冊頁）。
+- 已移除 `google_apps_script/README.md` 的試算表連結。
+- 已把全部 `/Users/<本機帳號>/…` 本機路徑改為 `.` 或 `<LOCAL_PATH>`／`<HOME>`（py/js/md 共 50 個檔案）。
+- 已刪除 `dist_public_web/.netlify/state.json`，並在 `.gitignore` 加入 `.netlify/`。
+- **Git 歷史尚未清除**：舊 commit 仍含上述內容，需另行用 git-filter-repo 清除並 force push（指令見 `docs/REDESIGN_OPEN_QUESTIONS.md`）。

@@ -43,3 +43,4 @@ music_focused_60s.wav
 
 *.pcm
 preview_frames/
+.netlify/

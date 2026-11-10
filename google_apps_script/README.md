@@ -7,7 +7,7 @@
 ## 步驟 1：開啟專屬 Google Sheet
 
 我們已經為您建立好專屬 Google Sheet：
-👉 **[點擊開啟：數位乩童小客服_對話日誌庫](https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit)**
+👉 **（對話日誌庫試算表連結已移除，請向維護者索取）**
 
 （您也可以在任何自己擁有的 Google Sheet 依此流程設定）
 
