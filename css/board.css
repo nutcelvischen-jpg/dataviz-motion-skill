@@ -1,0 +1,35 @@
+/* 學員即時看板（SITE_REDESIGN_SPEC §6.6） */
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 var(--font-sans);-webkit-font-smoothing:antialiased}
+h1,h2,h3,p{margin-top:0}
+.board-wrap{width:min(var(--wrap-catalog),calc(100% - 48px));margin:0 auto;padding:24px 0 24px}
+.board-crumbs{margin:0 0 20px;color:var(--ink-2);font-size:var(--fs-sm)}
+.board-crumbs a{color:var(--ink-2)}
+.board-head h1{font:600 clamp(1.75rem,3.4vw,2.5rem)/1.3 var(--font-serif);margin:0 0 8px;letter-spacing:-.02em}
+.board-head p{margin:0 0 24px;color:var(--ink-2)}
+.tabs-nav{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--rule);margin-bottom:28px}
+.tab-btn{flex:0 0 auto;min-height:48px;padding:10px 16px;border:0;border-bottom:3px solid transparent;background:transparent;color:var(--ink-2);font:600 15px var(--font-sans);cursor:pointer;white-space:nowrap}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-pane{display:none}.tab-pane.active{display:block}
+.card{margin:0 0 24px}
+.card-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin-bottom:12px}
+.card-title{font:600 var(--fs-md)/1.4 var(--font-sans);margin:0}
+.card p{max-width:none;margin:0 0 12px}
+.card-feature{border-color:var(--olive);background:var(--olive-soft)}
+.link-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;margin-top:12px}
+.chip-list{display:grid;gap:8px;margin-top:12px}
+.chip-list a{display:block;padding:12px 16px;border:1px solid var(--rule);border-radius:var(--radius);background:var(--surface);color:var(--ink);text-decoration:none;font-size:15px}
+.chip-list a:hover{border-color:var(--ink)}
+.prompt-label{display:block;margin:16px 0 6px;font:700 var(--fs-xs)/1.4 var(--font-mono);letter-spacing:.04em;color:var(--ink-2)}
+.prompt-block pre{padding-top:30px;font:inherit}
+.tips-box{margin-top:16px;padding:14px 18px;border-left:3px solid var(--warn);background:var(--warn-soft);border-radius:0 var(--radius) var(--radius) 0;font-size:15px}
+.check-group{margin:0 0 28px}
+.check-group h2{font:600 var(--fs-lg)/1.3 var(--font-serif);margin:0 0 12px}
+.check-list{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.check-list label{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:1px solid transparent;border-radius:var(--radius);cursor:pointer;font-weight:400}
+.check-list label:hover{background:var(--surface-2)}
+.check-list input{margin-top:6px;width:18px;height:18px;flex:none}
+.check-list input:checked + span{color:var(--ink-2);text-decoration:line-through}
+.check-progress{margin:0 0 20px;font-weight:700;color:var(--olive)}
+@media(max-width:640px){.board-wrap{width:calc(100% - 32px)}.prompt-block{padding-left:14px;padding-right:14px}}

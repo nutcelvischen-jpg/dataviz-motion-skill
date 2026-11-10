@@ -9,10 +9,6 @@
   <title>Data Atoms · PyGWalker 互動探索工作台 (e-Stat 日本人口大數據)</title>
   
   <!-- Typography: Plus Jakarta Sans, Noto Sans TC, JetBrains Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-  
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="css/style.css?v=20261105_v3">
   <link rel="stylesheet" href="css/pygwalker.css?v=20261105_v3">
@@ -326,60 +322,9 @@
       gap: 4px;
     }
   </style>
+<link href="css/tokens.css" rel="stylesheet"/><link href="css/components.css" rel="stylesheet"/><link href="css/shell.css" rel="stylesheet"/>
 </head>
-<body>
-
-  <!-- 頂部官方入口指示橫條 (去 AI 味：純色沉穩底色、SVG 幾何圖標、去除隨機 emoji 與符號串接) -->
-    <!-- 頂部官方入口與五階段分析步驟指示橫條 -->
-  <div class="portal-top-bar">
-    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-      <span style="background: #2563eb; color: #fff; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.05em;">DATA ANALYTICS TRACK</span>
-      <span style="font-weight: 700; color: #f1f5f9; font-size: 13px;">資料分析實戰步驟：</span>
-      
-      <!-- 步驟 1: 全日架構圖 -->
-      <a href="curriculum_1105_workflow.html" target="_blank" style="color: #93c5fd; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);" title="今天整天學什麼">
-        <span>① 全日課程架構</span>
-        <svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
-      </a>
-
-      <!-- 步驟 2: 資料分析師工作流程 -->
-      <a href="student_data_analyst_workflow.html" target="_blank" style="color: #93c5fd; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);" title="Antigravity 完整實戰流程">
-        <span>② 分析師完整工作流</span>
-        <svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
-      </a>
-
-      <!-- 步驟 3: 日本資料與 API 申請教學 -->
-      <a href="estat_api_tutorial_simulator.html" target="_blank" style="color: #fde047; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.08); border: 1px solid rgba(253,224,71,0.35);" title="介紹日本資料與 API 申請避坑">
-        <span>③ 日本資料與 API 申請</span>
-        <svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
-      </a>
-
-      <!-- 步驟 4: 17 領域研究指南與圖像化分析法 -->
-      <a href="estat_catalog_and_research_guide.html" target="_blank" style="color: #86efac; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.08); border: 1px solid rgba(134,239,172,0.35);" title="資料分析完後的研究指南與 10 大實戰視覺化分析法">
-        <span>④ 17 領域與圖像化研究指南</span>
-        <svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
-      </a>
-
-      <!-- 步驟 5: Data Atoms 儀表板實作 (當前頁面) -->
-      <span style="background: #0284c7; color: #fff; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 0 0 1px rgba(255,255,255,0.2);">
-        <span>⑤ Data Atoms 儀表板實作 (當前)</span>
-      </span>
-    </div>
-
-    <!-- 右側：官方網站直連與技能彈窗 -->
-    <div style="display: flex; gap: 10px; align-items: center; font-size: 12px;">
-      <button type="button" class="btn btn-sm" id="btnOpenSkillsModalTop" style="background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #fff; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
-        <span>💡 Skills (27) & MCP (3)</span>
-      </button>
-
-      <span style="color: #94a3b8;">官方直連：</span>
-      <a href="https://www.e-stat.go.jp" target="_blank" style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); color: #fff; padding: 3px 10px; border-radius: 4px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
-        <span style="font-family: monospace;">e-Stat 官網</span>
-        <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M7 7h10v10"/></svg>
-      </a>
-      <button type="button" id="btnCopyEstatUrlTop" data-action="copy-estat-url" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">複製網址</button>
-    </div>
-  </div>
+<body data-nav="workshop" data-step="5" data-shell="app" data-title="Data Atoms 儀表板" data-manual="data_atoms_manual.html"><script src="js/site-config.js"></script><script src="js/site-shell.js"></script>
 
   <div class="app-shell">
     
@@ -400,7 +345,7 @@
           <div class="brand-text-group">
             <div class="brand-title-row">
               <span class="brand-name">Data Atoms</span>
-              <span class="brand-version-chip" style="background: #2563eb; color: #fff;">PyGWalker</span>
+              <span class="brand-version-chip tag tag-olive">PyGWalker</span>
             </div>
             <div class="brand-subtitle">Tableau 互動探索工作台 : 支援日本 e-Stat 官方數據與自訂檔案即時解析</div>
           </div>
@@ -434,6 +379,7 @@
 
         <!-- Action Buttons Row (方案 A: 3 顆核心平鋪 + 1 個工具與設定下拉選單) -->
         <div class="topbar-actions-row">
+          <button type="button" class="btn btn-sm btn-outline" id="btnOpenSkillsModalTop" title="查看本工作坊使用的 Skills 與 MCP"><span>Skills (27) · MCP (3)</span></button>
           <!-- 1. 進階工具與設定下拉選單 (Tools & Settings Dropdown) -->
           <div class="dropdown-tools-wrapper" id="dropdownToolsWrapper">
             <button type="button" class="btn btn-sm btn-outline btn-tools-toggle" id="btnToolsToggle" aria-haspopup="true" aria-expanded="false" title="開啟進階工具、資料前處理與說明手冊">
@@ -2139,6 +2085,6 @@
     </div>
   </div>
 
-  <script src="js/digital_jitong.js?v=20261104_facet_v5"></script>
+  <script>document.addEventListener("keydown",function(e){if(e.key==="Escape"){var t=document.getElementById("toastNotice");if(t){t.classList.remove("show","visible");}}});</script>
 </body>
 </html>

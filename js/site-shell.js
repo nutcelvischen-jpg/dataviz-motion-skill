@@ -37,7 +37,7 @@
       return el('<header class="site-header is-app" data-shell-header><div class="sh-inner">' +
         '<div class="sh-sub"><a href="' + base + 'workshop.html">← 工作坊</a><span class="tag tag-olive">步驟 ' + step + '／' + cfg.steps.length + '</span></div>' +
         '<span class="sh-title">' + esc(document.body.getAttribute('data-title') || document.title) + '</span>' +
-        '<div class="sh-sub">' + (document.body.getAttribute('data-manual') ? '<a href="' + esc(document.body.getAttribute('data-manual')) + '" target="_blank" rel="noopener">使用說明 ↗</a>' : '') +
+        '<div class="sh-sub">' + (document.body.getAttribute('data-manual') ? '<a class="sh-manual" href="' + esc(document.body.getAttribute('data-manual')) + '" target="_blank" rel="noopener">使用說明 ↗</a>' : '') +
         '<a href="' + base + 'workshop.html">回到工作坊總覽 →</a></div></div></header>');
     }
     var links = items.map(function (i) {

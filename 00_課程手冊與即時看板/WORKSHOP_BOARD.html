@@ -4,303 +4,54 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>學員即時共筆看板 | AI 工作流程實戰工作坊</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #f8f9fa;
-      --card-bg: #ffffff;
-      --text-main: #1f2937;
-      --text-muted: #6b7280;
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --accent: #f97316;
-      --border: #e5e7eb;
-      --code-bg: #1e293b;
-      --code-text: #f8fafc;
-      --success: #10b981;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: var(--bg);
-      color: var(--text-main);
-      line-height: 1.6;
-      padding-bottom: 80px;
-    }
-    header {
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-      color: white;
-      padding: 36px 24px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-    .header-badge {
-      display: inline-block;
-      background: rgba(255,255,255,0.2);
-      padding: 4px 14px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-    }
-    header h1 {
-      font-size: 28px;
-      font-weight: 900;
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
-    }
-    header p {
-      font-size: 15px;
-      opacity: 0.9;
-      max-width: 700px;
-      margin: 0 auto;
-    }
-    .container {
-      max-width: 1080px;
-      margin: 28px auto;
-      padding: 0 20px;
-    }
-    /* Module Tab Nav */
-    .tabs-nav {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 12px;
-      margin-bottom: 24px;
-      border-bottom: 2px solid var(--border);
-    }
-    .tab-btn {
-      background: white;
-      border: 1px solid var(--border);
-      padding: 10px 18px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .tab-btn:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-    .tab-btn.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-      box-shadow: 0 4px 10px rgba(37,99,235,0.25);
-    }
-    .tab-pane {
-      display: none;
-    }
-    .tab-pane.active {
-      display: block;
-      animation: fadeIn 0.25s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    /* Section Cards */
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-    }
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-    .card-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .card-badge {
-      background: #eff6ff;
-      color: var(--primary);
-      font-size: 12px;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 6px;
-    }
-    /* Prompt Blocks */
-    .prompt-box {
-      background: var(--code-bg);
-      border-radius: 10px;
-      position: relative;
-      margin-top: 12px;
-      overflow: hidden;
-    }
-    .prompt-box-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #0f172a;
-      padding: 8px 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    .prompt-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: #94a3b8;
-    }
-    .copy-btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 5px 12px;
-      font-size: 12px;
-      font-weight: 700;
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: background 0.15s;
-    }
-    .copy-btn:hover { background: var(--primary-hover); }
-    .copy-btn.copied {
-      background: var(--success);
-    }
-    pre {
-      padding: 16px;
-      color: var(--code-text);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13.5px;
-      white-space: pre-wrap;
-      word-break: break-word;
-      line-height: 1.55;
-    }
-    .tips-box {
-      background: #fffbeb;
-      border-left: 4px solid #f59e0b;
-      padding: 14px 18px;
-      border-radius: 0 8px 8px 0;
-      font-size: 14px;
-      color: #92400e;
-      margin-top: 16px;
-    }
-    .tips-box strong { color: #78350f; }
-    .btn-group {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-      flex-wrap: wrap;
-    }
-    .action-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: white;
-      border: 1px solid var(--border);
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 13.5px;
-      font-weight: 600;
-      color: var(--text-main);
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-    .action-btn:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-  </style>
+  <link href="../css/tokens.css" rel="stylesheet"/><link href="../css/components.css" rel="stylesheet"/><link href="../css/shell.css" rel="stylesheet"/><link href="../css/board.css" rel="stylesheet"/>
 </head>
-<body>
-
-  <header>
-    <div class="header-badge">專為一般教室投影不清晰設計 · 免瞇眼同步看板</div>
-    <h1>🤖 AI 工作流程進階實戰工作坊 · 學員即時共筆看板</h1>
-    <p>陳俊智副教授 授課 ｜ 點擊「一鍵複製」即可將各階段提示詞直接貼入 ChatGPT / Claude / Antigravity</p>
-  </header>
-
-  <div class="container">
+<body data-nav="workshop" data-workshop>
+<script src="../js/site-config.js"></script><script src="../js/site-shell.js"></script>
+<main id="main" class="board-wrap">
+<p class="board-crumbs"><a href="../index.html">首頁</a> ／ <a href="../workshop.html">工作坊</a> ／ 學員看板</p>
+<header class="board-head"><h1>學員即時看板</h1><p>點「複製」即可把提示詞貼進 ChatGPT、Claude 或 Antigravity。右上角可切換投影模式。</p></header>
+<div class="container">
     <!-- Tab Navigation -->
-    <div class="tabs-nav">
-      <button class="tab-btn active" onclick="switchTab('mod1')">📊 Module 1：資料清洗與敏捷分析</button>
-      <button class="tab-btn" onclick="switchTab('mod2')">⚙️ Module 2：流程封裝與自訂 Skill</button>
-      <button class="tab-btn" onclick="switchTab('mod3')">🌐 Module 3：Antigravity 網頁與 MCP</button>
-      <button class="tab-btn" onclick="switchTab('mod4')">🎬 Module 4：60 秒動態數據短片</button>
+    <div class="tabs-nav" role="tablist" aria-label="工作坊單元">
+      <button class="tab-btn" role="tab" id="tab-mod1" aria-controls="mod1" data-tab="mod1" aria-selected="true">Module 1 資料清洗</button>
+      <button class="tab-btn" role="tab" id="tab-mod2" aria-controls="mod2" data-tab="mod2" aria-selected="false">Module 2 Skill 封裝</button>
+      <button class="tab-btn" role="tab" id="tab-mod3" aria-controls="mod3" data-tab="mod3" aria-selected="false">Module 3 建站與 MCP</button>
+      <button class="tab-btn" role="tab" id="tab-mod4" aria-controls="mod4" data-tab="mod4" aria-selected="false">Module 4 動態短片</button>
+      <button class="tab-btn" role="tab" id="tab-checklist" aria-controls="checklist" data-tab="checklist" aria-selected="false">課前檢核</button>
     </div>
 
     <!-- MODULE 1 PANE -->
-    <div id="mod1" class="tab-pane active">
-      <p style="margin:0 0 18px;font-size:16px;"><a href="../index.html#learning-map" style="color:#87311f;font-weight:700;">初次認識大語言模型？先從六站學習路線開始 →</a></p>
-      <!-- LLM Lab Interactive Showcase Banner -->
-      <div class="card" style="border: 2px solid #8b5cf6; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: white;">
-        <div class="card-header" style="border-bottom-color: rgba(255,255,255,0.15);">
-          <div class="card-title" style="color: #c084fc; font-size: 19px;">🔬 開場破冰實作：大語言模型本質探秘實驗室 (LLM Lab)</div>
-          <span class="card-badge" style="background: #a855f7; color: white;">互動探索工具</span>
-        </div>
-        <p style="color: #e2e8f0; font-size: 14.5px;">在進入資料分析之前，先帶學員親身體驗大語言模型的五大核心本質與邊界：<strong>提示詞注入越獄、缺乏內建時鐘、無狀態無記憶、文字機率預測陷阱、以及純語言算術盲區</strong>。支援填入個人 Gemini API Key 進行實機交互，亦提供免 Key 模擬演示！</p>
-        <div style="margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
-          <a class="action-btn" style="background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; border: none; font-weight: 800; font-size: 15px; padding: 10px 22px; border-radius: 10px; box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4); text-decoration: none;" href="../lab.html" target="_blank">
-            🚀 點此開啟《大語言模型本質探秘實驗室》（雙擊開跑）
-          </a>
-          <a class="action-btn" style="background: rgba(244, 63, 94, 0.2); border: 1px solid #f43f5e; color: #fecdd3; font-weight: 700; font-size: 14px; padding: 10px 18px; border-radius: 10px; text-decoration: none;" href="../01_Module1_Agent思維與資料分析/API金鑰資安防護與前後端架構圖解.md" target="_blank">
-            🚨 閱讀《API 金鑰防外洩與前後端架構圖解手冊》
-          </a>
-          <a class="action-btn" style="background: rgba(46, 90, 168, 0.3); border: 1px solid #60a5fa; color: #bfdbfe; font-weight: 700; font-size: 14px; padding: 10px 18px; border-radius: 10px; text-decoration: none;" href="../01_Module1_Agent思維與資料分析/diagram_api_security_architecture.html" target="_blank">
-            🎨 檢視《API 資安演進架構圖》（Diagram Design 規範）
-          </a>
-          <a class="action-btn" style="background: rgba(184, 74, 45, 0.2); border: 1px solid #f87171; color: #fed7aa; font-weight: 700; font-size: 14px; padding: 10px 18px; border-radius: 10px; text-decoration: none;" href="../01_Module1_Agent思維與資料分析/prompt_injection_metro_case.html" target="_blank">
-            🚇 專題《北捷 AI 客服歪樓寫程式案》（iThome 提示詞注入解析）
-          </a>
+    <div id="mod1" class="tab-pane active" role="tabpanel" aria-labelledby="tab-mod1">
+      <p><a class="link-arrow" href="../index.html#learning-map">初次認識大語言模型？先從六站學習路線開始</a></p>
+      <div class="card card-feature">
+        <div class="card-header"><h2 class="card-title">開場破冰實作：大語言模型本質探秘實驗室</h2><span class="tag tag-olive">互動探索</span></div>
+        <p>進入資料分析前，先親身體驗大語言模型的核心特性與邊界：提示詞注入、缺乏內建時鐘、無狀態記憶、機率式文字預測，以及純語言模型的算術盲區。支援免 Key 的模擬示範。</p>
+        <div class="link-row"><a class="btn btn-primary" href="../lab.html">開啟本質探秘實驗室 →</a></div>
+        <div class="link-row">
+          <a class="link-arrow" href="../01_Module1_Agent思維與資料分析/API金鑰資安防護與前後端架構圖解.md">API 金鑰防外洩與前後端架構手冊</a>
+          <a class="link-arrow" href="../01_Module1_Agent思維與資料分析/diagram_api_security_architecture.html">API 資安演進架構圖</a>
+          <a class="link-arrow" href="../01_Module1_Agent思維與資料分析/prompt_injection_metro_case.html">北捷 AI 客服歪樓寫程式案</a>
         </div>
       </div>
-
-      <!-- Real-World Datasets Showcase Banner -->
-      <div id="module1-practice" class="card" style="border: 2px solid #3b82f6; background: #eff6ff;">
-        <div class="card-header" style="border-bottom-color: #bfdbfe;">
-          <div class="card-title" style="color: #1e40af;">🌐 真實世界級公開資料庫實戰（已同步至教材庫）</div>
-          <span class="card-badge" style="background: #2563eb; color: white;">權威官方數據</span>
-        </div>
-        <p style="color: #1e3a8a; font-size: 14.5px;">本工作坊全面導入<strong>政府與證交所權威公開資料集</strong>，徹底告別玩具假資料，學員可依個人專業領域選擇實戰賽道：</p>
-        <div class="btn-group" style="margin-top: 12px;">
-          <a class="action-btn" style="background: #ffffff; border-color: #2563eb; color: #1e40af;" href="../01_Module1_Agent思維與資料分析/real_world_datasets/實戰挑戰_臺灣上市公司營收統計_1088家真實髒資料.csv" download>
-            📈 【商管/金融賽道】臺灣證交所 1,088 家上市公司營收（含千分位髒污）
-          </a>
-          <a class="action-btn" style="background: #ffffff; border-color: #059669; color: #065f46;" href="../01_Module1_Agent思維與資料分析/real_world_datasets/實戰挑戰_113學年度大專校院學生統計_737筆真實髒資料.csv" download>
-            🎓 【高教/校務治理賽道】教育部 113 學年全台 140 所大學學生統計（737筆）
-          </a>
-          <a class="action-btn" style="background: #ffffff; border-color: #94a3b8; color: #475569;" href="../01_Module1_Agent思維與資料分析/sample_dirty_data.csv" download>
-            ☕ 【新手入門熱身】校園活動經費報銷（12 筆迷你題）
-          </a>
+      <div id="module1-practice" class="card">
+        <div class="card-header"><h2 class="card-title">真實公開資料實戰（已放在教材庫）</h2><span class="tag">官方數據</span></div>
+        <p>使用政府與證交所公開資料集，依你的專業領域選一條賽道：</p>
+        <div class="chip-list">
+          <a href="../01_Module1_Agent思維與資料分析/real_world_datasets/實戰挑戰_臺灣上市公司營收統計_1088家真實髒資料.csv" download>【商管／金融】臺灣證交所 1,088 家上市公司營收（含千分位髒污）</a>
+          <a href="../01_Module1_Agent思維與資料分析/real_world_datasets/實戰挑戰_113學年度大專校院學生統計_737筆真實髒資料.csv" download>【高教／校務】教育部 113 學年全台 140 所大學學生統計（737 筆）</a>
+          <a href="../01_Module1_Agent思維與資料分析/sample_dirty_data.csv" download>【新手熱身】校園活動經費報銷（12 筆迷你題）</a>
         </div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title">📌 任務一：1,088 家上市公司真實營收資料清洗與標準化</div>
-          <span class="card-badge">Module 1 實作</span>
+          <div class="card-title">任務一：1,088 家上市公司真實營收資料清洗與標準化</div>
+          <span class="tag">Module 1 實作</span>
         </div>
         <p>上傳真實資料檔 <code>實戰挑戰_臺灣上市公司營收統計_1088家真實髒資料.csv</code>，並複製以下提示詞貼給 AI 模型執行清洗：</p>
         
-        <div class="prompt-box">
-          <div class="prompt-box-top">
-            <span class="prompt-label">PROMPT 1-1：大數據清洗與轉型指令</span>
-            <button class="copy-btn" onclick="copyPrompt('p1_1', this)">📋 一鍵複製 Prompt</button>
-          </div>
-          <pre id="p1_1">你是一位資深商業與金融數據工程專家。我已經上傳了一份由臺灣證券交易所 (TWSE) 彙整的真實市場檔案 `實戰挑戰_臺灣上市公司營收統計_1088家真實髒資料.csv`（共 1,088 家上市公司）。
+        <span class="prompt-label">PROMPT 1-1：大數據清洗與轉型指令</span><div class="prompt-block"><button type="button" data-copy>複製</button><pre><code id="p1_1">你是一位資深商業與金融數據工程專家。我已經上傳了一份由臺灣證券交易所 (TWSE) 彙整的真實市場檔案 `實戰挑戰_臺灣上市公司營收統計_1088家真實髒資料.csv`（共 1,088 家上市公司）。
 
 請仔細檢查數據結構，並調用代碼執行器（Python / Pandas）完成嚴格清洗：
 
@@ -313,27 +64,21 @@
    - 檢查「資料年月」欄位，將民國格式（如 11509 或 115/09）統一精準換算為 ISO 格式 2026-09。
 4. 輸出品質報表：
    - 列出資料清洗修復摘要（總行數、修復了幾筆字串、轉換了幾筆數值）。
-   - 產出乾淨版的 CSV 內容供下載。</pre>
-        </div>
+   - 產出乾淨版的 CSV 內容供下載。</code></pre></div>
 
         <div class="tips-box">
-          <strong>💡 講師小提醒：</strong> 面對 1,000+ 筆真實數據，傳統手動 Excel 清洗容易當機或看漏；AI Agent 透過撰寫 Python 腳本可在 3 秒內完成批量清洗與資料結構校驗。
+          <strong>講師小提醒：</strong> 面對 1,000+ 筆真實數據，傳統手動 Excel 清洗容易當機或看漏；AI Agent 透過撰寫 Python 腳本可在 3 秒內完成批量清洗與資料結構校驗。
         </div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title">📌 任務二：全市場產業板塊探索分析與防幻覺核對（Cross-Verification）</div>
-          <span class="card-badge">防幻覺關鍵技巧</span>
+          <div class="card-title">任務二：全市場產業板塊探索分析與防幻覺核對（Cross-Verification）</div>
+          <span class="tag">防幻覺關鍵技巧</span>
         </div>
         <p>為避免 AI 產生「看似合理但數字算錯」的幻覺，執行以下交叉核對提示詞：</p>
 
-        <div class="prompt-box">
-          <div class="prompt-box-top">
-            <span class="prompt-label">PROMPT 1-2：算術防幻覺與摘要報告</span>
-            <button class="copy-btn" onclick="copyPrompt('p1_2', this)">📋 一鍵複製 Prompt</button>
-          </div>
-          <pre id="p1_2">請根據剛才清洗完成的 1,088 家上市公司營收資料集，執行多維度探索性分析（EDA），並嚴格執行「雙重驗算（Cross-Verification）」：
+        <span class="prompt-label">PROMPT 1-2：算術防幻覺與摘要報告</span><div class="prompt-block"><button type="button" data-copy>複製</button><pre><code id="p1_2">請根據剛才清洗完成的 1,088 家上市公司營收資料集，執行多維度探索性分析（EDA），並嚴格執行「雙重驗算（Cross-Verification）」：
 
 1. 計算關鍵維度：
    - 計算各「產業別」（半導體、電腦週邊、金融保險、觀光等）的「當月總營收」與佔全市場比例（%）。
@@ -343,26 +88,20 @@
    - 加總勾稽：將「全市場 1,088 家個別公司營收總和 S1」與「各產業分類彙總總和 S2」進行比對，驗證 S1 - S2 差額是否嚴格為 0。
    - 比率透明化：凡涉及佔比（%）與成長率，必須清楚標註【分子 / 分母 = 計算結果】。
    - 請註明驗算通過 [PASS 驗算無誤]。
-3. 提供 3 點高價值的產業景氣與集中度決策建議，語言需客觀具體，杜絕空泛形容詞。</pre>
-        </div>
+3. 提供 3 點高價值的產業景氣與集中度決策建議，語言需客觀具體，杜絕空泛形容詞。</code></pre></div>
       </div>
     </div>
 
     <!-- MODULE 2 PANE -->
-    <div id="mod2" class="tab-pane">
+    <div id="mod2" class="tab-pane" role="tabpanel" aria-labelledby="tab-mod2">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">⚙️ 封裝自訂 Skill：公文與行政企劃書智慧審核潤飾器</div>
-          <span class="card-badge">可直接導入 Claude Projects / GPTs</span>
+          <div class="card-title">封裝自訂 Skill：公文與行政企劃書智慧審核潤飾器</div>
+          <span class="tag">可直接導入 Claude Projects / GPTs</span>
         </div>
         <p>將此結構化指令貼入自訂 GPTs 的「Instructions」或 Claude Projects 的「Project Instructions」：</p>
 
-        <div class="prompt-box">
-          <div class="prompt-box-top">
-            <span class="prompt-label">SKILL DEFINITION：公文審核 Skill</span>
-            <button class="copy-btn" onclick="copyPrompt('p2_1', this)">📋 一鍵複製 Skill 提示詞</button>
-          </div>
-          <pre id="p2_1"># 角色定義
+        <span class="prompt-label">SKILL DEFINITION：公文審核 Skill</span><div class="prompt-block"><button type="button" data-copy>複製</button><pre><code id="p2_1"># 角色定義
 你是一位具備 20 年大專院校與公務機關行政經驗的高級秘書兼法規審核專家。你的任務是審核並潤飾使用者提交的行政簽呈、公文草稿或計畫書。
 
 # 核心審核原則
@@ -373,32 +112,25 @@
 # 輸出規範（必須依序呈現以下三部分）
 【第一部分：瑕疵與風險清單】條列標記語意不清、用詞不當或邏輯斷層之處。
 【第二部分：標準修正全文】提供直接可用的完整正式版本（含 主旨、說明、擬辦）。
-【第三部分：主管決策重點摘要】以 2 句話概括此案精髓，方便長官快速裁決。</pre>
-        </div>
+【第三部分：主管決策重點摘要】以 2 句話概括此案精髓，方便長官快速裁決。</code></pre></div>
       </div>
     </div>
 
     <!-- MODULE 3 PANE -->
-    <div id="mod3" class="tab-pane">
+    <div id="mod3" class="tab-pane" role="tabpanel" aria-labelledby="tab-mod3">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">🌐 Antigravity 自然語言建站：互動式數據儀表板</div>
-          <span class="card-badge">無代碼/低代碼網頁</span>
+          <div class="card-title">Antigravity 自然語言建站：互動式數據儀表板</div>
+          <span class="tag">無代碼/低代碼網頁</span>
         </div>
         <p>在 Antigravity 中向 AI 輸入以下 Prompt，一鍵生成本地互動儀表板：</p>
 
-        <div class="prompt-box">
-          <div class="prompt-box-top">
-            <span class="prompt-label">PROMPT 3-1：儀表板生成指令</span>
-            <button class="copy-btn" onclick="copyPrompt('p3_1', this)">📋 一鍵複製 Prompt</button>
-          </div>
-          <pre id="p3_1">請使用 HTML、CSS（極簡現代風格）與原生 JavaScript 為我建立一個「單頁離線式商業數據儀表板」：
+        <span class="prompt-label">PROMPT 3-1：儀表板生成指令</span><div class="prompt-block"><button type="button" data-copy>複製</button><pre><code id="p3_1">請使用 HTML、CSS（極簡現代風格）與原生 JavaScript 為我建立一個「單頁離線式商業數據儀表板」：
 
 1. 包含拖曳上傳區，使用 SheetJS（xlsx.full.min.js）本地解析使用者上傳的 Excel/CSV。
 2. 畫面左側為資料洞察卡片，右側為動態 Canvas 圖表（支援柱狀圖、趨勢折線圖與佔比環形圖）。
 3. 畫面右下角內嵌一個「AI 數據問答懸浮按鈕」，點擊可展開問答對話視窗。
-4. 全程不需伺服器，直接在本地瀏覽器即可運行。</pre>
-        </div>
+4. 全程不需伺服器，直接在本地瀏覽器即可運行。</code></pre></div>
         <div class="btn-group">
           <a href="../index.html" target="_blank" class="action-btn">📖 開啟大語言模型六站學習地圖</a>
         </div>
@@ -406,20 +138,15 @@
     </div>
 
     <!-- MODULE 4 PANE -->
-    <div id="mod4" class="tab-pane">
+    <div id="mod4" class="tab-pane" role="tabpanel" aria-labelledby="tab-mod4">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">🎬 60 秒動態數據短片：黃金分鏡腳本範本</div>
-          <span class="card-badge">DataViz Motion 渲染</span>
+          <div class="card-title">60 秒動態數據短片：黃金分鏡腳本範本</div>
+          <span class="tag">DataViz Motion 渲染</span>
         </div>
         <p>將分析洞察填入此 60 秒分鏡模板，交給短片生成管線：</p>
 
-        <div class="prompt-box">
-          <div class="prompt-box-top">
-            <span class="prompt-label">SCRIPT 4-1：60 秒短片旁白與分鏡腳本</span>
-            <button class="copy-btn" onclick="copyPrompt('p4_1', this)">📋 一鍵複製分鏡模板</button>
-          </div>
-          <pre id="p4_1">【00-10s 破題 Hook】（畫面：原始雜亂數據瞬間形變為立體柱狀排行）
+        <span class="prompt-label">SCRIPT 4-1：60 秒短片旁白與分鏡腳本</span><div class="prompt-block"><button type="button" data-copy>複製</button><pre><code id="p4_1">【00-10s 破題 Hook】（畫面：原始雜亂數據瞬間形變為立體柱狀排行）
 旁白：「為什麼團隊投入了 300 萬預算，轉換率卻卡在瓶頸？答案藏在這份營運數據裡。」
 
 【10-25s 趨勢與反差】（畫面：平滑折線展開，MA7 均線與峰值亮點彈出）
@@ -432,33 +159,18 @@
 旁白：「前 20% 的核心功能貢獻了八成產能。縮減冗餘流程，將資源精準集中。」
 
 【55-60s 品牌收尾】（畫面：六大原子幾何聚合，打出專案標語）
-旁白：「好分析，是用圖表洞見真實趨勢。讓 AI 成為你的工作流夥伴。」</pre>
-        </div>
+旁白：「好分析，是用圖表洞見真實趨勢。讓 AI 成為你的工作流夥伴。」</code></pre></div>
       </div>
     </div>
+    <div id="checklist" class="tab-pane" role="tabpanel" aria-labelledby="tab-checklist">
+      <p class="check-progress" id="check-progress" role="status"></p>
+      <p>開課前 1～2 天，依下列清單確認設備與帳號。勾選狀態只存在這台電腦的瀏覽器。</p>
+      <section class="check-group"><h2>一、硬體與網路設備</h2><ul class="check-list"><li><label><input type="checkbox" data-check="c1"><span>筆記型電腦：攜帶個人筆電（Windows / macOS 皆可）與充電線。</span></label></li><li><label><input type="checkbox" data-check="c2"><span>瀏覽器：安裝最新版 Google Chrome 或 Microsoft Edge。</span></label></li><li><label><input type="checkbox" data-check="c3"><span>Wi-Fi：確認筆電可連上校園無線網路，並備妥手機熱點作為備用。</span></label></li><li><label><input type="checkbox" data-check="c4"><span>滑鼠（強烈建議）：網頁互動與圖表操作使用實體滑鼠效率更佳。</span></label></li></ul></section><section class="check-group"><h2>二、AI 帳號（至少備妥一項付費版本）</h2><ul class="check-list"><li><label><input type="checkbox" data-check="c5"><span>選項 A：ChatGPT Plus（GPT-4o、Canvas、Advanced Data Analysis、Custom GPTs）。</span></label></li><li><label><input type="checkbox" data-check="c6"><span>選項 B：Claude Pro（Artifacts、Projects 知識庫）。</span></label></li><li><label><input type="checkbox" data-check="c7"><span>選項 C：Google Antigravity／Gemini Advanced（Agentic Coding 與多模態）。</span></label></li></ul></section><section class="check-group"><h2>三、本機開發環境（選配，不影響無程式背景的學員）</h2><ul class="check-list"><li><label><input type="checkbox" data-check="c8"><span>Node.js（LTS 版本）：nodejs.org。</span></label></li><li><label><input type="checkbox" data-check="c9"><span>Git：git-scm.com。</span></label></li><li><label><input type="checkbox" data-check="c10"><span>VS Code 或 Google Antigravity IDE。</span></label></li></ul></section>
+      <p class="callout">教室投影可能不夠清晰，因此每位學員請在自己的筆電開啟本看板，所有提示詞、範例程式碼與資料集都可直接複製或下載。</p>
+    </div>
   </div>
-
-  <script>
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-      
-      event.currentTarget.classList.add('active');
-      document.getElementById(tabId).classList.add('active');
-    }
-
-    function copyPrompt(elementId, btn) {
-      const text = document.getElementById(elementId).innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        const originalText = btn.innerHTML;
-        btn.innerHTML = "✅ 已複製！";
-        btn.classList.add('copied');
-        setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.classList.remove('copied');
-        }, 2000);
-      });
-    }
-  </script>
+</main>
+<script src="../js/copy.js"></script>
+<script src="../js/board.js"></script>
 </body>
 </html>
