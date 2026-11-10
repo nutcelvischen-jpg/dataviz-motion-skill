@@ -18,6 +18,7 @@
     {id:'s2_adaptation', title:'讓 AI 變專家的三條路：決策矩陣', short:'微調 vs RAG vs LoRA', group:'第二季：核心機制與進階實戰', goal:'根據知識更新頻率、風格客製與成本預算，評估最合適的 AI 專家改造路徑。'}
   ];
   const groups = ['理解模型的回答','用工具核對結果','管理指令與權限','第二季：核心機制與進階實戰'];
+  const groupLabels = {'第二季：核心機制與進階實戰':'進階機制'};
   const lessonLabels = {'01':'認識模型','02':'理解上下文','03':'看見限制','04':'學會查證','05':'掌握使用條件','06':'完成工作'};
 
   // 60 秒看懂 AI 盲點微課程影音資產與精講卡片
@@ -240,75 +241,23 @@
 
     root.innerHTML =
       '<header class="page-intro">' +
-        '<h1>大語言模型本質探秘實驗室</h1>' +
-        '<p>講概念、選模型、動手做實驗。改變條件，觀察模型的真實回答與資料流邊界。</p>' +
-        '<p class="quiet">支援免 Key 教學模擬、OpenRouter 7 款主流模型與 Google Gemini 原生直連。</p>' +
+        '<h1>做實驗</h1>' +
+        '<p>改變條件，觀察模型的回答怎麼變。不需要 API Key 也能做；想接真實模型可用 OpenRouter 或 Gemini。</p>' +
+        '<p><a class="link-arrow" href="videos.html#series-blindspot">想先看比喻？到「看影片」</a></p>' +
       '</header>' +
-      '<section class="blindspots-index-showcase">' +
-        '<div class="blindspots-index-header">' +
-          '<h2>🎬 60 秒看懂 AI 盲點 · 影音實戰實驗室</h2>' +
-          '<p>三部曲學習心流：<strong>① 先看 60s 影片 ➔ ② 講解核心原理 ➔ ③ 動手做實驗</strong>。點選以下盲點直接進入實測：</p>' +
-        '</div>' +
-        '<div class="season-block season-block-s1" style="margin-bottom: 24px;">' +
-          '<div class="season-block-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid var(--rule); padding-bottom: 8px;">' +
-            '<h3 style="margin: 0; font-size: 16px; color: var(--accent); display: flex; align-items: center; gap: 8px;">' +
-              '<span style="background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">第一季</span>' +
-              '基礎通識（AI 盲點 #01～#06）' +
-            '</h3>' +
-            '<span style="font-size: 13px; color: var(--olive);">入門通識 · 5 大盲點實測</span>' +
-          '</div>' +
-          '<div class="blindspots-grid">' +
-            ['tokens', 'memory', 'injection', 'probability', 'time'].map(function (k) {
-              var v = BLINDSPOT_VIDEOS[k];
-              return '<a href="lab.html?experiment=' + k + '" class="blindspot-card" data-experiment="' + k + '">' +
-                '<div class="blindspot-card-top">' +
-                  '<span class="blindspot-card-ep">' + esc(v.ep) + '</span>' +
-                  '<span class="blindspot-card-duration">⏱️ ' + esc(v.duration) + '</span>' +
-                '</div>' +
-                '<div class="blindspot-card-title">' + esc(v.title) + '</div>' +
-                '<div class="blindspot-card-quote">💡 ' + esc(v.goldenQuote) + '</div>' +
-              '</a>';
-            }).join('') +
-          '</div>' +
-        '</div>' +
-        '<div class="season-block season-block-s2" style="margin-top: 28px;">' +
-          '<div class="season-block-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid var(--rule); padding-bottom: 8px;">' +
-            '<h3 style="margin: 0; font-size: 16px; color: #4c2889; display: flex; align-items: center; gap: 8px;">' +
-              '<span style="background: #f4f0ff; color: #4c2889; border: 1px solid #b69cff; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">第二季</span>' +
-              '核心機制與進階實戰（AI 盲點 #07～#12）' +
-            '</h3>' +
-            '<span style="font-size: 13px; color: var(--olive);">進階落地 · 6 大機制實測</span>' +
-          '</div>' +
-          '<div class="blindspots-grid">' +
-            ['s2_attention', 's2_rag', 's2_context', 's2_token_cost', 's2_tool_calling', 's2_adaptation'].map(function (k) {
-              var v = BLINDSPOT_VIDEOS[k];
-              return '<a href="lab.html?experiment=' + k + '" class="blindspot-card" data-experiment="' + k + '" style="border-left: 3px solid #b69cff;">' +
-                '<div class="blindspot-card-top">' +
-                  '<span class="blindspot-card-ep" style="color: #6d28d9;">' + esc(v.ep) + '</span>' +
-                  '<span class="blindspot-card-duration">⏱️ ' + esc(v.duration) + '</span>' +
-                '</div>' +
-                '<div class="blindspot-card-title">' + esc(v.title) + '</div>' +
-                '<div class="blindspot-card-quote" style="background: #faf5ff; color: #581c87; margin-bottom: 10px;">💡 ' + esc(v.goldenQuote) + '</div>' +
-                '<div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; font-size: 12px; padding-top: 6px; border-top: 1px dashed #e9d5ff;">' +
-                  '<span style="color: #7c3aed; font-weight: 700;">▶ 進入單元 (影片・原理・實驗)</span>' +
-                  '<span style="background: #f3e8ff; color: #6b21a8; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">互動實作</span>' +
-                '</div>' +
-              '</a>';
-            }).join('') +
-          '</div>' +
-        '</div>' +
-      '</section>' +
-      groups.filter(g => g !== '第二季：核心機制與進階實戰').map(g =>
+      groups.map(g =>
         '<section class="experiment-index-group">' +
-          '<h2>' + esc(g) + '</h2>' +
+          '<h2>' + esc(groupLabels[g] || g) + '</h2>' +
           '<ul>' +
-            definitions.filter(d => d.group === g).map(d =>
-              '<li><a href="lab.html?experiment=' + d.id + '" data-experiment="' + d.id + '">' +
-                '<strong>' + esc(d.short) + '</strong>' +
+            definitions.filter(d => d.group === g).map(d => {
+              const v = BLINDSPOT_VIDEOS[d.id];
+              const num = v && v.src ? (v.src.match(/AI盲點(\d+)/) || [])[1] : '';
+              return '<li><a href="lab.html?experiment=' + d.id + '" data-experiment="' + d.id + '">' +
+                '<strong>' + esc(d.short) + (num ? ' <span class="tag tag-muted exp-video-tag">影片 ' + esc(v.duration) + '</span>' : '') + '</strong>' +
                 '<span>' + esc(d.goal) + '</span>' +
                 '<span aria-hidden="true">→</span>' +
-              '</a></li>'
-            ).join('') +
+              '</a></li>';
+            }).join('') +
           '</ul>' +
         '</section>'
       ).join('');
@@ -332,9 +281,9 @@
             '<div class="att-bar-card">' +
               '<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;">' +
                 '<span>「它」指向 🎁 獎品 的注意力權重</span>' +
-                '<span id="att-val-prize" style="color:#7c3aed;">88%</span>' +
+                '<span id="att-val-prize" style="color:var(--accent);">88%</span>' +
               '</div>' +
-              '<div class="att-progress"><div class="att-fill" id="att-bar-prize" style="width:88%;background:#7c3aed;"></div></div>' +
+              '<div class="att-progress"><div class="att-fill" id="att-bar-prize" style="width:88%;background:var(--accent);"></div></div>' +
               '<p style="font-size:12px;color:var(--muted);margin:6px 0 0;" id="att-desc-prize">體積過大無法放入，邏輯主語為「獎品」。</p>' +
             '</div>' +
             '<div class="att-bar-card">' +
@@ -452,7 +401,7 @@
           '</div>' +
           '<div class="tool-steps-container">' +
             '<div class="tool-step-card active" id="tool-step-1">' +
-              '<strong style="color:#7c3aed;font-size:13px;">① AI 決策與參數提取（動腦，輸出 JSON Schema）：</strong>' +
+              '<strong style="color:var(--accent);font-size:13px;">① AI 決策與參數提取（動腦，輸出 JSON Schema）：</strong>' +
               '<div class="code-box" id="tool-code-ai">{\n  "tool": "get_weather",\n  "parameters": { "city": "Taipei", "unit": "celsius" }\n}</div>' +
             '</div>' +
             '<div class="tool-step-card" id="tool-step-2">' +
@@ -476,7 +425,7 @@
               '<span style="font-size:12px;color:var(--muted);">適合：企業規章、即時價格、每週動態文件。完全不改模型參數。</span>' +
             '</button>' +
             '<button type="button" class="path-btn" data-s2-adapt="lora">' +
-              '<strong style="display:block;font-size:14px;color:#7c3aed;margin-bottom:4px;">2. LoRA 輕量外掛（低成本外掛）</strong>' +
+              '<strong style="display:block;font-size:14px;color:var(--accent);margin-bottom:4px;">2. LoRA 輕量外掛（低成本外掛）</strong>' +
               '<span style="font-size:12px;color:var(--muted);">適合：固定角色口吻、品牌寫作規範、垂直行業專業格式。</span>' +
             '</button>' +
             '<button type="button" class="path-btn" data-s2-adapt="finetune">' +
@@ -495,7 +444,7 @@
               '</ul>' +
             '</div>' +
             '<div class="matrix-card" id="mat-lora">' +
-              '<h4 style="margin:0 0 8px;font-size:14px;color:#7c3aed;">🧩 LoRA 輕量微調</h4>' +
+              '<h4 style="margin:0 0 8px;font-size:14px;color:var(--accent);">🧩 LoRA 輕量微調</h4>' +
               '<ul style="margin:0;padding-left:18px;font-size:12.5px;color:var(--ink);line-height:1.6;">' +
                 '<li><strong>更新成本：</strong>中低（只訓練 1% 轉接層）</li>' +
                 '<li><strong>即時性：</strong>需重新訓練權重檔（數小時）</li>' +

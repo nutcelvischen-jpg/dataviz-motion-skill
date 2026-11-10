@@ -9,3 +9,30 @@
 .video-library-entry{max-width:1060px;margin:18px auto 30px;line-height:1.8}
 .course-video :focus-visible{outline:2px solid var(--accent,#873b29);outline-offset:4px}
 @media(max-width:600px){.course-video-body{grid-template-columns:minmax(0,1fr);gap:18px}.course-video video{max-width:360px;max-height:70vh;margin:auto}.course-video summary{font-size:16px}.course-video-notes{font-size:15px}}
+
+/* ===== V2：影片卡片牆與播放視窗 ===== */
+.vd-wrap { width: min(var(--wrap), calc(100% - 48px)); }
+.video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--sp-5) var(--sp-4); }
+.video-grid.is-portrait { grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); }
+.video-card { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; scroll-margin-top: calc(var(--header-h) + 24px); }
+.video-card-media { position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-lg); overflow: hidden; background: var(--code-bg); border: 1px solid var(--rule); }
+.video-card.is-portrait .video-card-media { aspect-ratio: 9 / 16; }
+.video-card-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .2s; }
+.video-card-media:hover img { transform: scale(1.03); }
+.video-card-play { position: absolute; inset: 0; margin: auto; width: 44px; height: 44px; border-radius: 50%; background: var(--surface); box-shadow: 0 2px 10px rgb(0 0 0 / .3); }
+.video-card-play::after { content: ""; position: absolute; left: 17px; top: 13px; border-style: solid; border-width: 9px 0 9px 14px; border-color: transparent transparent transparent var(--ink); }
+.video-card-time { position: absolute; right: 8px; bottom: 8px; padding: 1px 6px; border-radius: var(--radius-sm); background: rgb(32 35 31 / .78); color: #fff; font: 600 var(--fs-xs) var(--font-mono); }
+.video-card h3 { margin: 6px 0 0; font: 700 var(--fs-base)/1.4 var(--font-sans); }
+.video-card p { margin: 0; font-size: var(--fs-sm); line-height: 1.55; color: var(--ink-2); }
+.video-card .link-arrow { font-size: var(--fs-sm); margin-top: 2px; }
+.video-card:target .video-card-media { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+.video-dialog { border: 0; border-radius: var(--radius-lg); padding: var(--sp-4); background: var(--surface); color: var(--ink); max-width: min(960px, 94vw); max-height: 96vh; box-shadow: var(--shadow); }
+.video-dialog::backdrop { background: rgb(32 35 31 / .72); }
+.vd-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); margin-bottom: var(--sp-3); }
+.vd-head h2 { margin: 0; font: 600 var(--fs-md)/1.35 var(--font-serif); }
+.vd-stage video { display: block; width: min(928px, 88vw); max-height: 76vh; background: #000; border-radius: var(--radius); }
+.video-dialog.is-portrait .vd-stage video { width: auto; height: min(76vh, 720px); max-width: 88vw; aspect-ratio: 9 / 16; margin: 0 auto; }
+.vd-ask { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); color: var(--ink-2); max-width: 36em; }
+.vd-ask:empty { display: none; }
+@media (max-width: 640px) { .vd-wrap { width: calc(100% - 32px); } .video-grid.is-portrait { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
