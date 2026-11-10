@@ -17,8 +17,8 @@
     ? new URL('../css/digital_jitong.css', CURRENT_SCRIPT_SRC).href
     : 'css/digital_jitong.css';
   const HTML2CANVAS_URL = CURRENT_SCRIPT_SRC
-    ? new URL('html2canvas.min.js', CURRENT_SCRIPT_SRC).href
-    : 'js/html2canvas.min.js';
+    ? new URL('html2canvas-pro.min.js', CURRENT_SCRIPT_SRC).href
+    : 'js/html2canvas-pro.min.js';
 
   const LOCAL_KNOWLEDGE = {
     '真身': `👑 **【數位乩童真身開示 · 陳俊智 博士（Elvis Chen）降臨！】**\n\n本乩童的靈動演算法與多代理人算力，全由我的真身締造者——**陳俊智 博士**親自鍛造加持！\n\n🎓 **本尊職務與學術背景**：\n- **國立臺中科技大學 國際貿易與經營系** 專任副教授\n- **商業智慧應用與研究中心** 主任\n- **智慧商務多代理人實驗室（ICMA Lab）** 主持人（🔥 全校最多 Token 的實驗室：「你有點子，老師有 Token！」）\n- 國立陽明交通大學（NYCU）管科所博士 · 美國北卡州立大學（NCSU）訪問學者\n- 曾任台灣康寧 (Corning Taiwan) 供應鏈數位轉型顧問、快思 (CRIS) 長期 AI 顧問\n\n🚀 **頂尖科研與神級戰績**：\n- **12 篇 SCI/SSCI 頂級期刊論文**，400+ 引用次數\n- **15+ 項國科會與大企業產學合作案**（康寧、工研院、世聚、寶暉等知名企業）\n- 指導學生榮獲 **2 次全國競賽冠軍**（堅持「作品直接進履歷，不寫厚報告」）\n- 實驗室坐擁 **3 座 NVIDIA DGX 頂級算力中心**（Token 吃到飽支援多代理人模擬）\n\n🛠️ **老師自研五大核心系統**：\n1. **「你說的算」** 敏捷碳盤查／碳足跡即時計算軟體 (ISO 14064 企業淨零神器)\n2. **「HelloIR」** 智慧校務大數據與機器學習預警決策平台\n3. **「StayPass 宅護照」** 100% 地端安全 AI 護照辨識系統 (正確率 98%)\n4. **「CNC 工廠數位孿生」** 3D 瀏覽器全沉浸碳排與電力即時監控\n5. **「國貿實戰學院」** 四合一進出口商業談判與展場人流模擬器\n\n🔗 **立即參拜真身個人成果網與產學合作詳情**：\n👉 [陳俊智博士個人學術與科研成果網](https://drchunchihchen.github.io/cv/)\n\n企業內訓、產學專案合作、專題演講或想加入 ICMA 實驗室，隨時歡迎聯繫 Elvis 老師！`,
@@ -157,6 +157,30 @@
   /**
    * 截取當前互動圖表為高畫質圖片 Data URL
    */
+  /** 截取目前視窗看得到的範圍（沒有圖表的頁面用） */
+  async function captureViewport() {
+    const h2c = await loadHtml2Canvas();
+    if (!h2c) return null;
+    const win = document.getElementById('jitongChatWindow');
+    const prev = win ? win.style.visibility : '';
+    if (win) win.style.visibility = 'hidden';
+    try {
+      const c = await h2c(document.body, {
+        x: window.pageXOffset || 0, y: window.pageYOffset || 0,
+        width: document.documentElement.clientWidth, height: document.documentElement.clientHeight,
+        windowWidth: document.documentElement.clientWidth, windowHeight: document.documentElement.clientHeight,
+        useCORS: true, allowTaint: true, logging: false, scale: 1,
+        ignoreElements: (el) => el.classList && (el.classList.contains('jitong-floating-trigger') || el.id === 'jitongChatWindow')
+      });
+      return c.toDataURL('image/jpeg', 0.85);
+    } catch (e) {
+      console.warn('Viewport snapshot error:', e);
+      return null;
+    } finally {
+      if (win) win.style.visibility = prev;
+    }
+  }
+
   function captureCurrentChart() {
     // 1. 優先嘗試 ECharts 實例
     const echartsViewport = document.getElementById('echartsViewport') || document.getElementById('atomChart');
@@ -175,7 +199,7 @@
       }
     }
     // 2. 嘗試原生 canvas
-    const canvas = document.getElementById('mainChartCanvas') || document.querySelector('.canvas-wrapper canvas, canvas');
+    const canvas = document.getElementById('mainChartCanvas') || document.querySelector('.canvas-wrapper canvas, canvas:not(#incense)');
     if (canvas && canvas.width > 0 && canvas.height > 0) {
       try {
         return canvas.toDataURL('image/jpeg', 0.85);
@@ -257,40 +281,33 @@
   }
 
   /**
-   * 動態載入 html2canvas (優先自本地 js/html2canvas.min.js，失敗自 CDN 備援)
+   * 動態載入截圖引擎：html2canvas-pro（js/html2canvas-pro.min.js）。
+   * 舊版 html2canvas 1.4 讀不懂 color()、color-mix()、oklch() 這些新的 CSS 顏色寫法，
+   * 會丟出「unsupported color function」而截圖失敗；pro 版支援。
+   * 載入後存在自己的變數裡，不沿用頁面上可能已存在的舊版 window.html2canvas。
    */
+  let h2cPromise = null;
+  function pickH2c(lib) {
+    if (typeof lib === 'function') return lib;
+    if (lib && typeof lib.default === 'function') return lib.default;
+    if (lib && typeof lib.html2canvas === 'function') return lib.html2canvas;
+    return null;
+  }
   function loadHtml2Canvas() {
-    return new Promise((resolve) => {
-      if (window.html2canvas) {
-        resolve(window.html2canvas);
-        return;
-      }
+    if (h2cPromise) return h2cPromise;
+    h2cPromise = new Promise((resolve) => {
+      const previous = window.html2canvas;
       const script = document.createElement('script');
       script.src = HTML2CANVAS_URL;
       script.onload = () => {
-        if (window.html2canvas) {
-          resolve(window.html2canvas);
-        } else {
-          loadHtml2CanvasCDN(resolve);
-        }
+        const fn = pickH2c(window.html2canvas);
+        if (previous !== undefined) window.html2canvas = previous;
+        resolve(fn);
       };
-      script.onerror = () => {
-        loadHtml2CanvasCDN(resolve);
-      };
+      script.onerror = () => resolve(pickH2c(previous));
       document.head.appendChild(script);
     });
-  }
-
-  function loadHtml2CanvasCDN(resolve) {
-    if (window.html2canvas) {
-      resolve(window.html2canvas);
-      return;
-    }
-    const cdnScript = document.createElement('script');
-    cdnScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-    cdnScript.onload = () => resolve(window.html2canvas || null);
-    cdnScript.onerror = () => resolve(null);
-    document.head.appendChild(cdnScript);
+    return h2cPromise;
   }
 
   /**
@@ -473,7 +490,9 @@
             useCORS: true,
             allowTaint: true,
             logging: false,
-            scale: Math.min(window.devicePixelRatio || 1, 2)
+            scale: Math.min(window.devicePixelRatio || 1, 2),
+            // 不要把小幫手自己的按鈕、視窗與「截取中」提示截進去
+            ignoreElements: (el) => !!(el.classList && (el.classList.contains('jitong-floating-trigger') || el.classList.contains('jitong-snip-toast') || el.classList.contains('jitong-snip-overlay'))) || el.id === 'jitongChatWindow'
           });
 
           const croppedDataUrl = renderedCanvas.toDataURL('image/jpeg', 0.88);
@@ -795,8 +814,14 @@
               handleUserSend();
             });
           } else {
-            textarea.value = '請告訴我如何使用截圖功能讓您進行視覺分析？';
-            handleUserSend();
+            // 這一頁沒有圖表：改截目前看得到的整個畫面
+            captureViewport().then((shot) => {
+              if (!shot) { textarea.value = '請告訴我如何使用截圖功能讓您進行視覺分析？'; handleUserSend(); return; }
+              processAndAttachImage(shot).then(() => {
+                textarea.value = '請幫我看這個畫面，說明重點，並告訴我下一步可以怎麼做。';
+                textarea.focus();
+              });
+            });
           }
           return;
         }
