@@ -1,0 +1,91 @@
+/* 共用頁首、頁尾、工作坊步驟列、投影模式 */
+header.content-header, header.site-header:not([data-shell-header]),
+footer.content-footer, footer.site-footer:not([data-shell-footer]) { display: none; }
+
+.site-header[data-shell-header] { position: sticky; top: 0; z-index: 40; background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--rule); }
+.sh-inner { width: min(var(--wrap), calc(100% - 48px)); height: var(--header-h); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.sh-brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-size: 13px; line-height: 1.28; letter-spacing: .04em; white-space: nowrap; }
+.sh-brand strong { font: 600 16px var(--font-serif); }
+.sh-mark { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--ink); font: 600 20px var(--font-serif); }
+.sh-nav { display: flex; align-items: center; gap: clamp(16px, 2.6vw, 36px); font-size: 14px; font-weight: 650; }
+.sh-nav a { color: var(--ink); text-decoration: none; padding: 8px 0; border-bottom: 2px solid transparent; white-space: nowrap; }
+.sh-nav a:hover { color: var(--accent); }
+.sh-nav a[aria-current="page"] { color: var(--accent); border-bottom-color: var(--accent); }
+.sh-tools { display: flex; align-items: center; gap: 12px; }
+.sh-present { min-height: 32px; padding: 2px 10px; border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink-2); font-size: var(--fs-xs); font-weight: 600; cursor: pointer; }
+.sh-present[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+
+/* 工具頁（app shell） */
+.site-header[data-shell-header].is-app { background: var(--surface); }
+.is-app .sh-inner { height: 44px; width: calc(100% - 32px); max-width: none; font-size: 14px; }
+.is-app .sh-title { font-weight: 700; }
+.is-app a { color: var(--accent); text-decoration: none; font-weight: 600; white-space: nowrap; }
+.is-app a:hover { text-decoration: underline; }
+.is-app .sh-sub { display: flex; gap: 16px; align-items: center; }
+
+/* 步驟列 */
+.workshop-stepper { background: var(--surface); border-bottom: 1px solid var(--rule); }
+.ws-inner { width: min(var(--wrap), calc(100% - 48px)); margin: 0 auto; display: flex; align-items: stretch; gap: 4px; min-height: 48px; }
+.ws-steps { display: flex; gap: 4px; flex: 1; list-style: none; margin: 0; padding: 6px 0; overflow-x: auto; }
+.ws-steps a { display: flex; align-items: center; gap: 8px; height: 100%; padding: 0 12px; border-radius: var(--radius); color: var(--ink-2); font-size: 14px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.ws-steps a:hover { background: var(--surface-2); color: var(--ink); }
+.ws-steps a[aria-current="step"] { background: var(--olive); color: #fff; }
+.ws-num { font-family: var(--font-mono); }
+.ws-ref { position: relative; align-self: center; }
+.ws-ref summary { list-style: none; cursor: pointer; padding: 6px 12px; font-size: 14px; font-weight: 600; color: var(--ink-2); border-radius: var(--radius); min-height: 36px; display: flex; align-items: center; }
+.ws-ref summary::-webkit-details-marker { display: none; }
+.ws-ref[open] summary, .ws-ref summary:hover { background: var(--surface-2); }
+.ws-ref-menu { position: absolute; right: 0; top: 100%; z-index: 20; min-width: 260px; background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); box-shadow: var(--shadow); padding: 8px; display: grid; }
+.ws-ref-menu a { padding: 8px 12px; color: var(--ink); text-decoration: none; font-size: 14px; border-radius: var(--radius-sm); }
+.ws-ref-menu a:hover { background: var(--surface-2); }
+.ws-mobile { display: none; }
+
+.step-pager { width: min(var(--wrap), calc(100% - 48px)); margin: 48px auto 0; padding-top: 24px; border-top: 1px solid var(--rule); display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.step-pager a { display: block; padding: 16px 20px; border: 1px solid var(--rule); border-radius: var(--radius-lg); background: var(--surface); color: var(--ink); text-decoration: none; }
+.step-pager a:hover { border-color: var(--ink); }
+.step-pager small { display: block; color: var(--ink-2); font-size: var(--fs-xs); }
+.step-pager strong { font-size: var(--fs-md); }
+.step-pager .next { text-align: right; grid-column: 2; }
+.step-pager .prev { grid-column: 1; }
+
+/* 頁尾 */
+.site-footer[data-shell-footer] { margin-top: 64px; border-top: 1px solid var(--rule); background: var(--surface-2); color: var(--ink-2); font-size: 14px; }
+.sf-inner { width: min(var(--wrap), calc(100% - 48px)); margin: 0 auto; padding: 40px 0 32px; display: grid; grid-template-columns: 1.2fr 1fr 1.2fr; gap: 40px; }
+.sf-inner h2 { font: 600 15px var(--font-sans); color: var(--ink); margin: 0 0 10px; }
+.sf-inner p { margin: 0 0 6px; }
+.sf-inner ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.sf-inner a { color: var(--ink-2); }
+.sf-inner a:hover { color: var(--accent); }
+.sf-brand { font: 600 17px var(--font-serif); color: var(--ink); }
+
+/* 投影模式 */
+html.present { font-size: 125%; }
+html.present .site-footer[data-shell-footer], html.present .jitong-floating-trigger, html.present #jitong-root { display: none !important; }
+html.present .sh-inner, html.present .ws-inner, html.present .step-pager { width: min(1280px, calc(100% - 48px)); }
+
+@media (max-width: 960px) { .sf-inner { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) {
+  .site-header[data-shell-header] { position: static; }
+  html { scroll-padding-top: 16px; }
+  .sh-inner { width: calc(100% - 32px); height: auto; display: block; padding-top: 10px; }
+  .sh-brand { min-height: 42px; }
+  .sh-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-top: 4px; }
+  .sh-nav a { text-align: center; font-size: 13px; min-height: 44px; display: flex; align-items: center; justify-content: center; padding: 0; }
+  .sh-tools { margin: 6px 0; }
+  .is-app .sh-inner { display: flex; height: 44px; padding: 0; }
+  .ws-inner { width: calc(100% - 32px); }
+  .ws-steps, .ws-ref { display: none; }
+  .ws-mobile { display: block; width: 100%; padding: 6px 0; }
+  .ws-mobile summary { min-height: 40px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; font-weight: 700; font-size: 14px; list-style: none; }
+  .ws-mobile summary::-webkit-details-marker { display: none; }
+  .ws-mobile ol { margin: 8px 0 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+  .ws-mobile a { display: block; padding: 10px 8px; color: var(--ink); text-decoration: none; border-radius: var(--radius-sm); font-size: 14px; }
+  .ws-mobile a[aria-current="step"] { background: var(--olive); color: #fff; }
+  .step-pager { width: calc(100% - 32px); grid-template-columns: 1fr; }
+  .step-pager .next, .step-pager .prev { grid-column: 1; text-align: left; }
+  .sf-inner { grid-template-columns: 1fr; gap: 24px; width: calc(100% - 32px); }
+}
+
+/* sticky 側欄要避開 sticky 頁首 */
+.content-sidebar { top: calc(var(--header-h) + 24px); }
+@media (max-width: 640px) { .content-sidebar { top: 24px; } }

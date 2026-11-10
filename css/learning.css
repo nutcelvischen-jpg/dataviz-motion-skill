@@ -31,3 +31,17 @@
 [hidden]{display:none!important}
 .lesson-header{padding-bottom:22px;margin-bottom:28px}.lesson-header h1{font-size:38px;max-width:22em;margin-bottom:14px}.lesson-lead{font-size:17px;margin-bottom:14px}.lesson-page-nav{display:flex;flex-wrap:wrap;gap:24px;font-size:14px}.lesson-page-nav a{display:inline-flex;align-items:center;min-height:44px;color:var(--accent-dark)}.lesson-block{scroll-margin-top:24px;margin-bottom:42px}.lesson-block>h2{font-size:28px}.lesson-disclosure{border-top:1px solid var(--rule);margin:20px 0;padding:6px 0}.lesson-disclosure>summary{cursor:pointer;min-height:44px;padding:8px 0;font-weight:600;font-size:15px}.lesson-disclosure[open]>summary{margin-bottom:12px}.lesson-disclosure p{font-size:15px}.prediction-optional{border:0;margin:0 0 12px;padding:0}.prediction-optional>summary{color:var(--muted);font-weight:400}.prediction-optional[open]{padding-bottom:12px}.lesson-observation{padding-top:4px}.lesson-observation h3{font-size:18px;margin:20px 0 8px}.lesson-observation p{font-size:15px;color:var(--muted)}.lesson-key-idea{font-size:21px;font-weight:600;color:#304b3b!important}.inline-terms{border-bottom:1px solid var(--rule)}.inline-terms .lesson-disclosure{margin:0}.inline-terms a{font-size:14px;color:var(--accent-dark)}.lesson-actions .action-primary{display:flex;flex-direction:column;gap:8px;align-items:flex-start}.completion-hint{font-size:13px;color:var(--muted);margin:0;max-width:28em}.lesson-actions .lesson-skip{font-size:14px;font-weight:400;color:var(--muted)}.further-links{margin-top:20px;padding-top:10px}.further-links a{font-size:15px;color:var(--accent-dark)}
 @media(max-width:680px){.main-nav{grid-template-columns:repeat(3,minmax(0,1fr))}.lesson-header h1{font-size:30px}.lesson-layout{padding-top:20px}.lesson-page-nav{gap:22px}.lesson-block>h2{font-size:25px}.mobile-lesson-nav{margin-bottom:18px}.lesson-header{padding-bottom:18px;margin-bottom:24px}.lesson-key-idea{font-size:19px}.lesson-actions{gap:22px}.lesson-actions .action-primary{width:100%}.lesson-actions .action-primary .button{width:100%}.mechanism{padding:18px}.mechanism ol{counter-reset:none}.mechanism li{padding:12px}}
+
+/* ---- SITE_REDESIGN_SPEC §6.7：單站頁標題與段落切換列 ---- */
+.lesson-related{margin:0 0 4px;font-size:14px;color:var(--ink-2)}
+.lesson-related a{color:var(--accent);font-weight:700}
+.lesson-sticky-nav{position:sticky;top:var(--header-h);z-index:20;display:flex;gap:0;margin:0 0 36px;padding:0;background:var(--surface);border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden}
+.lesson-sticky-nav a{flex:1;text-align:center;padding:10px 12px;min-height:44px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;text-decoration:none;color:var(--ink-2);border-right:1px solid var(--rule)}
+.lesson-sticky-nav a:last-child{border-right:0}
+.lesson-sticky-nav a[aria-current="true"]{background:var(--ink);color:var(--surface)}
+.lesson-header{margin-bottom:20px}
+.lesson-sidebar{top:calc(var(--header-h) + 24px)}
+.route-status{display:inline-block;padding:2px 8px;border-radius:var(--radius-sm);background:var(--surface-2);color:var(--ink-2);font-size:var(--fs-xs);font-weight:700;white-space:nowrap}
+.route-status.complete{background:var(--olive-soft);color:var(--olive)}
+.route-status.current{background:var(--accent-soft);color:var(--accent)}
+@media(max-width:640px){.lesson-sticky-nav{top:0}.lesson-sidebar{top:24px}}

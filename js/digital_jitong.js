@@ -518,6 +518,7 @@
   }
 
   function init() {
+    try { if (localStorage.getItem('jitong_dismissed') === '1') return; } catch (e) { /* ignore */ }
     ensureStylesheet();
     createDOM();
     bindEvents();
@@ -552,8 +553,14 @@
         </div>
         <div class="jitong-trigger-sub">請解簽</div>
       </div>
+      <button type="button" class="jitong-dismiss" aria-label="關閉數位乩童">×</button>
     `;
     document.body.appendChild(trigger);
+    trigger.querySelector('.jitong-dismiss').addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      try { localStorage.setItem('jitong_dismissed', '1'); } catch (e) { /* ignore */ }
+      trigger.remove();
+    });
 
     // 2. 聊天對話視窗
     const windowEl = document.createElement('div');

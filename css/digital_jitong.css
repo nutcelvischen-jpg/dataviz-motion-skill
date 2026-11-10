@@ -899,3 +899,14 @@
   border-color: #f0abfc;
   transform: scale(1.05);
 }
+
+/* 精簡版浮動按鈕（SITE_REDESIGN_SPEC §5.5）：預設 48px 圓形，hover/focus 才展開文字 */
+.jitong-floating-trigger { right: 16px; bottom: 16px; gap: 0; padding: 0; width: 48px; height: 48px; border-radius: 50%; overflow: visible; justify-content: center; font-family: var(--font-sans, sans-serif); }
+.jitong-floating-trigger .jitong-avatar-halo { width: 44px; height: 44px; animation: none; box-shadow: none; }
+.jitong-floating-trigger .jitong-trigger-text { display: none; }
+.jitong-floating-trigger:hover, .jitong-floating-trigger:focus-within { width: auto; padding: 2px 14px 2px 2px; border-radius: 50px; gap: 10px; }
+.jitong-floating-trigger:hover .jitong-trigger-text, .jitong-floating-trigger:focus-within .jitong-trigger-text { display: flex; }
+.jitong-floating-trigger:hover { transform: none; }
+.jitong-dismiss { position: absolute; top: -8px; right: -8px; width: 22px; height: 22px; min-height: 0; padding: 0; border-radius: 50%; border: 1px solid #6b7068; background: #20231f; color: #fff; font-size: 14px; line-height: 1; display: none; cursor: pointer; }
+.jitong-floating-trigger:hover .jitong-dismiss, .jitong-floating-trigger:focus-within .jitong-dismiss { display: block; }
+@media (prefers-reduced-motion: reduce) { .jitong-avatar-halo { animation: none !important; } }

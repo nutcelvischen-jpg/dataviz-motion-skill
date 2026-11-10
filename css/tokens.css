@@ -1,0 +1,50 @@
+/* 全站設計 tokens：請放在其他 CSS 之後載入，統一覆蓋舊變數。 */
+:root {
+  --paper: #f7f5ee;
+  --surface: #fffefa;
+  --surface-2: #efede4;
+  --ink: #20231f;
+  --ink-2: #535950;
+  --rule: #d7d6c9;
+  --accent: #873b29;
+  --accent-soft: #f3e6df;
+  --olive: #415c49;
+  --olive-soft: #e3ebe4;
+  --warn: #9a6a00;
+  --warn-soft: #fbf1d6;
+  --danger: #a3281f;
+  --danger-soft: #f8e1de;
+  --focus: #873b29;
+
+  --font-serif: "Noto Serif TC", "Source Han Serif TC", "Songti TC", "PMingLiU", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+
+  --fs-xs: .8125rem; --fs-sm: .875rem; --fs-base: 1rem; --fs-md: 1.125rem;
+  --fs-lg: 1.375rem; --fs-xl: 1.75rem; --fs-2xl: 2.25rem; --fs-3xl: 3rem;
+
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px;
+  --sp-6: 32px; --sp-7: 48px; --sp-8: 64px; --sp-9: 96px;
+
+  --radius-sm: 4px; --radius: 8px; --radius-lg: 12px;
+  --shadow: 0 1px 2px rgb(32 35 31 / .06), 0 8px 24px -12px rgb(32 35 31 / .18);
+  --wrap: 1240px; --wrap-read: 800px; --wrap-catalog: 1060px;
+  --header-h: 64px;
+
+  /* 舊變數別名：讓 learning.css / content-layout.css 跟著統一 */
+  --paper-light: var(--surface);
+  --muted: var(--ink-2);
+  --accent-dark: #6e2f20;
+  --pale: #e8eadf;
+  --warm: #f2e8dc;
+  --link: var(--accent);
+  --serif: var(--font-serif);
+  --sans: var(--font-sans);
+}
+
+html { scroll-padding-top: calc(var(--header-h) + 16px); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

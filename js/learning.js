@@ -5,7 +5,7 @@
   const lessonUrl=id=>'learn.html?lesson='+id;
   const el=(selector,root=document)=>root.querySelector(selector);
   const statusClass=s=>s==='已完成'?'complete':s==='學習中'?'current':'';
-  const practice='00_課程手冊與即時看板/WORKSHOP_BOARD.html#module1-practice';
+  const practice='workshop.html';
   function storageNotice(){document.querySelectorAll('[data-storage-message]').forEach(n=>n.textContent=progress.available()?'':'目前無法保存進度，仍可繼續學習。');}
   function setupReset(){
     document.querySelectorAll('[data-reset-progress]').forEach(button=>{
@@ -23,7 +23,7 @@
     const state=progress.get(), count=state.completedLessonIds.length, next=progress.next();
     el('#home-progress-count').textContent=`已完成 ${count}／6 站`;
     el('#home-progress-bar').style.width=`${count/6*100}%`;
-    el('#start-learning').innerHTML=(count===6?'回顧學習路線':state.lastVisitedLessonId?'繼續學習':'開始第一站')+' <span aria-hidden="true">→</span>';
+    el('#start-learning').innerHTML=(count===6?'回顧學習路線':(count>0||state.lastVisitedLessonId)&&next?'繼續第 '+next+' 站':'開始第一站')+' <span aria-hidden="true">→</span>';
     el('#start-learning').href=next?lessonUrl(next):'#learning-map';
     el('#home-practice').hidden=count!==6;
     el('#route-list').innerHTML=lessons.map(l=>{const status=progress.status(l.id);return `<li><a class="route-link" href="${lessonUrl(l.id)}"><span class="route-number">${l.id}</span><span><span class="route-title">${esc(l.title)}</span><span class="route-desc">${esc(l.summary)}</span></span><span class="route-status ${statusClass(status)}">${status==='已完成'?'✓ ':''}${status} →</span></a></li>`;}).join('');
@@ -55,17 +55,26 @@
     const headings=window.LEARNING_LESSON_HEADINGS[lesson.id],state=progress.get(),passed=state.quizPassedLessonIds.includes(lesson.id),idx=lessons.findIndex(l=>l.id===lesson.id),next=lessons[idx+1],prev=lessons[idx-1];
     const terms=window.LEARNING_INLINE_TERMS[lesson.id]||[];
     const mapBranch={'01':'model','02':'context','03':'knowledge','04':'quality','05':'tools','06':'control'}[lesson.id];
-    const completeSection=lesson.id==='06'&&state.completedLessonIds.includes('06')?`<section class="completion" id="completion" tabindex="-1"><h2>恭喜完成第六站</h2><p>現在你可以帶著六站的觀念，接著練習資料分析。</p><ul><li>解釋回答與上下文的關係。</li><li>區分生成的回答與可查證的依據。</li><li>安排有工具、有檢核的工作步驟。</li></ul><div class="completion-links"><a class="button button-primary" href="${practice}">前往資料分析實作 →</a><a href="index.html#learning-map">回顧學習地圖</a></div></section>`:'';
+    const completeSection=lesson.id==='06'&&state.completedLessonIds.includes('06')?`<section class="completion" id="completion" tabindex="-1"><h2>恭喜完成第六站</h2><p>現在你可以帶著六站的觀念，接著練習資料分析。</p><ul><li>解釋回答與上下文的關係。</li><li>區分生成的回答與可查證的依據。</li><li>安排有工具、有檢核的工作步驟。</li></ul><div class="completion-links"><a class="button button-primary" href="${practice}">進入工作坊 →</a><a href="index.html#learning-map">回顧學習地圖</a></div></section>`:'';
     el('#lesson-root').innerHTML=`${invalid?'<p class="invalid-notice">找不到指定課程，已回到第一站。</p>':''}
-      <header class="lesson-header"><p class="lesson-counter">第 ${lesson.id}／06 站 · ${esc(lesson.shortTitle)}</p><h1>${esc(lesson.title)}</h1><p class="lesson-lead">${esc(lesson.lead)}</p><nav class="lesson-page-nav" aria-label="本課閱讀步驟"><a href="#lesson-try">動手試</a><a href="#lesson-understand">看解說</a><a href="#lesson-check">確認理解</a></nav><a class="lesson-map-link" href="concepts/overview.html#map-${mapBranch}">在概念全圖中看這一站 →</a><p><a class="lesson-map-link" href="videos.html#video-${({"01":"ep0","02":"ep2","03":"ep0","04":"ep3","05":"ep4","06":"ep3"})[lesson.id]}">用影片再理解這一站 →</a></p></header>
+      <header class="lesson-header"><p class="lesson-counter">第 ${lesson.id}／06 站 · ${esc(lesson.shortTitle)}</p><h1>${esc(lesson.title)}</h1><p class="lesson-lead">${esc(lesson.lead)}</p><p class="lesson-related">相關：<a href="concepts/overview.html#map-${mapBranch}">概念全圖</a> · <a href="videos.html#video-${({"01":"ep0","02":"ep2","03":"ep0","04":"ep3","05":"ep4","06":"ep3"})[lesson.id]}">60 秒影片</a></p></header>
+      <nav class="lesson-page-nav lesson-sticky-nav" aria-label="本課閱讀步驟"><a href="#lesson-try">動手試</a><a href="#lesson-understand">看解說</a><a href="#lesson-check">確認理解</a></nav>
       ${completeSection}
       <section class="lesson-block" id="lesson-try"><h2>${esc(headings[2])}</h2><details class="lesson-disclosure prediction-optional"><summary>先猜看看（選填）</summary><p>${esc(lesson.prediction)}</p><div class="prediction-buttons"><button type="button" aria-pressed="false">是</button><button type="button" aria-pressed="false">否</button><button type="button" aria-pressed="false">不確定</button></div><p class="micro-feedback" id="prediction-feedback" role="status"></p></details><div class="demo-area">${experimentMarkup(lesson.experiment)}</div><div class="lesson-observation"><h3>${esc(headings[3])}</h3><p>${esc(lesson.observation)}</p></div></section>
       <section class="lesson-block" id="lesson-understand"><h2>${esc(headings[0])}</h2><p class="lesson-key-idea">${esc(lesson.takeaway)}</p><p>${esc(lesson.explanation[0])}</p><div class="mechanism" aria-label="${esc(headings[1])}"><ol>${lesson.flow.map((step,i)=>`<li><strong>${String(i+1).padStart(2,'0')}</strong><br>${esc(step)}</li>`).join('')}</ol>${flowBranch(lesson.id)}<p class="mechanism-note">${esc(lesson.flowNote)}</p></div><details class="lesson-disclosure"><summary>更多解說與本課重點</summary>${lesson.explanation.slice(1).map(p=>`<p>${esc(p)}</p>`).join('')}<ul>${lesson.objectives.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details><div class="inline-terms" aria-label="本課名詞">${terms.map(([name,definition,url])=>`<details class="lesson-disclosure"><summary>${esc(name)} 是什麼？</summary><p>${esc(definition)}</p><a href="${esc(url)}">閱讀完整介紹 →</a></details>`).join('')}</div></section>
       <section class="lesson-block quiz" id="lesson-check"><h2>確認理解</h2><form id="quiz-form"><fieldset><legend>${esc(lesson.quiz.question)}</legend>${lesson.quiz.options.map(o=>`<label class="quiz-option"><input type="radio" name="quiz" value="${esc(o[0])}"><span>${esc(o[1])}</span></label>`).join('')}</fieldset><button class="button button-secondary" type="submit">確認答案</button><p id="quiz-feedback" class="quiz-feedback" role="status" aria-live="polite">${passed?'你已通過本站的理解檢查。':''}</p></form></section>
-      <nav class="lesson-actions" aria-label="課程前後導航"><div>${prev?`<a href="${lessonUrl(prev.id)}">← 上一站</a>`:'<a href="index.html#learning-map">← 返回學習地圖</a>'}</div><div class="action-primary"><button type="button" id="complete-lesson" class="button button-primary" ${passed?'':'disabled'}>${next?'完成本站並前往下一站':'完成基礎路線'} →</button><p class="completion-hint" id="completion-hint">${passed?'按下完成，才會更新本站進度。':'答對上方問題後，即可完成本站。'}</p>${next?`<a class="lesson-skip" href="${lessonUrl(next.id)}">先看下一站</a>`:'<a class="lesson-skip" href="index.html#learning-map">返回學習地圖</a>'}</div></nav>
+      <nav class="lesson-actions" aria-label="課程前後導航"><div>${prev?`<a href="${lessonUrl(prev.id)}">← 上一站</a>`:'<a href="index.html#learning-map">← 返回學習地圖</a>'}</div><div class="action-primary"><button type="button" id="complete-lesson" class="button ${completeSection?'button-secondary':'button-primary'}" ${passed?'':'disabled'}>${next?'完成本站並前往下一站':'完成基礎路線'} →</button><p class="completion-hint" id="completion-hint">${passed?'按下完成，才會更新本站進度。':'答對上方問題後，即可完成本站。'}</p>${next?`<a class="lesson-skip" href="${lessonUrl(next.id)}">先看下一站</a>`:'<a class="lesson-skip" href="index.html#learning-map">返回學習地圖</a>'}</div></nav>
       <details class="lesson-disclosure further-links"><summary>延伸圖解與自由測試（選讀）</summary><p>當頁示範已涵蓋本課重點。這裡提供完整圖解、更多預設與可連接 API 的自由測試。</p>${lesson.links.map(([label,url])=>`<a href="${esc(url)}">${esc(label)} ↗</a>`).join('')}</details>`;
-    renderNavigation(lesson);storageNotice();setupPrediction();setupExperiment(lesson.experiment);setupQuiz(lesson,next);
+    renderNavigation(lesson);watchSections();storageNotice();setupPrediction();setupExperiment(lesson.experiment);setupQuiz(lesson,next);
     if(location.hash==='#completion'&&el('#completion'))el('#completion').scrollIntoView();
+  }
+  function watchSections(){
+    const links=[...document.querySelectorAll('.lesson-sticky-nav a')];
+    if(!links.length||!('IntersectionObserver' in window))return;
+    const set=id=>links.forEach(a=>{if(a.getAttribute('href')==='#'+id)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current');});
+    const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)set(e.target.id);});},{rootMargin:'-20% 0px -65% 0px'});
+    ['lesson-try','lesson-understand','lesson-check'].forEach(id=>{const n=document.getElementById(id);if(n)io.observe(n);});
+    set('lesson-try');
   }
   function setupPrediction(){document.querySelectorAll('.prediction-buttons button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.prediction-buttons button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');el('#prediction-feedback').textContent='已記下你的想法。接著動手觀察，看看結果如何。';}));}
   function setupExperiment(type){
