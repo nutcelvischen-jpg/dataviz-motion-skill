@@ -33,3 +33,12 @@ h1,h2,h3,p{margin-top:0}
 .check-list input:checked + span{color:var(--ink-2);text-decoration:line-through}
 .check-progress{margin:0 0 20px;font-weight:700;color:var(--olive)}
 @media(max-width:640px){.board-wrap{width:calc(100% - 32px)}.prompt-block{padding-left:14px;padding-right:14px}}
+
+/* V2：手機分頁可橫向滑動，文字改短 */
+.tab-short{display:none}
+@media(max-width:640px){
+  .tabs-nav{gap:0;scrollbar-width:none;scroll-snap-type:x proximity;padding-right:24px;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 24px),transparent)}
+  .tabs-nav::-webkit-scrollbar{display:none}
+  .tab-btn{padding:10px 12px;font-size:14px;scroll-snap-align:center}
+  .tab-long{display:none}.tab-short{display:inline}
+}

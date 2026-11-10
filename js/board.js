@@ -8,6 +8,7 @@
       t.setAttribute('aria-selected', on ? 'true' : 'false'); t.tabIndex = on ? 0 : -1;
       var pane = document.getElementById(t.getAttribute('aria-controls')); if (pane) pane.classList.toggle('active', on);
       if (on && focus) t.focus();
+      if (on && t.scrollIntoView && window.matchMedia('(max-width: 640px)').matches) t.scrollIntoView({ inline: 'center', block: 'nearest' });
     });
     return found;
   }

@@ -29,3 +29,13 @@ node ~/.claude/skills/answer-me-with-html/scripts/am.mjs render docs/manual_sour
 - 截圖腳本會暫時隱藏提示訊息與浮動頭像，只影響截圖，不改網站檔案。
 - 「堆疊」與「統一／獨立量表」兩顆按鈕曾因呼叫 `setBarStackMode`、`toggleFacetScale` 缺少 `window.PyGWalker.` 前綴而失效，已於 2026-11-08 修正；擷圖腳本直接點按鈕，若這兩張圖看起來沒變化，先檢查是否又壞了。
 - 手冊內的數字（資料集數量、縮放比例、取前幾筆等）取自程式碼；改版後請對照 `js/pygwalker_data_atoms.js` 重新確認。
+
+## 產生後瘦身
+
+手冊產生後圖片是 base64 內嵌（約 2.4 MB）。請再執行一次：
+
+```
+python3 scripts/extract_manual_images.py
+```
+
+圖片會抽到 `assets/manual/step-NN.webp`，HTML 降到 200 KB 以下。

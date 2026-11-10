@@ -326,6 +326,28 @@
 </head>
 <body data-nav="workshop" data-step="4" data-shell="app" data-title="Data Atoms 儀表板" data-manual="data_atoms_manual.html"><script src="js/site-config.js?v=20261111"></script><script src="js/site-shell.js?v=20261111"></script>
 
+  <section class="app-gate" id="app-gate" hidden aria-labelledby="app-gate-t">
+    <div class="card">
+      <h1 id="app-gate-t">Data Atoms 需要大一點的畫面</h1>
+      <p>請用電腦，或把平板轉成橫向。手機上可以先看示範。</p>
+      <div class="app-gate-actions">
+        <a class="btn btn-primary" href="data_atoms_demo.html">看操作示範影片</a>
+        <a class="link-arrow" href="data_atoms_manual.html">看操作手冊</a>
+      </div>
+      <button type="button" class="app-gate-skip" id="app-gate-skip">仍要在這裡開啟</button>
+    </div>
+  </section>
+  <script>
+  (function () {
+    var gate = document.getElementById('app-gate'), mq = window.matchMedia('(max-width: 900px)');
+    function dismissed() { try { return sessionStorage.getItem('app_gate_dismissed') === '1'; } catch (e) { return false; } }
+    function sync() { var on = mq.matches && !dismissed(); gate.hidden = !on; document.documentElement.classList.toggle('app-gated', on); }
+    document.getElementById('app-gate-skip').addEventListener('click', function () { try { sessionStorage.setItem('app_gate_dismissed', '1'); } catch (e) {} sync(); window.dispatchEvent(new Event('resize')); });
+    if (mq.addEventListener) mq.addEventListener('change', sync); else mq.addListener(sync);
+    sync();
+  })();
+  </script>
+
   <div class="app-shell">
     
     <!-- 1. Top Navigation Bar -->
@@ -468,7 +490,7 @@
           </div>
 
           <!-- 2. 開啟自訂看板按鈕 (Custom Dashboard) -->
-          <button type="button" class="btn btn-sm" id="btnOpenDashboardModal" style="background:#4f46e5; color:#ffffff; border:1px solid #4338ca; font-weight:700;" title="開啟已釘選的多宮格自訂看板">
+          <button type="button" class="btn btn-sm btn-secondary" id="btnOpenDashboardModal" title="開啟已釘選的多宮格自訂看板">
             <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="8" height="8" rx="1"></rect>
               <rect x="13" y="3" width="8" height="8" rx="1"></rect>

@@ -14,10 +14,10 @@
 <div class="container">
     <!-- Tab Navigation -->
     <div class="tabs-nav" role="tablist" aria-label="工作坊單元">
-      <button class="tab-btn" role="tab" id="tab-mod1" aria-controls="mod1" data-tab="mod1" aria-selected="true">Module 1 資料清洗</button>
-      <button class="tab-btn" role="tab" id="tab-mod2" aria-controls="mod2" data-tab="mod2" aria-selected="false">Module 2 Skill 封裝</button>
-      <button class="tab-btn" role="tab" id="tab-mod3" aria-controls="mod3" data-tab="mod3" aria-selected="false">Module 3 建站與 MCP</button>
-      <button class="tab-btn" role="tab" id="tab-mod4" aria-controls="mod4" data-tab="mod4" aria-selected="false">Module 4 動態短片</button>
+      <button class="tab-btn" role="tab" id="tab-mod1" aria-controls="mod1" data-tab="mod1" aria-selected="true"><span class="tab-long">Module 1 資料清洗</span><span class="tab-short" aria-hidden="true">M1 清洗</span></button>
+      <button class="tab-btn" role="tab" id="tab-mod2" aria-controls="mod2" data-tab="mod2" aria-selected="false"><span class="tab-long">Module 2 Skill 封裝</span><span class="tab-short" aria-hidden="true">M2 Skill</span></button>
+      <button class="tab-btn" role="tab" id="tab-mod3" aria-controls="mod3" data-tab="mod3" aria-selected="false"><span class="tab-long">Module 3 建站與 MCP</span><span class="tab-short" aria-hidden="true">M3 建站</span></button>
+      <button class="tab-btn" role="tab" id="tab-mod4" aria-controls="mod4" data-tab="mod4" aria-selected="false"><span class="tab-long">Module 4 動態短片</span><span class="tab-short" aria-hidden="true">M4 短片</span></button>
       <button class="tab-btn" role="tab" id="tab-checklist" aria-controls="checklist" data-tab="checklist" aria-selected="false">課前檢核</button>
     </div>
 
@@ -29,7 +29,7 @@
         <p>進入資料分析前，先親身體驗大語言模型的核心特性與邊界：提示詞注入、缺乏內建時鐘、無狀態記憶、機率式文字預測，以及純語言模型的算術盲區。支援免 Key 的模擬示範。</p>
         <div class="link-row"><a class="btn btn-primary" href="../lab.html">開啟本質探秘實驗室 →</a></div>
         <div class="link-row">
-          <a class="link-arrow" href="../01_Module1_Agent思維與資料分析/API金鑰資安防護與前後端架構圖解.md">API 金鑰防外洩與前後端架構手冊</a>
+          <a class="link-arrow" href="https://github.com/nutcelvischen-jpg/dataviz-motion-skill/blob/main/01_Module1_Agent%E6%80%9D%E7%B6%AD%E8%88%87%E8%B3%87%E6%96%99%E5%88%86%E6%9E%90/API%E9%87%91%E9%91%B0%E8%B3%87%E5%AE%89%E9%98%B2%E8%AD%B7%E8%88%87%E5%89%8D%E5%BE%8C%E7%AB%AF%E6%9E%B6%E6%A7%8B%E5%9C%96%E8%A7%A3.md" target="_blank" rel="noopener">API 金鑰防外洩與前後端架構手冊</a>
           <a class="link-arrow" href="../01_Module1_Agent思維與資料分析/diagram_api_security_architecture.html">API 資安演進架構圖</a>
           <a class="link-arrow" href="../01_Module1_Agent思維與資料分析/prompt_injection_metro_case.html">北捷 AI 客服歪樓寫程式案</a>
         </div>
@@ -51,7 +51,7 @@
         </div>
         <p>上傳真實資料檔 <code>實戰挑戰_臺灣上市公司營收統計_1088家真實髒資料.csv</code>，並複製以下提示詞貼給 AI 模型執行清洗：</p>
         
-        <span class="prompt-label">PROMPT 1-1：大數據清洗與轉型指令</span><div class="prompt-block"><button type="button" data-copy>複製</button><pre><code id="p1_1">你是一位資深商業與金融數據工程專家。我已經上傳了一份由臺灣證券交易所 (TWSE) 彙整的真實市場檔案 `實戰挑戰_臺灣上市公司營收統計_1088家真實髒資料.csv`（共 1,088 家上市公司）。
+        <span class="prompt-label">提示詞 1-1：大數據清洗與轉型指令</span><div class="prompt-block"><button type="button" data-copy>複製</button><pre><code id="p1_1">你是一位資深商業與金融數據工程專家。我已經上傳了一份由臺灣證券交易所 (TWSE) 彙整的真實市場檔案 `實戰挑戰_臺灣上市公司營收統計_1088家真實髒資料.csv`（共 1,088 家上市公司）。
 
 請仔細檢查數據結構，並調用代碼執行器（Python / Pandas）完成嚴格清洗：
 
@@ -78,7 +78,7 @@
         </div>
         <p>為避免 AI 產生「看似合理但數字算錯」的幻覺，執行以下交叉核對提示詞：</p>
 
-        <span class="prompt-label">PROMPT 1-2：算術防幻覺與摘要報告</span><div class="prompt-block"><button type="button" data-copy>複製</button><pre><code id="p1_2">請根據剛才清洗完成的 1,088 家上市公司營收資料集，執行多維度探索性分析（EDA），並嚴格執行「雙重驗算（Cross-Verification）」：
+        <span class="prompt-label">提示詞 1-2：算術防幻覺與摘要報告</span><div class="prompt-block"><button type="button" data-copy>複製</button><pre><code id="p1_2">請根據剛才清洗完成的 1,088 家上市公司營收資料集，執行多維度探索性分析（EDA），並嚴格執行「雙重驗算（Cross-Verification）」：
 
 1. 計算關鍵維度：
    - 計算各「產業別」（半導體、電腦週邊、金融保險、觀光等）的「當月總營收」與佔全市場比例（%）。
@@ -125,14 +125,14 @@
         </div>
         <p>在 Antigravity 中向 AI 輸入以下 Prompt，一鍵生成本地互動儀表板：</p>
 
-        <span class="prompt-label">PROMPT 3-1：儀表板生成指令</span><div class="prompt-block"><button type="button" data-copy>複製</button><pre><code id="p3_1">請使用 HTML、CSS（極簡現代風格）與原生 JavaScript 為我建立一個「單頁離線式商業數據儀表板」：
+        <span class="prompt-label">提示詞 3-1：儀表板生成指令</span><div class="prompt-block"><button type="button" data-copy>複製</button><pre><code id="p3_1">請使用 HTML、CSS（極簡現代風格）與原生 JavaScript 為我建立一個「單頁離線式商業數據儀表板」：
 
 1. 包含拖曳上傳區，使用 SheetJS（xlsx.full.min.js）本地解析使用者上傳的 Excel/CSV。
 2. 畫面左側為資料洞察卡片，右側為動態 Canvas 圖表（支援柱狀圖、趨勢折線圖與佔比環形圖）。
 3. 畫面右下角內嵌一個「AI 數據問答懸浮按鈕」，點擊可展開問答對話視窗。
 4. 全程不需伺服器，直接在本地瀏覽器即可運行。</code></pre></div>
         <div class="btn-group">
-          <a href="../index.html" target="_blank" class="action-btn">📖 開啟大語言模型六站學習地圖</a>
+          <a href="../index.html#learning-map" class="link-arrow">開啟大語言模型六站學習地圖</a>
         </div>
       </div>
     </div>

@@ -99,3 +99,14 @@ html.present .sh-inner, html.present .ws-inner, html.present .step-pager { width
 .toast-notice { left: 0 !important; right: 0 !important; bottom: 16px !important; margin-inline: auto; width: max-content; max-width: calc(100% - 32px); }
 .brand-version-chip.tag { font-size: 11px; padding: 1px 8px; }
 @media (max-width: 640px) { .is-app .sh-title, .is-app .sh-manual { display: none; } .is-app .sh-inner { justify-content: space-between; } }
+
+/* V2：工具頁小螢幕提示 */
+.app-gate { padding: 32px 16px; }
+.app-gate .card { max-width: 440px; margin: 0 auto; }
+.app-gate h1 { margin: 0 0 8px; font: 600 var(--fs-xl)/1.3 var(--font-serif); }
+.app-gate p { margin: 0 0 20px; color: var(--ink-2); }
+.app-gate-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.app-gate-skip { margin-top: 24px; padding: 8px 0; min-height: 44px; border: 0; background: none; color: var(--ink-2); font: var(--fs-sm) var(--font-sans); text-decoration: underline; cursor: pointer; }
+html.app-gated .app-shell { display: none !important; }
+html.app-gated, html.app-gated body { height: auto !important; overflow: auto !important; background: var(--paper); }
+html.app-gated .toast-notice { display: none !important; }
