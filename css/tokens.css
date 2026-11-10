@@ -55,3 +55,46 @@ html { scroll-padding-top: calc(var(--header-h) + 16px); }
   --chart-4: #4a5a6a; --chart-5: #b98a7c; --chart-6: #8fa696;
   --code-bg: #1f2320; --code-ink: #f1efe6;
 }
+
+
+/* ===== 水墨版（2026-11）：書齋（白天）與宮廟（夜晚）共用一套 tokens ===== */
+:root {
+  --paper: #f4f1e8; --surface: #f9f6ee; --surface-2: #ebe7db;
+  --ink: #1c1b19; --ink-2: #5a5750; --rule: #d6d1c4;
+  --accent: #a8322a; --accent-soft: #f0e2dc; --accent-dark: #8a261f;
+  --olive: #1c1b19; --olive-soft: #ebe7db;
+  --gold: #7a5f2a;
+  --focus: #a8322a;
+  --pale: #ebe7db; --warm: #ebe7db;
+  --radius-sm: 2px; --radius: 3px; --radius-lg: 4px;
+  --shadow: 0 1px 2px rgb(28 27 25 / .05), 0 10px 28px -16px rgb(28 27 25 / .22);
+  --font-serif: "Noto Serif TC", "Source Han Serif TC", "Songti TC", "PMingLiU", serif;
+  --code-bg: #1c1b19; --code-ink: #efe9dc;
+}
+html[data-theme="night"] {
+  color-scheme: dark;
+  --paper: #14110f; --surface: #1b1714; --surface-2: #241f1a;
+  --ink: #efe9dc; --ink-2: #a59d8e; --rule: #3a342c;
+  --accent: #e0705f; --accent-soft: #2e1c18; --accent-dark: #f08c7c;
+  --seal: #b82a1c;
+  --olive: #c9a86a; --olive-soft: #2a241a;
+  --gold: #c9a86a;
+  --focus: #c9a86a;
+  --pale: #241f1a; --warm: #241f1a;
+  --paper-light: #1b1714; --muted: #a59d8e; --link: #e0705f;
+  --code-bg: #0c0a09; --code-ink: #efe9dc;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 10px 28px -16px rgb(0 0 0 / .8);
+}
+:root { --seal: #a8322a; }
+html { background: var(--paper); }
+body { transition: background-color .9s ease, color .9s ease; }
+h1, h2 { letter-spacing: .04em; }
+::selection { background: var(--accent-soft); color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { body { transition: none; } }
+
+/* 夜版：蓋掉舊樣式裡寫死的淺色 */
+html[data-theme="night"] input, html[data-theme="night"] textarea, html[data-theme="night"] select, html[data-theme="night"] #free-prompt { background: var(--surface); color: var(--ink); border-color: var(--rule); }
+html[data-theme="night"] .mechanism, html[data-theme="night"] .completion, html[data-theme="night"] .route-section { background: var(--surface-2); }
+html[data-theme="night"] .token-pieces span, html[data-theme="night"] .token-strip span, html[data-theme="night"] .token-output span { color: #1c1b19; }
+html[data-theme="night"] .lab-golden-quote, html[data-theme="night"] .blindspot-card-quote { background: var(--surface-2); color: var(--ink); }
+html[data-theme="night"] img.concept-figure, html[data-theme="night"] .concept-illustration img, html[data-theme="night"] main svg:not(.vd-smoke):not(.sf-hills) { }

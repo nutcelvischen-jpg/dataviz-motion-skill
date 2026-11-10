@@ -92,3 +92,33 @@ a.card:hover { border-color: var(--ink); transform: translateY(-1px); color: var
 @media (max-width: 820px) { .scroll-hint { display: block; } }
 .wk-crumbs { margin: 0 0 24px; color: var(--ink-2); font-size: var(--fs-sm); }
 .wk-crumbs a { color: var(--ink-2); }
+
+
+/* ===== 水墨版元件調整 ===== */
+.btn, .button { letter-spacing: .12em; border-radius: var(--radius); }
+.btn-primary, .button-primary { background: var(--seal); color: #fff8ec; }
+.btn-primary:hover, .button-primary:hover { background: var(--ink); color: var(--paper); }
+html[data-theme="night"] .btn-primary:hover, html[data-theme="night"] .button-primary:hover { background: var(--gold); color: #14110f; }
+.btn-secondary, .button-secondary { border-color: var(--ink); color: var(--ink); }
+.link-arrow { text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 1px; font-weight: 600; letter-spacing: .06em; }
+.card { background: transparent; border-color: var(--rule); }
+a.card:hover { border-color: var(--ink); background: var(--surface); }
+.tag { background: var(--surface-2); color: var(--ink); letter-spacing: .06em; }
+.tag-olive { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+.callout, .callout-info { border-left-color: var(--gold); background: var(--surface-2); }
+.eyebrow { color: var(--gold); letter-spacing: .4em; font-family: var(--font-serif); font-weight: 500; }
+.page-hero { border-bottom-color: var(--rule); }
+.page-hero h1 { font-weight: 500; letter-spacing: .06em; }
+.section > h2 { font-weight: 500; }
+.phase-num { background: transparent; color: var(--seal); border: 1.5px solid var(--seal); border-radius: var(--radius); font-family: var(--font-serif); }
+html[data-theme="night"] .phase-num { color: var(--gold); border-color: var(--gold); }
+.toc-chips a { background: transparent; border: 1px solid var(--rule); letter-spacing: .06em; }
+.toc-chips a:hover { background: transparent; border-color: var(--ink); color: var(--ink); }
+.stat { background: transparent; }
+.stat .stat-num { font-weight: 500; }
+
+/* 直排側標（首頁與影片頁的區塊標題） */
+.side-title { margin: 6px 0 0; writing-mode: vertical-rl; font: 500 26px/1.2 var(--font-serif); letter-spacing: .5em; white-space: nowrap; }
+.side-note { margin: 6px 0 0; writing-mode: vertical-rl; font: 14px/1.2 var(--font-serif); letter-spacing: .5em; color: var(--gold); border-right: 1px solid var(--rule); padding-right: 20px; white-space: nowrap; }
+.side-grid { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 48px; }
+@media (max-width: 720px) { .side-grid { grid-template-columns: 28px minmax(0, 1fr); gap: 20px; } .side-title { font-size: 20px; } }

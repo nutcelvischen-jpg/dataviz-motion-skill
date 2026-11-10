@@ -26,7 +26,8 @@
     el('#start-learning').innerHTML=(count===6?'回顧學習路線':(count>0||state.lastVisitedLessonId)&&next?'繼續第 '+next+' 站':'開始第一站')+' <span aria-hidden="true">→</span>';
     el('#start-learning').href=next?lessonUrl(next):'#learning-map';
     el('#home-practice').hidden=count!==6;
-    el('#route-list').innerHTML=lessons.map(l=>{const status=progress.status(l.id);return `<li><a class="route-link" href="${lessonUrl(l.id)}"><span class="route-number">${l.id}</span><span><span class="route-title">${esc(l.title)}</span><span class="route-desc">${esc(l.summary)}</span></span><span class="route-status ${statusClass(status)}">${status==='已完成'?'✓ ':''}${status} →</span></a></li>`;}).join('');
+    const han=['一','二','三','四','五','六'];
+    el('#route-list').innerHTML=lessons.map((l,i)=>{const status=progress.status(l.id);const mark=status==='已完成'?'<span class="route-seal" role="img" aria-label="已完成">畢</span>':`<span class="route-status ${statusClass(status)}">${status==='學習中'?'進行中':'未讀'}</span>`;return `<li><a class="route-link" href="${lessonUrl(l.id)}"><span class="route-number">${han[i]||l.id}</span><span><span class="route-title">${esc(l.title)}</span><span class="route-desc">${esc(l.shortTitle)}・${esc(l.summary)}</span></span><span class="route-dots" aria-hidden="true"></span>${mark}</a></li>`;}).join('');
     storageNotice();
   }
   function renderNavigation(lesson){

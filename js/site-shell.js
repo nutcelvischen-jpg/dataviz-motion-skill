@@ -18,6 +18,14 @@
   function sget(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
   function sset(k, v) { try { sessionStorage.setItem(k, v); } catch (e) { /* ignore */ } }
 
+  /* 日夜主題：頁面在 <body data-night="ok|default"> 表示支援夜版；使用者的選擇記在 localStorage['site_theme'] */
+  var nightMode = body.getAttribute('data-night');
+  function lget(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lset(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* ignore */ } }
+  function wantNight() { if (!nightMode) return false; var t = lget('site_theme'); return t ? t === 'night' : nightMode === 'default'; }
+  function applyTheme() { if (wantNight()) document.documentElement.setAttribute('data-theme', 'night'); else document.documentElement.removeAttribute('data-theme'); }
+  applyTheme();
+
   /* 投影模式 */
   var qs = new URLSearchParams(location.search);
   if (qs.get('present') === '1') sset('present_mode', '1');
@@ -44,7 +52,8 @@
     var links = items.map(function (i) {
       return '<a href="' + base + i[1] + '"' + (i[0] === nav ? ' aria-current="page"' : '') + '>' + i[2] + '</a>';
     }).join('');
-    var tools = isWorkshop ? '<div class="sh-tools"><button type="button" class="sh-present" aria-pressed="false">投影模式</button></div>' : '';
+    var themeBtn = nightMode ? '<button type="button" class="sh-theme" data-theme-toggle><span></span><span class="sh-theme-seal" aria-hidden="true"></span></button>' : '';
+    var tools = (isWorkshop ? '<div class="sh-tools"><button type="button" class="sh-present" aria-pressed="false">投影模式</button></div>' : '') + themeBtn;
     return el('<header class="site-header" data-shell-header><div class="sh-inner">' +
       '<a class="sh-brand" href="' + base + 'index.html" aria-label="' + esc(site.name) + '首頁"><span class="sh-mark" aria-hidden="true">' + esc(site.mark) + '</span><span>' + esc(site.nameTop) + '<br><strong>' + esc(site.nameMain) + '</strong></span></a>' +
       '<nav class="sh-nav" aria-label="主要導覽">' + links + '</nav>' + tools + '</div></header>');
@@ -83,7 +92,9 @@
 
   function buildFooter() {
     var w = cfg.workshop || {};
-    return el('<footer class="site-footer" data-shell-footer><div class="sf-inner">' +
+    return el('<footer class="site-footer" data-shell-footer>' +
+      '<svg class="sf-hills" viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 132 C120 120 190 86 270 96 C340 104 380 60 460 52 C540 44 580 98 670 104 C760 110 800 70 880 76 C960 82 1010 118 1100 112 C1190 106 1240 80 1320 90 C1380 97 1410 116 1440 122 L1440 150 L0 150 Z" fill="currentColor" opacity=".06"/><path d="M0 140 C160 134 240 116 360 122 C470 127 540 104 640 108 C760 113 820 136 940 132 C1070 128 1140 110 1260 116 C1340 120 1400 132 1440 136 L1440 150 L0 150 Z" fill="currentColor" opacity=".1"/></svg>' +
+      '<div class="sf-inner">' +
       '<div><p class="sf-brand">' + esc(site.name) + '</p><p>' + esc(site.tagline) + '</p></div>' +
       '<div><h2>快速連結</h2><ul>' +
       '<li><a href="' + base + 'index.html#learning-map">六站學習路線</a></li>' +
@@ -120,6 +131,17 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-workshop-date]'), function (n) { n.textContent = dateLabel; });
     Array.prototype.forEach.call(document.querySelectorAll('[data-workshop-title]'), function (n) { n.textContent = cfg.workshop.title; });
 
+    var tb = document.querySelector('[data-theme-toggle]');
+    if (tb) {
+      var syncTheme = function () {
+        var n = wantNight();
+        tb.firstChild.textContent = n ? '回到白天' : '入夜';
+        tb.lastChild.textContent = n ? '日' : '夜';
+        tb.setAttribute('aria-label', n ? '切換成白天版' : '切換成夜晚版');
+      };
+      syncTheme();
+      tb.addEventListener('click', function () { lset('site_theme', wantNight() ? 'day' : 'night'); applyTheme(); syncTheme(); });
+    }
     var btn = document.querySelector('.sh-present');
     if (btn) {
       var sync = function () { btn.setAttribute('aria-pressed', sget('present_mode') === '1' ? 'true' : 'false'); };

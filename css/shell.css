@@ -110,3 +110,32 @@ html.present .sh-inner, html.present .ws-inner, html.present .step-pager { width
 html.app-gated .app-shell { display: none !important; }
 html.app-gated, html.app-gated body { height: auto !important; overflow: auto !important; background: var(--paper); }
 html.app-gated .toast-notice { display: none !important; }
+
+
+/* ===== 水墨版頁首／頁尾 ===== */
+.site-header[data-shell-header] { transition: background-color .9s ease, border-color .9s ease; }
+.sh-inner { height: 72px; }
+:root { --header-h: 72px; }
+.sh-mark { width: 38px; height: 38px; border: 1.5px solid var(--seal); border-radius: 3px; color: var(--seal); font-size: 21px; }
+html[data-theme="night"] .sh-mark { background: var(--seal); color: #fff8ec; }
+.sh-brand { letter-spacing: .14em; }
+.sh-brand strong { font-weight: 500; letter-spacing: .3em; }
+.sh-nav { font-weight: 500; letter-spacing: .12em; font-size: 15px; }
+.sh-nav a[aria-current="page"] { color: var(--seal); border-bottom-color: var(--seal); }
+html[data-theme="night"] .sh-nav a[aria-current="page"] { color: var(--gold); border-bottom-color: var(--gold); }
+.sh-theme { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-left: 8px; padding: 0; border: 0; background: none; color: var(--ink-2); font: 13px var(--font-sans); letter-spacing: .15em; cursor: pointer; }
+.sh-theme-seal { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--seal); color: #fff8ec; font: 500 17px/1 var(--font-serif); }
+.ws-steps a[aria-current="step"], .ws-mobile a[aria-current="step"] { background: var(--ink); color: var(--paper); }
+.step-pager a { background: transparent; }
+.site-footer[data-shell-footer] { background: transparent; border-top: 1px solid var(--rule); position: relative; }
+.sf-hills { display: block; width: 100%; height: 110px; color: var(--ink); }
+html[data-theme="night"] .sf-hills { display: none; }
+.sf-brand { font-weight: 500; letter-spacing: .2em; }
+.sh-present { background: transparent; border-radius: var(--radius); }
+@media (max-width: 640px) {
+  .sh-inner { height: auto; }
+  .sh-theme { position: absolute; top: 10px; right: 16px; }
+  .sh-theme span:first-child { display: none; }
+  .site-header[data-shell-header] { position: relative; }
+  .sh-nav { font-size: 13px; letter-spacing: .04em; }
+}
