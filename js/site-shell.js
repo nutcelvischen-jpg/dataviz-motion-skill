@@ -103,7 +103,7 @@
       '<li><a href="' + base + 'videos.html">看影片</a></li>' +
       '<li><a href="' + base + 'workshop.html">工作坊</a></li></ul></div>' +
       '<div><h2>授課資訊</h2><p>' + esc(w.affiliation || '') + '</p><p>' + esc(w.instructor || '') + '</p>' +
-      '<p>教育部「AI驅動金融商管科技與技職人才培育計畫」推薦教材</p>' +
+      '<p>教育部「AI驅動金融商管科技與技職人才培育計畫」</p>' +
       '<p><a href="#" data-jitong-restore hidden>叫出數位乩童</a></p></div></div></footer>');
   }
 

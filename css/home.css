@@ -93,3 +93,16 @@ html[data-theme="night"] .route-seal { background: var(--seal); color: #fff8ec; 
   .draw-q { font-size: 22px; }
   .draw-side { width: auto; flex: 1; padding-left: 16px; }
 }
+
+/* 一炷香（js/incense.js） */
+.ink-hero.has-incense { grid-template-columns: 72px minmax(0, 1fr) 260px; align-items: end; }
+.ink-hero.has-incense .side-note, .ink-hero.has-incense .ink-hero-copy { align-self: start; }
+.ink-incense { display: block; width: 260px; height: 440px; margin-top: -72px; }
+@media (max-width: 980px) {
+  .ink-hero.has-incense { grid-template-columns: 72px minmax(0, 1fr); }
+  .ink-incense { grid-column: 2; justify-self: end; width: 200px; height: 300px; margin-top: -8px; }
+}
+@media (max-width: 720px) {
+  .ink-hero.has-incense { grid-template-columns: 28px minmax(0, 1fr); }
+  .ink-incense { width: 170px; height: 260px; margin: -4px 0 -24px; }
+}
