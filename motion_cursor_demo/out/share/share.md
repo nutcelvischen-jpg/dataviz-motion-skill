@@ -5,7 +5,7 @@
 ![Data Atoms Launch Preview](../../preview_frames/launch_demo_preview.gif)
 
 ## 📌 影片資訊
-- **影片檔案**：[`../../../media/data_atoms_launch_charon_38s.mp4`](../../data_atoms_launch_charon_38s.mp4)（1080p Full HD，38.2 秒，8.4 MB）
+- **影片檔案**：[`../../../videos/data_atoms_launch_charon_38s.mp4`](../../data_atoms_launch_charon_38s.mp4)（1080p Full HD，38.2 秒，8.4 MB）
 - **動態語言**：`huashu-motion` — **方向 A · 工作流真實演繹 (`cursor-demo` + `data-story`)**
 - **配音系統**：OpenRouter **Google Gemini 3.8 Flash TTS**（`Charon` 男性沉穩專業音色）
 - **音樂與音效**：118 BPM 科技脈衝合成律動 + Earshot 物理操作音效庫（拖曳吸附、開關按壓、數值計數、快門爆發）+ 自動語音避讓（Auto-Ducking）

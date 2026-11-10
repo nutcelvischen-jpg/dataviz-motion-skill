@@ -139,7 +139,7 @@ async function main() {
   });
 
   // 建立根目錄捷徑
-  const linkPath = path.join(__dirname, '..', 'media/eStat_API申請與連線手把手教學_24s.mp4');
+  const linkPath = path.join(__dirname, '..', 'videos/eStat_API申請與連線手把手教學.mp4');
   try {
     if (fs.existsSync(linkPath)) fs.unlinkSync(linkPath);
     fs.symlinkSync(path.relative(path.dirname(linkPath), OUTPUT_MP4), linkPath);

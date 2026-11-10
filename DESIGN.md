@@ -31,3 +31,16 @@
 ## 圖像來源
 
 本輪沒有新增裝飾圖片或替換教材圖解。驗收截圖是本機網站的實際畫面，放在 `docs/content-v2-screenshots/`，不屬於網站展示素材。
+
+## 2026-11-10 整併後新增的約定
+
+整個 repo（學習地圖、概念、實驗、工作坊）共用同一套設計，細節見 `SITE_REDESIGN_SPEC.md`。
+
+- **tokens**：`css/tokens.css` 在各頁 CSS 之後載入，統一覆蓋舊變數（含 `--muted`、`--serif` 等別名）。新增顏色一律用 tokens，不再寫死色碼；不使用藍色與紫色漸層。
+- **版型**：頁首、頁尾由 `js/site-shell.js` 注入，頁面只需在 `<body>` 設 `data-nav`（learn／concepts／lab／workshop）。主導覽四項：跟著學、查概念、做實驗、工作坊。工具頁用 `data-shell="app"`（44px 精簡列，不放頁尾）。
+- **工作坊步驟列**：`data-step="1..5"` 啟用步驟列與頁底上一步／下一步；步驟定義只在 `js/site-config.js`，日期與授課資訊也只改那裡。
+- **元件**：`css/components.css`（`.btn-primary` 每頁最多一顆、`.tag`、`.card`、`.callout`、`.prompt-block` 搭配 `[data-copy]`）。按鈕與導覽不放 emoji。
+- **數位乩童**：只在首頁與影片頁出現，預設為 48px 圓形並可關閉（`localStorage['jitong_dismissed']`）。
+- **投影模式**：工作坊頁右上角切換，或加 `?present=1`。
+- **媒體**：根目錄不放 mp4／wav，放 `media/`；已存在於 `videos/` 的檔案直接引用 `videos/`。
+- **驗收**：`python3 scripts/qa_site.py` 必須全部通過。

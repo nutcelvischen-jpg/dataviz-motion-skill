@@ -6,7 +6,7 @@ const fs = require('fs');
 const CHROME_PATH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const FFMPEG_PATH = path.join(__dirname, '..', 'bin', 'ffmpeg');
 const AUDIO_PATH = path.join(__dirname, '..', 'media/master_soundtrack_strawberry_60s.wav');
-const OUTPUT_MP4 = path.join(__dirname, '..', 'videos', 'media/草莓計數與Token盲區_60s_直式手機版.mp4');
+const OUTPUT_MP4 = path.join(__dirname, '..', 'videos', 'videos/草莓計數與Token盲區_60s_直式手機版.mp4');
 const HTML_PATH = 'file://' + path.join(__dirname, '..', 'src', 'index_strawberry_token_60s.html');
 
 const FPS = 30;

@@ -5,8 +5,8 @@ const fs = require('fs');
 
 const CHROME_PATH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const FFMPEG_PATH = path.join(__dirname, '..', 'bin', 'ffmpeg');
-const AUDIO_PATH = path.join(__dirname, '..', 'media/master_soundtrack_45s.wav');
-const OUTPUT_MP4 = path.join(__dirname, '..', 'media/dataviz_analytics_45s_gemini.mp4');
+const AUDIO_PATH = path.join(__dirname, '..', 'videos/master_soundtrack_45s.wav');
+const OUTPUT_MP4 = path.join(__dirname, '..', 'videos/dataviz_analytics_45s_gemini.mp4');
 const HTML_PATH = 'file://' + path.join(__dirname, '..', 'src', 'index_45s.html');
 
 const FPS = 30;
@@ -22,7 +22,7 @@ async function main() {
   console.log('========================================================\n');
 
   if (!fs.existsSync(AUDIO_PATH)) {
-    console.error('❌ 找不到音樂檔 media/master_soundtrack_45s.wav，請先執行 mix_master_audio.py');
+    console.error('❌ 找不到音樂檔 videos/master_soundtrack_45s.wav，請先執行 mix_master_audio.py');
     process.exit(1);
   }
 

@@ -5,7 +5,7 @@ Lively Earshot Master Audio Synthesizer & Voice Mixer (45.0s)
 - Voiceover: Gemini 3.8 Flash TTS (Leda - Youthful & Steady Female Voice)
 - SFX: Earshot Sound Architecture (click_snap, click_thock, cut_hit_sub, cut_hit_air, drip_plink, downlifter)
 - Auto-Ducking: Intelligent sidechain compression with smooth 120ms attack/release
-Output: media/master_soundtrack_45s.wav (44100 Hz, 16-bit Stereo)
+Output: videos/master_soundtrack_45s.wav (44100 Hz, 16-bit Stereo)
 """
 
 import os
@@ -17,7 +17,7 @@ import soundfile as sf
 PROJECT_DIR = '.'
 VOICE_DIR = os.path.join(PROJECT_DIR, 'voice_gemini')
 SFX_DIR = os.path.join(PROJECT_DIR, 'earshot_sfx')
-OUT_WAV = os.path.join(PROJECT_DIR, 'media/master_soundtrack_45s.wav')
+OUT_WAV = os.path.join(PROJECT_DIR, 'videos/master_soundtrack_45s.wav')
 
 SAMPLE_RATE = 44100
 DURATION = 45.0 # Exactly 45.0s

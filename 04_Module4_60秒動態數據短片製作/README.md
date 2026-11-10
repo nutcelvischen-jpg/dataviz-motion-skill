@@ -26,6 +26,6 @@
 
 ## 三、 本專案已渲染之標竿成果影片
 在根目錄的 `videos/` 中，已為大家準備三支標竿成片供參考與播放：
-1. **`../media/data_atoms_launch_charon_38s.mp4`**：38 秒產品發表片（真實滑鼠游標拖入 Excel 物理吸附展示）。
-2. **`../media/dataviz_analytics_45s.mp4`**：45 秒極簡白底美學配音版（繁體中文側邊解讀卡片 + 底部 6 組開關聯動）。
-3. **`../media/dataviz_motion_60s.mp4`**：60 秒深色奢華科技交響版（極致幾何形變與連續動量）。
+1. **`../videos/data_atoms_launch_charon_38s.mp4`**：38 秒產品發表片（真實滑鼠游標拖入 Excel 物理吸附展示）。
+2. **`../videos/dataviz_analytics_45s.mp4`**：45 秒極簡白底美學配音版（繁體中文側邊解讀卡片 + 底部 6 組開關聯動）。
+3. **`../videos/dataviz_motion_60s.mp4`**：60 秒深色奢華科技交響版（極致幾何形變與連續動量）。

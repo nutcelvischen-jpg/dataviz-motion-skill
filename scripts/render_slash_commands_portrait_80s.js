@@ -6,7 +6,7 @@ const fs = require('fs');
 const CHROME_PATH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const FFMPEG_PATH = path.join(__dirname, '..', 'bin', 'ffmpeg');
 const AUDIO_PATH = path.join(__dirname, '..', 'media/master_soundtrack_slash_commands_80s.wav');
-const OUTPUT_MP4 = path.join(__dirname, '..', 'videos', 'media/Antigravity十大神級指令全攻略_80s_直式手機版.mp4');
+const OUTPUT_MP4 = path.join(__dirname, '..', 'videos', 'videos/Antigravity十大神級指令全攻略_80s_直式手機版.mp4');
 const HTML_PATH = 'file://' + path.join(__dirname, '..', 'src', 'index_slash_commands_portrait_80s.html');
 
 const FPS = 30;

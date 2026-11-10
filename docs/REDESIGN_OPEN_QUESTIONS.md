@@ -1,7 +1,7 @@
 # 重整過程待決事項
 
 ## 1. 個資
-- 依你的指示，**尚未移除任何含個資的檔案**，掃描清單見對話回覆與 `docs/PII_SCAN_REPORT.md`。
+- 依你的指示，**尚未移除任何含個資的檔案**，掃描清單見 `docs/PII_SCAN_REPORT.md`。
 - 待你決定：是否從工作樹與 git 歷史移除（歷史清除需 force push，由擁有者執行）。
 
 ## 2. 重複頁（P5，已處理）
@@ -14,7 +14,7 @@
 ## 4. 製作素材（建議由你決定）
 以下目錄與網站無關，但佔 repo 體積；未刪除，建議移到另一個 repo 或 GitHub Release：
 `videos/`（176 MB）、`motion_cursor_demo/`（28 MB）、`preview_frames/`（25 MB）、`voice_*/`（合計約 50 MB，含 `.pcm`）、`earshot_sfx/`。
-根目錄的 31 個 mp4／wav 已搬到 `media/`，並更新所有引用（`videos.html`、`scripts/*`、docs）。
+根目錄原有 31 個 mp4／wav：15 個實體檔已搬到 `media/`；另 16 個是指向 `videos/` 的符號連結（GitHub Pages 不會跟隨），已移除並把引用直接改指 `videos/`。引用已同步更新（`videos.html`、`concepts/*`、`scripts/*`、docs）。
 
 ## 5. 與規格不同之處
 - `data_atoms.html` 仍保留約 49 處 `#2563eb`（維度欄位的藍色語意，Tableau 慣例）。依規格「會影響圖表配色就不要換」，QA 對此頁不檢查藍色。
