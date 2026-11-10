@@ -3,14 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>e-Stat 官方 API 申請實境指引 · 避坑教學與動態連線模擬器</title>
+  <title>申請 e-Stat API 金鑰｜大語言模型學習地圖</title>
   <meta name="description" content="手把手帶您取得日本政府統計局 e-Stat 官方 API 金鑰，完整解析核心避坑參數 http://test.localhost 與 Python 自動化抓取程式碼。">
 
-  <!-- Typography -->
-  <link rel="stylesheet" href="css/dose_mobile.css?v=20261111">
 
   <style>
-/* Hallmark: dose / modern-minimal / light 97.6 88 / committed */
 :root {
   --color-paper: oklch(97.6% 0.011 88);
   --color-paper-2: oklch(95.5% 0.015 88);
@@ -79,11 +76,6 @@ html, body {
   scrollbar-color: var(--color-rule) var(--color-paper);
 }
 
-::selection {
-  background: var(--color-accent-soft);
-  color: var(--color-accent-deep);
-}
-
 body {
   font-family: var(--font-body);
   background-color: var(--color-paper);
@@ -104,13 +96,6 @@ h1, h2, h3 {
   min-width: 0;
 }
 
-.mono-label {
-  font-family: var(--font-outlier);
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  color: var(--color-muted);
-}
-
 .container {
   max-width: 1240px;
   margin: 0 auto;
@@ -120,22 +105,6 @@ h1, h2, h3 {
 a:focus-visible, button:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
-}
-
-.step-nav-bar {
-  background: var(--color-ink);
-  color: var(--color-white);
-  padding: 12px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  font-size: 13px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: var(--shadow-bar);
 }
 
 .stamp-badge {
@@ -148,119 +117,6 @@ a:focus-visible, button:focus-visible {
   border-radius: var(--radius-pill);
 }
 
-.step-nav-pills {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.step-pill {
-  color: var(--color-white);
-  background: color-mix(in oklab, var(--color-paper) 12%, transparent);
-  border: 1px solid color-mix(in oklab, var(--color-paper) 20%, transparent);
-  padding: 4px 8px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  transition: background 0.15s ease;
-}
-.step-pill:hover {
-  background: color-mix(in oklab, var(--color-paper) 25%, transparent);
-}
-.step-pill.active {
-  background: var(--color-accent);
-  color: var(--color-white);
-  border-color: var(--color-accent);
-  font-weight: 700;
-}
-
-.hero-block {
-  padding: 48px 0 32px;
-}
-.hero-kicker {
-  font-family: var(--font-outlier);
-  font-size: 12px;
-  color: var(--color-muted);
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.hero-headline {
-  font-size: clamp(28px, 3.6vw, 42px);
-  margin-bottom: 16px;
-  max-width: 980px;
-}
-.hero-sentence {
-  font-size: 16px;
-  color: var(--color-muted);
-  max-width: 860px;
-  line-height: 1.6;
-  margin-bottom: 24px;
-}
-
-.btn {
-  height: 48px;
-  padding: 0 20px;
-  border: 0;
-  border-radius: var(--radius-input);
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 14px;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--color-rule), 0 3px 0 var(--color-rule);
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-  user-select: none;
-}
-.btn:active {
-  transform: translateY(3px);
-  box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--color-rule), 0 0 0 var(--color-rule);
-}
-.btn--primary {
-  background: linear-gradient(var(--color-accent), var(--color-accent-deep));
-  color: var(--color-accent-ink);
-  box-shadow: 0 0 0 1px var(--color-accent-deep), 0 3px 0 var(--color-accent-deep);
-}
-.btn--clear {
-  background: var(--color-paper-2);
-  color: var(--color-ink);
-}
-.btn--sm {
-  height: 36px;
-  padding: 0 16px;
-  font-size: 12px;
-  border-radius: 8px;
-}
-
-.plastic-tray {
-  position: relative;
-  border-radius: var(--radius-card);
-  background: linear-gradient(color-mix(in oklab, var(--glint) 32%, transparent), transparent 18%), color-mix(in oklab, var(--t, var(--p-thu)) 60%, transparent);
-  box-shadow: inset 0 1.5px 0 var(--glint), inset 0 -24px 36px -28px color-mix(in oklab, var(--t, var(--p-thu)) 45%, var(--color-ink)), var(--shadow-card);
-  padding: 24px;
-  margin-bottom: 32px;
-}
-
-.pharmacy-label {
-  background: var(--color-white);
-  border: 1px solid var(--color-rule);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: var(--shadow-card);
-}
-
-/* 擬真錄影播放器視窗 */
 .screen-player {
   background: var(--color-white);
   border: 1px solid var(--color-rule);
@@ -294,7 +150,6 @@ a:focus-visible, button:focus-visible {
   gap: 8px;
 }
 
-/* 畫面模擬內容區域 (Canvas/Stage) */
 .viewport {
   width: 100%;
   height: 560px;
@@ -304,7 +159,6 @@ a:focus-visible, button:focus-visible {
   overflow: hidden;
 }
 
-/* 虛擬游標 */
 .virtual-cursor {
   position: absolute;
   width: 22px;
@@ -332,7 +186,6 @@ a:focus-visible, button:focus-visible {
   100% { transform: scale(1.6); opacity: 0; }
 }
 
-/* 聚光框 */
 .spotlight-box {
   position: absolute;
   border: 2px solid var(--color-accent);
@@ -348,7 +201,6 @@ a:focus-visible, button:focus-visible {
   background: color-mix(in oklab, var(--color-accent) 20%, transparent);
 }
 
-/* e-Stat 官方介面樣式 */
 .estat-ui {
   font-family: var(--font-body);
   height: 100%;
@@ -541,15 +393,7 @@ a:focus-visible, button:focus-visible {
   cursor: pointer;
   color: var(--color-white);
 }
-.btn-blue-issue { background: var(--color-estat-bluebar); }
-.btn-blue-issue.active-click {
-  background: var(--color-accent);
-  transform: scale(0.95);
-}
-.btn-secondary { background: var(--color-estat-subnav); }
-.btn-remove { background: var(--color-muted); }
 
-/* 浮動步驟講解卡 */
 .step-callout {
   position: absolute;
   top: 16px;
@@ -597,7 +441,6 @@ a:focus-visible, button:focus-visible {
   font-weight: bold;
 }
 
-/* 控制列 */
 .controls-bar {
   background: var(--color-paper-2);
   padding: 12px 20px;
@@ -665,43 +508,46 @@ a:focus-visible, button:focus-visible {
   overflow-x: auto;
 }
 
-.tear-stub {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding-top: 16px;
-  margin-top: 16px;
-  border-top: 1px dashed var(--color-rule);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .btn, .step-pill, .virtual-cursor, .spotlight-box {
+  .virtual-cursor, .spotlight-box {
     transition: none;
   }
 }
+
+/* V2 */
+.sim-wrap { margin-top: var(--sp-6); }
+.sim-scroll { overflow-x: auto; }
+.sim-scroll .screen-player { min-width: 680px; margin: 0; border: 1px solid var(--rule); border-radius: var(--radius-lg); box-shadow: none; }
+.player-time { font: 700 var(--fs-xs) var(--font-mono); color: var(--ink); }
+.check-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--sp-4); }
+.check-steps li { display: flex; flex-direction: column; gap: 8px; padding: var(--sp-4) var(--sp-5); }
+.check-steps h3 { margin: 0; font: 700 var(--fs-md)/1.35 var(--font-sans); display: flex; align-items: center; gap: 10px; }
+.check-steps p { margin: 0; font-size: var(--fs-sm); line-height: 1.65; color: var(--ink-2); }
+.check-steps code, .callout code { font: .92em var(--font-mono); background: var(--surface-2); padding: 1px 5px; border-radius: var(--radius-sm); }
+.check-steps li.is-key { border-color: var(--warn); }
+.check-after { margin-top: var(--sp-4); }
+.check-after .prompt-block pre { padding-top: 0; white-space: pre-wrap; overflow-wrap: break-word; }
 </style>
 <link href="css/tokens.css?v=20261111" rel="stylesheet"/><link href="css/components.css?v=20261111" rel="stylesheet"/><link href="css/shell.css?v=20261111" rel="stylesheet"/><link href="css/workshop-pages.css?v=20261111" rel="stylesheet"/>
 </head>
 <body data-nav="workshop" data-step="2"><script src="js/site-config.js?v=20261111"></script><script src="js/site-shell.js?v=20261111"></script>
 
-  <main class="container">
+  <main id="main" class="wp-main"><div class="wp-wrap">
 
-    <section class="hero-block">
-      <p class="hero-date">步驟 3／5</p>
-      <h1 class="hero-headline">手把手動態錄影：取得日本政府 e-Stat 統計 API 金鑰</h1>
-      <p class="hero-sentence">
-        完整還原日本總務省統計局官方介面。解析核心避坑參數 <code>http://test.localhost</code>，動態演示從登入、發行 40 碼專屬金鑰到以 Python 程式獲取 47 都道府縣面板數據的全流程。
-      </p>
-      <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-        <button type="button" class="btn btn--primary" onclick="restartDemo()">重新播放實境錄影</button>
-        <a href="https://www.e-stat.go.jp" target="_blank" class="btn btn--clear">前往 e-Stat 官方首頁 ↗</a>
-        <a href="student_data_analyst_workflow.html" class="btn btn--clear">返回分析師工作流 ↗</a>
+    <header class="page-hero">
+      <h1>申請 e-Stat API 金鑰</h1>
+      <p class="lead">跟著下面的模擬畫面走一次：登入個人頁、申請 appId。URL 欄請填 <code>http://test.localhost</code>。</p>
+      <div class="page-hero-actions">
+        <button type="button" class="btn btn-primary" onclick="restartDemo()">重新播放示範</button>
+        <a href="https://www.e-stat.go.jp" target="_blank" rel="noopener" class="link-arrow">前往 e-Stat 官網</a>
       </div>
-    </section>
+    </header>
 
     <!-- 擬真錄影播放器視窗 -->
+    <section class="sim-wrap" aria-label="申請流程模擬畫面">
+      <p class="eyebrow">模擬畫面（不是真的 e-Stat 網站）</p>
+      <p class="scroll-hint">可左右滑動</p>
+      <div class="sim-scroll">
     <div class="screen-player">
       <div class="browser-topbar">
         <span class="stamp-badge" style="background: var(--color-accent-deep);">e-stat sandbox</span>
@@ -808,7 +654,7 @@ a:focus-visible, button:focus-visible {
                   </td>
                   <td class="app-table-btns">
                     <button class="official-btn btn-blue-issue" id="targetBtnIssue" type="button">Issue</button>
-                    <button class="official-btn btn-secondary" type="button">change</button>
+                    <button class="official-btn official-btn-secondary" type="button">change</button>
                     <button class="official-btn btn-remove" type="button">remove</button>
                   </td>
                 </tr>
@@ -833,8 +679,8 @@ a:focus-visible, button:focus-visible {
       <!-- 播放器底部控制欄 -->
       <div class="controls-bar">
         <div class="ctrl-left">
-          <button class="btn btn--primary btn--sm" id="playPauseBtn" onclick="togglePlayPause()" type="button">暫停</button>
-          <div class="mono-label" id="timeDisplay" style="font-weight: 700; color: var(--color-ink);">00:00 / 00:24</div>
+          <button class="btn btn-secondary btn-sm" id="playPauseBtn" onclick="togglePlayPause()" type="button">暫停</button>
+          <div class="player-time" id="timeDisplay">00:00 / 00:24</div>
         </div>
 
         <div class="timeline-container">
@@ -854,81 +700,36 @@ a:focus-visible, button:focus-visible {
     </div>
 
     <!-- 下方教學分解與避坑解說 (dose Plastic Tray) -->
-    <section class="plastic-tray" style="--t: var(--p-wed);">
-      <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
-        <h2 style="font-size: 22px;">API 申請實體步驟速查與避坑說明</h2>
-        <span class="mono-label">step-by-step checklist</span>
-      </div>
-
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
-        
-        <div class="pharmacy-label">
-          <div class="mono-label" style="margin-bottom: 4px;">step 01</div>
-          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">登入並進入個人頁</div>
-          <p style="font-size: 13px; color: var(--color-muted); line-height: 1.5;">
-            前往 e-Stat 官網右上角點擊「<strong>My page</strong>」進入會員控制台。若原為日文版可切換為英文版。
-          </p>
-        </div>
-
-        <div class="pharmacy-label">
-          <div class="mono-label" style="margin-bottom: 4px;">step 02</div>
-          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">鎖定 API 機能選單</div>
-          <p style="font-size: 13px; color: var(--color-muted); line-height: 1.5;">
-            點擊深藍色功能橫條中的 <strong>▶ API function (application ID issuance)</strong> 進入金鑰管理表。
-          </p>
-        </div>
-
-        <div class="pharmacy-label" style="border-color: var(--p-tue-deep);">
-          <div class="mono-label" style="color: var(--p-tue-deep); font-weight: 700; margin-bottom: 4px;">step 03 / 避坑核心</div>
-          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">URL 嚴格規範</div>
-          <p style="font-size: 13px; color: var(--color-muted); line-height: 1.5;">
-            官方防禦機制嚴格禁止純 <code>localhost</code>！<strong>請務必填寫 <code>http://test.localhost</code></strong> 即可直接通過驗證。
-          </p>
-        </div>
-
-        <div class="pharmacy-label" style="border-color: var(--color-accent);">
-          <div class="mono-label" style="color: var(--color-accent-deep); font-weight: 700; margin-bottom: 4px;">step 04 / 取得金鑰</div>
-          <div style="font-weight: 700; font-size: 16px; margin-bottom: 6px;">點擊 Issue 發行</div>
-          <p style="font-size: 13px; color: var(--color-muted); line-height: 1.5;">
-            點擊右側 <strong>Issue</strong> 按鈕，系統立即生成 40 碼專屬金鑰（appId），後續呼叫 REST API 即可代入。
-          </p>
-        </div>
-
-      </div>
-
-      <!-- Python 呼叫範例 Code Panel -->
-      <div style="margin-top: 20px;">
-        <div class="code-panel">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--color-code-text); font-size: 11px;">
-            <span>python: fetch_estat_api.py</span>
-            <span>REST v3.0</span>
-          </div>
-          <code>import requests<br>
-<br>
-app_id = "YOUR_40_CHAR_APP_ID"<br>
-url = "https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData"<br>
-params = {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;"appId": app_id,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;"statsDataId": "0000010101", # SSDSE-A 47都道府縣社會人口大表<br>
-&nbsp;&nbsp;&nbsp;&nbsp;"metaGetFlg": "Y"<br>
-}<br>
-response = requests.get(url, params=params)<br>
-data = response.json()<br>
-print(f"獲取成功，共載入 {len(data['GET_STATS_DATA']['STATISTICAL_DATA']['DATA_INF']['VALUE'])} 筆紀錄")</code>
-        </div>
-      </div>
-
-      <div class="tear-stub">
-        <div class="mono-label">
-          endpoint: api.e-stat.go.jp/rest/3.0/app / status: operational
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <a href="student_data_analyst_workflow.html" style="font-size: 13px; color: var(--color-accent-deep); font-weight: 700; text-decoration: underline;">返回分析師工作流 ↗</a>
-        </div>
       </div>
     </section>
 
-  </main>
+    <section class="section" aria-labelledby="check-t">
+      <h2 id="check-t">申請步驟速查</h2>
+      <ol class="check-steps"><li class="card"><h3><span class="phase-num" aria-hidden="true">1</span>登入並進入個人頁</h3><p>
+            前往 e-Stat 官網右上角點擊「<strong>My page</strong>」進入會員控制台。若原為日文版可切換為英文版。
+          </p></li><li class="card"><h3><span class="phase-num" aria-hidden="true">2</span>鎖定 API 機能選單</h3><p>
+            點擊深藍色功能橫條中的 <strong>▶ API function (application ID issuance)</strong> 進入金鑰管理表。
+          </p></li><li class="card is-key"><h3><span class="phase-num" aria-hidden="true">3</span>URL 嚴格規範</h3><p>
+            官方防禦機制嚴格禁止純 <code>localhost</code>！<strong>請務必填寫 <code>http://test.localhost</code></strong> 即可直接通過驗證。
+          </p></li><li class="card"><h3><span class="phase-num" aria-hidden="true">4</span>點擊 Issue 發行</h3><p>
+            點擊右側 <strong>Issue</strong> 按鈕，系統立即生成 40 碼專屬金鑰（appId），後續呼叫 REST API 即可代入。
+          </p></li></ol>
+      <div class="callout callout-warn check-after"><strong>最常見的錯誤：</strong>URL 欄不能填 <code>http://localhost</code>，請填 <code>http://test.localhost</code>。</div>
+      <figure class="prompt-block check-after"><pre><code>import requests
+
+app_id = &quot;YOUR_40_CHAR_APP_ID&quot;
+url = &quot;https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData&quot;
+params = {
+    &quot;appId&quot;: app_id,
+    &quot;statsDataId&quot;: &quot;0000010101&quot;, # SSDSE-A 47都道府縣社會人口大表
+    &quot;metaGetFlg&quot;: &quot;Y&quot;
+}
+response = requests.get(url, params=params)
+data = response.json()
+print(f&quot;獲取成功，共載入 {len(data[&#x27;GET_STATS_DATA&#x27;][&#x27;STATISTICAL_DATA&#x27;][&#x27;DATA_INF&#x27;][&#x27;VALUE&#x27;])} 筆紀錄&quot;)</code></pre></figure>
+    </section>
+
+  </div></main>
 
   <script>
     let isPlaying = true;

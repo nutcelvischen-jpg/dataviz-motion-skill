@@ -3,14 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>全日課程架構 · 從大模型認知到 Tableau-like 儀表板開發｜工作坊</title>
+  <title>全日課程架構圖｜大語言模型學習地圖</title>
   <meta name="description" content="當日課程兩大核心規劃：第一塊為大語言模型學習地圖（認知 Agent AI 概念與全球競爭格局），第二塊為真實工具實作（Antigravity 介紹、e-Stat API、8 大 Skill 封裝到打造類似 Tableau 的互動儀表板）。">
 
-  <!-- Typography -->
-  <link rel="stylesheet" href="css/dose_mobile.css?v=20261111">
-
   <style>
-/* Hallmark: dose / modern-minimal / light 97.6 88 / committed */
 :root {
   --color-paper: oklch(97.6% 0.011 88);
   --color-paper-2: oklch(95.5% 0.015 88);
@@ -67,11 +63,6 @@ html, body {
   scrollbar-color: var(--color-rule) var(--color-paper);
 }
 
-::selection {
-  background: var(--color-accent-soft);
-  color: var(--color-accent-deep);
-}
-
 body {
   font-family: var(--font-body);
   background-color: var(--color-paper);
@@ -92,13 +83,6 @@ h1, h2, h3 {
   min-width: 0;
 }
 
-.mono-label {
-  font-family: var(--font-outlier);
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  color: var(--color-muted);
-}
-
 .container {
   max-width: 1240px;
   margin: 0 auto;
@@ -108,22 +92,6 @@ h1, h2, h3 {
 a:focus-visible, button:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
-}
-
-.step-nav-bar {
-  background: var(--color-ink);
-  color: var(--color-white);
-  padding: 12px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  font-size: 13px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: var(--shadow-bar);
 }
 
 .stamp-badge {
@@ -136,125 +104,13 @@ a:focus-visible, button:focus-visible {
   border-radius: var(--radius-pill);
 }
 
-.step-nav-pills {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.step-pill {
-  color: var(--color-white);
-  background: color-mix(in oklab, var(--color-paper) 12%, transparent);
-  border: 1px solid color-mix(in oklab, var(--color-paper) 20%, transparent);
-  padding: 4px 8px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  transition: background 0.15s ease;
-}
-.step-pill:hover {
-  background: color-mix(in oklab, var(--color-paper) 25%, transparent);
-}
-.step-pill.active {
-  background: var(--color-accent);
-  color: var(--color-white);
-  border-color: var(--color-accent);
-  font-weight: 700;
-}
-
-.hero-block {
-  padding: 48px 0 32px;
-}
-.hero-kicker {
-  font-family: var(--font-outlier);
-  font-size: 12px;
-  color: var(--color-muted);
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.hero-headline {
-  font-size: clamp(28px, 3.6vw, 42px);
-  margin-bottom: 16px;
-  max-width: 980px;
-}
-.hero-sentence {
-  font-size: 16px;
-  color: var(--color-muted);
-  max-width: 860px;
-  line-height: 1.6;
-  margin-bottom: 24px;
-}
-
-.btn {
-  height: 48px;
-  padding: 0 20px;
-  border: 0;
-  border-radius: var(--radius-input);
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 14px;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--color-rule), 0 3px 0 var(--color-rule);
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-  user-select: none;
-}
-.btn:active {
-  transform: translateY(3px);
-  box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--color-rule), 0 0 0 var(--color-rule);
-}
-.btn--primary {
-  background: linear-gradient(var(--color-accent), var(--color-accent-deep));
-  color: var(--color-accent-ink);
-  box-shadow: 0 0 0 1px var(--color-accent-deep), 0 3px 0 var(--color-accent-deep);
-}
-.btn--clear {
-  background: var(--color-paper-2);
-  color: var(--color-ink);
-}
-.btn--sm {
-  height: 36px;
-  padding: 0 16px;
-  font-size: 12px;
-  border-radius: 8px;
-}
-
-.plastic-tray {
-  position: relative;
-  border-radius: var(--radius-card);
-  background: linear-gradient(color-mix(in oklab, var(--glint) 32%, transparent), transparent 18%), color-mix(in oklab, var(--t, var(--p-thu)) 60%, transparent);
-  box-shadow: inset 0 1.5px 0 var(--glint), inset 0 -24px 36px -28px color-mix(in oklab, var(--t, var(--p-thu)) 45%, var(--color-ink)), var(--shadow-card);
-  padding: 24px;
-  margin-bottom: 32px;
-}
-
-.pharmacy-label {
-  background: var(--color-white);
-  border: 1px solid var(--color-rule);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: var(--shadow-card);
-}
-
 .diagram-card {
   width: 100%;
   background: var(--color-white);
   border: 1px solid var(--color-rule);
   border-radius: var(--radius-card);
   padding: 16px;
-  box-shadow: var(--shadow-card);
+  box-shadow: none;
   overflow-x: auto;
   margin-bottom: 32px;
 }
@@ -266,39 +122,35 @@ a:focus-visible, button:focus-visible {
   min-width: 980px;
 }
 
-.tear-stub {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding-top: 16px;
-  margin-top: 16px;
-  border-top: 1px dashed var(--color-rule);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .btn, .step-pill {
-    transition: none;
-  }
-}
+/* V2 */
+.diagram-wrap { margin-top: var(--sp-6); }
+.diagram-card { margin: 0; border: 1px solid var(--rule); border-radius: var(--radius-lg); background: var(--surface); padding: var(--sp-4); overflow-x: auto; }
+.diagram-card svg { min-width: 900px; display: block; }
+.cur-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); }
+.cur-grid .card:last-child { grid-column: 1 / -1; }
+.cur-grid h3 { margin: 6px 0 8px; font: 600 var(--fs-lg)/1.35 var(--font-serif); }
+.cur-grid p, .cur-grid li { font-size: var(--fs-sm); line-height: 1.7; color: var(--ink-2); }
+.cur-grid ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.cur-grid a { color: var(--accent); }
+.cur-grid code { font: .92em var(--font-mono); background: var(--surface-2); padding: 1px 5px; border-radius: var(--radius-sm); }
+@media (max-width: 820px) { .cur-grid { grid-template-columns: 1fr; } }
 </style>
 <link href="css/tokens.css?v=20261111" rel="stylesheet"/><link href="css/components.css?v=20261111" rel="stylesheet"/><link href="css/shell.css?v=20261111" rel="stylesheet"/><link href="css/workshop-pages.css?v=20261111" rel="stylesheet"/>
 </head>
 <body data-nav="workshop" data-workshop><script src="js/site-config.js?v=20261111"></script><script src="js/site-shell.js?v=20261111"></script>
 
-  <main class="container">
+  <main id="main" class="wp-main"><div class="wp-wrap">
 
-    <section class="hero-block">
-      <p class="hero-date"><span data-workshop-date></span> 工作坊 · 步驟 1／5</p>
-      <h1 class="hero-headline">全日課程架構：從大模型認知到打造 Tableau-like 儀表板</h1>
-      <p class="hero-sentence">
-        清楚交代今天「使用哪一套工具、用了哪些 Skill、串接哪一些 API」。課程嚴謹分為兩大階段：第一塊以《大語言模型學習地圖》建立 Agent 認知與全球競爭局勢；第二塊全面進入 Antigravity 實戰，串接日本官方 e-Stat API，調用 8 大 Skill，把類似 Tableau 的 10 大數據原子儀表板從無到有一步步做出來。
-      </p>
-      <div class="hero-actions-row"><a href="student_data_analyst_workflow.html" class="btn btn-primary">下一步：分析師工作流 →</a></div>
-    </section>
+    <p class="wk-crumbs"><a href="index.html">首頁</a> ／ <a href="workshop.html">工作坊</a> ／ 全日課程架構圖</p>
+    <header class="page-hero">
+      <p class="eyebrow">參考資料</p>
+      <h1>全日課程架構圖</h1>
+      <p class="lead">清楚交代今天「使用哪一套工具、用了哪些 Skill、串接哪一些 API」。</p>
+    </header>
 
     <!-- Blueprint Canvas Card -->
+    <section class="diagram-wrap" aria-label="課程架構圖">
+    <p class="scroll-hint">可左右滑動</p>
     <div class="diagram-card">
       <svg viewBox="0 0 1180 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="svg-title svg-desc">
         <title id="svg-title">全日課程流程與工具技術架構圖</title>
@@ -517,86 +369,55 @@ a:focus-visible, button:focus-visible {
     </div>
 
     <!-- Detail Breakdown Grid in dose Plastic Tray -->
-    <section class="plastic-tray" style="--t: var(--p-fri);">
-      <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;">
-        <h2 style="font-size: 22px;">課程兩大階段核心技術解構</h2>
-        <span class="mono-label">hands-on modules breakdown</span>
-      </div>
-
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
-        
-        <div class="pharmacy-label">
-          <div style="font-weight: 700; font-size: 13px; color: var(--p-tue-deep); margin-bottom: 4px;">第一塊：認知篇 (15%)</div>
-          <h3 style="font-size: 18px; margin-bottom: 8px;">大語言模型學習地圖 (index.html)</h3>
-          <p style="font-size: 13.5px; color: var(--color-muted); line-height: 1.6; margin-bottom: 12px;">
-            以原版《大語言模型學習地圖》為核心，引導學員建立底層世界觀與 Agent 概念：
-          </p>
-          <ul style="font-size: 13px; color: var(--color-ink-2); display: flex; flex-direction: column; gap: 6px; padding-left: 16px;">
-            <li><strong>通關 6 大站點：</strong>理解與生成、交代任務、查資料記憶、Tool Calling、Workflow、Evals 核對。</li>
-            <li><strong>全球競爭格局：</strong>全球主流開源與商用大模型全景（Claude 3.5, GPT-4o, Gemini 2.0, DeepSeek）。</li>
-            <li><strong>為什麼需要 Agent 工具：</strong>理解純語言模型在即時資料與精確計算上的極限，引出調用外部工具與 API 的必要性。</li>
-          </ul>
-        </div>
-
-        <div class="pharmacy-label" style="border-color: var(--color-accent);">
-          <div style="font-weight: 700; font-size: 13px; color: var(--color-accent-deep); margin-bottom: 4px;">第二塊：工具與 API (85%)</div>
-          <h3 style="font-size: 18px; margin-bottom: 8px;">使用哪套工具？串接哪一些 API？</h3>
-          <p style="font-size: 13.5px; color: var(--color-muted); line-height: 1.6; margin-bottom: 12px;">
-            真實工程環境與權威資料庫，拒絕假數據與空泛玩具代碼：
-          </p>
-          <ul style="font-size: 13px; color: var(--color-ink-2); display: flex; flex-direction: column; gap: 6px; padding-left: 16px;">
-            <li><strong>工具 1：Antigravity</strong>（Google DeepMind 開發之 Agentic Coding 環境，自主執行終端與 Skill 擴展）。</li>
-            <li><strong>工具 2：前端開源引擎</strong>（Apache ECharts 互動圖表與 Graphic Walker 拖曳編碼槽，Zero-Build 即開即用）。</li>
-            <li><strong>API：日本 e-Stat 官方 REST API v3.0</strong>（總務省統計局官方資料庫）。</li>
-            <li><strong>端點呼叫：</strong><code>/getStatsList</code> 取得 17 大領域代碼；<code>/getStatsData</code> 獲取半世紀面板數據。</li>
-          </ul>
-        </div>
-
-        <div class="pharmacy-label">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <div style="font-weight: 700; font-size: 13px; color: var(--color-accent-deep);">第二塊：Skill 矩陣與 MCP 成果交付</div>
-            <a href="student_data_analyst_workflow.html#skills-catalog" style="font-size: 12px; font-weight: 700; color: var(--color-accent-deep); text-decoration: underline;">查看完整 27 款 Skill & 3 款 MCP ↗</a>
-          </div>
-          <h3 style="font-size: 18px; margin-bottom: 8px;">用了哪些 Skill 與 MCP？做出什麼成果？</h3>
-          <p style="font-size: 13.5px; color: var(--color-muted); line-height: 1.6; margin-bottom: 12px;">
-            全課程已將複雜的資料處理、網頁版面、影音合成與自動化串聯完整封裝為 <strong>27 大嚴選 Skill</strong> 與 <strong>3 大實戰 MCP 端點</strong>：
-          </p>
-          <ul style="font-size: 13px; color: var(--color-ink-2); display: flex; flex-direction: column; gap: 6px; padding-left: 16px;">
-            <li><strong>data-analyst（示範）：</strong>分析師 Prompt 提示詞樣板與 <code>clean_data.py</code> 清洗腳本（<a href="https://github.com/nutcelvischen-jpg/data-analyst-skill" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
-            <li><strong>data-atoms-dashboard（自研儀表板）：</strong>自研 10 大數據原子、Tableau Prep 分類與互動引擎（<a href="https://github.com/nutcelvischen-jpg/dataviz-analyst-skill" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
-            <li><strong>sweety-statechart-video（蠟筆狀態圖短片）：</strong>Ann Nguyen 風格手繪票據狀態圖、TLC 規則紅線檢查與語音合成（<a href="https://github.com/threerocks/sweety-statechart-video" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
-            <li><strong>googleworkspaceskill（辦公自動化）：</strong>Google Workspace & Apps Script 零安裝一鍵授權與 Sheets/Docs 自動化（<a href="https://github.com/nutcelvischen-jpg/googleworkspaceskill" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
-            <li><strong>procedural-character-craft（向量角色）：</strong>純 SVG/Canvas 代碼生成多表情肢體角色與聲音對嘴（<a href="https://github.com/nutcelvischen-jpg/procedural-character-craft" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
-            <li><strong>motion-video-skill（短影音渲染）：</strong>HTML+GSAP 物理運動與 Gemini TTS 配音影片渲染引擎（<a href="https://github.com/nutcelvischen-jpg/motion-video-skill" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
-            <li><strong>motion-prompt（動態提示詞）：</strong>Shohei Ohtaki 192 款視覺動態與運鏡配方詞庫（<a href="https://github.com/showheyohtaki/motion-prompt" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
-            <li><strong>hallmark（網頁設計）：</strong>現代工程極簡網頁規範與 dose 藥盤主題（<a href="https://github.com/Nutlope/hallmark" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
-            <li><strong>archify（互動架構圖解）：</strong>自然語言與代碼轉自包含互動式架構 HTML，支援動態路徑追蹤與前後差異比對（<a href="https://github.com/tt-a1i/archify" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
-            <li><strong>diagram-design（架構流程）：</strong>繪製分析師 5 階段流程圖與全日時序圖 SVG（<a href="https://github.com/cathrynlavery/diagram-design" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
-            <li><strong>text-to-cad（實體工件設計）：</strong>自然語言生成 3D CAD STEP/GLB/STL 與工程圖（<a href="https://github.com/earthtojake/text-to-cad" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
-            <li><strong>agent-skills（產線級工程規範）：</strong>Google Chrome 總監 Addy Osmani 出品之約束與測試規範（<a href="https://github.com/addyosmani/agent-skills" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
-            <li><strong>deeptutor-mentor（自主學習）：</strong>港大 DeepTutor 架構，無老師也能靠三階提示獨立自學（<a href="https://github.com/HKUDS/DeepTutor" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">GitHub ↗</a>）。</li>
-            <li style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--color-line-1);">
-              <strong>🔌 實戰嚴選 MCP：</strong>
-              <a href="https://hub.twinkleai.tw/zh-TW" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">Twinkle Hub（7 國 76 萬政府開源數據）</a>、
-              <a href="https://github.com/ahujasid/mcp-for-blender" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">mcp-for-blender（Blender 3D 渲染控制）</a>、
-              <a href="https://ask.cna.com.tw/ask/index" target="_blank" style="color: var(--color-accent-deep); text-decoration: underline;">中央社 AskCNA（國家通訊社可信新聞查核）</a>。
-            </li>
-          </ul>
-        </div>
-
-      </div>
-
-      <div class="tear-stub">
-        <div class="mono-label">
-          architecture status: verified / curriculum date: 11-05
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <a href="student_data_analyst_workflow.html" style="font-size: 13px; color: var(--color-accent-deep); font-weight: 700; text-decoration: underline;">進入分析師工作流 ↗</a>
-        </div>
-      </div>
     </section>
 
-  </main>
+    <section class="section" aria-labelledby="cur-t">
+      <h2 id="cur-t">兩大階段在做什麼</h2>
+      <div class="cur-grid"><article class="card"><span class="tag tag-olive">第一塊：認知篇 (15%)</span><h3>大語言模型學習地圖 (index.html)</h3>
+<p>
+            以原版《大語言模型學習地圖》為核心，引導學員建立底層世界觀與 Agent 概念：
+          </p>
+<ul>
+<li><strong>通關 6 大站點：</strong>理解與生成、交代任務、查資料記憶、Tool Calling、Workflow、Evals 核對。</li>
+<li><strong>全球競爭格局：</strong>全球主流開源與商用大模型全景（Claude 3.5, GPT-4o, Gemini 2.0, DeepSeek）。</li>
+<li><strong>為什麼需要 Agent 工具：</strong>理解純語言模型在即時資料與精確計算上的極限，引出調用外部工具與 API 的必要性。</li>
+</ul></article><article class="card"><span class="tag tag-olive">第二塊：工具與 API (85%)</span><h3>使用哪套工具？串接哪一些 API？</h3>
+<p>
+            真實工程環境與權威資料庫，拒絕假數據與空泛玩具代碼：
+          </p>
+<ul>
+<li><strong>工具 1：Antigravity</strong>（Google DeepMind 開發之 Agentic Coding 環境，自主執行終端與 Skill 擴展）。</li>
+<li><strong>工具 2：前端開源引擎</strong>（Apache ECharts 互動圖表與 Graphic Walker 拖曳編碼槽，Zero-Build 即開即用）。</li>
+<li><strong>API：日本 e-Stat 官方 REST API v3.0</strong>（總務省統計局官方資料庫）。</li>
+<li><strong>端點呼叫：</strong><code>/getStatsList</code> 取得 17 大領域代碼；<code>/getStatsData</code> 獲取半世紀面板數據。</li>
+</ul></article><article class="card"><span class="tag tag-olive">第二塊：Skill 矩陣與 MCP 成果交付</span><h3>用了哪些 Skill 與 MCP？做出什麼成果？</h3>
+<p>
+            全課程已將複雜的資料處理、網頁版面、影音合成與自動化串聯完整封裝為 <strong>27 大嚴選 Skill</strong> 與 <strong>3 大實戰 MCP 端點</strong>：
+          </p>
+<ul>
+<li><strong>data-analyst（示範）：</strong>分析師 Prompt 提示詞樣板與 <code>clean_data.py</code> 清洗腳本（<a href="https://github.com/nutcelvischen-jpg/data-analyst-skill" rel="noopener" target="_blank">GitHub ↗</a>）。</li>
+<li><strong>data-atoms-dashboard（自研儀表板）：</strong>自研 10 大數據原子、Tableau Prep 分類與互動引擎（<a href="https://github.com/nutcelvischen-jpg/dataviz-analyst-skill" rel="noopener" target="_blank">GitHub ↗</a>）。</li>
+<li><strong>sweety-statechart-video（蠟筆狀態圖短片）：</strong>Ann Nguyen 風格手繪票據狀態圖、TLC 規則紅線檢查與語音合成（<a href="https://github.com/threerocks/sweety-statechart-video" rel="noopener" target="_blank">GitHub ↗</a>）。</li>
+<li><strong>googleworkspaceskill（辦公自動化）：</strong>Google Workspace &amp; Apps Script 零安裝一鍵授權與 Sheets/Docs 自動化（<a href="https://github.com/nutcelvischen-jpg/googleworkspaceskill" rel="noopener" target="_blank">GitHub ↗</a>）。</li>
+<li><strong>procedural-character-craft（向量角色）：</strong>純 SVG/Canvas 代碼生成多表情肢體角色與聲音對嘴（<a href="https://github.com/nutcelvischen-jpg/procedural-character-craft" rel="noopener" target="_blank">GitHub ↗</a>）。</li>
+<li><strong>motion-video-skill（短影音渲染）：</strong>HTML+GSAP 物理運動與 Gemini TTS 配音影片渲染引擎（<a href="https://github.com/nutcelvischen-jpg/motion-video-skill" rel="noopener" target="_blank">GitHub ↗</a>）。</li>
+<li><strong>motion-prompt（動態提示詞）：</strong>Shohei Ohtaki 192 款視覺動態與運鏡配方詞庫（<a href="https://github.com/showheyohtaki/motion-prompt" rel="noopener" target="_blank">GitHub ↗</a>）。</li>
+<li><strong>hallmark（網頁設計）：</strong>現代工程極簡網頁規範與 dose 藥盤主題（<a href="https://github.com/Nutlope/hallmark" rel="noopener" target="_blank">GitHub ↗</a>）。</li>
+<li><strong>archify（互動架構圖解）：</strong>自然語言與代碼轉自包含互動式架構 HTML，支援動態路徑追蹤與前後差異比對（<a href="https://github.com/tt-a1i/archify" rel="noopener" target="_blank">GitHub ↗</a>）。</li>
+<li><strong>diagram-design（架構流程）：</strong>繪製分析師 5 階段流程圖與全日時序圖 SVG（<a href="https://github.com/cathrynlavery/diagram-design" rel="noopener" target="_blank">GitHub ↗</a>）。</li>
+<li><strong>text-to-cad（實體工件設計）：</strong>自然語言生成 3D CAD STEP/GLB/STL 與工程圖（<a href="https://github.com/earthtojake/text-to-cad" rel="noopener" target="_blank">GitHub ↗</a>）。</li>
+<li><strong>agent-skills（產線級工程規範）：</strong>Google Chrome 總監 Addy Osmani 出品之約束與測試規範（<a href="https://github.com/addyosmani/agent-skills" rel="noopener" target="_blank">GitHub ↗</a>）。</li>
+<li><strong>deeptutor-mentor（自主學習）：</strong>港大 DeepTutor 架構，無老師也能靠三階提示獨立自學（<a href="https://github.com/HKUDS/DeepTutor" rel="noopener" target="_blank">GitHub ↗</a>）。</li>
+<li>
+<strong>實戰嚴選 MCP：</strong>
+<a href="https://hub.twinkleai.tw/zh-TW" rel="noopener" target="_blank">Twinkle Hub（7 國 76 萬政府開源數據）</a>、
+              <a href="https://github.com/ahujasid/mcp-for-blender" rel="noopener" target="_blank">mcp-for-blender（Blender 3D 渲染控制）</a>、
+              <a href="https://ask.cna.com.tw/ask/index" rel="noopener" target="_blank">中央社 AskCNA（國家通訊社可信新聞查核）</a>。
+            </li>
+</ul><p><a class="link-arrow" href="skills.html">看完整的 Skill 與 MCP 清單</a></p></article></div>
+    </section>
+
+  </div></main>
 
   </body>
 </html>

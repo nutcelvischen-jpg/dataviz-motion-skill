@@ -43,3 +43,6 @@ table { max-width: 100%; }
 .skill-card .skill-out { font-size: var(--fs-xs); flex: 1; }
 .skill-card code { font: .92em var(--font-mono); overflow-wrap: anywhere; }
 @media (max-width: 640px) { .wp-wrap { width: calc(100% - 32px); } }
+.wk-crumbs { margin: 0 0 24px; color: var(--ink-2); font-size: var(--fs-sm); }
+.wk-crumbs a { color: var(--ink-2); }
+.prompt-block pre { font: inherit; }

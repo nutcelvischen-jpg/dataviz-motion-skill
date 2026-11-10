@@ -3,14 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>日本官方統計視覺化實戰導航與數據矩陣 · 17 大領域與 10 大視覺化分析法</title>
+  <title>選題：17 個領域、10 種圖表｜大語言模型學習地圖</title>
   <meta name="description" content="e-Stat 日本政府官方統計資料庫導航：10 大資料視覺化分析法、17 大統計領域研究矩陣、百年歷史時序長度與 Data Atoms 互動儀表板對應。">
 
-  <!-- Typography -->
-  <link rel="stylesheet" href="css/dose_mobile.css?v=20261111">
-
   <style>
-/* Hallmark: dose / modern-minimal / light 97.6 88 / committed */
 :root {
   --color-paper: oklch(97.6% 0.011 88);
   --color-paper-2: oklch(95.5% 0.015 88);
@@ -82,11 +78,6 @@ html, body {
   scrollbar-color: var(--color-rule) var(--color-paper);
 }
 
-::selection {
-  background: var(--color-accent-soft);
-  color: var(--color-accent-deep);
-}
-
 body {
   font-family: var(--font-body);
   background-color: var(--color-paper);
@@ -107,19 +98,6 @@ h1, h2, h3, h4 {
   min-width: 0;
 }
 
-.mono-label {
-  font-family: var(--font-outlier);
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  color: var(--color-muted);
-}
-
-.wordmark {
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
 .container {
   max-width: 1320px;
   margin: 0 auto;
@@ -131,27 +109,10 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   outline-offset: 2px;
 }
 
-button:disabled, input:disabled, .btn:disabled {
+button:disabled, input:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
-}
-
-/* 頂部全站步驟導航列 */
-.step-nav-bar {
-  background: var(--color-ink);
-  color: var(--color-white);
-  padding: 12px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  font-size: 13px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: var(--shadow-bar);
 }
 
 .stamp-badge {
@@ -164,189 +125,6 @@ button:disabled, input:disabled, .btn:disabled {
   border-radius: var(--radius-pill);
 }
 
-.step-nav-pills {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.step-pill {
-  color: var(--color-white);
-  background: color-mix(in oklab, var(--color-paper) 12%, transparent);
-  border: 1px solid color-mix(in oklab, var(--color-paper) 20%, transparent);
-  padding: 4px 8px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  transition: background 0.15s ease;
-}
-.step-pill:hover {
-  background: color-mix(in oklab, var(--color-paper) 25%, transparent);
-}
-.step-pill.active {
-  background: var(--color-accent);
-  color: var(--color-white);
-  border-color: var(--color-accent);
-  font-weight: 700;
-}
-
-/* 官方入口子條 */
-.portal-subbar {
-  background: var(--color-paper-2);
-  border-bottom: 1px solid var(--color-rule);
-  padding: 8px 24px;
-  font-size: 12.5px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.portal-link {
-  color: var(--color-accent-deep);
-  font-family: var(--font-outlier);
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-.portal-link:hover {
-  color: var(--color-accent);
-}
-
-/* 頁面 Hero 標頭 */
-.hero-block {
-  padding: 40px 0 24px;
-}
-.hero-kicker {
-  font-family: var(--font-outlier);
-  font-size: 12px;
-  color: var(--color-muted);
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.hero-headline {
-  font-size: clamp(26px, 3.2vw, 38px);
-  margin-bottom: 12px;
-  max-width: 1040px;
-}
-.hero-sentence {
-  font-size: 15.5px;
-  color: var(--color-muted);
-  max-width: 920px;
-  line-height: 1.6;
-}
-
-/* 按鈕風格 (Moulded Plastic Buttons) */
-.btn {
-  height: 44px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: var(--radius-input);
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 13.5px;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--color-rule), 0 3px 0 var(--color-rule);
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-  user-select: none;
-}
-.btn:active {
-  transform: translateY(2px);
-  box-shadow: inset 0 1px 0 var(--glint), 0 0 0 1px var(--color-rule), 0 1px 0 var(--color-rule);
-}
-.btn--primary {
-  background: linear-gradient(var(--color-accent), var(--color-accent-deep));
-  color: var(--color-accent-ink);
-  box-shadow: 0 0 0 1px var(--color-accent-deep), 0 3px 0 var(--color-accent-deep);
-}
-.btn--clear {
-  background: var(--color-paper-2);
-  color: var(--color-ink);
-}
-.btn--sm {
-  height: 32px;
-  padding: 0 12px;
-  font-size: 12px;
-  border-radius: 6px;
-}
-
-/* 塑料托盤與標籤卡片容器 */
-.plastic-tray {
-  position: relative;
-  border-radius: var(--radius-card);
-  background: linear-gradient(color-mix(in oklab, var(--glint) 32%, transparent), transparent 18%), color-mix(in oklab, var(--t, var(--p-thu)) 60%, transparent);
-  box-shadow: inset 0 1.5px 0 var(--glint), inset 0 -24px 36px -28px color-mix(in oklab, var(--t, var(--p-thu)) 45%, var(--color-ink)), var(--shadow-card);
-  padding: 24px;
-  margin-bottom: 28px;
-}
-
-.pharmacy-label {
-  background: var(--color-white);
-  border: 1px solid var(--color-rule);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: var(--shadow-card);
-}
-
-/* 頂部數據看板 */
-.hero-stat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-  margin-bottom: 28px;
-}
-.hero-stat-card {
-  background: var(--color-white);
-  border: 1px solid var(--color-rule);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: var(--shadow-card);
-}
-.hero-stat-num {
-  font-family: var(--font-outlier);
-  font-size: 34px;
-  font-weight: 700;
-  color: var(--color-accent-deep);
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  line-height: 1;
-}
-.hero-stat-unit {
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-muted);
-}
-.hero-stat-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-ink);
-  margin-top: 8px;
-}
-.hero-stat-sub {
-  font-size: 12px;
-  color: var(--color-muted);
-  margin-top: 4px;
-  line-height: 1.45;
-}
-
-/* 視角切換器 (View Switcher Bar) */
 .view-switcher-bar {
   display: flex;
   align-items: center;
@@ -356,7 +134,7 @@ button:disabled, input:disabled, .btn:disabled {
   border-radius: 12px;
   padding: 12px 16px;
   margin-bottom: 24px;
-  box-shadow: var(--shadow-card);
+  box-shadow: none;
   flex-wrap: wrap;
   gap: 12px;
 }
@@ -389,7 +167,7 @@ button:disabled, input:disabled, .btn:disabled {
   background: var(--color-accent);
   color: var(--color-white);
   border-color: var(--color-accent-deep);
-  box-shadow: inset 0 1px 0 var(--glint), 0 2px 6px color-mix(in oklab, var(--color-accent) 40%, transparent);
+  box-shadow: none;
 }
 .view-tab-count {
   display: inline-block;
@@ -404,14 +182,13 @@ button:disabled, input:disabled, .btn:disabled {
   color: var(--color-white);
 }
 
-/* 搜尋與篩選列 */
 .filter-panel {
   background: var(--color-white);
   border: 1px solid var(--color-rule);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 32px;
-  box-shadow: var(--shadow-card);
+  box-shadow: none;
 }
 .search-row {
   display: flex;
@@ -435,7 +212,7 @@ button:disabled, input:disabled, .btn:disabled {
 .search-input:focus {
   border-color: var(--color-accent);
   background: var(--color-white);
-  box-shadow: 0 0 0 3px var(--color-accent-soft);
+  box-shadow: none;
 }
 
 .tags-group {
@@ -467,7 +244,6 @@ button:disabled, input:disabled, .btn:disabled {
   font-weight: 600;
 }
 
-/* 區塊標題 */
 .section-heading-group {
   display: flex;
   justify-content: space-between;
@@ -514,9 +290,6 @@ button:disabled, input:disabled, .btn:disabled {
   margin-bottom: 16px;
 }
 
-/* ==========================================================
-   區塊 0: 10 大資料視覺化實戰分析法 (DataViz Atoms Section)
-   ========================================================== */
 .dataviz-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
@@ -530,7 +303,7 @@ button:disabled, input:disabled, .btn:disabled {
   border: 1px solid var(--color-rule);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: var(--shadow-card);
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -569,7 +342,6 @@ button:disabled, input:disabled, .btn:disabled {
   white-space: nowrap;
 }
 
-/* 問題情境框 */
 .dataviz-question-box {
   background: var(--color-paper);
   border: 1px solid var(--color-rule-soft);
@@ -584,7 +356,6 @@ button:disabled, input:disabled, .btn:disabled {
   color: var(--color-ink);
 }
 
-/* 欄位拖曳設定 */
 .dataviz-shelf-box {
   background: var(--color-paper-2);
   border: 1px solid var(--color-rule);
@@ -603,7 +374,6 @@ button:disabled, input:disabled, .btn:disabled {
   font-family: var(--font-body);
 }
 
-/* 洞察技巧 */
 .dataviz-insight-box {
   font-size: 12.5px;
   color: var(--color-ink-2);
@@ -618,7 +388,6 @@ button:disabled, input:disabled, .btn:disabled {
   color: var(--color-accent-deep);
 }
 
-/* 底部開啟按鈕 */
 .dataviz-card-footer {
   display: flex;
   justify-content: space-between;
@@ -646,7 +415,7 @@ button:disabled, input:disabled, .btn:disabled {
   font-size: 12.5px;
   font-weight: 600;
   text-decoration: none;
-  box-shadow: 0 1px 2px var(--shadow-card);
+  box-shadow: none;
   transition: background 0.15s ease, color 0.15s ease;
 }
 .launch-atom-btn:hover {
@@ -654,9 +423,6 @@ button:disabled, input:disabled, .btn:disabled {
   border-color: var(--color-accent);
 }
 
-/* ==========================================================
-   區塊 1: 官方 17 大領域分類卡片 (Category Grid)
-   ========================================================== */
 .category-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
@@ -670,7 +436,7 @@ button:disabled, input:disabled, .btn:disabled {
   border: 1px solid var(--color-rule);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: var(--shadow-card);
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -806,16 +572,13 @@ button:disabled, input:disabled, .btn:disabled {
   border-color: var(--color-accent);
 }
 
-/* ==========================================================
-   區塊 2: 官方數據時間跨度與歷史長度縱深 (Horizons)
-   ========================================================== */
 .horizon-panel {
   background: var(--color-white);
   border: 1px solid var(--color-rule);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 32px;
-  box-shadow: var(--shadow-card);
+  box-shadow: none;
 }
 .horizon-summary-row {
   display: grid;
@@ -853,7 +616,6 @@ button:disabled, input:disabled, .btn:disabled {
   margin-top: 4px;
 }
 
-/* 視覺化時間軸長條比較 */
 .timeline-chart-wrap {
   background: var(--color-paper-2);
   border: 1px solid var(--color-rule);
@@ -920,7 +682,6 @@ button:disabled, input:disabled, .btn:disabled {
   font-size: 12.5px;
 }
 
-/* 時間跨度詳細規格表 */
 .horizon-table-wrap {
   overflow-x: auto;
   border: 1px solid var(--color-rule);
@@ -973,9 +734,6 @@ button:disabled, input:disabled, .btn:disabled {
   border: 1px solid var(--color-rule);
 }
 
-/* ==========================================================
-   區塊 3: 進階學術計量研究卡片 (Econometric Grid)
-   ========================================================== */
 .method-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
@@ -986,7 +744,7 @@ button:disabled, input:disabled, .btn:disabled {
   border: 1px solid var(--color-rule);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: var(--shadow-card);
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1082,75 +840,54 @@ button:disabled, input:disabled, .btn:disabled {
   margin-top: 4px;
 }
 
-footer {
-  max-width: 1320px;
-  margin: 64px auto 0;
-  padding: 28px 24px;
-  border-top: 1px solid var(--color-rule);
-  display: flex;
-  justify-content: space-between;
-  color: var(--color-muted);
-  font-size: 13px;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .btn, .step-pill, .dataviz-card, .cat-card, .method-card {
+  .dataviz-card, .cat-card, .method-card {
     transition: none;
   }
 }
-  </style>
+  
+/* V2：改用全站元件外觀 */
+.stat-row { margin-top: var(--sp-6); }
+.view-switcher-bar { margin: var(--sp-6) 0 0; padding: 0; background: none; border: 0; border-radius: 0; display: block; }
+.view-switcher-bar > div:first-child { display: none !important; }
+.view-tab-group { display: flex; gap: var(--sp-5); border-bottom: 1px solid var(--rule); flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.view-tab-btn { flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 10px 2px; min-height: 44px; margin-bottom: -1px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; color: var(--ink-2); font: 600 var(--fs-sm)/1.4 var(--font-sans); cursor: pointer; white-space: nowrap; transform: none; }
+.view-tab-btn:hover { background: none; color: var(--ink); transform: none; }
+.view-tab-btn.active { background: none; color: var(--accent); border-bottom-color: var(--accent); }
+.view-tab-count, .view-tab-btn.active .view-tab-count { background: var(--surface-2); color: var(--ink-2); font: 600 var(--fs-xs) var(--font-sans); padding: 1px 8px; border-radius: var(--radius-sm); border: 0; }
+.filter-panel { margin: var(--sp-5) 0 var(--sp-6); padding: 0; background: none; border: 0; border-radius: 0; }
+.search-input { min-height: 44px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); font: var(--fs-base) var(--font-sans); }
+.search-input:focus { outline: 3px solid var(--focus); outline-offset: 2px; border-color: var(--ink); }
+.filter-tag { min-height: 32px; display: inline-flex; align-items: center; padding: 2px 12px; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); color: var(--ink-2); font: 600 var(--fs-sm) var(--font-sans); cursor: pointer; }
+.filter-tag:hover { border-color: var(--ink); color: var(--ink); background: var(--surface); }
+.filter-tag.active { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.section-title { font: 600 var(--fs-xl)/1.3 var(--font-serif); }
+.section-tag-pill { background: var(--olive-soft); color: var(--olive); border: 0; border-radius: var(--radius-sm); font: 700 var(--fs-xs) var(--font-sans); padding: 2px 8px; }
+.dataviz-card, .cat-card, .method-card, .horizon-panel, .horizon-summary-box, .timeline-chart-wrap, .horizon-table-wrap { border-radius: var(--radius-lg); }
+.dataviz-card:hover, .cat-card:hover, .method-card:hover { transform: translateY(-1px); border-color: var(--ink); }
+@media (max-width: 640px) {
+  .view-tab-group { gap: var(--sp-4); }
+  .horizon-table-wrap, .timeline-chart-wrap { overflow-x: auto; }
+  .dataviz-grid, .category-grid, .method-grid { grid-template-columns: 1fr !important; }
+  .dataviz-grid > *, .category-grid > *, .method-grid > * { min-width: 0; }
+  .dataviz-title-row, .dataviz-card-header, .cat-header, .method-card-header, .dataviz-card-footer, .cat-footer { flex-wrap: wrap; gap: 6px; }
+  .dataviz-card, .cat-card, .method-card { overflow-wrap: anywhere; }
+  .dataviz-atom-badge, .dataset-hint-tag, .api-hint { white-space: normal; }
+  .horizon-summary-row { grid-template-columns: 1fr 1fr !important; }
+  .section-heading-group { flex-direction: column; align-items: flex-start !important; gap: 6px; }
+}
+</style>
 <link href="css/tokens.css?v=20261111" rel="stylesheet"/><link href="css/components.css?v=20261111" rel="stylesheet"/><link href="css/shell.css?v=20261111" rel="stylesheet"/><link href="css/workshop-pages.css?v=20261111" rel="stylesheet"/>
 </head>
 <body data-nav="workshop" data-step="3"><script src="js/site-config.js?v=20261111"></script><script src="js/site-shell.js?v=20261111"></script>
 
-  <!-- 頂部全站步驟導航列 -->
-  <!-- 官方入口子指示列 -->
-  <div class="portal-subbar">
-    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-      <span style="font-weight: 600;">日本總務省統計局官方入口：</span>
-      <a href="https://www.e-stat.go.jp" target="_blank" rel="noopener" class="portal-link">https://www.e-stat.go.jp ↗</a>
-    </div>
-    <div style="display: flex; gap: 12px; align-items: center; font-size: 12px;">
-      <span class="mono-label">API 端點: api.e-stat.go.jp/rest/3.0/app</span>
-      <button class="btn btn--clear btn--sm" onclick="navigator.clipboard.writeText('https://www.e-stat.go.jp'); alert('已複製 e-Stat 官網網址！');">複製官網網址</button>
-    </div>
-  </div>
-
-  <main class="container">
-    <!-- Hero 區塊 -->
-    <section class="hero-block">
-      <p class="hero-date">步驟 4／5</p>
-      <h1 class="hero-headline">日本官方統計視覺化實戰導航與數據矩陣</h1>
-      <p class="hero-sentence">
-        專為學員與分析師設計：從生活與商業問題出發 ➔ 10 大圖表選型 ➔ 一鍵在 Data Atoms 儀表板開啟繪出洞察，打通官方 API 數據到可互動圖表。
-      </p>
-    </section>
-
-    <!-- 宏觀數字看板 -->
-    <section class="hero-stat-grid">
-      <div class="hero-stat-card">
-        <div class="hero-stat-num">10 <span class="hero-stat-unit">大招式</span></div>
-        <div class="hero-stat-label">資料視覺化實戰分析法</div>
-        <div class="hero-stat-sub">直觀對應 10 大 Data Atoms 圖表型態</div>
-      </div>
-      <div class="hero-stat-card">
-        <div class="hero-stat-num">17 <span class="hero-stat-unit">大領域</span></div>
-        <div class="hero-stat-label">官方統計分野矩陣</div>
-        <div class="hero-stat-sub">涵蓋人口、經濟、司法至教育文化</div>
-      </div>
-      <div class="hero-stat-card">
-        <div class="hero-stat-num">100+ <span class="hero-stat-unit">年歷史</span></div>
-        <div class="hero-stat-label">普查時間跨度</div>
-        <div class="hero-stat-sub">國勢調查 (1920~2020) 百年人口長河</div>
-      </div>
-      <div class="hero-stat-card">
-        <div class="hero-stat-num">50 <span class="hero-stat-unit">年連續</span></div>
-        <div class="hero-stat-label">都道府縣 50 年面板體系</div>
-        <div class="hero-stat-sub">1975~2024 半世紀跨縣追蹤體系 (N=47, T=50)</div>
-      </div>
-    </section>
+  <main id="main" class="wp-main"><div class="wp-wrap">
+    <header class="page-hero">
+      <h1>選題：17 個領域、10 種圖表</h1>
+      <p class="lead">從生活或商業問題出發，挑一種圖表，再到 Data Atoms 一鍵開啟對應的官方資料。</p>
+      <p class="hero-meta"><span>官方入口：<a href="https://www.e-stat.go.jp" target="_blank" rel="noopener">e-Stat ↗</a></span><span>API 端點：<code id="estat-endpoint">api.e-stat.go.jp/rest/3.0/app</code></span><button type="button" class="btn btn-secondary btn-sm" id="copy-endpoint">複製端點</button></p>
+    </header>
+    <section class="stat-row" aria-label="這份指南涵蓋的範圍"><div class="stat"><div class="stat-num">10<small>大招式</small></div><p class="stat-label">資料視覺化實戰分析法</p><p class="stat-sub">直觀對應 10 大 Data Atoms 圖表型態</p></div><div class="stat"><div class="stat-num">17<small>大領域</small></div><p class="stat-label">官方統計分野矩陣</p><p class="stat-sub">涵蓋人口、經濟、司法至教育文化</p></div><div class="stat"><div class="stat-num">100+<small>年歷史</small></div><p class="stat-label">普查時間跨度</p><p class="stat-sub">國勢調查 (1920~2020) 百年人口長河</p></div><div class="stat"><div class="stat-num">50<small>年連續</small></div><p class="stat-label">都道府縣 50 年面板體系</p><p class="stat-sub">1975~2024 半世紀跨縣追蹤體系 (N=47, T=50)</p></div></section>
 
     <!-- 視角切換器 -->
     <div class="view-switcher-bar">
@@ -1203,7 +940,7 @@ footer {
       <div class="section-heading-group section-heading-first">
         <div class="section-heading-main">
           <div class="section-title">10 大資料視覺化實戰分析法（直接對應 Data Atoms 工具）</div>
-          <span class="section-tag-pill">一般人與學員首選 / 免艱澀數學</span>
+          <span class="section-tag-pill">一般人與學員首選</span>
         </div>
         <div class="section-count" id="datavizResultsCount">共 10 個實戰圖表招式</div>
       </div>
@@ -1306,7 +1043,7 @@ footer {
       <div class="section-heading-group">
         <div class="section-heading-main">
           <div class="section-title">進階學術計量研究矩陣 (因果推論 / 時序模型 / 空間模型)</div>
-          <span class="section-tag-pill">進階選修 / 論文與政策實證</span>
+          <span class="section-tag-pill">進階選修</span>
         </div>
         <div class="section-count" id="methodResultsCount">6 大計量實證體系</div>
       </div>
@@ -1316,7 +1053,8 @@ footer {
         <!-- JS 會自動注入 6 大實證計量卡片 -->
       </div>
     </section>
-  </main>
+  </div></main>
+<script>(function(){var b=document.getElementById("copy-endpoint");if(!b)return;b.addEventListener("click",function(){var t="https://api.e-stat.go.jp/rest/3.0/app",old=b.textContent;function ok(){b.textContent="已複製 ✓";setTimeout(function(){b.textContent=old;},1500);}if(navigator.clipboard){navigator.clipboard.writeText(t).then(ok,function(){});}});})();</script>
 
   <footer>
     <div>
