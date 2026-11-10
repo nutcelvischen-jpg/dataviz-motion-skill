@@ -58,9 +58,7 @@ def static_checks():
             check(not BLUE.search(s), f'{name} 仍有藍色色碼')
         check('fonts.googleapis.com' not in s, f'{name} 仍載入 Google Fonts')
         check('11/05' not in s, f'{name} 靜態寫死日期 11/05')
-        # 8. 數位乩童
-        has_j = 'digital_jitong.js' in s
-        check(has_j == (name in ('index.html', 'videos.html')), f'{name} 數位乩童載入狀態不符')
+        # 8. 數位乩童：由 site-shell.js 在每一頁載入（瀏覽器檢查見 page_checks）
     # 7.
     idx = open(os.path.join(ROOT, 'index.html'), encoding='utf-8').read()
     check(idx.count('style=') == 0, 'index.html 仍有 inline style')

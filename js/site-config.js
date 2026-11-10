@@ -9,7 +9,7 @@ window.SITE_CONFIG = {
     instructor: '陳俊智 副教授',
     affiliation: '國立臺中科技大學 國際貿易與經營系'
   },
-  assetVersion: '20261113',
+  assetVersion: '20261114',
   /* 資料分析實作路線（檔名不可改，以免舊連結失效）。
      module：填 1–4 可讓工作坊時程的對應時段出現「本時段實作」連結；null 表示不標示。 */
   steps: [

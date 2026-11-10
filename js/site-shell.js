@@ -131,6 +131,12 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-workshop-date]'), function (n) { n.textContent = dateLabel; });
     Array.prototype.forEach.call(document.querySelectorAll('[data-workshop-title]'), function (n) { n.textContent = cfg.workshop.title; });
 
+    /* 數位乩童小幫手：每一頁都載入（頁面自己已經放 script 的就不重複） */
+    if (!document.querySelector('script[src*="digital_jitong.js"]')) {
+      var js = document.createElement('script');
+      js.src = base + 'js/digital_jitong.js?v=' + (cfg.assetVersion || '');
+      body.appendChild(js);
+    }
     var tb = document.querySelector('[data-theme-toggle]');
     if (tb) {
       var syncTheme = function () {

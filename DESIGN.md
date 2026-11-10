@@ -55,7 +55,7 @@
 - **新元件**（`css/components.css`）：`.page-hero`、`.eyebrow`、`.section`、`.toc-chips`、`.phase`／`.phase-num`、`.stat`、`.tabs`、`.scroll-hint`、`.btn-sm`。工作坊內頁版面在 `css/workshop-pages.css`（`.wp-wrap`、`.skill-grid`）。
 - **影片**：`videos.html` 是卡片牆，原始碼不放 `<video>`；點卡片才由 `js/videos.js` 在 `<dialog>` 建立播放器。卡片 id（`#video-ep0` 等）就是分享用的網址錨點。
 - **不要再用**：`pharmacy-label`、`mono-label`、`plastic-tray`、`tear-stub`、`btn--*` 這些舊 class；漸層色塊；英文等寬小標（`step 01 / blueprint` 這類）；`css/dose_mobile.css`（已刪除）。
-- **數位乩童**：只在影片頁出現。
+- **數位乩童**：由 `js/site-shell.js` 在每一頁載入（`data_atoms_manual.html` 因為有嚴格 CSP 且不用共用頁首，是唯一例外）。按 × 只隱藏到換頁為止，不再永久隱藏。
 - **工具頁**（Data Atoms）在 900px 以下先顯示提示卡，使用者按「仍要在這裡開啟」才顯示工具。
 - **圖表色**：`--chart-1`…`--chart-6`（`css/tokens.css`）供新圖表使用；既有圖表的資料配色未更動。
 

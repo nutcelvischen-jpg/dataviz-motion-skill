@@ -518,7 +518,7 @@
   }
 
   function init() {
-    try { if (localStorage.getItem('jitong_dismissed') === '1') return; } catch (e) { /* ignore */ }
+    try { localStorage.removeItem('jitong_dismissed'); } catch (e) { /* 舊版曾永久隱藏，現在每頁都會出現 */ }
     ensureStylesheet();
     createDOM();
     bindEvents();
@@ -558,7 +558,6 @@
     document.body.appendChild(trigger);
     trigger.querySelector('.jitong-dismiss').addEventListener('click', function (ev) {
       ev.stopPropagation();
-      try { localStorage.setItem('jitong_dismissed', '1'); } catch (e) { /* ignore */ }
       trigger.remove();
     });
 
