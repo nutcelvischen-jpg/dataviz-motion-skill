@@ -60,7 +60,7 @@ def static_checks():
         check('11/05' not in s, f'{name} 靜態寫死日期 11/05')
         # 8. 數位乩童
         has_j = 'digital_jitong.js' in s
-        check(has_j == (name == 'videos.html'), f'{name} 數位乩童載入狀態不符')
+        check(has_j == (name in ('index.html', 'videos.html')), f'{name} 數位乩童載入狀態不符')
     # 7.
     idx = open(os.path.join(ROOT, 'index.html'), encoding='utf-8').read()
     check(idx.count('style=') == 0, 'index.html 仍有 inline style')

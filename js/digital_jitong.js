@@ -1055,7 +1055,7 @@
     msg.className = 'jitong-msg bot';
     msg.innerHTML = `
       <img class="jitong-msg-avatar" src="${AVATAR_IMG_URL}" style="animation: jitongPulse 1.2s infinite alternate;" alt="數位乩童" onerror="this.onerror=null;this.src='Tech-Headband%20Anime%20Portrait.png';">
-      <div class="jitong-msg-bubble" style="color: #7c3aed; font-style: italic; display: flex; align-items: center; gap: 8px;">
+      <div class="jitong-msg-bubble" style="color: #a8322a; font-style: italic; display: flex; align-items: center; gap: 8px;">
         <span style="animation: jitongPulse 1s infinite alternate;">🔮</span>
         <span>數位乩童沉思通靈中...</span>
       </div>
@@ -1080,9 +1080,9 @@
     let out = escapeHtml(md);
 
     // 代碼塊
-    out = out.replace(/```([a-z]*)\n([\s\S]*?)```/g, '<pre style="background:#1e293b; color:#f8fafc; padding:8px 10px; border-radius:6px; overflow-x:auto; font-family:monospace; font-size:11.5px;"><code>$2</code></pre>');
+    out = out.replace(/```([a-z]*)\n([\s\S]*?)```/g, '<pre style="background:#1e293b; color:#f9f6ee; padding:8px 10px; border-radius:6px; overflow-x:auto; font-family:monospace; font-size:11.5px;"><code>$2</code></pre>');
     // 行內代碼
-    out = out.replace(/`([^`]+)`/g, '<code style="background:#f1f5f9; color:#0f172a; padding:1px 5px; border-radius:4px; font-family:monospace; font-size:12px;">$1</code>');
+    out = out.replace(/`([^`]+)`/g, '<code style="background:#ebe7db; color:#1c1b19; padding:1px 5px; border-radius:4px; font-family:monospace; font-size:12px;">$1</code>');
 
     // Markdown 連結暫存防重複匹配
     const links = [];
@@ -1092,18 +1092,18 @@
     });
 
     // 獨立裸 URL 自動轉超連結
-    out = out.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#7c3aed; text-decoration:underline; font-weight:600;">$1 ↗</a>');
+    out = out.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#a8322a; text-decoration:underline; font-weight:600;">$1 ↗</a>');
 
     // 還原 Markdown 連結
     out = out.replace(/___TOKEN_LINK_(\d+)___/g, (_, idx) => {
       const item = links[Number(idx)];
-      return `<a href="${item.url}" target="_blank" rel="noopener noreferrer" style="color:#7c3aed; text-decoration:underline; font-weight:600;">${item.text} ↗</a>`;
+      return `<a href="${item.url}" target="_blank" rel="noopener noreferrer" style="color:#a8322a; text-decoration:underline; font-weight:600;">${item.text} ↗</a>`;
     });
 
     // 標題 ##
-    out = out.replace(/^##\s+(.+)$/gm, '<div style="font-size:13.5px; font-weight:700; color:#1e1b4b; margin:6px 0 3px 0;">$1</div>');
+    out = out.replace(/^##\s+(.+)$/gm, '<div style="font-size:13.5px; font-weight:700; color:#1c1b19; margin:6px 0 3px 0;">$1</div>');
     // 引用塊 &gt;
-    out = out.replace(/^&gt;\s+(.+)$/gm, '<div style="border-left:3px solid #8b5cf6; padding-left:8px; margin:4px 0; color:#475569; font-style:italic;">$1</div>');
+    out = out.replace(/^&gt;\s+(.+)$/gm, '<div style="border-left:3px solid #a8322a; padding-left:8px; margin:4px 0; color:#475569; font-style:italic;">$1</div>');
     // 粗體
     out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
     // 換行

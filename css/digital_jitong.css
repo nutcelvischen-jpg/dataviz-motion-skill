@@ -2,15 +2,15 @@
  * 🔮 數位乩童（Digital Jitong）AI 客服小工具樣式
  */
 :root {
-  --jitong-primary: #7c3aed;
-  --jitong-primary-hover: #6d28d9;
-  --jitong-accent: #f59e0b;
-  --jitong-bg-gradient: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+  --jitong-primary: #a8322a;
+  --jitong-primary-hover: #8a261f;
+  --jitong-accent: #c9a86a;
+  --jitong-bg-gradient: linear-gradient(135deg, #1c1b19 0%, #2b211c 50%, #5a1f18 100%);
   --jitong-card-bg: #ffffff;
-  --jitong-text-dark: #0f172a;
-  --jitong-text-muted: #64748b;
-  --jitong-radius: 16px;
-  --jitong-shadow: 0 16px 40px -8px rgba(124, 58, 237, 0.35), 0 8px 20px -4px rgba(0, 0, 0, 0.15);
+  --jitong-text-dark: #1c1b19;
+  --jitong-text-muted: #5a5750;
+  --jitong-radius: 6px;
+  --jitong-shadow: 0 16px 40px -8px rgba(168, 50, 42, 0.35), 0 8px 20px -4px rgba(0, 0, 0, 0.15);
 }
 
 /* 懸浮按鈕 */
@@ -36,7 +36,7 @@
 
 .jitong-floating-trigger:hover {
   transform: translateY(-3px) scale(1.03);
-  box-shadow: 0 20px 45px -6px rgba(124, 58, 237, 0.5);
+  box-shadow: 0 20px 45px -6px rgba(168, 50, 42, 0.5);
   border-color: rgba(255, 255, 255, 0.7);
 }
 
@@ -44,11 +44,11 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: radial-gradient(circle, #fde047 0%, #a855f7 60%, #6366f1 100%);
+  background: radial-gradient(circle, #fde047 0%, #a8322a 60%, #a8322a 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 15px rgba(253, 224, 71, 0.65), 0 0 25px rgba(168, 85, 247, 0.45);
+  box-shadow: 0 0 15px rgba(253, 224, 71, 0.65), 0 0 25px rgba(168, 50, 42, 0.45);
   position: relative;
   animation: jitongPulse 2.8s infinite ease-in-out;
   padding: 2px;
@@ -66,11 +66,11 @@
 
 @keyframes jitongPulse {
   0%, 100% {
-    box-shadow: 0 0 12px rgba(253, 224, 71, 0.5), 0 0 20px rgba(168, 85, 247, 0.4);
+    box-shadow: 0 0 12px rgba(253, 224, 71, 0.5), 0 0 20px rgba(168, 50, 42, 0.4);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 22px rgba(253, 224, 71, 0.8), 0 0 32px rgba(168, 85, 247, 0.6);
+    box-shadow: 0 0 22px rgba(253, 224, 71, 0.8), 0 0 32px rgba(168, 50, 42, 0.6);
     transform: scale(1.06);
   }
 }
@@ -117,7 +117,7 @@
   z-index: 10000;
   background: var(--jitong-card-bg);
   border-radius: var(--jitong-radius);
-  box-shadow: 0 24px 60px -10px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(124, 58, 237, 0.2);
+  box-shadow: 0 24px 60px -10px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(168, 50, 42, 0.2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -157,7 +157,7 @@
   height: 40px;
   border-radius: 50%;
   padding: 2px;
-  background: linear-gradient(135deg, #fde047 0%, #a855f7 70%, #6366f1 100%);
+  background: linear-gradient(135deg, #fde047 0%, #a8322a 70%, #a8322a 100%);
   box-shadow: 0 0 12px rgba(253, 224, 71, 0.45);
   flex-shrink: 0;
   box-sizing: border-box;
@@ -230,7 +230,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: #fafaf9;
+  background: #f9f6ee;
 }
 
 .jitong-msg {
@@ -256,8 +256,8 @@
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
-  border: 1.5px solid #a855f7;
-  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.25);
+  border: 1.5px solid #a8322a;
+  box-shadow: 0 2px 6px rgba(168, 50, 42, 0.25);
   margin-top: 3px;
   display: block;
 }
@@ -278,19 +278,19 @@
 .jitong-msg.bot .jitong-msg-bubble {
   background: #ffffff;
   color: #1e293b;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #d6d1c4;
   border-bottom-left-radius: 2px;
 }
 
 /* 乩童靈光思考推導卡 (Reasoning Details) */
 .jitong-reasoning-card {
   margin-bottom: 8px;
-  background: #f5f3ff;
-  border: 1px dashed #c4b5fd;
+  background: #f4f1e8;
+  border: 1px dashed #c9a86a;
   border-radius: 8px;
   padding: 8px 10px;
   font-size: 11.5px;
-  color: #5b21b6;
+  color: #8a261f;
 }
 
 .jitong-reasoning-summary {
@@ -322,7 +322,7 @@
   gap: 6px;
   overflow-x: auto;
   padding: 6px 14px 10px 14px;
-  background: #fafaf9;
+  background: #f9f6ee;
   scrollbar-width: none;
 }
 
@@ -333,7 +333,7 @@
 .jitong-chip-btn {
   white-space: nowrap;
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #d6d1c4;
   color: #475569;
   padding: 5px 11px;
   border-radius: 20px;
@@ -345,9 +345,9 @@
 }
 
 .jitong-chip-btn:hover {
-  background: #f5f3ff;
-  border-color: #c4b5fd;
-  color: #6d28d9;
+  background: #f4f1e8;
+  border-color: #c9a86a;
+  color: #8a261f;
 }
 
 .jitong-chip-btn.highlight {
@@ -368,7 +368,7 @@
 .jitong-footer {
   padding: 10px 12px;
   background: #ffffff;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #d6d1c4;
   display: flex;
   gap: 8px;
   align-items: flex-end;
@@ -380,9 +380,9 @@
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  background: #f8fafc;
-  border-top: 1px dashed #cbd5e1;
-  border-bottom: 1px solid #f1f5f9;
+  background: #f9f6ee;
+  border-top: 1px dashed #cfc9bb;
+  border-bottom: 1px solid #ebe7db;
   animation: jitongSlideUp 0.2s ease-out;
 }
 
@@ -392,8 +392,8 @@
   height: 52px;
   border-radius: 8px;
   overflow: hidden;
-  border: 1.5px solid #8b5cf6;
-  box-shadow: 0 2px 6px rgba(139, 92, 246, 0.25);
+  border: 1.5px solid #a8322a;
+  box-shadow: 0 2px 6px rgba(168, 50, 42, 0.25);
   flex-shrink: 0;
   background: #000;
 }
@@ -436,7 +436,7 @@
 .jitong-preview-title {
   font-size: 12px;
   font-weight: 700;
-  color: #7c3aed;
+  color: #a8322a;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -444,7 +444,7 @@
 
 .jitong-preview-sub {
   font-size: 11px;
-  color: #64748b;
+  color: #5a5750;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -455,9 +455,9 @@
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  background: #f1f5f9;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
+  background: #ebe7db;
+  color: #5a5750;
+  border: 1px solid #d6d1c4;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -468,9 +468,9 @@
 }
 
 .jitong-tool-btn:hover {
-  background: #f5f3ff;
-  border-color: #c4b5fd;
-  color: #7c3aed;
+  background: #f4f1e8;
+  border-color: #c9a86a;
+  color: #a8322a;
   transform: scale(1.05);
 }
 
@@ -502,7 +502,7 @@
   background: rgba(0, 0, 0, 0.35);
   border-radius: 4px;
   margin-top: 3px;
-  color: #e2e8f0;
+  color: #d6d1c4;
 }
 
 /* 拖曳截圖時的 Drop Zone Overlay */
@@ -512,7 +512,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(124, 58, 237, 0.92);
+  background: rgba(168, 50, 42, 0.92);
   backdrop-filter: blur(4px);
   z-index: 100;
   display: flex;
@@ -547,7 +547,7 @@
   resize: none;
   height: 38px;
   max-height: 90px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid #cfc9bb;
   border-radius: 10px;
   padding: 8px 12px;
   font-size: 13px;
@@ -559,7 +559,7 @@
 
 .jitong-textarea:focus {
   border-color: var(--jitong-primary);
-  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
+  box-shadow: 0 0 0 2px rgba(168, 50, 42, 0.15);
 }
 
 .jitong-send-btn {
@@ -583,7 +583,7 @@
 }
 
 .jitong-send-btn:disabled {
-  background: #cbd5e1;
+  background: #cfc9bb;
   cursor: not-allowed;
   transform: none;
 }
@@ -602,7 +602,7 @@
     height: 52px;
     border-radius: 50%;
     justify-content: center;
-    box-shadow: 0 8px 24px -4px rgba(124, 58, 237, 0.55), 0 0 16px rgba(253, 224, 71, 0.4);
+    box-shadow: 0 8px 24px -4px rgba(168, 50, 42, 0.55), 0 0 16px rgba(253, 224, 71, 0.4);
   }
 
   .jitong-floating-trigger .jitong-trigger-text {
@@ -759,7 +759,7 @@
   gap: 8px;
   font-size: 13.5px;
   font-weight: 600;
-  color: #f8fafc;
+  color: #f9f6ee;
 }
 
 .jitong-snip-icon {
@@ -772,7 +772,7 @@
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 4px;
   padding: 1px 6px;
-  color: #cbd5e1;
+  color: #cfc9bb;
   font-family: monospace;
 }
 
@@ -783,7 +783,7 @@
 }
 
 .jitong-snip-action-btn {
-  background: #7c3aed;
+  background: #a8322a;
   color: #ffffff;
   border: none;
   border-radius: 20px;
@@ -795,13 +795,13 @@
 }
 
 .jitong-snip-action-btn:hover {
-  background: #6d28d9;
+  background: #8a261f;
   transform: scale(1.04);
 }
 
 .jitong-snip-action-btn.cancel {
   background: rgba(255, 255, 255, 0.12);
-  color: #e2e8f0;
+  color: #d6d1c4;
 }
 
 .jitong-snip-action-btn.cancel:hover {
@@ -868,15 +868,15 @@
 
 /* 框選工具按鈕樣式 */
 .jitong-snip-tool-btn {
-  background: #fdf4ff !important;
-  border-color: #f0abfc !important;
-  color: #c026d3 !important;
+  background: #f4f1e8 !important;
+  border-color: #c9a86a !important;
+  color: #a8322a !important;
   font-size: 16px !important;
 }
 .jitong-snip-tool-btn:hover {
-  background: #fae8ff !important;
-  border-color: #d946ef !important;
-  color: #a21caf !important;
+  background: #f0e2dc !important;
+  border-color: #b8473c !important;
+  color: #8a261f !important;
   transform: scale(1.08) !important;
 }
 
@@ -895,8 +895,8 @@
   gap: 4px;
 }
 .jitong-header-tool-btn:hover {
-  background: #c026d3;
-  border-color: #f0abfc;
+  background: #a8322a;
+  border-color: #c9a86a;
   transform: scale(1.05);
 }
 

@@ -98,3 +98,4 @@ html[data-theme="night"] .mechanism, html[data-theme="night"] .completion, html[
 html[data-theme="night"] .token-pieces span, html[data-theme="night"] .token-strip span, html[data-theme="night"] .token-output span { color: #1c1b19; }
 html[data-theme="night"] .lab-golden-quote, html[data-theme="night"] .blindspot-card-quote { background: var(--surface-2); color: var(--ink); }
 html[data-theme="night"] img.concept-figure, html[data-theme="night"] .concept-illustration img, html[data-theme="night"] main svg:not(.vd-smoke):not(.sf-hills) { }
+html[data-theme="night"] [class*="jitong"] input, html[data-theme="night"] [class*="jitong"] textarea { background: #fffdf8; color: #1c1b19; border-color: #d6d1c4; }
