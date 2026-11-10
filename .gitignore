@@ -40,3 +40,8 @@ scratch/
 voice_memory_leda/
 voice_strawberry_leda/
 music_focused_60s.wav
+
+workshop_registration_dashboard.html
+*registration*.csv
+*.pcm
+preview_frames/
