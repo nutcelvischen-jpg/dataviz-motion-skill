@@ -1,7 +1,7 @@
 [
   {
     "id": "ep0",
-    "file": "法器篇EP0_神明的後台.mp4",
+    "file": "../media/法器篇EP0_神明的後台.mp4",
     "title": "EP0 神明的後台",
     "subtitle": "LLM 基礎：Token、機率與生成",
     "seconds": 133,
@@ -11,7 +11,7 @@
   },
   {
     "id": "ep1",
-    "file": "法器篇EP1_咒語.mp4",
+    "file": "../media/法器篇EP1_咒語.mp4",
     "title": "EP1 咒語",
     "subtitle": "Prompt：把任務交代清楚",
     "seconds": 131,
@@ -21,7 +21,7 @@
   },
   {
     "id": "ep2",
-    "file": "法器篇EP2_布壇.mp4",
+    "file": "../media/法器篇EP2_布壇.mp4",
     "title": "EP2 布壇",
     "subtitle": "Context Engineering：準備需要的資訊",
     "seconds": 164,
@@ -31,7 +31,7 @@
   },
   {
     "id": "ep3",
-    "file": "法器篇EP3_起乩循環.mp4",
+    "file": "../media/法器篇EP3_起乩循環.mp4",
     "title": "EP3 起乩循環",
     "subtitle": "Agent Loop：執行、觀察與核對",
     "seconds": 139,
@@ -41,7 +41,7 @@
   },
   {
     "id": "ep4",
-    "file": "法器篇EP4_宮廟.mp4",
+    "file": "../media/法器篇EP4_宮廟.mp4",
     "title": "EP4 宮廟",
     "subtitle": "Harness：管理模型外圍的工作環境",
     "seconds": 153,
@@ -51,7 +51,7 @@
   },
   {
     "id": "overview",
-    "file": "數位乩童.mp4",
+    "file": "../media/數位乩童.mp4",
     "title": "數位乩童",
     "subtitle": "Agent 架構總覽",
     "seconds": 94,
@@ -61,7 +61,7 @@
   },
   {
     "id": "funnel",
-    "file": "數位乩童開示_AI漏斗.mp4",
+    "file": "../media/數位乩童開示_AI漏斗.mp4",
     "title": "數位乩童開示：AI 漏斗",
     "subtitle": "課前暖身：你如何使用 AI？",
     "seconds": 149,

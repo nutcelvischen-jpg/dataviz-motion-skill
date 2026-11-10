@@ -46,7 +46,7 @@ CONCEPTS = {'concepts/'+name+'.html' for name in (
     'context-engineering','agent','agent-tools','agent-operation','graphics','evidence',
     'verification','injection','api','cost','models','deployment')}
 VIDEO_FILES = {
-    '數位乩童.mp4','數位乩童開示_AI漏斗.mp4','法器篇EP0_神明的後台.mp4','法器篇EP1_咒語.mp4','法器篇EP2_布壇.mp4','法器篇EP3_起乩循環.mp4','法器篇EP4_宮廟.mp4',
+    'media/數位乩童.mp4','media/數位乩童開示_AI漏斗.mp4','media/法器篇EP0_神明的後台.mp4','media/法器篇EP1_咒語.mp4','media/法器篇EP2_布壇.mp4','media/法器篇EP3_起乩循環.mp4','media/法器篇EP4_宮廟.mp4',
     'videos/ai_blindspots/AI盲點01_草莓與Token.mp4',
     'videos/ai_blindspots/AI盲點02_金魚腦與記憶.mp4',
     'videos/ai_blindspots/AI盲點03_提示詞注入.mp4',

@@ -4,11 +4,11 @@
 
 | 影片 | 片長 | 畫面與字幕涵蓋內容 | 主要位置 | 延伸入口 |
 | --- | --- | --- | --- | --- |
-| 數位乩童.mp4 | 1:34 | 模型選擇、API 設定、System/User Prompt、工具呼叫、Harness、人員確認、驗證與 Loop | concepts/overview.html 的任務流程分頁，在任務示例與流程圖之間，以選讀影片呈現 | concepts/agent.html；第六站完成工作 |
-| 數位乩童開示_AI漏斗.mp4 | 2:29 | 不同 AI 使用層次、能驗證的任務、能力不均與人員理解速度 | 首頁的可展開「課前暖身：你如何使用 AI？」區，只顯示封面、片長與摘要 | topics/ai-economy.html 的討論延伸 |
-| 法器篇EP0_神明的後台.mp4 | 2:13 | Token ID、Embedding、Token 計價、機率分布、Temperature、預訓練／微調、Context Window | concepts/model.html 的導讀後、深入介紹前；第一站提供同一影片入口 | concepts/tokens.html、sampling.html 的影片章節入口 |
-| 法器篇EP1_咒語.mp4 | 2:11 | 角色提示、Zero/Few-shot、自我一致性、思考樹、ReAct、提示鏈 | concepts/prompt.html 的白話導讀後，標示「提示詞怎麼交代任務？」 | Prompt 相關操作與 Agent 概念頁的延伸連結 |
-| 法器篇EP2_布壇.mp4 | 2:44 | Context Window、資料與回答的容量、System/User/Memory/RAG/Tools、挑選／壓縮／記錄／隔離 | concepts/context-engineering.html 的導讀後 | concepts/context.html 的記憶與 Context 解說；第二站延伸觀看 |
+| ../media/數位乩童.mp4 | 1:34 | 模型選擇、API 設定、System/User Prompt、工具呼叫、Harness、人員確認、驗證與 Loop | concepts/overview.html 的任務流程分頁，在任務示例與流程圖之間，以選讀影片呈現 | concepts/agent.html；第六站完成工作 |
+| ../media/數位乩童開示_AI漏斗.mp4 | 2:29 | 不同 AI 使用層次、能驗證的任務、能力不均與人員理解速度 | 首頁的可展開「課前暖身：你如何使用 AI？」區，只顯示封面、片長與摘要 | topics/ai-economy.html 的討論延伸 |
+| ../media/法器篇EP0_神明的後台.mp4 | 2:13 | Token ID、Embedding、Token 計價、機率分布、Temperature、預訓練／微調、Context Window | concepts/model.html 的導讀後、深入介紹前；第一站提供同一影片入口 | concepts/tokens.html、sampling.html 的影片章節入口 |
+| ../media/法器篇EP1_咒語.mp4 | 2:11 | 角色提示、Zero/Few-shot、自我一致性、思考樹、ReAct、提示鏈 | concepts/prompt.html 的白話導讀後，標示「提示詞怎麼交代任務？」 | Prompt 相關操作與 Agent 概念頁的延伸連結 |
+| ../media/法器篇EP2_布壇.mp4 | 2:44 | Context Window、資料與回答的容量、System/User/Memory/RAG/Tools、挑選／壓縮／記錄／隔離 | concepts/context-engineering.html 的導讀後 | concepts/context.html 的記憶與 Context 解說；第二站延伸觀看 |
 
 ## 課程順序
 

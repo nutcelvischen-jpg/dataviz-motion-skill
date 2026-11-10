@@ -17,7 +17,7 @@ BEAT_DUR = 60.0 / BPM
 BAR_DUR = BEAT_DUR * 4.0
 
 VOICE_DIR = 'voice_skill_70s'
-OUTPUT_WAV = 'master_soundtrack_skill_tutorial_72s.wav'
+OUTPUT_WAV = 'media/master_soundtrack_skill_tutorial_72s.wav'
 
 CHORDS = [
     [261.63, 329.63, 392.00, 493.88],  # Cmaj7

@@ -6,7 +6,7 @@ Features:
 - Funky Bassline + 126 BPM Tech-Pop Drums (Kick, Snare, Groove Hi-Hats)
 - Earshot Physical Sound Effects on Transitions (Click, Snap, Plink, Sub Hit, Downlifter)
 - Intelligent Sidechain Auto-Ducking (-7.5dB under Leda's voice)
-- Output: master_soundtrack_antigravity_guide_60s.wav
+- Output: media/master_soundtrack_antigravity_guide_60s.wav
 """
 
 import os
@@ -23,7 +23,7 @@ SPB = 60.0 / BPM  # ~0.4762s per beat
 PROJECT_DIR = '.'
 VOICE_DIR = os.path.join(PROJECT_DIR, 'voice_guide_60s')
 SFX_DIR = os.path.join(PROJECT_DIR, 'earshot_sfx')
-OUT_WAV = os.path.join(PROJECT_DIR, 'master_soundtrack_antigravity_guide_60s.wav')
+OUT_WAV = os.path.join(PROJECT_DIR, 'media/master_soundtrack_antigravity_guide_60s.wav')
 
 print("=== Generating Upbeat 126 BPM 60-Second Antigravity Guide Soundtrack ===")
 

@@ -6,7 +6,7 @@ mix_strawberry_soundtrack_60s.py
 2. 使用 OpenRouter Gemini 3.8 Flash TTS（Leda 女性沉穩年輕音色）作為唯一主角。
 3. 採用 Earshot 原生微觸感音效（cut_hit_air, click_thock, drip_plink）精準卡點。
 4. 導入 84 BPM 極簡空氣感清襯樂（Focused Ambient Bed），人聲時避讓至 -34dB，極致溫潤不喧賓奪主。
-5. 輸出 master_soundtrack_strawberry_60s.wav (44.1kHz, 16-bit 立體聲)。
+5. 輸出 media/master_soundtrack_strawberry_60s.wav (44.1kHz, 16-bit 立體聲)。
 """
 
 import os
@@ -22,7 +22,7 @@ TOTAL_SAMPLES = int(SR * DURATION)
 PROJECT_DIR = '.'
 OPR_KEY_FILE = os.path.join(PROJECT_DIR, 'OPR-KEY.txt')
 FFMPEG = os.path.join(PROJECT_DIR, 'bin', 'ffmpeg')
-OUT_WAV = os.path.join(PROJECT_DIR, 'master_soundtrack_strawberry_60s.wav')
+OUT_WAV = os.path.join(PROJECT_DIR, 'media/master_soundtrack_strawberry_60s.wav')
 VOICE_TEMP_DIR = os.path.join(PROJECT_DIR, 'voice_strawberry_leda')
 SFX_DIR = os.path.join(PROJECT_DIR, 'earshot_sfx')
 CLEAN_BED_WAV = os.path.join(PROJECT_DIR, 'music_focused_60s.wav')

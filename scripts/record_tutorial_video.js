@@ -5,7 +5,7 @@ const fs = require('fs');
 
 const CHROME_PATH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const FFMPEG_PATH = path.join(__dirname, '..', 'bin', 'ffmpeg');
-const AUDIO_PATH = path.join(__dirname, '..', 'master_soundtrack_antigravity_guide_60s.wav');
+const AUDIO_PATH = path.join(__dirname, '..', 'media/master_soundtrack_antigravity_guide_60s.wav');
 const OUTPUT_DIR = path.join(__dirname, '..', 'videos');
 const OUTPUT_MP4 = path.join(OUTPUT_DIR, 'eStat_API申請與連線手把手教學.mp4');
 const HTML_URL = 'http://localhost:8080/estat_api_tutorial_simulator.html';
@@ -139,7 +139,7 @@ async function main() {
   });
 
   // 建立根目錄捷徑
-  const linkPath = path.join(__dirname, '..', 'eStat_API申請與連線手把手教學_24s.mp4');
+  const linkPath = path.join(__dirname, '..', 'media/eStat_API申請與連線手把手教學_24s.mp4');
   try {
     if (fs.existsSync(linkPath)) fs.unlinkSync(linkPath);
     fs.symlinkSync(path.relative(path.dirname(linkPath), OUTPUT_MP4), linkPath);

@@ -5,7 +5,7 @@ Features:
 - Confident Rhodes & Marimba Chord Progressions (60.0s)
 - Earshot Physical Sound Effects on Transitions
 - Intelligent Auto-Ducking (-5.5dB under Charon's voice)
-- Output: master_soundtrack_boss_60s.wav
+- Output: media/master_soundtrack_boss_60s.wav
 """
 
 import os
@@ -22,7 +22,7 @@ SPB = 60.0 / BPM  # 0.5s per beat
 PROJECT_DIR = '.'
 VOICE_DIR = os.path.join(PROJECT_DIR, 'voice_boss_60s')
 SFX_DIR = os.path.join(PROJECT_DIR, 'earshot_sfx')
-OUT_WAV = os.path.join(PROJECT_DIR, 'master_soundtrack_boss_60s.wav')
+OUT_WAV = os.path.join(PROJECT_DIR, 'media/master_soundtrack_boss_60s.wav')
 
 print("=== Generating Rich 120 BPM 60-Second Executive Soundtrack ===")
 

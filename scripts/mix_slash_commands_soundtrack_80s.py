@@ -17,7 +17,7 @@ BEAT_DUR = 60.0 / BPM
 BAR_DUR = BEAT_DUR * 4.0
 
 VOICE_DIR = 'voice_slash_60s'
-OUTPUT_WAV = 'master_soundtrack_slash_commands_80s.wav'
+OUTPUT_WAV = 'media/master_soundtrack_slash_commands_80s.wav'
 
 # Chord frequencies for Rhodes Progression
 CHORDS = [

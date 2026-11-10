@@ -5,8 +5,8 @@ const fs = require('fs');
 
 const CHROME_PATH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const FFMPEG_PATH = path.join(__dirname, '..', 'bin', 'ffmpeg');
-const AUDIO_PATH = path.join(__dirname, '..', 'master_soundtrack_skill_tutorial_72s.wav');
-const OUTPUT_MP4 = path.join(__dirname, '..', 'videos', '手把手教你自製Antigravity_Skill_72s_直式大字版.mp4');
+const AUDIO_PATH = path.join(__dirname, '..', 'media/master_soundtrack_skill_tutorial_72s.wav');
+const OUTPUT_MP4 = path.join(__dirname, '..', 'videos', 'media/手把手教你自製Antigravity_Skill_72s_直式大字版.mp4');
 const HTML_PATH = 'file://' + path.join(__dirname, '..', 'src', 'index_skill_tutorial_portrait_72s.html');
 
 const FPS = 30;
@@ -23,7 +23,7 @@ async function main() {
   console.log('========================================================\n');
 
   if (!fs.existsSync(AUDIO_PATH)) {
-    console.error('❌ 找不到音樂檔 master_soundtrack_skill_tutorial_72s.wav');
+    console.error('❌ 找不到音樂檔 media/master_soundtrack_skill_tutorial_72s.wav');
     process.exit(1);
   }
 

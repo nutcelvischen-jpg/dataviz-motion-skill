@@ -19,7 +19,7 @@
 
 ---
 
-### 2. [`data_atoms_launch_charon_38s.mp4`](./data_atoms_launch_charon_38s.mp4)
+### 2. [`../media/data_atoms_launch_charon_38s.mp4`](./data_atoms_launch_charon_38s.mp4)
 - **規格**：1920×1080 @ 30 FPS，長度 38.0 秒，檔案大小約 8.5 MB
 - **主題**：**Data Atoms Studio 軟體產品發表片**
 - **風格系統**：`huashu-motion` 方向 A — **工作流真實演繹 (`cursor-demo` + `data-story`)**
@@ -31,7 +31,7 @@
 
 ---
 
-### 2. [`dataviz_analytics_45s.mp4`](./dataviz_analytics_45s.mp4) / [`dataviz_analytics_45s_gemini.mp4`](./dataviz_analytics_45s_gemini.mp4)
+### 2. [`../media/dataviz_analytics_45s.mp4`](./dataviz_analytics_45s.mp4) / [`../media/dataviz_analytics_45s_gemini.mp4`](./dataviz_analytics_45s_gemini.mp4)
 - **規格**：1920×1080 @ 30 FPS，長度 45.0 秒，檔案大小約 4.0 MB
 - **主題**：**數據分析原子 (Data Atoms) 45秒 白底動態視覺化**
 - **風格系統**：觀默導演層動態系統極簡白底美學（`#f5f5f3`）、字體放大優化（數字 118px、標題 56px）、側邊繁中導讀指引、底部 6 組開關物理聯動
@@ -39,14 +39,14 @@
 
 ---
 
-### 3. [`dataviz_motion_60s.mp4`](./dataviz_motion_60s.mp4)
+### 3. [`../media/dataviz_motion_60s.mp4`](./dataviz_motion_60s.mp4)
 - **規格**：1920×1080 @ 60 FPS，長度 60.0 秒，檔案大小約 17.0 MB
 - **主題**：**數據視覺化 60秒 深色交響版全景短片**
 - **風格系統**：深色科技奢華風（`#080b11`），完整體現一形貫穿與連續動量幾何形變
 
 ---
 
-### 4. [`master_soundtrack_45s.wav`](./master_soundtrack_45s.wav)
+### 4. [`../media/master_soundtrack_45s.wav`](./master_soundtrack_45s.wav)
 - **規格**：44.1kHz 16-bit PCM 立體聲 WAV，長度 45.0 秒，檔案大小約 7.6 MB
 - **內容**：45 秒影片專用母帶級完整音軌（合成器配樂 + Earshot SFX + 旁白混音）
 

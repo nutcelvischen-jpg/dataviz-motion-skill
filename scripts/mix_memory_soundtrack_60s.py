@@ -5,7 +5,7 @@ mix_memory_soundtrack_60s.py
 1. 使用 OpenRouter Gemini 3.8 Flash TTS（Leda 音色）生成生動自然、充滿節奏感的解說旁白。
 2. 導入純淨輕快動感 BGM，人聲時自動側鏈壓低（Auto-Ducking -30dB）。
 3. 接入 Earshot 觸感級微動態音效（漫畫彈出、切卡、剪刀剪裁、驚嘆點擊）。
-4. 輸出 master_soundtrack_memory_60s.wav (44.1kHz, 16-bit 立體聲)。
+4. 輸出 media/master_soundtrack_memory_60s.wav (44.1kHz, 16-bit 立體聲)。
 """
 
 import os
@@ -21,7 +21,7 @@ TOTAL_SAMPLES = int(SR * DURATION)
 PROJECT_DIR = '.'
 OPR_KEY_FILE = os.path.join(PROJECT_DIR, 'OPR-KEY.txt')
 FFMPEG = os.path.join(PROJECT_DIR, 'bin', 'ffmpeg')
-OUT_WAV = os.path.join(PROJECT_DIR, 'master_soundtrack_memory_60s.wav')
+OUT_WAV = os.path.join(PROJECT_DIR, 'media/master_soundtrack_memory_60s.wav')
 VOICE_TEMP_DIR = os.path.join(PROJECT_DIR, 'voice_memory_leda')
 SFX_DIR = os.path.join(PROJECT_DIR, 'earshot_sfx')
 CLEAN_BED_WAV = os.path.join(PROJECT_DIR, 'music_focused_60s.wav')
