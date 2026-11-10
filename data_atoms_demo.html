@@ -3,38 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Data Atoms 操作示範影片</title>
+<title>Data Atoms 操作示範影片｜大語言模型學習地圖</title>
+<link rel="icon" href="favicon.ico"/>
+<link href="css/tokens.css?v=20261111" rel="stylesheet"/><link href="css/components.css?v=20261111" rel="stylesheet"/><link href="css/shell.css?v=20261111" rel="stylesheet"/><link href="css/workshop-pages.css?v=20261111" rel="stylesheet"/>
 <style>
-  :root { --bg: #F3F2EE; --ink: #111111; --accent: #FF4400; --muted: #4a4a4a; --line: #d9d6cc; }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); line-height: 1.75;
-         font-family: -apple-system, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif; }
-  header { background: var(--ink); color: #fff; padding: 20px 24px; border-bottom: 4px solid var(--accent); }
-  header h1 { margin: 0; font-size: 22px; }
-  header p { margin: 4px 0 0; color: #d6d6d6; font-size: 14px; }
-  main { max-width: 980px; margin: 0 auto; padding: 28px 16px 56px; }
-  .player { border: 3px solid var(--ink); box-shadow: 10px 10px 0 var(--accent); background: #000; }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.75 var(--font-sans); }
+  .player { margin-top: var(--sp-6); border: 1px solid var(--rule); border-radius: var(--radius-lg); overflow: hidden; background: #000; }
   video { display: block; width: 100%; color: #fff; }
-  video a { color: #ffb08a; }
-  .actions { margin: 28px 0 0; display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; font-size: 14px; }
-  .btn { display: inline-block; padding: 8px 16px; border: 2px solid var(--ink); background: var(--ink); color: #fff;
-         text-decoration: none; font-weight: 700; }
-  .btn.alt { background: transparent; color: var(--ink); }
-  .btn:hover, .btn:focus-visible { background: var(--accent); border-color: var(--accent); color: #fff; }
-  h2 { font-size: 18px; margin: 40px 0 12px; border-left: 6px solid var(--accent); padding-left: 10px; }
-  table { width: 100%; border-collapse: collapse; background: #fff; border: 2px solid var(--ink); }
-  th, td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: left; font-size: 14px; vertical-align: top; }
-  th { background: var(--ink); color: #fff; }
+  .actions { margin: var(--sp-5) 0 0; display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; font-size: var(--fs-sm); color: var(--ink-2); }
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--rule); }
+  th, td { padding: 10px 12px; border-bottom: 1px solid var(--rule); text-align: left; font-size: var(--fs-sm); vertical-align: top; }
+  th { background: var(--surface-2); font-weight: 700; }
   td:first-child { white-space: nowrap; font-weight: 700; }
-  .note { color: var(--muted); font-size: 13px; margin-top: 10px; }
+  .note { color: var(--ink-2); font-size: var(--fs-sm); margin-top: 10px; }
+  .demo-h2 { margin: var(--sp-7) 0 var(--sp-4); font: 600 var(--fs-xl)/1.3 var(--font-serif); }
 </style>
 </head>
-<body>
-<header>
-  <h1>Data Atoms 操作示範影片</h1>
-  <p>拖曳欄位到 X、Y、色、面、濾，即時組出互動圖表｜日本 e-Stat 資料｜全程在瀏覽器本機運算</p>
-</header>
-<main>
+<body data-nav="workshop" data-workshop>
+<script src="js/site-config.js?v=20261111"></script><script src="js/site-shell.js?v=20261111"></script>
+<main id="main" class="wp-main"><div class="wp-wrap">
+  <p class="wk-crumbs"><a href="index.html">首頁</a> ／ <a href="workshop.html">工作坊</a> ／ Data Atoms 操作示範影片</p>
+  <header class="page-hero">
+    <p class="eyebrow">參考資料</p>
+    <h1>Data Atoms 操作示範影片</h1>
+    <p class="lead">拖曳欄位到 X、Y、色、面、濾，即時組出互動圖表｜日本 e-Stat 資料｜全程在瀏覽器本機運算</p>
+  </header>
   <div class="player">
     <video controls preload="metadata" poster="videos/data_atoms_demo_poster.png">
       <source src="videos/data_atoms_demo.mp4" type="video/mp4">
@@ -44,13 +38,13 @@
 
   <div class="actions">
     <span>約 2 分鐘，含旁白與字幕</span>
-    <a class="btn" href="data_atoms.html">開啟 Data Atoms 工作台</a>
-    <a class="btn alt" href="data_atoms_manual.html">視覺編碼操作手冊</a>
-    <a class="btn alt" href="videos/data_atoms_demo.mp4" download>下載影片</a>
-    <a class="btn alt" href="videos/data_atoms_demo.srt" download>下載字幕（SRT）</a>
+    <a class="btn btn-primary" href="data_atoms.html">開啟 Data Atoms 工作台</a>
+    <a class="link-arrow" href="data_atoms_manual.html">視覺編碼操作手冊</a>
+    <a class="link-arrow" href="videos/data_atoms_demo.mp4" download>下載影片</a>
+    <a class="link-arrow" href="videos/data_atoms_demo.srt" download>下載字幕（SRT）</a>
   </div>
 
-  <h2>影片內容</h2>
+  <h2 class="demo-h2">影片內容</h2>
   <table>
     <tr><th>#</th><th>主題</th><th>示範重點</th></tr>
     <tr><td>1</td><td>選資料集</td><td>日本 47 都道府縣人口與高齡化，指標卡即時計算筆數、總和、平均</td></tr>
@@ -63,6 +57,6 @@
     <tr><td>8</td><td>釘選與儀表板</td><td>把圖表釘選到自訂看板，以雙欄排版組成儀表板</td></tr>
   </table>
   <p class="note">示範用資料為日本 e-Stat 官方統計與內建範例資料集。旁白為 AI 語音合成（Gemini TTS）。</p>
-</main>
+</div></main>
 </body>
 </html>

@@ -3,12 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OpenRouter API 三階資料流架構圖解：裸模型 ➔ 聯網增強 ➔ 工具調用智慧體</title>
+  <title>OpenRouter 三階資料流｜大語言模型學習地圖</title>
   <meta name="description" content="深入解構大語言模型從「缸中之腦（Zero Context）」、「檢索增強（Web Grounding / RAG）」到「代理人工具循環（Tool Calling / Agent Loop）」的 API 資料流向與動態封包生命週期。">
 
   <!-- Typography & Fonts -->
   <link rel="stylesheet" href="css/learning.css?v=20261111">
-  <link rel="stylesheet" href="css/dose_mobile.css?v=20261111">
 
   <style>
     /* diagram-design editorial design tokens */
@@ -35,7 +34,7 @@
       --dd-purple-tint: #faf5ff;
 
       --font-serif: "Instrument Serif", Georgia, serif;
-      --font-sans: "Inter", "Noto Sans TC", -apple-system, sans-serif;
+      --font-sans: var(--font-sans), "Noto Sans TC", -apple-system, sans-serif;
       --font-mono: "DM Mono", Menlo, Monaco, monospace;
     }
 
@@ -491,39 +490,26 @@
       50% { filter: drop-shadow(0 0 8px #38bdf8); }
     }
     .pulse-glow-cyan { animation: pulseGlow 2s infinite ease-in-out; }
-  </style>
+  
+/* V2 */
+@media (max-width: 768px) { html, body { overflow-x: hidden; max-width: 100vw; } }
+.arch-container > .wk-crumbs { margin: 24px 0 0; }
+.arch-container > .page-hero { padding-top: var(--sp-5); margin-bottom: var(--sp-6); }
+.arch-tags { gap: 8px 10px; }
+.arch-tags .tag { white-space: normal; }
+</style>
 <link href="css/tokens.css?v=20261111" rel="stylesheet"/><link href="css/components.css?v=20261111" rel="stylesheet"/><link href="css/shell.css?v=20261111" rel="stylesheet"/>
 </head>
 <body data-nav="workshop" data-workshop><script src="js/site-config.js?v=20261111"></script><script src="js/site-shell.js?v=20261111"></script>
 
   <div class="arch-container">
 
-    <!-- Breadcrumb Navigation -->
-    <nav class="arch-nav" aria-label="導覽路徑">
-      <a href="index.html">首頁</a>
-      <span class="sep">/</span>
-      <a href="index.html#learning-map">大語言模型學習地圖</a>
-      <span class="sep">/</span>
-      <a href="system_architecture.html">全端系統架構</a>
-      <span class="sep">/</span>
-      <span style="color:var(--dd-ink); font-weight:600;">OpenRouter 三階資料流架構</span>
-    </nav>
-
-    <!-- Header Banner -->
-    <header class="arch-header">
-      <span class="arch-eyebrow">DATA FLOW ARCHITECTURE · 3 PATTERNS</span>
-      <h1>API 打到 OpenRouter 的三階資料流：裸模型 ➔ 聯網增強 ➔ 工具調用</h1>
-      <p class="arch-lead">
-        任何向大模型發起的 API 請求，都依賴其<strong>「上下文與外部工具邊界」</strong>。本圖解以動態封包粒子（Data Packets），帶您具象化看懂大語言模型從「缸中之腦（Zero Context）」、「檢索增強（Web Grounding / RAG）」到「代理人工具循環（Tool Calling / Agent Loop）」的完整資料流向。
-      </p>
-
-      <div class="badge-bar">
-        <span class="badge-item blue">🧠 階梯 1：裸模型直接回覆 (Zero Context)</span>
-        <span class="badge-item orange">🌐 階梯 2：聯網 / 外部檢索增強 (Web Grounding)</span>
-        <span class="badge-item green">⚡ 階梯 3：工具調用與雙向驗算 (Tool Calling Agent)</span>
-        <span class="badge-item purple">🪐 OpenRouter Unified API Gateway</span>
-        <span class="badge-item slate">🛡️ OWASP LLM 安全邊界對照</span>
-      </div>
+    <p class="wk-crumbs"><a href="index.html">首頁</a> ／ <a href="workshop.html">工作坊</a> ／ OpenRouter 三階資料流</p>
+    <header class="page-hero">
+      <p class="eyebrow">參考資料</p>
+      <h1>OpenRouter 三階資料流</h1>
+      <p class="lead">任何向大模型發起的 API 請求，都依賴其<strong>「上下文與外部工具邊界」</strong>。本圖解以動態封包粒子（Data Packets），帶您具象化看懂大語言模型從「缸中之腦（Zero Context）」、「檢索增強（Web Grounding / RAG）」到「代理人工具循環（Tool Calling / Agent Loop）」的完整資料流向。</p>
+      <p class="hero-meta arch-tags"><span class="tag tag-muted">階梯 1：裸模型直接回覆 (Zero Context)</span><span class="tag tag-muted">階梯 2：聯網 / 外部檢索增強 (Web Grounding)</span><span class="tag tag-muted">階梯 3：工具調用與雙向驗算 (Tool Calling Agent)</span><span class="tag tag-muted">OpenRouter Unified API Gateway</span><span class="tag tag-muted">OWASP LLM 安全邊界對照</span></p>
     </header>
 
     <!-- Master Architecture Diagram Frame -->
@@ -590,7 +576,7 @@
 
       <!-- SVG Blueprint Canvas -->
       <div class="diagram-scroll-box">
-        <svg id="archSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 660" style="background:#090d13; font-family:'Inter', 'Noto Sans TC', sans-serif;">
+        <svg id="archSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 660" style="background:#090d13; font-family:var(--font-sans), 'Noto Sans TC', sans-serif;">
           <defs>
             <!-- Glow Filters for Moving Packet Balls -->
             <filter id="glow-cyan" x="-60%" y="-60%" width="220%" height="220%">

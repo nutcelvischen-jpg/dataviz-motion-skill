@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>日本政府統計 e-Stat API 實戰數據儀表板 · 50年人口變遷與 Data Atoms 數據原子分析</title>
+  <title>日本人口儀表板範例｜大語言模型學習地圖</title>
   <script src="./js/echarts.min.js?v=20261111"></script>
   <script>if (typeof echarts === 'undefined') { document.write('<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"><\/script>'); }</script>
   <style>
@@ -37,122 +37,12 @@
     }
 
     body {
-      font-family: 'Geist', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+      font-family: var(--font-sans);
       background-color: var(--bg-page);
       color: var(--ink-primary);
       line-height: 1.6;
       padding: 0 0 80px 0;
       -webkit-font-smoothing: antialiased;
-    }
-
-    /* 頂部官方入口橫幅 */
-    .official-portal-strip {
-      background: #0d47a1;
-      color: #ffffff;
-      padding: 8px 48px;
-      font-size: 13px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .portal-link-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: #e0f2fe;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .portal-link-badge:hover { text-decoration: underline; color: #fff; }
-    .portal-url-tag {
-      background: rgba(255, 255, 255, 0.18);
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-family: monospace;
-      color: #fff;
-    }
-
-    header {
-      background: var(--bg-surface);
-      border-bottom: 1px solid var(--border-default);
-      padding: 24px 48px 20px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(10px);
-      background-color: rgba(255, 255, 255, 0.94);
-    }
-    .header-inner {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-    .header-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      background: var(--metro-tint);
-      color: var(--metro-blue);
-      padding: 4px 10px;
-      border-radius: 20px;
-      margin-bottom: 8px;
-    }
-    .header-badge span.dot {
-      width: 7px;
-      height: 7px;
-      background: #10b981;
-      border-radius: 50%;
-      display: inline-block;
-      box-shadow: 0 0 8px #10b981;
-    }
-    h1 {
-      font-family: 'Noto Serif TC', 'Instrument Serif', Georgia, serif;
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--ink-primary);
-    }
-    .header-desc {
-      font-size: 13.5px;
-      color: var(--ink-secondary);
-      margin-top: 3px;
-    }
-    .nav-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .nav-btn {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-default);
-      color: var(--ink-primary);
-      padding: 7px 12px;
-      border-radius: var(--radius-sm);
-      font-size: 12.5px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-    .nav-btn:hover {
-      background: var(--metro-blue);
-      color: #fff;
-      border-color: var(--metro-blue);
-    }
-    .nav-btn.primary {
-      background: var(--metro-blue);
-      color: #fff;
-      border-color: var(--metro-blue);
     }
 
     main {
@@ -161,10 +51,9 @@
       padding: 0 48px;
     }
     @media (max-width: 1024px) {
-      .official-portal-strip, header, main { padding-left: 20px; padding-right: 20px; }
+      main { padding-left: 20px; padding-right: 20px; }
     }
 
-    /* KPI 卡片 */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -206,7 +95,6 @@
     }
     .kpi-sub strong { color: var(--clay-danger); }
 
-    /* Tab 切換按鈕 */
     .tabs-nav {
       display: flex;
       gap: 8px;
@@ -239,10 +127,9 @@
       color: #ffffff;
     }
     .tab-btn.active.atom-tab {
-      background: #ea580c;
+      background: none;
     }
 
-    /* 圖表網格 */
     .charts-grid {
       display: grid;
       grid-template-columns: 2fr 1.1fr;
@@ -284,9 +171,8 @@
       height: 420px;
     }
 
-    /* Data Atoms 專屬區域樣式 */
     .atom-banner {
-      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+      background: var(--olive-soft);
       border: 1px solid #fed7aa;
       border-radius: var(--radius-lg);
       padding: 20px 24px;
@@ -312,7 +198,6 @@
       max-width: 800px;
     }
 
-    /* 排行榜表格 */
     .table-container {
       max-height: 420px;
       overflow-y: auto;
@@ -353,7 +238,6 @@
     .aging-mid { background: rgba(192, 125, 43, 0.1); color: var(--amber-accent); }
     .aging-low { background: var(--metro-tint); color: var(--metro-blue); }
 
-    /* API 測試實驗台 */
     .playground-box {
       background: #18181c;
       color: #f3f3f5;
@@ -408,62 +292,50 @@
       color: #a5f3fc;
       line-height: 1.5;
     }
-
-    footer {
-      max-width: 1400px;
-      margin: 40px auto 0;
-      padding: 24px 48px;
-      border-top: 1px solid var(--border-default);
-      display: flex;
-      justify-content: space-between;
-      color: var(--ink-muted);
-      font-size: 13px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-  </style>
+  
+/* V2：對應全站 tokens */
+body > footer:not([data-shell-footer]) { width: min(var(--wrap), calc(100% - 48px)); margin: 24px auto 0; font-size: var(--fs-sm); color: var(--ink-2); }
+body > footer:not([data-shell-footer]) a { color: var(--accent); }
+:root { --bg-page: var(--paper); --bg-surface: var(--surface); --bg-subtle: var(--surface-2); --bg-inset: var(--surface-2); --border-default: var(--rule); --ink-primary: var(--ink); --ink-secondary: var(--ink-2); --ink-muted: var(--ink-2); --amber-accent: var(--warn); --radius-md: var(--radius); --radius-lg: var(--radius-lg); --shadow-sm: none; --shadow-md: none; }
+body { background: var(--paper); font-family: var(--font-sans); }
+main { max-width: none; width: min(var(--wrap), calc(100% - 48px)); margin: 0 auto; padding: 0 0 24px; }
+.kpi-grid { margin-top: var(--sp-6); }
+.kpi-card { border: 1px solid var(--rule); border-radius: var(--radius-lg); box-shadow: none; }
+.kpi-card:hover { transform: none; box-shadow: none; }
+.kpi-value { font-family: var(--font-serif); color: var(--ink); }
+.kpi-label span + span { background: var(--surface-2); color: var(--ink-2); padding: 1px 8px; border-radius: var(--radius-sm); font-size: var(--fs-xs); font-weight: 600; }
+.tabs-nav { display: flex; gap: var(--sp-5); border: 0; border-bottom: 1px solid var(--rule); background: none; padding: 0; border-radius: 0; overflow-x: auto; scrollbar-width: none; }
+.tab-btn, .tab-btn.active, .tab-btn.active.atom-tab { flex: none; padding: 10px 2px; min-height: 44px; margin-bottom: -1px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; box-shadow: none; color: var(--ink-2); font: 600 var(--fs-sm)/1.4 var(--font-sans); white-space: nowrap; cursor: pointer; }
+.tab-btn:hover { background: none; color: var(--ink); }
+.tab-btn.active, .tab-btn.active.atom-tab { color: var(--accent); border-bottom-color: var(--accent); }
+.atom-banner { border: 0; border-left: 3px solid var(--olive); border-radius: 0 var(--radius) var(--radius) 0; background: var(--olive-soft); }
+.atom-banner-title { color: var(--ink); }
+.atom-banner-desc { color: var(--ink-2); }
+.chart-panel, .table-container, .playground-box { border: 1px solid var(--rule); border-radius: var(--radius-lg); box-shadow: none; }
+.panel-title > span:first-child { background: var(--olive-soft) !important; color: var(--olive) !important; font-weight: 700; }
+.api-btn { background: var(--ink); border-radius: var(--radius); }
+.api-btn:hover { background: var(--accent); }
+@media (max-width: 640px) { main { width: calc(100% - 32px); } .tabs-nav { gap: var(--sp-4); } }
+</style>
 <link href="css/tokens.css?v=20261111" rel="stylesheet"/><link href="css/components.css?v=20261111" rel="stylesheet"/><link href="css/shell.css?v=20261111" rel="stylesheet"/>
 </head>
 <body data-nav="workshop" data-workshop><script src="js/site-config.js?v=20261111"></script><script src="js/site-shell.js?v=20261111"></script>
 
-<!-- 頂部官方入口指示橫條 (明確指示 e-Stat 網址與直連管道) -->
-<div class="official-portal-strip">
-  <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-    <span>🏛️ 日本總務省統計局官方資料門戶：</span>
-    <a href="https://www.e-stat.go.jp" target="_blank" class="portal-link-badge">
-      <span class="portal-url-tag">https://www.e-stat.go.jp</span>
-      <span>(點擊在新分頁開啟官網) ↗</span>
-    </a>
-  </div>
-  <div style="display: flex; gap: 12px; align-items: center;">
-    <span style="opacity: 0.85;">API Base: api.e-stat.go.jp/rest/3.0/app</span>
-    <button onclick="copyPortalUrl()" style="background: rgba(255,255,255,0.2); border: none; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">複製官網網址</button>
-  </div>
-</div>
-
-<header>
-  <div class="header-inner">
-    <div>
-      <div class="header-badge"><span class="dot"></span> API 連線正常 · e-Stat v3.0 官方直連</div>
-      <h1>日本政府統計 e-Stat 實戰儀表板</h1>
-      <p class="header-desc">半世紀（1975–2024）人口結構演變與 Data Atoms 數據原子矩陣</p>
-    </div>
-    <div class="nav-actions">
-      <a href="student_data_analyst_workflow.html" class="nav-btn primary">🎓 學員工作流指南</a>
-      <a href="estat_catalog_and_research_guide.html" class="nav-btn">🗺️ 17領域研究指南</a>
-      <a href="estat_api_tutorial_simulator.html" class="nav-btn">🎥 API申請錄影教學</a>
-      <a href="data_atoms.html" class="nav-btn" target="_blank">⚛️ Data Atoms Studio</a>
-    </div>
-  </div>
-</header>
-
-<main>
+<main id="main">
+  <p class="wk-crumbs" style="margin-top:24px"><a href="index.html">首頁</a> ／ <a href="workshop.html">工作坊</a> ／ 日本人口儀表板範例</p>
+  <header class="page-hero">
+    <p class="eyebrow">參考資料・範例</p>
+    <h1>日本人口儀表板範例</h1>
+    <p class="lead">半世紀（1975–2024）人口結構演變與 Data Atoms 數據原子矩陣</p>
+    <p class="hero-meta"><span>資料來源：<a href="https://www.e-stat.go.jp" target="_blank" rel="noopener">日本總務省統計局 e-Stat ↗</a></span><span>API 端點：<code>api.e-stat.go.jp/rest/3.0/app</code></span></p>
+    <div class="page-hero-actions"><a class="btn btn-primary" href="data_atoms.html">開啟 Data Atoms 工作台 →</a></div>
+  </header>
   <!-- KPI 摘要卡片 -->
   <section class="kpi-grid">
     <div class="kpi-card">
       <div class="kpi-label">
         <span>2024 全國總人口</span>
-        <span style="color: var(--clay-danger)">▼ 連續15年遞減</span>
+        <span>▼ 連續15年遞減</span>
       </div>
       <div class="kpi-value" id="kpiTotalPop">123,802,000</div>
       <div class="kpi-sub">較歷史峰值（2008年 1.28億）減少約 428 萬人</div>
@@ -472,7 +344,7 @@
     <div class="kpi-card">
       <div class="kpi-label">
         <span>65歲以上高齡化率</span>
-        <span style="color: var(--clay-danger)">▲ 創歷史新高</span>
+        <span>▲ 創歷史新高</span>
       </div>
       <div class="kpi-value" id="kpiElderlyRatio">29.27%</div>
       <div class="kpi-sub">高齡人口達 <strong>3,624 萬人</strong>（每 3.4 人即有 1 位長者）</div>
@@ -483,7 +355,7 @@
         <span>全日本最高齡縣市</span>
         <span>秋田縣</span>
       </div>
-      <div class="kpi-value" style="color: var(--clay-danger);">39.46%</div>
+      <div class="kpi-value">39.46%</div>
       <div class="kpi-sub">秋田總人口 90.3 萬人，每 10 人就有近 4 位長者</div>
     </div>
 
@@ -492,18 +364,18 @@
         <span>全日本最年輕都縣</span>
         <span>東京都</span>
       </div>
-      <div class="kpi-value" style="color: var(--metro-blue);">22.68%</div>
+      <div class="kpi-value">22.68%</div>
       <div class="kpi-sub">東京總人口 1,418 萬人，持續受青年人口流入支撐</div>
     </div>
   </section>
 
   <!-- 導航切換 (整合 Data Atoms 數據原子) -->
   <div class="tabs-nav">
-    <button class="tab-btn active atom-tab" onclick="switchTab(event, 'atoms')">⚛️ Data Atoms 數據原子矩陣 (整合視圖)</button>
-    <button class="tab-btn" onclick="switchTab(event, 'trends')">📈 50年人口趨勢分析</button>
-    <button class="tab-btn" onclick="switchTab(event, 'prefectures')">🗺️ 47都道府縣深度對比</button>
-    <button class="tab-btn" onclick="switchTab(event, 'structure')">👥 年齡結構與少子化</button>
-    <button class="tab-btn" onclick="switchTab(event, 'playground')">⚡ e-Stat API 實時測試台</button>
+    <button class="tab-btn active atom-tab" onclick="switchTab(event, 'atoms')">Data Atoms 數據原子矩陣 (整合視圖)</button>
+    <button class="tab-btn" onclick="switchTab(event, 'trends')">50年人口趨勢分析</button>
+    <button class="tab-btn" onclick="switchTab(event, 'prefectures')">47都道府縣深度對比</button>
+    <button class="tab-btn" onclick="switchTab(event, 'structure')">年齡結構與少子化</button>
+    <button class="tab-btn" onclick="switchTab(event, 'playground')">e-Stat API 實時測試台</button>
   </div>
 
   <!-- 【全新核心】：整合 Data Atoms 概念的日本資料應用 -->
@@ -511,15 +383,13 @@
     <div class="atom-banner">
       <div>
         <div class="atom-banner-title">
-          <span>⚛️ Data Atoms（數據原子）化合分析法</span>
+          <span>Data Atoms（數據原子）化合分析法</span>
         </div>
         <div class="atom-banner-desc">
           正如化學分子由基礎原子構成，任何複雜的國家統計也能拆解為基礎的<strong>「數據原子 (Data Atoms)」</strong>。透過離散體量、時序趨勢、結構佔比、相關分佈與多維畫像，我們能立體解讀日本少子高齡化的全貌！
         </div>
       </div>
-      <div>
-        <a href="data_atoms.html" target="_blank" style="background: #ea580c; color: #fff; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 6px; text-decoration: none; display: inline-block;">開啟 Data Atoms 工作台 ↗</a>
-      </div>
+      
     </div>
 
     <!-- 5大原子視覺化切換 -->
@@ -529,7 +399,7 @@
         <div class="panel-header">
           <div>
             <div class="panel-title">
-              <span style="background: #ea580c; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 04 · 相關矩陣</span>
+              <span style="font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 04 · 相關矩陣</span>
               都道府縣「總人口規模 vs 高齡化率」散點分佈
             </div>
             <div class="panel-desc">觀察極端負相關：人口越少、偏遠之縣市，高齡化率越逼近 40%</div>
@@ -543,7 +413,7 @@
         <div class="panel-header">
           <div>
             <div class="panel-title">
-              <span style="background: #ea580c; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 05 · 多維畫像</span>
+              <span style="font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 05 · 多維畫像</span>
               極值地區多維特徵對比 (Radar)
             </div>
             <div class="panel-desc">東京都（都市青年吸力）vs 秋田縣（極限老齡化）vs 全國基準</div>
@@ -561,7 +431,7 @@
         <div class="panel-header">
           <div>
             <div class="panel-title">
-              <span style="background: #2c548a; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 02 · 時序趨勢</span>
+              <span style="font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 02 · 時序趨勢</span>
               日本總人口 vs 65歲以上高齡化率（1975–2024）
             </div>
             <div class="panel-desc">雙軸聯動分析：人口總量下行與高齡佔比飆升之「剪刀差」</div>
@@ -589,7 +459,7 @@
         <div class="panel-header">
           <div>
             <div class="panel-title">
-              <span style="background: #2c548a; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 01 · 離散體量</span>
+              <span style="font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 01 · 離散體量</span>
               2024 年日本各都道府縣人口規模 Top 15
             </div>
             <div class="panel-desc">首都圈與關西圈集中效應極其顯著</div>
@@ -628,7 +498,7 @@
       <div class="panel-header">
         <div>
           <div class="panel-title">
-            <span style="background: #2c548a; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 03 · 結構佔比</span>
+            <span style="font-size: 11px; padding: 2px 6px; border-radius: 4px;">原子 03 · 結構佔比</span>
             日本三大年齡組百分比結構變遷（1975–2024）
           </div>
           <div class="panel-desc">幼年人口（0-14）、生產工作年齡人口（15-64）與老年人口（65+）之消長</div>
@@ -643,7 +513,7 @@
     <div class="playground-box">
       <div class="playground-header">
         <div>
-          <h2 style="font-size: 18px; margin-bottom: 4px;">⚡ e-Stat API 實時端點測試實驗台</h2>
+          <h2 style="font-size: 18px; margin-bottom: 4px;">e-Stat API 實時端點測試實驗台</h2>
           <p style="font-size: 13px; color: #9ca3af;">直連日本統計局官方資料庫 (https://api.e-stat.go.jp)，即時查看原始 JSON 回應</p>
         </div>
         <span style="background: #065f46; color: #34d399; font-size: 11px; padding: 4px 10px; border-radius: 12px; font-weight: 600;">CORS / JSONP 直連模式</span>

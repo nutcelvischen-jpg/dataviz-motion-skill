@@ -3,12 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>系統架構實戰圖解：GitHub Pages ＋ Google Apps Script 無伺服器 AI 應用開發</title>
+  <title>系統架構：GitHub Pages + Google Apps Script｜大語言模型學習地圖</title>
   <meta name="description" content="零主機成本、安全隔離 API 金鑰、支援多模態問答與 Google Sheet 試算表持久化的現代輕量級 AI 應用系統架構。">
 
   <!-- Typography & Fonts -->
   <link rel="stylesheet" href="css/learning.css?v=20261111">
-  <link rel="stylesheet" href="css/dose_mobile.css?v=20261111">
 
   <style>
     /* diagram-design editorial design tokens */
@@ -31,7 +30,7 @@
       --dd-green-border: #86efac;
 
       --font-serif: "Instrument Serif", Georgia, serif;
-      --font-sans: "Inter", "Noto Sans TC", -apple-system, sans-serif;
+      --font-sans: var(--font-sans), "Noto Sans TC", -apple-system, sans-serif;
       --font-mono: "DM Mono", Menlo, Monaco, monospace;
     }
 
@@ -560,37 +559,25 @@
       flex-wrap: wrap;
       gap: 1rem;
     }
-  </style>
+  
+/* V2 */
+@media (max-width: 768px) { html, body { overflow-x: hidden; max-width: 100vw; } }
+.arch-container > .wk-crumbs { margin: 24px 0 0; }
+.arch-container > .page-hero { padding-top: var(--sp-5); margin-bottom: var(--sp-6); }
+.arch-tags { gap: 8px 10px; }
+.arch-tags .tag { white-space: normal; }
+</style>
 <link href="css/tokens.css?v=20261111" rel="stylesheet"/><link href="css/components.css?v=20261111" rel="stylesheet"/><link href="css/shell.css?v=20261111" rel="stylesheet"/>
 </head>
 <body data-nav="workshop" data-workshop><script src="js/site-config.js?v=20261111"></script><script src="js/site-shell.js?v=20261111"></script>
 
   <div class="arch-container">
-    <!-- Breadcrumb navigation -->
-    <nav class="arch-nav" aria-label="麵包屑導覽">
-      <a href="index.html">首頁</a>
-      <span>/</span>
-      <a href="curriculum_1105_workflow.html">11/5 實戰課程流程</a>
-      <span>/</span>
-      <span style="color: var(--dd-ink);">系統架構圖解</span>
-    </nav>
-
-    <!-- Header Banner -->
-    <header class="arch-header">
-      <span class="arch-eyebrow">SYSTEM ARCHITECTURE · ZERO SERVERLESS</span>
-      <h1>前端 GitHub ＋ 後端 Google Apps Script 架構解密</h1>
-      <p class="arch-lead">
-        這套架構是專為學生、獨立開發者與教學實戰設計的<strong>「完全免費、零維運主機、金鑰永久安全隔離」</strong>的現代 AI 全端解決方案。前端部署於 GitHub Pages，後端利用 Google Apps Script (GAS) 充當安全中繼代理，對接 OpenRouter 大模型並在 Google Sheet 寫入即時對話審計日誌。
-      </p>
-
-      <div class="badge-bar">
-        <span class="badge-item green">🌱 零主機費用 ($0 / 月)</span>
-        <span class="badge-item orange">🛡️ API Key 絕不落地外洩</span>
-        <span class="badge-item blue">⚡ 免管 Linux & 免維護 Docker</span>
-        <span class="badge-item slate">📸 支援多模態圖表截圖問答</span>
-        <span class="badge-item green">📊 Google Sheet 免費試算表日誌庫</span>
-        <a href="openrouter_architecture.html" class="badge-item orange" style="text-decoration:none; font-weight:700;">🪐 觀看 OpenRouter 三階資料流動態圖 ↗</a>
-      </div>
+    <p class="wk-crumbs"><a href="index.html">首頁</a> ／ <a href="workshop.html">工作坊</a> ／ 系統架構</p>
+    <header class="page-hero">
+      <p class="eyebrow">參考資料</p>
+      <h1>系統架構：GitHub Pages + Google Apps Script</h1>
+      <p class="lead">這套架構是專為學生、獨立開發者與教學實戰設計的<strong>「完全免費、零維運主機、金鑰永久安全隔離」</strong>的現代 AI 全端解決方案。前端部署於 GitHub Pages，後端利用 Google Apps Script (GAS) 充當安全中繼代理，對接 OpenRouter 大模型並在 Google Sheet 寫入即時對話審計日誌。</p>
+      <p class="hero-meta arch-tags"><span class="tag tag-muted">零主機費用 ($0 / 月)</span><span class="tag tag-muted">API Key 絕不落地外洩</span><span class="tag tag-muted">免管 Linux & 免維護 Docker</span><span class="tag tag-muted">支援多模態圖表截圖問答</span><span class="tag tag-muted">Google Sheet 免費試算表日誌庫</span><a class="link-arrow" href="openrouter_architecture.html">觀看 OpenRouter 三階資料流動態圖</a></p>
     </header>
 
     <!-- Architecture Diagram Box (Dark Terminal Edition with Dynamic Motion) -->
@@ -634,7 +621,7 @@
 
       <div class="diagram-scroll-box">
         <!-- SVG Architecture Diagram - Dark Terminal Mode with Moving Packets & Dynamic Loading Bars -->
-        <svg id="archSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 580" style="background:#090d13; font-family:'Inter', 'Noto Sans TC', sans-serif;">
+        <svg id="archSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 580" style="background:#090d13; font-family:var(--font-sans), 'Noto Sans TC', sans-serif;">
           <defs>
             <!-- Glow Filters for Moving Packet Balls -->
             <filter id="glow-cyan" x="-60%" y="-60%" width="220%" height="220%">
@@ -1381,9 +1368,7 @@ function doGet(e) {
 
     <!-- Bottom Navigation Footer -->
     <div class="page-footer-nav" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
-      <a href="curriculum_1105_workflow.html" class="button" style="background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; text-decoration:none; padding:0.6rem 1.25rem; border-radius:6px; font-weight:600;">
-        ← 返回 11/5 實戰課程流程藍圖
-      </a>
+      <a href="workshop.html" class="btn btn-secondary">← 回到工作坊總覽</a>
       <a href="openrouter_architecture.html" class="button" style="background:#0284c7; color:#ffffff; border:1px solid #0369a1; text-decoration:none; padding:0.6rem 1.25rem; border-radius:6px; font-weight:600;">
         🪐 進入 OpenRouter 三階資料流動態圖 →
       </a>
