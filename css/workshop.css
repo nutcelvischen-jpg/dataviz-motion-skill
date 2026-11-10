@@ -46,3 +46,12 @@ h1,h2,h3,p{margin-top:0}
   .wk-steps { grid-template-columns: 1fr; }
   .wk-actions { flex-direction: column; align-items: flex-start; }
 }
+
+/* V2 */
+.wk-steps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.wk-note { margin: -8px 0 20px; color: var(--ink-2); }
+.wk-after { margin: 24px 0 0; }
+.wk-links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 20px; margin: 8px 0 0 !important; }
+.wk-links .wk-folder { font-size: var(--fs-sm); color: var(--ink-2); }
+@media (max-width: 820px) { .wk-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .wk-steps { grid-template-columns: 1fr; } }

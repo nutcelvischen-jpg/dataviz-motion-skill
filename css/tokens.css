@@ -48,3 +48,10 @@ html { scroll-padding-top: calc(var(--header-h) + 16px); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* V2：圖表色與程式碼區塊色 */
+:root {
+  --chart-1: #873b29; --chart-2: #415c49; --chart-3: #9a6a00;
+  --chart-4: #4a5a6a; --chart-5: #b98a7c; --chart-6: #8fa696;
+  --code-bg: #1f2320; --code-ink: #f1efe6;
+}

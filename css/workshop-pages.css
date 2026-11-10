@@ -26,3 +26,20 @@ body { background: var(--paper); font-family: var(--font-sans); }
 .container { max-width: var(--wrap); }
 table { max-width: 100%; }
 @media (max-width: 640px) { .container table { display: block; overflow-x: auto; } }
+
+/* ===== V2：工作坊內頁共用版面 ===== */
+.wp-main { padding: 0 0 24px; }
+.wp-wrap { width: min(var(--wrap-catalog), calc(100% - 48px)); margin: 0 auto; }
+.wp-wrap > .wk-crumbs { margin: 24px 0 0; }
+.wp-wrap > .wk-crumbs + .page-hero { padding-top: var(--sp-5); }
+.wp-intro { margin: var(--sp-6) 0 0; max-width: 46em; color: var(--ink-2); font-size: 15px; line-height: 1.75; }
+.wp-note { margin: var(--sp-4) 0 0; font-size: var(--fs-sm); color: var(--ink-2); }
+.wp-linkrow { list-style: none; margin: var(--sp-6) 0 0; padding: var(--sp-4) 0 0; border-top: 1px solid var(--rule); display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.skill-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--sp-4); }
+.skill-card { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: var(--sp-4) var(--sp-5); }
+.skill-card .tag { white-space: normal; }
+.skill-card h3 { margin: 0; font: 700 var(--fs-md)/1.35 var(--font-mono); overflow-wrap: anywhere; }
+.skill-card p { margin: 0; font-size: var(--fs-sm); line-height: 1.65; color: var(--ink-2); }
+.skill-card .skill-out { font-size: var(--fs-xs); flex: 1; }
+.skill-card code { font: .92em var(--font-mono); overflow-wrap: anywhere; }
+@media (max-width: 640px) { .wp-wrap { width: calc(100% - 32px); } }

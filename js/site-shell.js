@@ -2,6 +2,7 @@
 (function () {
   'use strict';
   var cfg = window.SITE_CONFIG || { workshop: {}, steps: [], references: [] };
+  var site = cfg.site || { name: '大語言模型學習地圖', nameTop: '大語言模型', nameMain: '學習地圖', mark: '學', tagline: '理解，然後動手做。' };
   var script = document.currentScript;
   var src = script ? script.getAttribute('src') : 'js/site-shell.js';
   var base = src.replace(/js\/site-shell\.js.*$/, '');
@@ -28,13 +29,13 @@
     ['learn', 'index.html#learning-map', '跟著學'],
     ['concepts', 'encyclopedia.html', '查概念'],
     ['lab', 'lab.html', '做實驗'],
+    ['videos', 'videos.html', '看影片'],
     ['workshop', 'workshop.html', '工作坊']
   ];
 
   function buildHeader() {
     if (shell === 'app') {
-      var next = cfg.steps[step] ? '' : '';
-      return el('<header class="site-header is-app" data-shell-header><div class="sh-inner">' +
+            return el('<header class="site-header is-app" data-shell-header><div class="sh-inner">' +
         '<div class="sh-sub"><a href="' + base + 'workshop.html">← 工作坊</a><span class="tag tag-olive">步驟 ' + step + '／' + cfg.steps.length + '</span></div>' +
         '<span class="sh-title">' + esc(document.body.getAttribute('data-title') || document.title) + '</span>' +
         '<div class="sh-sub">' + (document.body.getAttribute('data-manual') ? '<a class="sh-manual" href="' + esc(document.body.getAttribute('data-manual')) + '" target="_blank" rel="noopener">使用說明 ↗</a>' : '') +
@@ -45,15 +46,15 @@
     }).join('');
     var tools = isWorkshop ? '<div class="sh-tools"><button type="button" class="sh-present" aria-pressed="false">投影模式</button></div>' : '';
     return el('<header class="site-header" data-shell-header><div class="sh-inner">' +
-      '<a class="sh-brand" href="' + base + 'index.html" aria-label="大語言模型學習地圖首頁"><span class="sh-mark" aria-hidden="true">學</span><span>大語言模型<br><strong>學習地圖</strong></span></a>' +
+      '<a class="sh-brand" href="' + base + 'index.html" aria-label="' + esc(site.name) + '首頁"><span class="sh-mark" aria-hidden="true">' + esc(site.mark) + '</span><span>' + esc(site.nameTop) + '<br><strong>' + esc(site.nameMain) + '</strong></span></a>' +
       '<nav class="sh-nav" aria-label="主要導覽">' + links + '</nav>' + tools + '</div></header>');
   }
 
   function buildStepper() {
     var steps = cfg.steps, cur = step - 1;
     var seen = [];
-    try { seen = JSON.parse(sget('workshop_steps_seen') || '[]'); } catch (e) { seen = []; }
-    if (seen.indexOf(step) < 0) { seen.push(step); sset('workshop_steps_seen', JSON.stringify(seen)); }
+    try { seen = JSON.parse(sget('workshop_steps_seen_v2') || '[]'); } catch (e) { seen = []; }
+    if (seen.indexOf(step) < 0) { seen.push(step); sset('workshop_steps_seen_v2', JSON.stringify(seen)); }
     var lis = steps.map(function (s, i) {
       var done = seen.indexOf(i + 1) >= 0 && i !== cur;
       return '<li><a href="' + base + s.file + '"' + (i === cur ? ' aria-current="step"' : '') + '><span class="ws-num">' + (done ? '✓' : (i + 1)) + '</span>' + esc(s.title) + '</a></li>';
@@ -83,12 +84,12 @@
   function buildFooter() {
     var w = cfg.workshop || {};
     return el('<footer class="site-footer" data-shell-footer><div class="sf-inner">' +
-      '<div><p class="sf-brand">大語言模型學習地圖</p><p>理解，然後動手做。</p></div>' +
+      '<div><p class="sf-brand">' + esc(site.name) + '</p><p>' + esc(site.tagline) + '</p></div>' +
       '<div><h2>快速連結</h2><ul>' +
       '<li><a href="' + base + 'index.html#learning-map">六站學習路線</a></li>' +
       '<li><a href="' + base + 'encyclopedia.html">概念目錄</a></li>' +
       '<li><a href="' + base + 'lab.html">互動實驗</a></li>' +
-      '<li><a href="' + base + 'videos.html">影片系列</a></li>' +
+      '<li><a href="' + base + 'videos.html">看影片</a></li>' +
       '<li><a href="' + base + 'workshop.html">工作坊</a></li></ul></div>' +
       '<div><h2>授課資訊</h2><p>' + esc(w.affiliation || '') + '</p><p>' + esc(w.instructor || '') + '</p>' +
       '<p>教育部「AI驅動金融商管科技與技職人才培育計畫」推薦教材</p>' +

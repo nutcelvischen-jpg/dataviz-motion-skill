@@ -69,7 +69,7 @@ html.present .sh-inner, html.present .ws-inner, html.present .step-pager { width
   html { scroll-padding-top: 16px; }
   .sh-inner { width: calc(100% - 32px); height: auto; display: block; padding-top: 10px; }
   .sh-brand { min-height: 42px; }
-  .sh-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-top: 4px; }
+  .sh-nav { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; margin-top: 4px; }
   .sh-nav a { text-align: center; font-size: 13px; min-height: 44px; display: flex; align-items: center; justify-content: center; padding: 0; }
   .sh-tools { margin: 6px 0; }
   .is-app .sh-inner { display: flex; height: 44px; padding: 0; }

@@ -2,28 +2,35 @@
   'use strict';
   var cfg = window.SITE_CONFIG || {};
   var w = cfg.workshop || {};
+  var steps = cfg.steps || [];
   var tag = document.querySelector('[data-workshop-date-tag]');
   if (tag) tag.textContent = w.dateLabel || '';
 
-  var purposes = [
-    '先看今天用哪些工具、Skill 與 API，再往下走。',
-    '從官方數據到 Tableau-like 儀表板的完整工作流。',
-    '一步步申請 e-Stat 金鑰，並避開常見的設定陷阱。',
-    '17 個領域、10 種圖表選型，從問題找到資料。',
-    '拖曳欄位組圖、分面、篩選，做出自己的儀表板。'
-  ];
   var cards = document.getElementById('step-cards');
-  if (cards && cfg.steps) {
-    cards.innerHTML = cfg.steps.map(function (s, i) {
-      return '<li><a class="card" href="' + s.file + '"><span class="num">' + (i + 1) + '</span><strong>' + s.title + '</strong><p>' + purposes[i] + '</p><span class="go">開始 →</span></a></li>';
+  if (cards) {
+    cards.innerHTML = steps.map(function (s, i) {
+      return '<li><a class="card" href="' + s.file + '"><span class="num">' + (i + 1) + '</span><strong>' + s.title + '</strong><p>' + (s.goal || '') + '</p><span class="go">開始 →</span></a></li>';
     }).join('');
   }
+  var first = document.querySelector('[data-first-step]');
+  if (first && steps[0]) first.setAttribute('href', steps[0].file);
+
+  /* 步驟若標了 module，就在對應時段補上「本時段實作」連結 */
+  document.querySelectorAll('#timeline [data-module]').forEach(function (li) {
+    var m = parseInt(li.getAttribute('data-module'), 10);
+    var mine = steps.filter(function (s) { return s.module === m; });
+    var box = li.querySelector('.wk-links');
+    if (!mine.length || !box) return;
+    mine.forEach(function (s) {
+      var a = document.createElement('a');
+      a.className = 'link-arrow'; a.href = s.file; a.textContent = '本時段實作：' + s.title;
+      box.insertBefore(a, box.querySelector('.wk-folder'));
+    });
+  });
+
   var refs = document.getElementById('ref-list');
-  var extra = [
-    { href: 'student_data_analyst_workflow.html#skills-catalog', title: 'Skill 清單（27 Skill 與 3 MCP）' }
-  ];
   if (refs && cfg.references) {
-    refs.innerHTML = cfg.references.concat(extra).map(function (r) {
+    refs.innerHTML = cfg.references.map(function (r) {
       var href = r.href || r.file, ext = r.href && /^https?:/.test(r.href);
       return '<li><a href="' + href + '"' + (ext ? ' target="_blank" rel="noopener"' : '') + '><span>' + r.title.replace(' ↗', '') + '</span><small>' + (ext ? '外部連結 ↗' : '→') + '</small></a></li>';
     }).join('');
