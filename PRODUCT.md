@@ -28,7 +28,7 @@ web
 
 ## Evidence on Hand
 
-`LLM_LEARNING_REDESIGN_SPEC.md` 定義六站內容及驗收方式；`encyclopedia.html`、`lab.html` 與工作坊看板提供既有教材。
+`docs/specs/LLM_LEARNING_REDESIGN_SPEC.md` 定義六站內容及驗收方式；`encyclopedia.html`、`lab.html` 與工作坊看板提供既有教材。
 
 ## Product Principles
 

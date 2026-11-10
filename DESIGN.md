@@ -34,7 +34,7 @@
 
 ## 2026-11-10 整併後新增的約定
 
-整個 repo（學習地圖、概念、實驗、工作坊）共用同一套設計，細節見 `SITE_REDESIGN_SPEC.md`。
+整個 repo（學習地圖、概念、實驗、工作坊）共用同一套設計，細節見 `docs/specs/SITE_REDESIGN_SPEC.md`。
 
 - **tokens**：`css/tokens.css` 在各頁 CSS 之後載入，統一覆蓋舊變數（含 `--muted`、`--serif` 等別名）。新增顏色一律用 tokens，不再寫死色碼；不使用藍色與紫色漸層。
 - **版型**：頁首、頁尾由 `js/site-shell.js` 注入，頁面只需在 `<body>` 設 `data-nav`（learn／concepts／lab／workshop）。主導覽四項：跟著學、查概念、做實驗、工作坊。工具頁用 `data-shell="app"`（44px 精簡列，不放頁尾）。
@@ -44,3 +44,17 @@
 - **投影模式**：工作坊頁右上角切換，或加 `?present=1`。
 - **媒體**：根目錄不放 mp4／wav，放 `media/`；已存在於 `videos/` 的檔案直接引用 `videos/`。
 - **驗收**：`python3 scripts/qa_site.py` 必須全部通過。
+
+## 2026-11-10 第二輪（V2）新增的約定
+
+規格見 `docs/specs/SITE_REDESIGN_SPEC_V2.md`。與上一節衝突時以這一節為準。
+
+- **主導覽五項**：跟著學、查概念、做實驗、看影片、工作坊（`data-nav` 多一個 `videos`）。
+- **資料分析實作路線是 4 步**（`data-step="1..4"`）：看懂工作流 → 申請 e-Stat API → 選題 → 做儀表板。全日課程架構圖、Skill 與 MCP 清單（`skills.html`）屬於參考資料，不算步驟。步驟若要對應時程的 Module，在 `js/site-config.js` 的 `steps[n].module` 填 1–4。
+- **頁面標題區**一律用 `.page-hero`（`.eyebrow` → `h1` → `.lead` → 最多一顆 `.btn-primary` 加一個 `.link-arrow`）。h1 要短，細節放 `.lead`。
+- **新元件**（`css/components.css`）：`.page-hero`、`.eyebrow`、`.section`、`.toc-chips`、`.phase`／`.phase-num`、`.stat`、`.tabs`、`.scroll-hint`、`.btn-sm`。工作坊內頁版面在 `css/workshop-pages.css`（`.wp-wrap`、`.skill-grid`）。
+- **影片**：`videos.html` 是卡片牆，原始碼不放 `<video>`；點卡片才由 `js/videos.js` 在 `<dialog>` 建立播放器。卡片 id（`#video-ep0` 等）就是分享用的網址錨點。
+- **不要再用**：`pharmacy-label`、`mono-label`、`plastic-tray`、`tear-stub`、`btn--*` 這些舊 class；漸層色塊；英文等寬小標（`step 01 / blueprint` 這類）；`css/dose_mobile.css`（已刪除）。
+- **數位乩童**：只在影片頁出現。
+- **工具頁**（Data Atoms）在 900px 以下先顯示提示卡，使用者按「仍要在這裡開啟」才顯示工具。
+- **圖表色**：`--chart-1`…`--chart-6`（`css/tokens.css`）供新圖表使用；既有圖表的資料配色未更動。

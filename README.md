@@ -5,12 +5,13 @@
 | 你是 | 從這裡開始 |
 | :--- | :--- |
 | 想自學 LLM 基礎 | [`index.html`](index.html)：六站學習路線，進度存在瀏覽器 |
-| 工作坊學員或講師 | [`workshop.html`](workshop.html)：課表、5 步驟資料分析實作、[學員看板](00_課程手冊與即時看板/WORKSHOP_BOARD.html) |
+| 工作坊學員或講師 | [`workshop.html`](workshop.html)：課表、4 步資料分析實作路線、[學員看板](00_課程手冊與即時看板/WORKSHOP_BOARD.html) |
 | 只想查名詞 | [`encyclopedia.html`](encyclopedia.html)：可搜尋的概念目錄 |
+| 想先看短片 | [`videos.html`](videos.html)：60 秒 AI 盲點、數位乩童法器篇 |
 
 本機預覽：`python3 scripts/llm_preview.py`，再開啟 http://127.0.0.1:8765/index.html 。
 
-設計約定見 [`DESIGN.md`](DESIGN.md)，整併規格見 [`SITE_REDESIGN_SPEC.md`](SITE_REDESIGN_SPEC.md)，待決事項見 [`docs/REDESIGN_OPEN_QUESTIONS.md`](docs/REDESIGN_OPEN_QUESTIONS.md)。
+設計約定見 [`DESIGN.md`](DESIGN.md)，重整規格見 [`docs/specs/`](docs/specs/)（最新為 `SITE_REDESIGN_SPEC_V2.md`），待決事項見 [`docs/REDESIGN_OPEN_QUESTIONS.md`](docs/REDESIGN_OPEN_QUESTIONS.md)。
 
 ---
 
